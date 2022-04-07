@@ -1,5 +1,7 @@
 BLAST_databases/*
 genome_files/*
+.idea/*
+scripts/__pycache__/*
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/misc.xml
 .idea/modules.xml
