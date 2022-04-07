@@ -1,4 +1,0 @@
-wget https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_set/chm13v2.0.fa.gz --directory-prefix ../genome_files
-python 1.0.get_all_human_gRNA.py --fastagz chm13v2.0.fa.gz
-python circos.get.gRNAnum.py --dir gRNA.tab.gz --tab chm13v2.0.fa.gz.out.tab
-python 1.1.split4mapping.py --dir gRNA.tab.gz --tab chm13v2.0.fa.gz.out.tab
