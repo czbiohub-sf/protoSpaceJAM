@@ -1,14 +1,2 @@
-BLAST_databases/*
-genome_files/*
 .idea/*
 scripts/__pycache__/*
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/protospaceXS.iml
-.idea/vcs.xml
-scripts/__pycache__/classes.cpython-39.pyc
-scripts/__pycache__/fetch_ensembl.cpython-39.pyc
-scripts/__pycache__/gRNA_search.cpython-39.pyc
-scripts/__pycache__/scoring_routine.cpython-39.pyc
-scripts/__pycache__/utils.cpython-39.pyc
