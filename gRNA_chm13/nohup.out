@@ -1,1 +1,26 @@
 chr:	chr1	length:	248387328	26561560
+chr:	chr2	length:	242696752	24356686
+chr:	chr3	length:	201105948	19443163
+chr:	chr4	length:	193574945	17330513
+chr:	chr5	length:	182045439	17517465
+chr:	chr6	length:	172126628	16666573
+chr:	chr7	length:	160567428	16436701
+chr:	chr8	length:	146259331	14592528
+chr:	chr9	length:	150617247	17488903
+chr:	chr10	length:	134758134	14386695
+chr:	chr11	length:	135127769	14487385
+chr:	chr12	length:	133324548	13728506
+chr:	chr13	length:	113566686	10356639
+chr:	chr14	length:	101161492	10582890
+chr:	chr15	length:	99753195	11137046
+chr:	chr16	length:	96330374	11244631
+chr:	chr17	length:	84276897	10672680
+chr:	chr18	length:	80542538	7735334
+chr:	chr19	length:	61707364	8525886
+chr:	chr20	length:	66210255	7818884
+chr:	chr21	length:	45090682	4872593
+chr:	chr22	length:	51324926	6645005
+chr:	chrX	length:	154259566	14935557
+chr:	chrY	length:	62460029	5866093
+chr:	chrM	length:	16569	2191
+[[1mGet all gRNA[0m][[1;37mINFO[0m]  finished in 227.40 min, processed 25 chromosomes, found 323392107 gRNAs 
