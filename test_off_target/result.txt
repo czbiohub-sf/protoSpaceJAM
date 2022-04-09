@@ -1,0 +1,4 @@
+total guide count: 179
+
+bwa finished in 0.48 min (0:00:29.061973 sec)
+bowtie finished in 12.28 min (0:12:17.666913 sec)
