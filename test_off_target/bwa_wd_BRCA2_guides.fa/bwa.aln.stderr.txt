@@ -1,0 +1,6 @@
+[bwa_aln_core] calculate SA coordinate... 13.03 sec
+[bwa_aln_core] write to the disk... 0.02 sec
+[bwa_aln_core] 179 sequences have been processed.
+[main] Version: 0.7.15-r1140
+[main] CMD: /home/duo.peng/github_repos/protospaceXS/test_off_target/bin/Linux/bwa aln -o 0 -m 2000000.0000000002 -n 4 -k 4 -N -l 20 /home/duo.peng/github_repos/protospaceXS/genome_files/indexes_bwa/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa /home/duo.peng/github_repos/protospaceXS/test_off_target/BRCA2_guides.fa
+[main] Real time: 15.141 sec; CPU: 15.117 sec

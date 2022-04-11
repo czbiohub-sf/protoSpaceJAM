@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+"""
+ Copyright 2014, Ben Langmead <langmea@cs.jhu.edu>
+
+ This file is part of Bowtie.
+
+ Bowtie is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ Bowtie is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Bowtie.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+import os
+import sys
+import logging
+import argparse
+
+def main():
+    for i, arg in enumerate(sys.argv[1:]):
+        if arg.startswith('-'):
+            continue
+        if arg.lower().endswith(('.bz', '.bz2')):
+            basename, ext = os.path.splitext(arg.lower())
+            out_file = open(basename, 'wb')
+            import bz2
+            out_file.write(bz2.BZ2File(arg).read())
+            out_file.close()
+            sys.argv[i+1] = basename
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--large-index', action='store_true')
+
+    # parse the args specific to the wrapper script
+    # all other args will be passed verbatim to bowtie
+    args, bowtie_args = parser.parse_known_args()
+
+    logging.basicConfig(level=logging.ERROR,
+                        format='%(levelname)s: %(message)s'
+                        )
+    bin_s               = 'bowtie-align-s'
+    bin_l               = 'bowtie-align-l'
+    idx_ext_l           = '.1.ebwtl'
+    idx_ext_s           = '.1.ebwt'
+    ex_path             = os.path.dirname(os.path.realpath(__file__))
+    bin_spec            = os.path.join(ex_path, bin_s)
+
+    if args.verbose:
+        bowtie_args.append('--verbose')
+        logging.getLogger().setLevel(logging.INFO)
+
+    if args.large_index:
+        bin_spec = os.path.join(ex_path, bin_l)
+
+    for arg in bowtie_args:
+        if arg[0] == '-':
+            continue
+        if not os.path.exists(arg + idx_ext_s)\
+           and os.path.exists(arg + idx_ext_l):
+            bin_spec = os.path.join(ex_path, bin_l)
+
+    if args.debug:
+        bin_spec += '-debug'
+
+    bowtie_args.insert(0, bin_spec)
+    bowtie_args.insert(1, 'basic-0')
+    bowtie_args.insert(1, '--wrapper')
+
+    logging.info('Command: %s %s' %  (bin_spec,' '.join(bowtie_args[1:])))
+    os.execv(bin_spec, bowtie_args)
+
+if __name__ == "__main__":
+    main()

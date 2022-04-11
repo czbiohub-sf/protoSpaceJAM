@@ -1,0 +1,195 @@
+#!/usr/bin/env python
+
+# filter fasta file and keep only sequences that end with pattern (if + strand)
+# output as a bed file
+# CAREFUL: input sequences have to be on a single line. This is different from normal fasta files.
+
+# arguments: guideSeqFaFname pamPat altPats altMinScore
+
+# passHitCount is the maximum number of guide hits in the genome, as returned by the aligner, irrespective 
+# of PAM presence. If a match has a sum of X0 and X1 beyond that, it is always shown in the output,
+# because otherwise crispor.py cannot distinguish between non-matches and too-repetitive matches.
+
+# 2nd input fasta is fasta read from stdin, with |-separated fields in the ID line:
+# 0 = sequence ID
+# 1 = chromosome
+# 2 = start pos
+# 3 = end pos
+# 4 = strand
+# 5 = BWA editDist
+# 6 = BWA totalAlnCount  (=X0+X1)
+# 7 = position of gap, -1 if not used. Usually not used.
+
+# example input ( with field numbers above the ID line):
+# 0     1      2       3       4 5  6    8
+#>seq1|chrII|16108096|16108116|+|0|12345|-1
+#TCGAAAGTGGTAAGAATTTA
+
+#DuoPeng's update:
+#the input looks like this:
+# 9 = is rep
+# 0               1   2    3    4 5 6 9
+#>BRCA2_96_revcom|1|12592|12615|-|4|0|0::1:12592-12615(-)
+#CACCTGGGGGGAGACAGGAGCCT
+
+
+# example output:
+# format: (seqId, strand, mismatchCount, seq, totalAlnCount, hitScore (or 0, if it was a pamPat match or passHitCount) 
+
+# pamPat: 
+# pam IUPAC pattern, all sequences that end with this pattern get through
+# altPats: comma-sep list of patterns, all sequences with this pattern get only through
+#          if they have >altMaxScore. The score is the hitScore as defined in Hsu et al 2013, 
+#          see below
+#          Can be "na" if not altPat search needed
+# altMinScore: hits ending with one of altPats have to exceed this threshold, otherwise 
+#          they are skipped
+
+import sys, re
+
+# MIT offtarget scoring
+# aka Matrix "M"
+hitScoreM = [0,0,0.014,0,0,0.395,0.317,0,0.389,0.079,0.445,0.508,0.613,0.851,0.732,0.828,0.615,0.804,0.685,0.583]
+
+def calcHitScore(string1,string2):
+    " see 'Scores of single hits' on http://crispr.mit.edu/about "
+    # The Patrick Hsu weighting scheme
+    # S. aureus requires 21bp long guides. We fudge by using only last 20bp
+    matrixStart = 0
+    if len(string1)>20:
+        string1 = string1[-20:]
+        string2 = string2[-20:]
+    # for 19bp guides, we fudge a little, but first pos has no weight anyways
+    elif len(string1)==19:
+        string1 = "A"+string1
+        string2 = "A"+string2
+    # for shorter guides, I'm not sure if this score makes sense anymore, we force things
+    elif len(string1)<19:
+        matrixStart = 20-len(string1)
+
+    assert(len(string1)==len(string2))
+
+    dists = [] # distances between mismatches, for part 2
+    mmCount = 0 # number of mismatches, for part 3
+    lastMmPos = None # position of last mismatch, used to calculate distance
+
+    score1 = 1.0
+    for pos in range(matrixStart, len(string1)):
+        if string1[pos]!=string2[pos]:
+            mmCount+=1
+            if lastMmPos!=None:
+                dists.append(pos-lastMmPos)
+            score1 *= 1-hitScoreM[pos]
+            lastMmPos = pos
+    # 2nd part of the score
+    if mmCount<2: # special case, not shown in the paper
+        score2 = 1.0
+    else:
+        avgDist = sum(dists)/len(dists)
+        score2 = 1.0 / (((19-avgDist)/19.0) * 4 + 1)
+    # 3rd part of the score
+    if mmCount==0: # special case, not shown in the paper
+        score3 = 1.0
+    else:
+        score3 = 1.0 / (mmCount**2)
+
+    score = score1 * score2 * score3 * 100
+    return score
+# END ---- MIT offtarget scoring
+
+def patMatch(seq, pat):
+    " return true if pat matches seq, both have to be same length "
+    assert(len(seq)==len(pat))
+    for x in range(0, len(pat)):
+        patChar = pat[x]
+        nuc = seq[x]
+        if patChar=="N":
+            continue
+        if patChar=="M" and nuc in ["A", "C"]:
+            continue
+        if patChar=="K" and nuc in ["T", "G"]:
+            continue
+        if patChar=="R" and nuc in ["A", "G"]:
+            continue
+        if patChar=="Y" and nuc in ["C", "T"]:
+            continue
+        if patChar=="W" and nuc in ["A", "T"]:
+            continue
+        if patChar=="V" and nuc in "ACG":
+            continue
+        if patChar!=nuc:
+            return False
+    return True
+
+def parseFasta(ifh):
+    seq = None
+    for line in ifh:
+        if line.startswith(">"):
+            seq = None
+            seqId = line.rstrip("\n").lstrip(">")
+        else:
+            assert(seq==None)
+            seq = line.rstrip("\n").upper()
+            yield seqId, seq
+            seq = None
+    if seq!=None:
+        yield seqId, seq
+
+def main():
+    guideSeqFnames, pamPat, altPats, altScore = sys.argv[1:]
+    # XX SHOULD BE PUT INTO A LIB
+    # DO NOT FORGET TO EDIT bin/filterFaToBed, bin/samToBed and crispor.py if you change this!!
+    # NGTN is a special case in Crispor, but here in this part, it is just treated like another Cpf1
+    isCpf1 = (pamPat in ["TTN", "TTTN", "TYCV", "TATV", "TTTV", "ATTN", "TTTA", "TCTA", "TCCA", "CCCA", "NGTN", "YTTV"])
+
+    altScore = float(altScore)
+
+    altPats = altPats.split(",") # convert to list
+    pamLen = len(pamPat)
+
+    if len(altPats)>0 and altPats!=["na"]:
+        assert(len(pamPat)==len(altPats[0]))
+
+    guideSeqs = dict()
+    for guideSeqFname in guideSeqFnames.split(","):
+        guideSeqs.update(dict(parseFasta(open(guideSeqFname))))
+
+    for seqIdLine, seq in parseFasta(sys.stdin):
+        #print seqIdLine, seq
+        seqIdLine = re.sub(r'::.+$',"",seqIdLine)
+        seqId, chrom, start, end, strand, editDist, alnCount, isRep = seqIdLine.split("|")
+        doesPass = False
+        hitScore = 0
+        if bool(int(isRep)):
+            # we pass through alignments flagged as too repetitive, no matter what the PAM is
+            # and we pass through this flag for crispor that this was a too repetitive sequence
+            doesPass = True
+            #print "isRep"
+        else:
+            if isCpf1:
+                pamGenomeSeq = seq[:pamLen]
+            else:
+                pamGenomeSeq = seq[-pamLen:]
+
+            if patMatch(pamGenomeSeq, pamPat):
+                doesPass = True
+            else:
+                for altPat in altPats:
+                    if altPat!="na":
+                        guideSeq = guideSeqs[seqId]
+                        if patMatch(pamGenomeSeq, altPat):
+                            if isCpf1:
+                                otSeq = seq[pamLen:]
+                            else:
+                                otSeq = seq[:-pamLen]
+                            hitScore = calcHitScore(guideSeq, otSeq)
+                            if hitScore > altScore:
+                                doesPass = True
+                                break
+
+        if doesPass:
+            name = seqId+"|"+strand+"|"+editDist+"|"+seq+"|"+alnCount+"|"+str(hitScore)+"|"+isRep
+            row = [chrom, start, end, name]
+            print("\t".join(row))
+
+main()
