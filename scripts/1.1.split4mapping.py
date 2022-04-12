@@ -10,7 +10,6 @@ import datetime
 import gzip
 import gc
 import math
-from BLAST_utils import check_blastDB_human
 import errno, os, stat, shutil
 
 sys.path.insert(1, '..')
@@ -27,6 +26,7 @@ def parse_args():
     parser= MyParser(description='This script splits the gz files into parts suitable for parallel computing, please specify either --fastagz or --fasta')
     parser.add_argument('--dir', default="", type=str, help='path to the directory containing tabulated gRNA outputs', metavar='')
     parser.add_argument('--tab', default="", type=str, help='path to the tab file (containing gRNA info)', metavar='')
+    parser.add_argument('--part_size', default="", type=int, help='number of gRNAs per part, a good start is 200000', metavar='')
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
         parser.print_help()
@@ -40,7 +40,7 @@ log.propagate = False
 log.setLevel(logging.INFO) #set the level of warning displayed
 
 config = vars(parse_args())
-part_size = 200000
+part_size = config["part_size"]
 
 #####################
 ##      main       ##

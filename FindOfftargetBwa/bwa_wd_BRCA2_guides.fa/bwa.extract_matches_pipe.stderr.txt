@@ -1,7 +1,7 @@
-[bwa_aln_core] convert to sequence coordinate... 7.47 sec
-[bwa_aln_core] refine gapped alignments... 0.46 sec
-[bwa_aln_core] print alignments... 0.33 sec
+[bwa_aln_core] convert to sequence coordinate... 7.39 sec
+[bwa_aln_core] refine gapped alignments... 0.51 sec
+[bwa_aln_core] print alignments... 0.28 sec
 [bwa_aln_core] 179 sequences have been processed.
 [main] Version: 0.7.15-r1140
-[main] CMD: /home/duo.peng/github_repos/protospaceXS/test_off_target/bin/Linux/bwa samse -n 60000 /home/duo.peng/github_repos/protospaceXS/genome_files/indexes_bwa/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa sai.out /home/duo.peng/github_repos/protospaceXS/test_off_target/BRCA2_guides.fa
-[main] Real time: 11.916 sec; CPU: 8.270 sec
+[main] CMD: /home/duo.peng/github_repos/protospaceXS/FindOfftargetBwa/bin/Linux/bwa samse -n 60000 /home/duo.peng/github_repos/protospaceXS/genome_files/indexes_bwa/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa sai.out /home/duo.peng/github_repos/protospaceXS/FindOfftargetBwa/BRCA2_guides.fa
+[main] Real time: 11.859 sec; CPU: 8.194 sec

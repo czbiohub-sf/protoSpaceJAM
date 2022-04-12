@@ -11,7 +11,7 @@ import argparse
 import sys
 
 logging.basicConfig() #setup the default configuration set
-log = logging.getLogger("offtarget_bwa") #Logger name
+log = logging.getLogger("FinOfftargetBwa") #Logger name
 log.propagate = False
 log.setLevel(logging.INFO) #set the level of warning displayed
 
@@ -285,8 +285,11 @@ path_to_stderr_file = os.path.join(bwa_wd_path,f"bwa.seqExtraction.stderr.txt")
 mystderr = open(path_to_stderr_file, 'w+')
 if os.path.isfile(shmFaFname):
     logging.info("Using bedtools and genome fasta on ramdisk, %s" % shmFaFname)
-    command = f"time {BIN}/bedtools getfasta -s -name -fi {shmFaFname} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
-    #command = f"time {BIN}/bedtools getfasta -s -name -fi {shmFaFname} -bed {matchesBedFname} -fo /dev/stdout > {filtMatchesBedFname}"
+    #use genome fa in /dev/shm
+    #command = f"time {BIN}/bedtools getfasta -s -name -fi {shmFaFname} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
+    #don't use genome fa in /dev/shm
+    command = f"time {BIN}/bedtools getfasta -s -name -fi {GENOME_IDX_BWA} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
+    
 else:
     logging.info("Using twoBitfofa, %s" % shmFaFname)
     command = f"time {BIN}/twoBitToFa {bwa_genome_idx}.2bit stdout -bed={matchesBedFname} | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
