@@ -28,7 +28,7 @@ class MyParser(argparse.ArgumentParser):
 def parse_args():
     parser= MyParser(description='This script does XXX')
     parser.add_argument('--fa', default="", type=str, help='name of the input fa', metavar='')
-    parser.add_argument('--fa_path', default="", type=str, help='path to the input fa directory', metavar='')
+    parser.add_argument('--fa_dir', default="", type=str, help='path to the input fa directory', metavar='')
     parser.add_argument('--bin_dir', default="", type=str, help='path to the bin directory', metavar='')
     parser.add_argument('--script_dir', default="", type=str, help='path to the script directory', metavar='')
     parser.add_argument('--bwa_idx', default="", type=str, help='path to bwa index', metavar='')
@@ -44,7 +44,7 @@ def parse_args():
 config = vars(parse_args())
 
 GRNA_FA = config["fa"]
-GRNA_FA_PATH = os.path.join(config["fa_path"], config["fa"])
+GRNA_FA_PATH = os.path.join(config["fa_dir"], config["fa"])
 BIN= config['bin_dir']
 SCRIPT = config['script_dir']
 GENOME = config["genome_fa"]
@@ -61,7 +61,7 @@ with open(GRNA_FA_PATH, "r", encoding="utf-8") as handle:
     for entry in fasta_sequences:
         name, desc,seq = entry.id, entry.description, str(entry.seq)
         guide_count +=1
-print(f"total guide count: {guide_count}\n")
+#print(f"total guide count: {guide_count}\n")
 
 
 # for some PAMs, we allow other alternative motifs when searching for offtargets
@@ -185,14 +185,18 @@ MAXOCC = 60000
 # the BWA queue size is 2M by default. We derive the queue size from MAXOCC
 MFAC = 2000000/MAXOCC
 
+
+
 #make output dir
-current_dir = os.getcwd()
-bwa_wd_path = os.path.join(current_dir,f"bwa_wd_{GRNA_FA}")
+bwa_wd_path = os.path.join(config["fa_dir"],f"{GRNA_FA}_bwa")
 if os.path.isdir(bwa_wd_path):
     shutil.rmtree(bwa_wd_path)
 os.makedirs(bwa_wd_path)
 
-os.chdir(bwa_wd_path)
+#print(f"wd {os.getcwd()}")
+#print(f"workding dir {workding_dir}")
+#print(f"bwa_wd_path {bwa_wd_path}")
+
 
 seqLen = GUIDELEN
 maxDiff = maxMMs
@@ -200,10 +204,16 @@ bwaM = MFAC*MAXOCC # -m is queue size in bwa
 maxOcc = MAXOCC
 
 bwa_genome_idx = os.path.join(GENOME_IDX_BWA)
-bedFname = "bwa.out.bed"
 saFname = "sai.out"
+bedFname = "bwa.out.bed"
 matchesBedFname = "matches.bed"
 filtMatchesBedFname = "filtMatches.bed"
+
+
+saFname = os.path.join(bwa_wd_path,f"{saFname}")
+bedFname = os.path.join(bwa_wd_path,f"{bedFname}")
+matchesBedFname = os.path.join(bwa_wd_path,f"{matchesBedFname}")
+filtMatchesBedFname = os.path.join(bwa_wd_path,f"{filtMatchesBedFname}")
 
 starttime = datetime.datetime.now()
 
@@ -215,11 +225,12 @@ command = [f"{BIN}/bwa",
             "-k", f"{maxDiff}", # Maximum edit distance in the seed
             "-N", # -N Disable iterative search. All hits with no more than maxDiff differences will be found. This mode is much slower than the default.
             "-l", f"{seqLen}", #Take the first INT subsequence as seed. If INT is larger than the query sequence, seeding will be disabled. For long reads, this option is typically ranged from 25 to 35 for ‘-k 2’. [inf] 
+            "-t", "2",
             f"{bwa_genome_idx}",
             f"{GRNA_FA_PATH}"
             ]
 path_to_stderr_file = os.path.join(bwa_wd_path,f"bwa.aln.stderr.txt")
-path_to_stdout_file = os.path.join(bwa_wd_path,f"{saFname}")
+path_to_stdout_file = saFname
 mystdput = open(path_to_stdout_file, 'w+')
 mystderr = open(path_to_stderr_file, 'w+')
 p = Popen(command, stdout=mystdput, stderr=mystderr)
