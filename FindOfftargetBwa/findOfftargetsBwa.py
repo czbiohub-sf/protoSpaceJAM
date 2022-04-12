@@ -1,3 +1,7 @@
+#Finds OffTargets using bwa
+#input: fasta file
+#output: bwa_wd_BRCA2_[fasta file name]/bwa.out.bed
+
 import os
 from subprocess import Popen
 import subprocess
