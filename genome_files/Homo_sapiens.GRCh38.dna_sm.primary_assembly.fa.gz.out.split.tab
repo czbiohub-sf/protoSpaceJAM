@@ -1,1535 +1,1535 @@
-chr_part	length	gRNA_count	directory	filename
-1.part0	NA	200000	gRNA.tab.gz.split	1.part0.tab.gz
-1.part1	NA	200000	gRNA.tab.gz.split	1.part1.tab.gz
-1.part2	NA	200000	gRNA.tab.gz.split	1.part2.tab.gz
-1.part3	NA	200000	gRNA.tab.gz.split	1.part3.tab.gz
-1.part4	NA	200000	gRNA.tab.gz.split	1.part4.tab.gz
-1.part5	NA	200000	gRNA.tab.gz.split	1.part5.tab.gz
-1.part6	NA	200000	gRNA.tab.gz.split	1.part6.tab.gz
-1.part7	NA	200000	gRNA.tab.gz.split	1.part7.tab.gz
-1.part8	NA	200000	gRNA.tab.gz.split	1.part8.tab.gz
-1.part9	NA	200000	gRNA.tab.gz.split	1.part9.tab.gz
-1.part10	NA	200000	gRNA.tab.gz.split	1.part10.tab.gz
-1.part11	NA	200000	gRNA.tab.gz.split	1.part11.tab.gz
-1.part12	NA	200000	gRNA.tab.gz.split	1.part12.tab.gz
-1.part13	NA	200000	gRNA.tab.gz.split	1.part13.tab.gz
-1.part14	NA	200000	gRNA.tab.gz.split	1.part14.tab.gz
-1.part15	NA	200000	gRNA.tab.gz.split	1.part15.tab.gz
-1.part16	NA	200000	gRNA.tab.gz.split	1.part16.tab.gz
-1.part17	NA	200000	gRNA.tab.gz.split	1.part17.tab.gz
-1.part18	NA	200000	gRNA.tab.gz.split	1.part18.tab.gz
-1.part19	NA	200000	gRNA.tab.gz.split	1.part19.tab.gz
-1.part20	NA	200000	gRNA.tab.gz.split	1.part20.tab.gz
-1.part21	NA	200000	gRNA.tab.gz.split	1.part21.tab.gz
-1.part22	NA	200000	gRNA.tab.gz.split	1.part22.tab.gz
-1.part23	NA	200000	gRNA.tab.gz.split	1.part23.tab.gz
-1.part24	NA	200000	gRNA.tab.gz.split	1.part24.tab.gz
-1.part25	NA	200000	gRNA.tab.gz.split	1.part25.tab.gz
-1.part26	NA	200000	gRNA.tab.gz.split	1.part26.tab.gz
-1.part27	NA	200000	gRNA.tab.gz.split	1.part27.tab.gz
-1.part28	NA	200000	gRNA.tab.gz.split	1.part28.tab.gz
-1.part29	NA	200000	gRNA.tab.gz.split	1.part29.tab.gz
-1.part30	NA	200000	gRNA.tab.gz.split	1.part30.tab.gz
-1.part31	NA	200000	gRNA.tab.gz.split	1.part31.tab.gz
-1.part32	NA	200000	gRNA.tab.gz.split	1.part32.tab.gz
-1.part33	NA	200000	gRNA.tab.gz.split	1.part33.tab.gz
-1.part34	NA	200000	gRNA.tab.gz.split	1.part34.tab.gz
-1.part35	NA	200000	gRNA.tab.gz.split	1.part35.tab.gz
-1.part36	NA	200000	gRNA.tab.gz.split	1.part36.tab.gz
-1.part37	NA	200000	gRNA.tab.gz.split	1.part37.tab.gz
-1.part38	NA	200000	gRNA.tab.gz.split	1.part38.tab.gz
-1.part39	NA	200000	gRNA.tab.gz.split	1.part39.tab.gz
-1.part40	NA	200000	gRNA.tab.gz.split	1.part40.tab.gz
-1.part41	NA	200000	gRNA.tab.gz.split	1.part41.tab.gz
-1.part42	NA	200000	gRNA.tab.gz.split	1.part42.tab.gz
-1.part43	NA	200000	gRNA.tab.gz.split	1.part43.tab.gz
-1.part44	NA	200000	gRNA.tab.gz.split	1.part44.tab.gz
-1.part45	NA	200000	gRNA.tab.gz.split	1.part45.tab.gz
-1.part46	NA	200000	gRNA.tab.gz.split	1.part46.tab.gz
-1.part47	NA	200000	gRNA.tab.gz.split	1.part47.tab.gz
-1.part48	NA	200000	gRNA.tab.gz.split	1.part48.tab.gz
-1.part49	NA	200000	gRNA.tab.gz.split	1.part49.tab.gz
-1.part50	NA	200000	gRNA.tab.gz.split	1.part50.tab.gz
-1.part51	NA	200000	gRNA.tab.gz.split	1.part51.tab.gz
-1.part52	NA	200000	gRNA.tab.gz.split	1.part52.tab.gz
-1.part53	NA	200000	gRNA.tab.gz.split	1.part53.tab.gz
-1.part54	NA	200000	gRNA.tab.gz.split	1.part54.tab.gz
-1.part55	NA	200000	gRNA.tab.gz.split	1.part55.tab.gz
-1.part56	NA	200000	gRNA.tab.gz.split	1.part56.tab.gz
-1.part57	NA	200000	gRNA.tab.gz.split	1.part57.tab.gz
-1.part58	NA	200000	gRNA.tab.gz.split	1.part58.tab.gz
-1.part59	NA	200000	gRNA.tab.gz.split	1.part59.tab.gz
-1.part60	NA	200000	gRNA.tab.gz.split	1.part60.tab.gz
-1.part61	NA	200000	gRNA.tab.gz.split	1.part61.tab.gz
-1.part62	NA	200000	gRNA.tab.gz.split	1.part62.tab.gz
-1.part63	NA	200000	gRNA.tab.gz.split	1.part63.tab.gz
-1.part64	NA	200000	gRNA.tab.gz.split	1.part64.tab.gz
-1.part65	NA	200000	gRNA.tab.gz.split	1.part65.tab.gz
-1.part66	NA	200000	gRNA.tab.gz.split	1.part66.tab.gz
-1.part67	NA	200000	gRNA.tab.gz.split	1.part67.tab.gz
-1.part68	NA	200000	gRNA.tab.gz.split	1.part68.tab.gz
-1.part69	NA	200000	gRNA.tab.gz.split	1.part69.tab.gz
-1.part70	NA	200000	gRNA.tab.gz.split	1.part70.tab.gz
-1.part71	NA	200000	gRNA.tab.gz.split	1.part71.tab.gz
-1.part72	NA	200000	gRNA.tab.gz.split	1.part72.tab.gz
-1.part73	NA	200000	gRNA.tab.gz.split	1.part73.tab.gz
-1.part74	NA	200000	gRNA.tab.gz.split	1.part74.tab.gz
-1.part75	NA	200000	gRNA.tab.gz.split	1.part75.tab.gz
-1.part76	NA	200000	gRNA.tab.gz.split	1.part76.tab.gz
-1.part77	NA	200000	gRNA.tab.gz.split	1.part77.tab.gz
-1.part78	NA	200000	gRNA.tab.gz.split	1.part78.tab.gz
-1.part79	NA	200000	gRNA.tab.gz.split	1.part79.tab.gz
-1.part80	NA	200000	gRNA.tab.gz.split	1.part80.tab.gz
-1.part81	NA	200000	gRNA.tab.gz.split	1.part81.tab.gz
-1.part82	NA	200000	gRNA.tab.gz.split	1.part82.tab.gz
-1.part83	NA	200000	gRNA.tab.gz.split	1.part83.tab.gz
-1.part84	NA	200000	gRNA.tab.gz.split	1.part84.tab.gz
-1.part85	NA	200000	gRNA.tab.gz.split	1.part85.tab.gz
-1.part86	NA	200000	gRNA.tab.gz.split	1.part86.tab.gz
-1.part87	NA	200000	gRNA.tab.gz.split	1.part87.tab.gz
-1.part88	NA	200000	gRNA.tab.gz.split	1.part88.tab.gz
-1.part89	NA	200000	gRNA.tab.gz.split	1.part89.tab.gz
-1.part90	NA	200000	gRNA.tab.gz.split	1.part90.tab.gz
-1.part91	NA	200000	gRNA.tab.gz.split	1.part91.tab.gz
-1.part92	NA	200000	gRNA.tab.gz.split	1.part92.tab.gz
-1.part93	NA	200000	gRNA.tab.gz.split	1.part93.tab.gz
-1.part94	NA	200000	gRNA.tab.gz.split	1.part94.tab.gz
-1.part95	NA	200000	gRNA.tab.gz.split	1.part95.tab.gz
-1.part96	NA	200000	gRNA.tab.gz.split	1.part96.tab.gz
-1.part97	NA	200000	gRNA.tab.gz.split	1.part97.tab.gz
-1.part98	NA	200000	gRNA.tab.gz.split	1.part98.tab.gz
-1.part99	NA	200000	gRNA.tab.gz.split	1.part99.tab.gz
-1.part100	NA	200000	gRNA.tab.gz.split	1.part100.tab.gz
-1.part101	NA	200000	gRNA.tab.gz.split	1.part101.tab.gz
-1.part102	NA	200000	gRNA.tab.gz.split	1.part102.tab.gz
-1.part103	NA	200000	gRNA.tab.gz.split	1.part103.tab.gz
-1.part104	NA	200000	gRNA.tab.gz.split	1.part104.tab.gz
-1.part105	NA	200000	gRNA.tab.gz.split	1.part105.tab.gz
-1.part106	NA	200000	gRNA.tab.gz.split	1.part106.tab.gz
-1.part107	NA	200000	gRNA.tab.gz.split	1.part107.tab.gz
-1.part108	NA	200000	gRNA.tab.gz.split	1.part108.tab.gz
-1.part109	NA	200000	gRNA.tab.gz.split	1.part109.tab.gz
-1.part110	NA	200000	gRNA.tab.gz.split	1.part110.tab.gz
-1.part111	NA	200000	gRNA.tab.gz.split	1.part111.tab.gz
-1.part112	NA	200000	gRNA.tab.gz.split	1.part112.tab.gz
-1.part113	NA	200000	gRNA.tab.gz.split	1.part113.tab.gz
-1.part114	NA	200000	gRNA.tab.gz.split	1.part114.tab.gz
-1.part115	NA	200000	gRNA.tab.gz.split	1.part115.tab.gz
-1.part116	NA	200000	gRNA.tab.gz.split	1.part116.tab.gz
-1.part117	NA	200000	gRNA.tab.gz.split	1.part117.tab.gz
-1.part118	NA	200000	gRNA.tab.gz.split	1.part118.tab.gz
-1.part119	NA	200000	gRNA.tab.gz.split	1.part119.tab.gz
-1.part120	NA	200000	gRNA.tab.gz.split	1.part120.tab.gz
-1.part121	NA	200000	gRNA.tab.gz.split	1.part121.tab.gz
-1.part122	NA	200000	gRNA.tab.gz.split	1.part122.tab.gz
-1.part123	NA	200000	gRNA.tab.gz.split	1.part123.tab.gz
-1.part124	NA	158058	gRNA.tab.gz.split	1.part124.tab.gz
-10.part0	NA	200000	gRNA.tab.gz.split	10.part0.tab.gz
-10.part1	NA	200000	gRNA.tab.gz.split	10.part1.tab.gz
-10.part2	NA	200000	gRNA.tab.gz.split	10.part2.tab.gz
-10.part3	NA	200000	gRNA.tab.gz.split	10.part3.tab.gz
-10.part4	NA	200000	gRNA.tab.gz.split	10.part4.tab.gz
-10.part5	NA	200000	gRNA.tab.gz.split	10.part5.tab.gz
-10.part6	NA	200000	gRNA.tab.gz.split	10.part6.tab.gz
-10.part7	NA	200000	gRNA.tab.gz.split	10.part7.tab.gz
-10.part8	NA	200000	gRNA.tab.gz.split	10.part8.tab.gz
-10.part9	NA	200000	gRNA.tab.gz.split	10.part9.tab.gz
-10.part10	NA	200000	gRNA.tab.gz.split	10.part10.tab.gz
-10.part11	NA	200000	gRNA.tab.gz.split	10.part11.tab.gz
-10.part12	NA	200000	gRNA.tab.gz.split	10.part12.tab.gz
-10.part13	NA	200000	gRNA.tab.gz.split	10.part13.tab.gz
-10.part14	NA	200000	gRNA.tab.gz.split	10.part14.tab.gz
-10.part15	NA	200000	gRNA.tab.gz.split	10.part15.tab.gz
-10.part16	NA	200000	gRNA.tab.gz.split	10.part16.tab.gz
-10.part17	NA	200000	gRNA.tab.gz.split	10.part17.tab.gz
-10.part18	NA	200000	gRNA.tab.gz.split	10.part18.tab.gz
-10.part19	NA	200000	gRNA.tab.gz.split	10.part19.tab.gz
-10.part20	NA	200000	gRNA.tab.gz.split	10.part20.tab.gz
-10.part21	NA	200000	gRNA.tab.gz.split	10.part21.tab.gz
-10.part22	NA	200000	gRNA.tab.gz.split	10.part22.tab.gz
-10.part23	NA	200000	gRNA.tab.gz.split	10.part23.tab.gz
-10.part24	NA	200000	gRNA.tab.gz.split	10.part24.tab.gz
-10.part25	NA	200000	gRNA.tab.gz.split	10.part25.tab.gz
-10.part26	NA	200000	gRNA.tab.gz.split	10.part26.tab.gz
-10.part27	NA	200000	gRNA.tab.gz.split	10.part27.tab.gz
-10.part28	NA	200000	gRNA.tab.gz.split	10.part28.tab.gz
-10.part29	NA	200000	gRNA.tab.gz.split	10.part29.tab.gz
-10.part30	NA	200000	gRNA.tab.gz.split	10.part30.tab.gz
-10.part31	NA	200000	gRNA.tab.gz.split	10.part31.tab.gz
-10.part32	NA	200000	gRNA.tab.gz.split	10.part32.tab.gz
-10.part33	NA	200000	gRNA.tab.gz.split	10.part33.tab.gz
-10.part34	NA	200000	gRNA.tab.gz.split	10.part34.tab.gz
-10.part35	NA	200000	gRNA.tab.gz.split	10.part35.tab.gz
-10.part36	NA	200000	gRNA.tab.gz.split	10.part36.tab.gz
-10.part37	NA	200000	gRNA.tab.gz.split	10.part37.tab.gz
-10.part38	NA	200000	gRNA.tab.gz.split	10.part38.tab.gz
-10.part39	NA	200000	gRNA.tab.gz.split	10.part39.tab.gz
-10.part40	NA	200000	gRNA.tab.gz.split	10.part40.tab.gz
-10.part41	NA	200000	gRNA.tab.gz.split	10.part41.tab.gz
-10.part42	NA	200000	gRNA.tab.gz.split	10.part42.tab.gz
-10.part43	NA	200000	gRNA.tab.gz.split	10.part43.tab.gz
-10.part44	NA	200000	gRNA.tab.gz.split	10.part44.tab.gz
-10.part45	NA	200000	gRNA.tab.gz.split	10.part45.tab.gz
-10.part46	NA	200000	gRNA.tab.gz.split	10.part46.tab.gz
-10.part47	NA	200000	gRNA.tab.gz.split	10.part47.tab.gz
-10.part48	NA	200000	gRNA.tab.gz.split	10.part48.tab.gz
-10.part49	NA	200000	gRNA.tab.gz.split	10.part49.tab.gz
-10.part50	NA	200000	gRNA.tab.gz.split	10.part50.tab.gz
-10.part51	NA	200000	gRNA.tab.gz.split	10.part51.tab.gz
-10.part52	NA	200000	gRNA.tab.gz.split	10.part52.tab.gz
-10.part53	NA	200000	gRNA.tab.gz.split	10.part53.tab.gz
-10.part54	NA	200000	gRNA.tab.gz.split	10.part54.tab.gz
-10.part55	NA	200000	gRNA.tab.gz.split	10.part55.tab.gz
-10.part56	NA	200000	gRNA.tab.gz.split	10.part56.tab.gz
-10.part57	NA	200000	gRNA.tab.gz.split	10.part57.tab.gz
-10.part58	NA	200000	gRNA.tab.gz.split	10.part58.tab.gz
-10.part59	NA	200000	gRNA.tab.gz.split	10.part59.tab.gz
-10.part60	NA	200000	gRNA.tab.gz.split	10.part60.tab.gz
-10.part61	NA	200000	gRNA.tab.gz.split	10.part61.tab.gz
-10.part62	NA	200000	gRNA.tab.gz.split	10.part62.tab.gz
-10.part63	NA	200000	gRNA.tab.gz.split	10.part63.tab.gz
-10.part64	NA	200000	gRNA.tab.gz.split	10.part64.tab.gz
-10.part65	NA	200000	gRNA.tab.gz.split	10.part65.tab.gz
-10.part66	NA	200000	gRNA.tab.gz.split	10.part66.tab.gz
-10.part67	NA	200000	gRNA.tab.gz.split	10.part67.tab.gz
-10.part68	NA	200000	gRNA.tab.gz.split	10.part68.tab.gz
-10.part69	NA	200000	gRNA.tab.gz.split	10.part69.tab.gz
-10.part70	NA	200000	gRNA.tab.gz.split	10.part70.tab.gz
-10.part71	NA	3970	gRNA.tab.gz.split	10.part71.tab.gz
-11.part0	NA	200000	gRNA.tab.gz.split	11.part0.tab.gz
-11.part1	NA	200000	gRNA.tab.gz.split	11.part1.tab.gz
-11.part2	NA	200000	gRNA.tab.gz.split	11.part2.tab.gz
-11.part3	NA	200000	gRNA.tab.gz.split	11.part3.tab.gz
-11.part4	NA	200000	gRNA.tab.gz.split	11.part4.tab.gz
-11.part5	NA	200000	gRNA.tab.gz.split	11.part5.tab.gz
-11.part6	NA	200000	gRNA.tab.gz.split	11.part6.tab.gz
-11.part7	NA	200000	gRNA.tab.gz.split	11.part7.tab.gz
-11.part8	NA	200000	gRNA.tab.gz.split	11.part8.tab.gz
-11.part9	NA	200000	gRNA.tab.gz.split	11.part9.tab.gz
-11.part10	NA	200000	gRNA.tab.gz.split	11.part10.tab.gz
-11.part11	NA	200000	gRNA.tab.gz.split	11.part11.tab.gz
-11.part12	NA	200000	gRNA.tab.gz.split	11.part12.tab.gz
-11.part13	NA	200000	gRNA.tab.gz.split	11.part13.tab.gz
-11.part14	NA	200000	gRNA.tab.gz.split	11.part14.tab.gz
-11.part15	NA	200000	gRNA.tab.gz.split	11.part15.tab.gz
-11.part16	NA	200000	gRNA.tab.gz.split	11.part16.tab.gz
-11.part17	NA	200000	gRNA.tab.gz.split	11.part17.tab.gz
-11.part18	NA	200000	gRNA.tab.gz.split	11.part18.tab.gz
-11.part19	NA	200000	gRNA.tab.gz.split	11.part19.tab.gz
-11.part20	NA	200000	gRNA.tab.gz.split	11.part20.tab.gz
-11.part21	NA	200000	gRNA.tab.gz.split	11.part21.tab.gz
-11.part22	NA	200000	gRNA.tab.gz.split	11.part22.tab.gz
-11.part23	NA	200000	gRNA.tab.gz.split	11.part23.tab.gz
-11.part24	NA	200000	gRNA.tab.gz.split	11.part24.tab.gz
-11.part25	NA	200000	gRNA.tab.gz.split	11.part25.tab.gz
-11.part26	NA	200000	gRNA.tab.gz.split	11.part26.tab.gz
-11.part27	NA	200000	gRNA.tab.gz.split	11.part27.tab.gz
-11.part28	NA	200000	gRNA.tab.gz.split	11.part28.tab.gz
-11.part29	NA	200000	gRNA.tab.gz.split	11.part29.tab.gz
-11.part30	NA	200000	gRNA.tab.gz.split	11.part30.tab.gz
-11.part31	NA	200000	gRNA.tab.gz.split	11.part31.tab.gz
-11.part32	NA	200000	gRNA.tab.gz.split	11.part32.tab.gz
-11.part33	NA	200000	gRNA.tab.gz.split	11.part33.tab.gz
-11.part34	NA	200000	gRNA.tab.gz.split	11.part34.tab.gz
-11.part35	NA	200000	gRNA.tab.gz.split	11.part35.tab.gz
-11.part36	NA	200000	gRNA.tab.gz.split	11.part36.tab.gz
-11.part37	NA	200000	gRNA.tab.gz.split	11.part37.tab.gz
-11.part38	NA	200000	gRNA.tab.gz.split	11.part38.tab.gz
-11.part39	NA	200000	gRNA.tab.gz.split	11.part39.tab.gz
-11.part40	NA	200000	gRNA.tab.gz.split	11.part40.tab.gz
-11.part41	NA	200000	gRNA.tab.gz.split	11.part41.tab.gz
-11.part42	NA	200000	gRNA.tab.gz.split	11.part42.tab.gz
-11.part43	NA	200000	gRNA.tab.gz.split	11.part43.tab.gz
-11.part44	NA	200000	gRNA.tab.gz.split	11.part44.tab.gz
-11.part45	NA	200000	gRNA.tab.gz.split	11.part45.tab.gz
-11.part46	NA	200000	gRNA.tab.gz.split	11.part46.tab.gz
-11.part47	NA	200000	gRNA.tab.gz.split	11.part47.tab.gz
-11.part48	NA	200000	gRNA.tab.gz.split	11.part48.tab.gz
-11.part49	NA	200000	gRNA.tab.gz.split	11.part49.tab.gz
-11.part50	NA	200000	gRNA.tab.gz.split	11.part50.tab.gz
-11.part51	NA	200000	gRNA.tab.gz.split	11.part51.tab.gz
-11.part52	NA	200000	gRNA.tab.gz.split	11.part52.tab.gz
-11.part53	NA	200000	gRNA.tab.gz.split	11.part53.tab.gz
-11.part54	NA	200000	gRNA.tab.gz.split	11.part54.tab.gz
-11.part55	NA	200000	gRNA.tab.gz.split	11.part55.tab.gz
-11.part56	NA	200000	gRNA.tab.gz.split	11.part56.tab.gz
-11.part57	NA	200000	gRNA.tab.gz.split	11.part57.tab.gz
-11.part58	NA	200000	gRNA.tab.gz.split	11.part58.tab.gz
-11.part59	NA	200000	gRNA.tab.gz.split	11.part59.tab.gz
-11.part60	NA	200000	gRNA.tab.gz.split	11.part60.tab.gz
-11.part61	NA	200000	gRNA.tab.gz.split	11.part61.tab.gz
-11.part62	NA	200000	gRNA.tab.gz.split	11.part62.tab.gz
-11.part63	NA	200000	gRNA.tab.gz.split	11.part63.tab.gz
-11.part64	NA	200000	gRNA.tab.gz.split	11.part64.tab.gz
-11.part65	NA	200000	gRNA.tab.gz.split	11.part65.tab.gz
-11.part66	NA	200000	gRNA.tab.gz.split	11.part66.tab.gz
-11.part67	NA	200000	gRNA.tab.gz.split	11.part67.tab.gz
-11.part68	NA	200000	gRNA.tab.gz.split	11.part68.tab.gz
-11.part69	NA	200000	gRNA.tab.gz.split	11.part69.tab.gz
-11.part70	NA	200000	gRNA.tab.gz.split	11.part70.tab.gz
-11.part71	NA	200000	gRNA.tab.gz.split	11.part71.tab.gz
-11.part72	NA	9297	gRNA.tab.gz.split	11.part72.tab.gz
-12.part0	NA	200000	gRNA.tab.gz.split	12.part0.tab.gz
-12.part1	NA	200000	gRNA.tab.gz.split	12.part1.tab.gz
-12.part2	NA	200000	gRNA.tab.gz.split	12.part2.tab.gz
-12.part3	NA	200000	gRNA.tab.gz.split	12.part3.tab.gz
-12.part4	NA	200000	gRNA.tab.gz.split	12.part4.tab.gz
-12.part5	NA	200000	gRNA.tab.gz.split	12.part5.tab.gz
-12.part6	NA	200000	gRNA.tab.gz.split	12.part6.tab.gz
-12.part7	NA	200000	gRNA.tab.gz.split	12.part7.tab.gz
-12.part8	NA	200000	gRNA.tab.gz.split	12.part8.tab.gz
-12.part9	NA	200000	gRNA.tab.gz.split	12.part9.tab.gz
-12.part10	NA	200000	gRNA.tab.gz.split	12.part10.tab.gz
-12.part11	NA	200000	gRNA.tab.gz.split	12.part11.tab.gz
-12.part12	NA	200000	gRNA.tab.gz.split	12.part12.tab.gz
-12.part13	NA	200000	gRNA.tab.gz.split	12.part13.tab.gz
-12.part14	NA	200000	gRNA.tab.gz.split	12.part14.tab.gz
-12.part15	NA	200000	gRNA.tab.gz.split	12.part15.tab.gz
-12.part16	NA	200000	gRNA.tab.gz.split	12.part16.tab.gz
-12.part17	NA	200000	gRNA.tab.gz.split	12.part17.tab.gz
-12.part18	NA	200000	gRNA.tab.gz.split	12.part18.tab.gz
-12.part19	NA	200000	gRNA.tab.gz.split	12.part19.tab.gz
-12.part20	NA	200000	gRNA.tab.gz.split	12.part20.tab.gz
-12.part21	NA	200000	gRNA.tab.gz.split	12.part21.tab.gz
-12.part22	NA	200000	gRNA.tab.gz.split	12.part22.tab.gz
-12.part23	NA	200000	gRNA.tab.gz.split	12.part23.tab.gz
-12.part24	NA	200000	gRNA.tab.gz.split	12.part24.tab.gz
-12.part25	NA	200000	gRNA.tab.gz.split	12.part25.tab.gz
-12.part26	NA	200000	gRNA.tab.gz.split	12.part26.tab.gz
-12.part27	NA	200000	gRNA.tab.gz.split	12.part27.tab.gz
-12.part28	NA	200000	gRNA.tab.gz.split	12.part28.tab.gz
-12.part29	NA	200000	gRNA.tab.gz.split	12.part29.tab.gz
-12.part30	NA	200000	gRNA.tab.gz.split	12.part30.tab.gz
-12.part31	NA	200000	gRNA.tab.gz.split	12.part31.tab.gz
-12.part32	NA	200000	gRNA.tab.gz.split	12.part32.tab.gz
-12.part33	NA	200000	gRNA.tab.gz.split	12.part33.tab.gz
-12.part34	NA	200000	gRNA.tab.gz.split	12.part34.tab.gz
-12.part35	NA	200000	gRNA.tab.gz.split	12.part35.tab.gz
-12.part36	NA	200000	gRNA.tab.gz.split	12.part36.tab.gz
-12.part37	NA	200000	gRNA.tab.gz.split	12.part37.tab.gz
-12.part38	NA	200000	gRNA.tab.gz.split	12.part38.tab.gz
-12.part39	NA	200000	gRNA.tab.gz.split	12.part39.tab.gz
-12.part40	NA	200000	gRNA.tab.gz.split	12.part40.tab.gz
-12.part41	NA	200000	gRNA.tab.gz.split	12.part41.tab.gz
-12.part42	NA	200000	gRNA.tab.gz.split	12.part42.tab.gz
-12.part43	NA	200000	gRNA.tab.gz.split	12.part43.tab.gz
-12.part44	NA	200000	gRNA.tab.gz.split	12.part44.tab.gz
-12.part45	NA	200000	gRNA.tab.gz.split	12.part45.tab.gz
-12.part46	NA	200000	gRNA.tab.gz.split	12.part46.tab.gz
-12.part47	NA	200000	gRNA.tab.gz.split	12.part47.tab.gz
-12.part48	NA	200000	gRNA.tab.gz.split	12.part48.tab.gz
-12.part49	NA	200000	gRNA.tab.gz.split	12.part49.tab.gz
-12.part50	NA	200000	gRNA.tab.gz.split	12.part50.tab.gz
-12.part51	NA	200000	gRNA.tab.gz.split	12.part51.tab.gz
-12.part52	NA	200000	gRNA.tab.gz.split	12.part52.tab.gz
-12.part53	NA	200000	gRNA.tab.gz.split	12.part53.tab.gz
-12.part54	NA	200000	gRNA.tab.gz.split	12.part54.tab.gz
-12.part55	NA	200000	gRNA.tab.gz.split	12.part55.tab.gz
-12.part56	NA	200000	gRNA.tab.gz.split	12.part56.tab.gz
-12.part57	NA	200000	gRNA.tab.gz.split	12.part57.tab.gz
-12.part58	NA	200000	gRNA.tab.gz.split	12.part58.tab.gz
-12.part59	NA	200000	gRNA.tab.gz.split	12.part59.tab.gz
-12.part60	NA	200000	gRNA.tab.gz.split	12.part60.tab.gz
-12.part61	NA	200000	gRNA.tab.gz.split	12.part61.tab.gz
-12.part62	NA	200000	gRNA.tab.gz.split	12.part62.tab.gz
-12.part63	NA	200000	gRNA.tab.gz.split	12.part63.tab.gz
-12.part64	NA	200000	gRNA.tab.gz.split	12.part64.tab.gz
-12.part65	NA	200000	gRNA.tab.gz.split	12.part65.tab.gz
-12.part66	NA	200000	gRNA.tab.gz.split	12.part66.tab.gz
-12.part67	NA	200000	gRNA.tab.gz.split	12.part67.tab.gz
-12.part68	NA	101730	gRNA.tab.gz.split	12.part68.tab.gz
-13.part0	NA	200000	gRNA.tab.gz.split	13.part0.tab.gz
-13.part1	NA	200000	gRNA.tab.gz.split	13.part1.tab.gz
-13.part2	NA	200000	gRNA.tab.gz.split	13.part2.tab.gz
-13.part3	NA	200000	gRNA.tab.gz.split	13.part3.tab.gz
-13.part4	NA	200000	gRNA.tab.gz.split	13.part4.tab.gz
-13.part5	NA	200000	gRNA.tab.gz.split	13.part5.tab.gz
-13.part6	NA	200000	gRNA.tab.gz.split	13.part6.tab.gz
-13.part7	NA	200000	gRNA.tab.gz.split	13.part7.tab.gz
-13.part8	NA	200000	gRNA.tab.gz.split	13.part8.tab.gz
-13.part9	NA	200000	gRNA.tab.gz.split	13.part9.tab.gz
-13.part10	NA	200000	gRNA.tab.gz.split	13.part10.tab.gz
-13.part11	NA	200000	gRNA.tab.gz.split	13.part11.tab.gz
-13.part12	NA	200000	gRNA.tab.gz.split	13.part12.tab.gz
-13.part13	NA	200000	gRNA.tab.gz.split	13.part13.tab.gz
-13.part14	NA	200000	gRNA.tab.gz.split	13.part14.tab.gz
-13.part15	NA	200000	gRNA.tab.gz.split	13.part15.tab.gz
-13.part16	NA	200000	gRNA.tab.gz.split	13.part16.tab.gz
-13.part17	NA	200000	gRNA.tab.gz.split	13.part17.tab.gz
-13.part18	NA	200000	gRNA.tab.gz.split	13.part18.tab.gz
-13.part19	NA	200000	gRNA.tab.gz.split	13.part19.tab.gz
-13.part20	NA	200000	gRNA.tab.gz.split	13.part20.tab.gz
-13.part21	NA	200000	gRNA.tab.gz.split	13.part21.tab.gz
-13.part22	NA	200000	gRNA.tab.gz.split	13.part22.tab.gz
-13.part23	NA	200000	gRNA.tab.gz.split	13.part23.tab.gz
-13.part24	NA	200000	gRNA.tab.gz.split	13.part24.tab.gz
-13.part25	NA	200000	gRNA.tab.gz.split	13.part25.tab.gz
-13.part26	NA	200000	gRNA.tab.gz.split	13.part26.tab.gz
-13.part27	NA	200000	gRNA.tab.gz.split	13.part27.tab.gz
-13.part28	NA	200000	gRNA.tab.gz.split	13.part28.tab.gz
-13.part29	NA	200000	gRNA.tab.gz.split	13.part29.tab.gz
-13.part30	NA	200000	gRNA.tab.gz.split	13.part30.tab.gz
-13.part31	NA	200000	gRNA.tab.gz.split	13.part31.tab.gz
-13.part32	NA	200000	gRNA.tab.gz.split	13.part32.tab.gz
-13.part33	NA	200000	gRNA.tab.gz.split	13.part33.tab.gz
-13.part34	NA	200000	gRNA.tab.gz.split	13.part34.tab.gz
-13.part35	NA	200000	gRNA.tab.gz.split	13.part35.tab.gz
-13.part36	NA	200000	gRNA.tab.gz.split	13.part36.tab.gz
-13.part37	NA	200000	gRNA.tab.gz.split	13.part37.tab.gz
-13.part38	NA	200000	gRNA.tab.gz.split	13.part38.tab.gz
-13.part39	NA	200000	gRNA.tab.gz.split	13.part39.tab.gz
-13.part40	NA	200000	gRNA.tab.gz.split	13.part40.tab.gz
-13.part41	NA	200000	gRNA.tab.gz.split	13.part41.tab.gz
-13.part42	NA	200000	gRNA.tab.gz.split	13.part42.tab.gz
-13.part43	NA	200000	gRNA.tab.gz.split	13.part43.tab.gz
-13.part44	NA	115397	gRNA.tab.gz.split	13.part44.tab.gz
-14.part0	NA	200000	gRNA.tab.gz.split	14.part0.tab.gz
-14.part1	NA	200000	gRNA.tab.gz.split	14.part1.tab.gz
-14.part2	NA	200000	gRNA.tab.gz.split	14.part2.tab.gz
-14.part3	NA	200000	gRNA.tab.gz.split	14.part3.tab.gz
-14.part4	NA	200000	gRNA.tab.gz.split	14.part4.tab.gz
-14.part5	NA	200000	gRNA.tab.gz.split	14.part5.tab.gz
-14.part6	NA	200000	gRNA.tab.gz.split	14.part6.tab.gz
-14.part7	NA	200000	gRNA.tab.gz.split	14.part7.tab.gz
-14.part8	NA	200000	gRNA.tab.gz.split	14.part8.tab.gz
-14.part9	NA	200000	gRNA.tab.gz.split	14.part9.tab.gz
-14.part10	NA	200000	gRNA.tab.gz.split	14.part10.tab.gz
-14.part11	NA	200000	gRNA.tab.gz.split	14.part11.tab.gz
-14.part12	NA	200000	gRNA.tab.gz.split	14.part12.tab.gz
-14.part13	NA	200000	gRNA.tab.gz.split	14.part13.tab.gz
-14.part14	NA	200000	gRNA.tab.gz.split	14.part14.tab.gz
-14.part15	NA	200000	gRNA.tab.gz.split	14.part15.tab.gz
-14.part16	NA	200000	gRNA.tab.gz.split	14.part16.tab.gz
-14.part17	NA	200000	gRNA.tab.gz.split	14.part17.tab.gz
-14.part18	NA	200000	gRNA.tab.gz.split	14.part18.tab.gz
-14.part19	NA	200000	gRNA.tab.gz.split	14.part19.tab.gz
-14.part20	NA	200000	gRNA.tab.gz.split	14.part20.tab.gz
-14.part21	NA	200000	gRNA.tab.gz.split	14.part21.tab.gz
-14.part22	NA	200000	gRNA.tab.gz.split	14.part22.tab.gz
-14.part23	NA	200000	gRNA.tab.gz.split	14.part23.tab.gz
-14.part24	NA	200000	gRNA.tab.gz.split	14.part24.tab.gz
-14.part25	NA	200000	gRNA.tab.gz.split	14.part25.tab.gz
-14.part26	NA	200000	gRNA.tab.gz.split	14.part26.tab.gz
-14.part27	NA	200000	gRNA.tab.gz.split	14.part27.tab.gz
-14.part28	NA	200000	gRNA.tab.gz.split	14.part28.tab.gz
-14.part29	NA	200000	gRNA.tab.gz.split	14.part29.tab.gz
-14.part30	NA	200000	gRNA.tab.gz.split	14.part30.tab.gz
-14.part31	NA	200000	gRNA.tab.gz.split	14.part31.tab.gz
-14.part32	NA	200000	gRNA.tab.gz.split	14.part32.tab.gz
-14.part33	NA	200000	gRNA.tab.gz.split	14.part33.tab.gz
-14.part34	NA	200000	gRNA.tab.gz.split	14.part34.tab.gz
-14.part35	NA	200000	gRNA.tab.gz.split	14.part35.tab.gz
-14.part36	NA	200000	gRNA.tab.gz.split	14.part36.tab.gz
-14.part37	NA	200000	gRNA.tab.gz.split	14.part37.tab.gz
-14.part38	NA	200000	gRNA.tab.gz.split	14.part38.tab.gz
-14.part39	NA	200000	gRNA.tab.gz.split	14.part39.tab.gz
-14.part40	NA	200000	gRNA.tab.gz.split	14.part40.tab.gz
-14.part41	NA	200000	gRNA.tab.gz.split	14.part41.tab.gz
-14.part42	NA	200000	gRNA.tab.gz.split	14.part42.tab.gz
-14.part43	NA	200000	gRNA.tab.gz.split	14.part43.tab.gz
-14.part44	NA	200000	gRNA.tab.gz.split	14.part44.tab.gz
-14.part45	NA	200000	gRNA.tab.gz.split	14.part45.tab.gz
-14.part46	NA	159748	gRNA.tab.gz.split	14.part46.tab.gz
-15.part0	NA	200000	gRNA.tab.gz.split	15.part0.tab.gz
-15.part1	NA	200000	gRNA.tab.gz.split	15.part1.tab.gz
-15.part2	NA	200000	gRNA.tab.gz.split	15.part2.tab.gz
-15.part3	NA	200000	gRNA.tab.gz.split	15.part3.tab.gz
-15.part4	NA	200000	gRNA.tab.gz.split	15.part4.tab.gz
-15.part5	NA	200000	gRNA.tab.gz.split	15.part5.tab.gz
-15.part6	NA	200000	gRNA.tab.gz.split	15.part6.tab.gz
-15.part7	NA	200000	gRNA.tab.gz.split	15.part7.tab.gz
-15.part8	NA	200000	gRNA.tab.gz.split	15.part8.tab.gz
-15.part9	NA	200000	gRNA.tab.gz.split	15.part9.tab.gz
-15.part10	NA	200000	gRNA.tab.gz.split	15.part10.tab.gz
-15.part11	NA	200000	gRNA.tab.gz.split	15.part11.tab.gz
-15.part12	NA	200000	gRNA.tab.gz.split	15.part12.tab.gz
-15.part13	NA	200000	gRNA.tab.gz.split	15.part13.tab.gz
-15.part14	NA	200000	gRNA.tab.gz.split	15.part14.tab.gz
-15.part15	NA	200000	gRNA.tab.gz.split	15.part15.tab.gz
-15.part16	NA	200000	gRNA.tab.gz.split	15.part16.tab.gz
-15.part17	NA	200000	gRNA.tab.gz.split	15.part17.tab.gz
-15.part18	NA	200000	gRNA.tab.gz.split	15.part18.tab.gz
-15.part19	NA	200000	gRNA.tab.gz.split	15.part19.tab.gz
-15.part20	NA	200000	gRNA.tab.gz.split	15.part20.tab.gz
-15.part21	NA	200000	gRNA.tab.gz.split	15.part21.tab.gz
-15.part22	NA	200000	gRNA.tab.gz.split	15.part22.tab.gz
-15.part23	NA	200000	gRNA.tab.gz.split	15.part23.tab.gz
-15.part24	NA	200000	gRNA.tab.gz.split	15.part24.tab.gz
-15.part25	NA	200000	gRNA.tab.gz.split	15.part25.tab.gz
-15.part26	NA	200000	gRNA.tab.gz.split	15.part26.tab.gz
-15.part27	NA	200000	gRNA.tab.gz.split	15.part27.tab.gz
-15.part28	NA	200000	gRNA.tab.gz.split	15.part28.tab.gz
-15.part29	NA	200000	gRNA.tab.gz.split	15.part29.tab.gz
-15.part30	NA	200000	gRNA.tab.gz.split	15.part30.tab.gz
-15.part31	NA	200000	gRNA.tab.gz.split	15.part31.tab.gz
-15.part32	NA	200000	gRNA.tab.gz.split	15.part32.tab.gz
-15.part33	NA	200000	gRNA.tab.gz.split	15.part33.tab.gz
-15.part34	NA	200000	gRNA.tab.gz.split	15.part34.tab.gz
-15.part35	NA	200000	gRNA.tab.gz.split	15.part35.tab.gz
-15.part36	NA	200000	gRNA.tab.gz.split	15.part36.tab.gz
-15.part37	NA	200000	gRNA.tab.gz.split	15.part37.tab.gz
-15.part38	NA	200000	gRNA.tab.gz.split	15.part38.tab.gz
-15.part39	NA	200000	gRNA.tab.gz.split	15.part39.tab.gz
-15.part40	NA	200000	gRNA.tab.gz.split	15.part40.tab.gz
-15.part41	NA	200000	gRNA.tab.gz.split	15.part41.tab.gz
-15.part42	NA	200000	gRNA.tab.gz.split	15.part42.tab.gz
-15.part43	NA	200000	gRNA.tab.gz.split	15.part43.tab.gz
-15.part44	NA	200000	gRNA.tab.gz.split	15.part44.tab.gz
-15.part45	NA	200000	gRNA.tab.gz.split	15.part45.tab.gz
-15.part46	NA	29439	gRNA.tab.gz.split	15.part46.tab.gz
-16.part0	NA	200000	gRNA.tab.gz.split	16.part0.tab.gz
-16.part1	NA	200000	gRNA.tab.gz.split	16.part1.tab.gz
-16.part2	NA	200000	gRNA.tab.gz.split	16.part2.tab.gz
-16.part3	NA	200000	gRNA.tab.gz.split	16.part3.tab.gz
-16.part4	NA	200000	gRNA.tab.gz.split	16.part4.tab.gz
-16.part5	NA	200000	gRNA.tab.gz.split	16.part5.tab.gz
-16.part6	NA	200000	gRNA.tab.gz.split	16.part6.tab.gz
-16.part7	NA	200000	gRNA.tab.gz.split	16.part7.tab.gz
-16.part8	NA	200000	gRNA.tab.gz.split	16.part8.tab.gz
-16.part9	NA	200000	gRNA.tab.gz.split	16.part9.tab.gz
-16.part10	NA	200000	gRNA.tab.gz.split	16.part10.tab.gz
-16.part11	NA	200000	gRNA.tab.gz.split	16.part11.tab.gz
-16.part12	NA	200000	gRNA.tab.gz.split	16.part12.tab.gz
-16.part13	NA	200000	gRNA.tab.gz.split	16.part13.tab.gz
-16.part14	NA	200000	gRNA.tab.gz.split	16.part14.tab.gz
-16.part15	NA	200000	gRNA.tab.gz.split	16.part15.tab.gz
-16.part16	NA	200000	gRNA.tab.gz.split	16.part16.tab.gz
-16.part17	NA	200000	gRNA.tab.gz.split	16.part17.tab.gz
-16.part18	NA	200000	gRNA.tab.gz.split	16.part18.tab.gz
-16.part19	NA	200000	gRNA.tab.gz.split	16.part19.tab.gz
-16.part20	NA	200000	gRNA.tab.gz.split	16.part20.tab.gz
-16.part21	NA	200000	gRNA.tab.gz.split	16.part21.tab.gz
-16.part22	NA	200000	gRNA.tab.gz.split	16.part22.tab.gz
-16.part23	NA	200000	gRNA.tab.gz.split	16.part23.tab.gz
-16.part24	NA	200000	gRNA.tab.gz.split	16.part24.tab.gz
-16.part25	NA	200000	gRNA.tab.gz.split	16.part25.tab.gz
-16.part26	NA	200000	gRNA.tab.gz.split	16.part26.tab.gz
-16.part27	NA	200000	gRNA.tab.gz.split	16.part27.tab.gz
-16.part28	NA	200000	gRNA.tab.gz.split	16.part28.tab.gz
-16.part29	NA	200000	gRNA.tab.gz.split	16.part29.tab.gz
-16.part30	NA	200000	gRNA.tab.gz.split	16.part30.tab.gz
-16.part31	NA	200000	gRNA.tab.gz.split	16.part31.tab.gz
-16.part32	NA	200000	gRNA.tab.gz.split	16.part32.tab.gz
-16.part33	NA	200000	gRNA.tab.gz.split	16.part33.tab.gz
-16.part34	NA	200000	gRNA.tab.gz.split	16.part34.tab.gz
-16.part35	NA	200000	gRNA.tab.gz.split	16.part35.tab.gz
-16.part36	NA	200000	gRNA.tab.gz.split	16.part36.tab.gz
-16.part37	NA	200000	gRNA.tab.gz.split	16.part37.tab.gz
-16.part38	NA	200000	gRNA.tab.gz.split	16.part38.tab.gz
-16.part39	NA	200000	gRNA.tab.gz.split	16.part39.tab.gz
-16.part40	NA	200000	gRNA.tab.gz.split	16.part40.tab.gz
-16.part41	NA	200000	gRNA.tab.gz.split	16.part41.tab.gz
-16.part42	NA	200000	gRNA.tab.gz.split	16.part42.tab.gz
-16.part43	NA	200000	gRNA.tab.gz.split	16.part43.tab.gz
-16.part44	NA	200000	gRNA.tab.gz.split	16.part44.tab.gz
-16.part45	NA	200000	gRNA.tab.gz.split	16.part45.tab.gz
-16.part46	NA	200000	gRNA.tab.gz.split	16.part46.tab.gz
-16.part47	NA	200000	gRNA.tab.gz.split	16.part47.tab.gz
-16.part48	NA	200000	gRNA.tab.gz.split	16.part48.tab.gz
-16.part49	NA	200000	gRNA.tab.gz.split	16.part49.tab.gz
-16.part50	NA	2903	gRNA.tab.gz.split	16.part50.tab.gz
-17.part0	NA	200000	gRNA.tab.gz.split	17.part0.tab.gz
-17.part1	NA	200000	gRNA.tab.gz.split	17.part1.tab.gz
-17.part2	NA	200000	gRNA.tab.gz.split	17.part2.tab.gz
-17.part3	NA	200000	gRNA.tab.gz.split	17.part3.tab.gz
-17.part4	NA	200000	gRNA.tab.gz.split	17.part4.tab.gz
-17.part5	NA	200000	gRNA.tab.gz.split	17.part5.tab.gz
-17.part6	NA	200000	gRNA.tab.gz.split	17.part6.tab.gz
-17.part7	NA	200000	gRNA.tab.gz.split	17.part7.tab.gz
-17.part8	NA	200000	gRNA.tab.gz.split	17.part8.tab.gz
-17.part9	NA	200000	gRNA.tab.gz.split	17.part9.tab.gz
-17.part10	NA	200000	gRNA.tab.gz.split	17.part10.tab.gz
-17.part11	NA	200000	gRNA.tab.gz.split	17.part11.tab.gz
-17.part12	NA	200000	gRNA.tab.gz.split	17.part12.tab.gz
-17.part13	NA	200000	gRNA.tab.gz.split	17.part13.tab.gz
-17.part14	NA	200000	gRNA.tab.gz.split	17.part14.tab.gz
-17.part15	NA	200000	gRNA.tab.gz.split	17.part15.tab.gz
-17.part16	NA	200000	gRNA.tab.gz.split	17.part16.tab.gz
-17.part17	NA	200000	gRNA.tab.gz.split	17.part17.tab.gz
-17.part18	NA	200000	gRNA.tab.gz.split	17.part18.tab.gz
-17.part19	NA	200000	gRNA.tab.gz.split	17.part19.tab.gz
-17.part20	NA	200000	gRNA.tab.gz.split	17.part20.tab.gz
-17.part21	NA	200000	gRNA.tab.gz.split	17.part21.tab.gz
-17.part22	NA	200000	gRNA.tab.gz.split	17.part22.tab.gz
-17.part23	NA	200000	gRNA.tab.gz.split	17.part23.tab.gz
-17.part24	NA	200000	gRNA.tab.gz.split	17.part24.tab.gz
-17.part25	NA	200000	gRNA.tab.gz.split	17.part25.tab.gz
-17.part26	NA	200000	gRNA.tab.gz.split	17.part26.tab.gz
-17.part27	NA	200000	gRNA.tab.gz.split	17.part27.tab.gz
-17.part28	NA	200000	gRNA.tab.gz.split	17.part28.tab.gz
-17.part29	NA	200000	gRNA.tab.gz.split	17.part29.tab.gz
-17.part30	NA	200000	gRNA.tab.gz.split	17.part30.tab.gz
-17.part31	NA	200000	gRNA.tab.gz.split	17.part31.tab.gz
-17.part32	NA	200000	gRNA.tab.gz.split	17.part32.tab.gz
-17.part33	NA	200000	gRNA.tab.gz.split	17.part33.tab.gz
-17.part34	NA	200000	gRNA.tab.gz.split	17.part34.tab.gz
-17.part35	NA	200000	gRNA.tab.gz.split	17.part35.tab.gz
-17.part36	NA	200000	gRNA.tab.gz.split	17.part36.tab.gz
-17.part37	NA	200000	gRNA.tab.gz.split	17.part37.tab.gz
-17.part38	NA	200000	gRNA.tab.gz.split	17.part38.tab.gz
-17.part39	NA	200000	gRNA.tab.gz.split	17.part39.tab.gz
-17.part40	NA	200000	gRNA.tab.gz.split	17.part40.tab.gz
-17.part41	NA	200000	gRNA.tab.gz.split	17.part41.tab.gz
-17.part42	NA	200000	gRNA.tab.gz.split	17.part42.tab.gz
-17.part43	NA	200000	gRNA.tab.gz.split	17.part43.tab.gz
-17.part44	NA	200000	gRNA.tab.gz.split	17.part44.tab.gz
-17.part45	NA	200000	gRNA.tab.gz.split	17.part45.tab.gz
-17.part46	NA	200000	gRNA.tab.gz.split	17.part46.tab.gz
-17.part47	NA	200000	gRNA.tab.gz.split	17.part47.tab.gz
-17.part48	NA	200000	gRNA.tab.gz.split	17.part48.tab.gz
-17.part49	NA	200000	gRNA.tab.gz.split	17.part49.tab.gz
-17.part50	NA	200000	gRNA.tab.gz.split	17.part50.tab.gz
-17.part51	NA	200000	gRNA.tab.gz.split	17.part51.tab.gz
-17.part52	NA	96051	gRNA.tab.gz.split	17.part52.tab.gz
-18.part0	NA	200000	gRNA.tab.gz.split	18.part0.tab.gz
-18.part1	NA	200000	gRNA.tab.gz.split	18.part1.tab.gz
-18.part2	NA	200000	gRNA.tab.gz.split	18.part2.tab.gz
-18.part3	NA	200000	gRNA.tab.gz.split	18.part3.tab.gz
-18.part4	NA	200000	gRNA.tab.gz.split	18.part4.tab.gz
-18.part5	NA	200000	gRNA.tab.gz.split	18.part5.tab.gz
-18.part6	NA	200000	gRNA.tab.gz.split	18.part6.tab.gz
-18.part7	NA	200000	gRNA.tab.gz.split	18.part7.tab.gz
-18.part8	NA	200000	gRNA.tab.gz.split	18.part8.tab.gz
-18.part9	NA	200000	gRNA.tab.gz.split	18.part9.tab.gz
-18.part10	NA	200000	gRNA.tab.gz.split	18.part10.tab.gz
-18.part11	NA	200000	gRNA.tab.gz.split	18.part11.tab.gz
-18.part12	NA	200000	gRNA.tab.gz.split	18.part12.tab.gz
-18.part13	NA	200000	gRNA.tab.gz.split	18.part13.tab.gz
-18.part14	NA	200000	gRNA.tab.gz.split	18.part14.tab.gz
-18.part15	NA	200000	gRNA.tab.gz.split	18.part15.tab.gz
-18.part16	NA	200000	gRNA.tab.gz.split	18.part16.tab.gz
-18.part17	NA	200000	gRNA.tab.gz.split	18.part17.tab.gz
-18.part18	NA	200000	gRNA.tab.gz.split	18.part18.tab.gz
-18.part19	NA	200000	gRNA.tab.gz.split	18.part19.tab.gz
-18.part20	NA	200000	gRNA.tab.gz.split	18.part20.tab.gz
-18.part21	NA	200000	gRNA.tab.gz.split	18.part21.tab.gz
-18.part22	NA	200000	gRNA.tab.gz.split	18.part22.tab.gz
-18.part23	NA	200000	gRNA.tab.gz.split	18.part23.tab.gz
-18.part24	NA	200000	gRNA.tab.gz.split	18.part24.tab.gz
-18.part25	NA	200000	gRNA.tab.gz.split	18.part25.tab.gz
-18.part26	NA	200000	gRNA.tab.gz.split	18.part26.tab.gz
-18.part27	NA	200000	gRNA.tab.gz.split	18.part27.tab.gz
-18.part28	NA	200000	gRNA.tab.gz.split	18.part28.tab.gz
-18.part29	NA	200000	gRNA.tab.gz.split	18.part29.tab.gz
-18.part30	NA	200000	gRNA.tab.gz.split	18.part30.tab.gz
-18.part31	NA	200000	gRNA.tab.gz.split	18.part31.tab.gz
-18.part32	NA	200000	gRNA.tab.gz.split	18.part32.tab.gz
-18.part33	NA	200000	gRNA.tab.gz.split	18.part33.tab.gz
-18.part34	NA	200000	gRNA.tab.gz.split	18.part34.tab.gz
-18.part35	NA	200000	gRNA.tab.gz.split	18.part35.tab.gz
-18.part36	NA	200000	gRNA.tab.gz.split	18.part36.tab.gz
-18.part37	NA	200000	gRNA.tab.gz.split	18.part37.tab.gz
-18.part38	NA	80966	gRNA.tab.gz.split	18.part38.tab.gz
-19.part0	NA	200000	gRNA.tab.gz.split	19.part0.tab.gz
-19.part1	NA	200000	gRNA.tab.gz.split	19.part1.tab.gz
-19.part2	NA	200000	gRNA.tab.gz.split	19.part2.tab.gz
-19.part3	NA	200000	gRNA.tab.gz.split	19.part3.tab.gz
-19.part4	NA	200000	gRNA.tab.gz.split	19.part4.tab.gz
-19.part5	NA	200000	gRNA.tab.gz.split	19.part5.tab.gz
-19.part6	NA	200000	gRNA.tab.gz.split	19.part6.tab.gz
-19.part7	NA	200000	gRNA.tab.gz.split	19.part7.tab.gz
-19.part8	NA	200000	gRNA.tab.gz.split	19.part8.tab.gz
-19.part9	NA	200000	gRNA.tab.gz.split	19.part9.tab.gz
-19.part10	NA	200000	gRNA.tab.gz.split	19.part10.tab.gz
-19.part11	NA	200000	gRNA.tab.gz.split	19.part11.tab.gz
-19.part12	NA	200000	gRNA.tab.gz.split	19.part12.tab.gz
-19.part13	NA	200000	gRNA.tab.gz.split	19.part13.tab.gz
-19.part14	NA	200000	gRNA.tab.gz.split	19.part14.tab.gz
-19.part15	NA	200000	gRNA.tab.gz.split	19.part15.tab.gz
-19.part16	NA	200000	gRNA.tab.gz.split	19.part16.tab.gz
-19.part17	NA	200000	gRNA.tab.gz.split	19.part17.tab.gz
-19.part18	NA	200000	gRNA.tab.gz.split	19.part18.tab.gz
-19.part19	NA	200000	gRNA.tab.gz.split	19.part19.tab.gz
-19.part20	NA	200000	gRNA.tab.gz.split	19.part20.tab.gz
-19.part21	NA	200000	gRNA.tab.gz.split	19.part21.tab.gz
-19.part22	NA	200000	gRNA.tab.gz.split	19.part22.tab.gz
-19.part23	NA	200000	gRNA.tab.gz.split	19.part23.tab.gz
-19.part24	NA	200000	gRNA.tab.gz.split	19.part24.tab.gz
-19.part25	NA	200000	gRNA.tab.gz.split	19.part25.tab.gz
-19.part26	NA	200000	gRNA.tab.gz.split	19.part26.tab.gz
-19.part27	NA	200000	gRNA.tab.gz.split	19.part27.tab.gz
-19.part28	NA	200000	gRNA.tab.gz.split	19.part28.tab.gz
-19.part29	NA	200000	gRNA.tab.gz.split	19.part29.tab.gz
-19.part30	NA	200000	gRNA.tab.gz.split	19.part30.tab.gz
-19.part31	NA	200000	gRNA.tab.gz.split	19.part31.tab.gz
-19.part32	NA	200000	gRNA.tab.gz.split	19.part32.tab.gz
-19.part33	NA	200000	gRNA.tab.gz.split	19.part33.tab.gz
-19.part34	NA	200000	gRNA.tab.gz.split	19.part34.tab.gz
-19.part35	NA	200000	gRNA.tab.gz.split	19.part35.tab.gz
-19.part36	NA	200000	gRNA.tab.gz.split	19.part36.tab.gz
-19.part37	NA	200000	gRNA.tab.gz.split	19.part37.tab.gz
-19.part38	NA	200000	gRNA.tab.gz.split	19.part38.tab.gz
-19.part39	NA	200000	gRNA.tab.gz.split	19.part39.tab.gz
-19.part40	NA	200000	gRNA.tab.gz.split	19.part40.tab.gz
-19.part41	NA	48882	gRNA.tab.gz.split	19.part41.tab.gz
-2.part0	NA	200000	gRNA.tab.gz.split	2.part0.tab.gz
-2.part1	NA	200000	gRNA.tab.gz.split	2.part1.tab.gz
-2.part2	NA	200000	gRNA.tab.gz.split	2.part2.tab.gz
-2.part3	NA	200000	gRNA.tab.gz.split	2.part3.tab.gz
-2.part4	NA	200000	gRNA.tab.gz.split	2.part4.tab.gz
-2.part5	NA	200000	gRNA.tab.gz.split	2.part5.tab.gz
-2.part6	NA	200000	gRNA.tab.gz.split	2.part6.tab.gz
-2.part7	NA	200000	gRNA.tab.gz.split	2.part7.tab.gz
-2.part8	NA	200000	gRNA.tab.gz.split	2.part8.tab.gz
-2.part9	NA	200000	gRNA.tab.gz.split	2.part9.tab.gz
-2.part10	NA	200000	gRNA.tab.gz.split	2.part10.tab.gz
-2.part11	NA	200000	gRNA.tab.gz.split	2.part11.tab.gz
-2.part12	NA	200000	gRNA.tab.gz.split	2.part12.tab.gz
-2.part13	NA	200000	gRNA.tab.gz.split	2.part13.tab.gz
-2.part14	NA	200000	gRNA.tab.gz.split	2.part14.tab.gz
-2.part15	NA	200000	gRNA.tab.gz.split	2.part15.tab.gz
-2.part16	NA	200000	gRNA.tab.gz.split	2.part16.tab.gz
-2.part17	NA	200000	gRNA.tab.gz.split	2.part17.tab.gz
-2.part18	NA	200000	gRNA.tab.gz.split	2.part18.tab.gz
-2.part19	NA	200000	gRNA.tab.gz.split	2.part19.tab.gz
-2.part20	NA	200000	gRNA.tab.gz.split	2.part20.tab.gz
-2.part21	NA	200000	gRNA.tab.gz.split	2.part21.tab.gz
-2.part22	NA	200000	gRNA.tab.gz.split	2.part22.tab.gz
-2.part23	NA	200000	gRNA.tab.gz.split	2.part23.tab.gz
-2.part24	NA	200000	gRNA.tab.gz.split	2.part24.tab.gz
-2.part25	NA	200000	gRNA.tab.gz.split	2.part25.tab.gz
-2.part26	NA	200000	gRNA.tab.gz.split	2.part26.tab.gz
-2.part27	NA	200000	gRNA.tab.gz.split	2.part27.tab.gz
-2.part28	NA	200000	gRNA.tab.gz.split	2.part28.tab.gz
-2.part29	NA	200000	gRNA.tab.gz.split	2.part29.tab.gz
-2.part30	NA	200000	gRNA.tab.gz.split	2.part30.tab.gz
-2.part31	NA	200000	gRNA.tab.gz.split	2.part31.tab.gz
-2.part32	NA	200000	gRNA.tab.gz.split	2.part32.tab.gz
-2.part33	NA	200000	gRNA.tab.gz.split	2.part33.tab.gz
-2.part34	NA	200000	gRNA.tab.gz.split	2.part34.tab.gz
-2.part35	NA	200000	gRNA.tab.gz.split	2.part35.tab.gz
-2.part36	NA	200000	gRNA.tab.gz.split	2.part36.tab.gz
-2.part37	NA	200000	gRNA.tab.gz.split	2.part37.tab.gz
-2.part38	NA	200000	gRNA.tab.gz.split	2.part38.tab.gz
-2.part39	NA	200000	gRNA.tab.gz.split	2.part39.tab.gz
-2.part40	NA	200000	gRNA.tab.gz.split	2.part40.tab.gz
-2.part41	NA	200000	gRNA.tab.gz.split	2.part41.tab.gz
-2.part42	NA	200000	gRNA.tab.gz.split	2.part42.tab.gz
-2.part43	NA	200000	gRNA.tab.gz.split	2.part43.tab.gz
-2.part44	NA	200000	gRNA.tab.gz.split	2.part44.tab.gz
-2.part45	NA	200000	gRNA.tab.gz.split	2.part45.tab.gz
-2.part46	NA	200000	gRNA.tab.gz.split	2.part46.tab.gz
-2.part47	NA	200000	gRNA.tab.gz.split	2.part47.tab.gz
-2.part48	NA	200000	gRNA.tab.gz.split	2.part48.tab.gz
-2.part49	NA	200000	gRNA.tab.gz.split	2.part49.tab.gz
-2.part50	NA	200000	gRNA.tab.gz.split	2.part50.tab.gz
-2.part51	NA	200000	gRNA.tab.gz.split	2.part51.tab.gz
-2.part52	NA	200000	gRNA.tab.gz.split	2.part52.tab.gz
-2.part53	NA	200000	gRNA.tab.gz.split	2.part53.tab.gz
-2.part54	NA	200000	gRNA.tab.gz.split	2.part54.tab.gz
-2.part55	NA	200000	gRNA.tab.gz.split	2.part55.tab.gz
-2.part56	NA	200000	gRNA.tab.gz.split	2.part56.tab.gz
-2.part57	NA	200000	gRNA.tab.gz.split	2.part57.tab.gz
-2.part58	NA	200000	gRNA.tab.gz.split	2.part58.tab.gz
-2.part59	NA	200000	gRNA.tab.gz.split	2.part59.tab.gz
-2.part60	NA	200000	gRNA.tab.gz.split	2.part60.tab.gz
-2.part61	NA	200000	gRNA.tab.gz.split	2.part61.tab.gz
-2.part62	NA	200000	gRNA.tab.gz.split	2.part62.tab.gz
-2.part63	NA	200000	gRNA.tab.gz.split	2.part63.tab.gz
-2.part64	NA	200000	gRNA.tab.gz.split	2.part64.tab.gz
-2.part65	NA	200000	gRNA.tab.gz.split	2.part65.tab.gz
-2.part66	NA	200000	gRNA.tab.gz.split	2.part66.tab.gz
-2.part67	NA	200000	gRNA.tab.gz.split	2.part67.tab.gz
-2.part68	NA	200000	gRNA.tab.gz.split	2.part68.tab.gz
-2.part69	NA	200000	gRNA.tab.gz.split	2.part69.tab.gz
-2.part70	NA	200000	gRNA.tab.gz.split	2.part70.tab.gz
-2.part71	NA	200000	gRNA.tab.gz.split	2.part71.tab.gz
-2.part72	NA	200000	gRNA.tab.gz.split	2.part72.tab.gz
-2.part73	NA	200000	gRNA.tab.gz.split	2.part73.tab.gz
-2.part74	NA	200000	gRNA.tab.gz.split	2.part74.tab.gz
-2.part75	NA	200000	gRNA.tab.gz.split	2.part75.tab.gz
-2.part76	NA	200000	gRNA.tab.gz.split	2.part76.tab.gz
-2.part77	NA	200000	gRNA.tab.gz.split	2.part77.tab.gz
-2.part78	NA	200000	gRNA.tab.gz.split	2.part78.tab.gz
-2.part79	NA	200000	gRNA.tab.gz.split	2.part79.tab.gz
-2.part80	NA	200000	gRNA.tab.gz.split	2.part80.tab.gz
-2.part81	NA	200000	gRNA.tab.gz.split	2.part81.tab.gz
-2.part82	NA	200000	gRNA.tab.gz.split	2.part82.tab.gz
-2.part83	NA	200000	gRNA.tab.gz.split	2.part83.tab.gz
-2.part84	NA	200000	gRNA.tab.gz.split	2.part84.tab.gz
-2.part85	NA	200000	gRNA.tab.gz.split	2.part85.tab.gz
-2.part86	NA	200000	gRNA.tab.gz.split	2.part86.tab.gz
-2.part87	NA	200000	gRNA.tab.gz.split	2.part87.tab.gz
-2.part88	NA	200000	gRNA.tab.gz.split	2.part88.tab.gz
-2.part89	NA	200000	gRNA.tab.gz.split	2.part89.tab.gz
-2.part90	NA	200000	gRNA.tab.gz.split	2.part90.tab.gz
-2.part91	NA	200000	gRNA.tab.gz.split	2.part91.tab.gz
-2.part92	NA	200000	gRNA.tab.gz.split	2.part92.tab.gz
-2.part93	NA	200000	gRNA.tab.gz.split	2.part93.tab.gz
-2.part94	NA	200000	gRNA.tab.gz.split	2.part94.tab.gz
-2.part95	NA	200000	gRNA.tab.gz.split	2.part95.tab.gz
-2.part96	NA	200000	gRNA.tab.gz.split	2.part96.tab.gz
-2.part97	NA	200000	gRNA.tab.gz.split	2.part97.tab.gz
-2.part98	NA	200000	gRNA.tab.gz.split	2.part98.tab.gz
-2.part99	NA	200000	gRNA.tab.gz.split	2.part99.tab.gz
-2.part100	NA	200000	gRNA.tab.gz.split	2.part100.tab.gz
-2.part101	NA	200000	gRNA.tab.gz.split	2.part101.tab.gz
-2.part102	NA	200000	gRNA.tab.gz.split	2.part102.tab.gz
-2.part103	NA	200000	gRNA.tab.gz.split	2.part103.tab.gz
-2.part104	NA	200000	gRNA.tab.gz.split	2.part104.tab.gz
-2.part105	NA	200000	gRNA.tab.gz.split	2.part105.tab.gz
-2.part106	NA	200000	gRNA.tab.gz.split	2.part106.tab.gz
-2.part107	NA	200000	gRNA.tab.gz.split	2.part107.tab.gz
-2.part108	NA	200000	gRNA.tab.gz.split	2.part108.tab.gz
-2.part109	NA	200000	gRNA.tab.gz.split	2.part109.tab.gz
-2.part110	NA	200000	gRNA.tab.gz.split	2.part110.tab.gz
-2.part111	NA	200000	gRNA.tab.gz.split	2.part111.tab.gz
-2.part112	NA	200000	gRNA.tab.gz.split	2.part112.tab.gz
-2.part113	NA	200000	gRNA.tab.gz.split	2.part113.tab.gz
-2.part114	NA	200000	gRNA.tab.gz.split	2.part114.tab.gz
-2.part115	NA	200000	gRNA.tab.gz.split	2.part115.tab.gz
-2.part116	NA	200000	gRNA.tab.gz.split	2.part116.tab.gz
-2.part117	NA	200000	gRNA.tab.gz.split	2.part117.tab.gz
-2.part118	NA	200000	gRNA.tab.gz.split	2.part118.tab.gz
-2.part119	NA	200000	gRNA.tab.gz.split	2.part119.tab.gz
-2.part120	NA	131036	gRNA.tab.gz.split	2.part120.tab.gz
-20.part0	NA	200000	gRNA.tab.gz.split	20.part0.tab.gz
-20.part1	NA	200000	gRNA.tab.gz.split	20.part1.tab.gz
-20.part2	NA	200000	gRNA.tab.gz.split	20.part2.tab.gz
-20.part3	NA	200000	gRNA.tab.gz.split	20.part3.tab.gz
-20.part4	NA	200000	gRNA.tab.gz.split	20.part4.tab.gz
-20.part5	NA	200000	gRNA.tab.gz.split	20.part5.tab.gz
-20.part6	NA	200000	gRNA.tab.gz.split	20.part6.tab.gz
-20.part7	NA	200000	gRNA.tab.gz.split	20.part7.tab.gz
-20.part8	NA	200000	gRNA.tab.gz.split	20.part8.tab.gz
-20.part9	NA	200000	gRNA.tab.gz.split	20.part9.tab.gz
-20.part10	NA	200000	gRNA.tab.gz.split	20.part10.tab.gz
-20.part11	NA	200000	gRNA.tab.gz.split	20.part11.tab.gz
-20.part12	NA	200000	gRNA.tab.gz.split	20.part12.tab.gz
-20.part13	NA	200000	gRNA.tab.gz.split	20.part13.tab.gz
-20.part14	NA	200000	gRNA.tab.gz.split	20.part14.tab.gz
-20.part15	NA	200000	gRNA.tab.gz.split	20.part15.tab.gz
-20.part16	NA	200000	gRNA.tab.gz.split	20.part16.tab.gz
-20.part17	NA	200000	gRNA.tab.gz.split	20.part17.tab.gz
-20.part18	NA	200000	gRNA.tab.gz.split	20.part18.tab.gz
-20.part19	NA	200000	gRNA.tab.gz.split	20.part19.tab.gz
-20.part20	NA	200000	gRNA.tab.gz.split	20.part20.tab.gz
-20.part21	NA	200000	gRNA.tab.gz.split	20.part21.tab.gz
-20.part22	NA	200000	gRNA.tab.gz.split	20.part22.tab.gz
-20.part23	NA	200000	gRNA.tab.gz.split	20.part23.tab.gz
-20.part24	NA	200000	gRNA.tab.gz.split	20.part24.tab.gz
-20.part25	NA	200000	gRNA.tab.gz.split	20.part25.tab.gz
-20.part26	NA	200000	gRNA.tab.gz.split	20.part26.tab.gz
-20.part27	NA	200000	gRNA.tab.gz.split	20.part27.tab.gz
-20.part28	NA	200000	gRNA.tab.gz.split	20.part28.tab.gz
-20.part29	NA	200000	gRNA.tab.gz.split	20.part29.tab.gz
-20.part30	NA	200000	gRNA.tab.gz.split	20.part30.tab.gz
-20.part31	NA	200000	gRNA.tab.gz.split	20.part31.tab.gz
-20.part32	NA	200000	gRNA.tab.gz.split	20.part32.tab.gz
-20.part33	NA	200000	gRNA.tab.gz.split	20.part33.tab.gz
-20.part34	NA	200000	gRNA.tab.gz.split	20.part34.tab.gz
-20.part35	NA	200000	gRNA.tab.gz.split	20.part35.tab.gz
-20.part36	NA	200000	gRNA.tab.gz.split	20.part36.tab.gz
-20.part37	NA	155255	gRNA.tab.gz.split	20.part37.tab.gz
-21.part0	NA	200000	gRNA.tab.gz.split	21.part0.tab.gz
-21.part1	NA	200000	gRNA.tab.gz.split	21.part1.tab.gz
-21.part2	NA	200000	gRNA.tab.gz.split	21.part2.tab.gz
-21.part3	NA	200000	gRNA.tab.gz.split	21.part3.tab.gz
-21.part4	NA	200000	gRNA.tab.gz.split	21.part4.tab.gz
-21.part5	NA	200000	gRNA.tab.gz.split	21.part5.tab.gz
-21.part6	NA	200000	gRNA.tab.gz.split	21.part6.tab.gz
-21.part7	NA	200000	gRNA.tab.gz.split	21.part7.tab.gz
-21.part8	NA	200000	gRNA.tab.gz.split	21.part8.tab.gz
-21.part9	NA	200000	gRNA.tab.gz.split	21.part9.tab.gz
-21.part10	NA	200000	gRNA.tab.gz.split	21.part10.tab.gz
-21.part11	NA	200000	gRNA.tab.gz.split	21.part11.tab.gz
-21.part12	NA	200000	gRNA.tab.gz.split	21.part12.tab.gz
-21.part13	NA	200000	gRNA.tab.gz.split	21.part13.tab.gz
-21.part14	NA	200000	gRNA.tab.gz.split	21.part14.tab.gz
-21.part15	NA	200000	gRNA.tab.gz.split	21.part15.tab.gz
-21.part16	NA	200000	gRNA.tab.gz.split	21.part16.tab.gz
-21.part17	NA	200000	gRNA.tab.gz.split	21.part17.tab.gz
-21.part18	NA	200000	gRNA.tab.gz.split	21.part18.tab.gz
-21.part19	NA	200000	gRNA.tab.gz.split	21.part19.tab.gz
-21.part20	NA	106073	gRNA.tab.gz.split	21.part20.tab.gz
-22.part0	NA	200000	gRNA.tab.gz.split	22.part0.tab.gz
-22.part1	NA	200000	gRNA.tab.gz.split	22.part1.tab.gz
-22.part2	NA	200000	gRNA.tab.gz.split	22.part2.tab.gz
-22.part3	NA	200000	gRNA.tab.gz.split	22.part3.tab.gz
-22.part4	NA	200000	gRNA.tab.gz.split	22.part4.tab.gz
-22.part5	NA	200000	gRNA.tab.gz.split	22.part5.tab.gz
-22.part6	NA	200000	gRNA.tab.gz.split	22.part6.tab.gz
-22.part7	NA	200000	gRNA.tab.gz.split	22.part7.tab.gz
-22.part8	NA	200000	gRNA.tab.gz.split	22.part8.tab.gz
-22.part9	NA	200000	gRNA.tab.gz.split	22.part9.tab.gz
-22.part10	NA	200000	gRNA.tab.gz.split	22.part10.tab.gz
-22.part11	NA	200000	gRNA.tab.gz.split	22.part11.tab.gz
-22.part12	NA	200000	gRNA.tab.gz.split	22.part12.tab.gz
-22.part13	NA	200000	gRNA.tab.gz.split	22.part13.tab.gz
-22.part14	NA	200000	gRNA.tab.gz.split	22.part14.tab.gz
-22.part15	NA	200000	gRNA.tab.gz.split	22.part15.tab.gz
-22.part16	NA	200000	gRNA.tab.gz.split	22.part16.tab.gz
-22.part17	NA	200000	gRNA.tab.gz.split	22.part17.tab.gz
-22.part18	NA	200000	gRNA.tab.gz.split	22.part18.tab.gz
-22.part19	NA	200000	gRNA.tab.gz.split	22.part19.tab.gz
-22.part20	NA	200000	gRNA.tab.gz.split	22.part20.tab.gz
-22.part21	NA	200000	gRNA.tab.gz.split	22.part21.tab.gz
-22.part22	NA	200000	gRNA.tab.gz.split	22.part22.tab.gz
-22.part23	NA	200000	gRNA.tab.gz.split	22.part23.tab.gz
-22.part24	NA	200000	gRNA.tab.gz.split	22.part24.tab.gz
-22.part25	NA	200000	gRNA.tab.gz.split	22.part25.tab.gz
-22.part26	NA	95093	gRNA.tab.gz.split	22.part26.tab.gz
-3.part0	NA	200000	gRNA.tab.gz.split	3.part0.tab.gz
-3.part1	NA	200000	gRNA.tab.gz.split	3.part1.tab.gz
-3.part2	NA	200000	gRNA.tab.gz.split	3.part2.tab.gz
-3.part3	NA	200000	gRNA.tab.gz.split	3.part3.tab.gz
-3.part4	NA	200000	gRNA.tab.gz.split	3.part4.tab.gz
-3.part5	NA	200000	gRNA.tab.gz.split	3.part5.tab.gz
-3.part6	NA	200000	gRNA.tab.gz.split	3.part6.tab.gz
-3.part7	NA	200000	gRNA.tab.gz.split	3.part7.tab.gz
-3.part8	NA	200000	gRNA.tab.gz.split	3.part8.tab.gz
-3.part9	NA	200000	gRNA.tab.gz.split	3.part9.tab.gz
-3.part10	NA	200000	gRNA.tab.gz.split	3.part10.tab.gz
-3.part11	NA	200000	gRNA.tab.gz.split	3.part11.tab.gz
-3.part12	NA	200000	gRNA.tab.gz.split	3.part12.tab.gz
-3.part13	NA	200000	gRNA.tab.gz.split	3.part13.tab.gz
-3.part14	NA	200000	gRNA.tab.gz.split	3.part14.tab.gz
-3.part15	NA	200000	gRNA.tab.gz.split	3.part15.tab.gz
-3.part16	NA	200000	gRNA.tab.gz.split	3.part16.tab.gz
-3.part17	NA	200000	gRNA.tab.gz.split	3.part17.tab.gz
-3.part18	NA	200000	gRNA.tab.gz.split	3.part18.tab.gz
-3.part19	NA	200000	gRNA.tab.gz.split	3.part19.tab.gz
-3.part20	NA	200000	gRNA.tab.gz.split	3.part20.tab.gz
-3.part21	NA	200000	gRNA.tab.gz.split	3.part21.tab.gz
-3.part22	NA	200000	gRNA.tab.gz.split	3.part22.tab.gz
-3.part23	NA	200000	gRNA.tab.gz.split	3.part23.tab.gz
-3.part24	NA	200000	gRNA.tab.gz.split	3.part24.tab.gz
-3.part25	NA	200000	gRNA.tab.gz.split	3.part25.tab.gz
-3.part26	NA	200000	gRNA.tab.gz.split	3.part26.tab.gz
-3.part27	NA	200000	gRNA.tab.gz.split	3.part27.tab.gz
-3.part28	NA	200000	gRNA.tab.gz.split	3.part28.tab.gz
-3.part29	NA	200000	gRNA.tab.gz.split	3.part29.tab.gz
-3.part30	NA	200000	gRNA.tab.gz.split	3.part30.tab.gz
-3.part31	NA	200000	gRNA.tab.gz.split	3.part31.tab.gz
-3.part32	NA	200000	gRNA.tab.gz.split	3.part32.tab.gz
-3.part33	NA	200000	gRNA.tab.gz.split	3.part33.tab.gz
-3.part34	NA	200000	gRNA.tab.gz.split	3.part34.tab.gz
-3.part35	NA	200000	gRNA.tab.gz.split	3.part35.tab.gz
-3.part36	NA	200000	gRNA.tab.gz.split	3.part36.tab.gz
-3.part37	NA	200000	gRNA.tab.gz.split	3.part37.tab.gz
-3.part38	NA	200000	gRNA.tab.gz.split	3.part38.tab.gz
-3.part39	NA	200000	gRNA.tab.gz.split	3.part39.tab.gz
-3.part40	NA	200000	gRNA.tab.gz.split	3.part40.tab.gz
-3.part41	NA	200000	gRNA.tab.gz.split	3.part41.tab.gz
-3.part42	NA	200000	gRNA.tab.gz.split	3.part42.tab.gz
-3.part43	NA	200000	gRNA.tab.gz.split	3.part43.tab.gz
-3.part44	NA	200000	gRNA.tab.gz.split	3.part44.tab.gz
-3.part45	NA	200000	gRNA.tab.gz.split	3.part45.tab.gz
-3.part46	NA	200000	gRNA.tab.gz.split	3.part46.tab.gz
-3.part47	NA	200000	gRNA.tab.gz.split	3.part47.tab.gz
-3.part48	NA	200000	gRNA.tab.gz.split	3.part48.tab.gz
-3.part49	NA	200000	gRNA.tab.gz.split	3.part49.tab.gz
-3.part50	NA	200000	gRNA.tab.gz.split	3.part50.tab.gz
-3.part51	NA	200000	gRNA.tab.gz.split	3.part51.tab.gz
-3.part52	NA	200000	gRNA.tab.gz.split	3.part52.tab.gz
-3.part53	NA	200000	gRNA.tab.gz.split	3.part53.tab.gz
-3.part54	NA	200000	gRNA.tab.gz.split	3.part54.tab.gz
-3.part55	NA	200000	gRNA.tab.gz.split	3.part55.tab.gz
-3.part56	NA	200000	gRNA.tab.gz.split	3.part56.tab.gz
-3.part57	NA	200000	gRNA.tab.gz.split	3.part57.tab.gz
-3.part58	NA	200000	gRNA.tab.gz.split	3.part58.tab.gz
-3.part59	NA	200000	gRNA.tab.gz.split	3.part59.tab.gz
-3.part60	NA	200000	gRNA.tab.gz.split	3.part60.tab.gz
-3.part61	NA	200000	gRNA.tab.gz.split	3.part61.tab.gz
-3.part62	NA	200000	gRNA.tab.gz.split	3.part62.tab.gz
-3.part63	NA	200000	gRNA.tab.gz.split	3.part63.tab.gz
-3.part64	NA	200000	gRNA.tab.gz.split	3.part64.tab.gz
-3.part65	NA	200000	gRNA.tab.gz.split	3.part65.tab.gz
-3.part66	NA	200000	gRNA.tab.gz.split	3.part66.tab.gz
-3.part67	NA	200000	gRNA.tab.gz.split	3.part67.tab.gz
-3.part68	NA	200000	gRNA.tab.gz.split	3.part68.tab.gz
-3.part69	NA	200000	gRNA.tab.gz.split	3.part69.tab.gz
-3.part70	NA	200000	gRNA.tab.gz.split	3.part70.tab.gz
-3.part71	NA	200000	gRNA.tab.gz.split	3.part71.tab.gz
-3.part72	NA	200000	gRNA.tab.gz.split	3.part72.tab.gz
-3.part73	NA	200000	gRNA.tab.gz.split	3.part73.tab.gz
-3.part74	NA	200000	gRNA.tab.gz.split	3.part74.tab.gz
-3.part75	NA	200000	gRNA.tab.gz.split	3.part75.tab.gz
-3.part76	NA	200000	gRNA.tab.gz.split	3.part76.tab.gz
-3.part77	NA	200000	gRNA.tab.gz.split	3.part77.tab.gz
-3.part78	NA	200000	gRNA.tab.gz.split	3.part78.tab.gz
-3.part79	NA	200000	gRNA.tab.gz.split	3.part79.tab.gz
-3.part80	NA	200000	gRNA.tab.gz.split	3.part80.tab.gz
-3.part81	NA	200000	gRNA.tab.gz.split	3.part81.tab.gz
-3.part82	NA	200000	gRNA.tab.gz.split	3.part82.tab.gz
-3.part83	NA	200000	gRNA.tab.gz.split	3.part83.tab.gz
-3.part84	NA	200000	gRNA.tab.gz.split	3.part84.tab.gz
-3.part85	NA	200000	gRNA.tab.gz.split	3.part85.tab.gz
-3.part86	NA	200000	gRNA.tab.gz.split	3.part86.tab.gz
-3.part87	NA	200000	gRNA.tab.gz.split	3.part87.tab.gz
-3.part88	NA	200000	gRNA.tab.gz.split	3.part88.tab.gz
-3.part89	NA	200000	gRNA.tab.gz.split	3.part89.tab.gz
-3.part90	NA	200000	gRNA.tab.gz.split	3.part90.tab.gz
-3.part91	NA	200000	gRNA.tab.gz.split	3.part91.tab.gz
-3.part92	NA	200000	gRNA.tab.gz.split	3.part92.tab.gz
-3.part93	NA	200000	gRNA.tab.gz.split	3.part93.tab.gz
-3.part94	NA	200000	gRNA.tab.gz.split	3.part94.tab.gz
-3.part95	NA	200000	gRNA.tab.gz.split	3.part95.tab.gz
-3.part96	NA	83402	gRNA.tab.gz.split	3.part96.tab.gz
-4.part0	NA	200000	gRNA.tab.gz.split	4.part0.tab.gz
-4.part1	NA	200000	gRNA.tab.gz.split	4.part1.tab.gz
-4.part2	NA	200000	gRNA.tab.gz.split	4.part2.tab.gz
-4.part3	NA	200000	gRNA.tab.gz.split	4.part3.tab.gz
-4.part4	NA	200000	gRNA.tab.gz.split	4.part4.tab.gz
-4.part5	NA	200000	gRNA.tab.gz.split	4.part5.tab.gz
-4.part6	NA	200000	gRNA.tab.gz.split	4.part6.tab.gz
-4.part7	NA	200000	gRNA.tab.gz.split	4.part7.tab.gz
-4.part8	NA	200000	gRNA.tab.gz.split	4.part8.tab.gz
-4.part9	NA	200000	gRNA.tab.gz.split	4.part9.tab.gz
-4.part10	NA	200000	gRNA.tab.gz.split	4.part10.tab.gz
-4.part11	NA	200000	gRNA.tab.gz.split	4.part11.tab.gz
-4.part12	NA	200000	gRNA.tab.gz.split	4.part12.tab.gz
-4.part13	NA	200000	gRNA.tab.gz.split	4.part13.tab.gz
-4.part14	NA	200000	gRNA.tab.gz.split	4.part14.tab.gz
-4.part15	NA	200000	gRNA.tab.gz.split	4.part15.tab.gz
-4.part16	NA	200000	gRNA.tab.gz.split	4.part16.tab.gz
-4.part17	NA	200000	gRNA.tab.gz.split	4.part17.tab.gz
-4.part18	NA	200000	gRNA.tab.gz.split	4.part18.tab.gz
-4.part19	NA	200000	gRNA.tab.gz.split	4.part19.tab.gz
-4.part20	NA	200000	gRNA.tab.gz.split	4.part20.tab.gz
-4.part21	NA	200000	gRNA.tab.gz.split	4.part21.tab.gz
-4.part22	NA	200000	gRNA.tab.gz.split	4.part22.tab.gz
-4.part23	NA	200000	gRNA.tab.gz.split	4.part23.tab.gz
-4.part24	NA	200000	gRNA.tab.gz.split	4.part24.tab.gz
-4.part25	NA	200000	gRNA.tab.gz.split	4.part25.tab.gz
-4.part26	NA	200000	gRNA.tab.gz.split	4.part26.tab.gz
-4.part27	NA	200000	gRNA.tab.gz.split	4.part27.tab.gz
-4.part28	NA	200000	gRNA.tab.gz.split	4.part28.tab.gz
-4.part29	NA	200000	gRNA.tab.gz.split	4.part29.tab.gz
-4.part30	NA	200000	gRNA.tab.gz.split	4.part30.tab.gz
-4.part31	NA	200000	gRNA.tab.gz.split	4.part31.tab.gz
-4.part32	NA	200000	gRNA.tab.gz.split	4.part32.tab.gz
-4.part33	NA	200000	gRNA.tab.gz.split	4.part33.tab.gz
-4.part34	NA	200000	gRNA.tab.gz.split	4.part34.tab.gz
-4.part35	NA	200000	gRNA.tab.gz.split	4.part35.tab.gz
-4.part36	NA	200000	gRNA.tab.gz.split	4.part36.tab.gz
-4.part37	NA	200000	gRNA.tab.gz.split	4.part37.tab.gz
-4.part38	NA	200000	gRNA.tab.gz.split	4.part38.tab.gz
-4.part39	NA	200000	gRNA.tab.gz.split	4.part39.tab.gz
-4.part40	NA	200000	gRNA.tab.gz.split	4.part40.tab.gz
-4.part41	NA	200000	gRNA.tab.gz.split	4.part41.tab.gz
-4.part42	NA	200000	gRNA.tab.gz.split	4.part42.tab.gz
-4.part43	NA	200000	gRNA.tab.gz.split	4.part43.tab.gz
-4.part44	NA	200000	gRNA.tab.gz.split	4.part44.tab.gz
-4.part45	NA	200000	gRNA.tab.gz.split	4.part45.tab.gz
-4.part46	NA	200000	gRNA.tab.gz.split	4.part46.tab.gz
-4.part47	NA	200000	gRNA.tab.gz.split	4.part47.tab.gz
-4.part48	NA	200000	gRNA.tab.gz.split	4.part48.tab.gz
-4.part49	NA	200000	gRNA.tab.gz.split	4.part49.tab.gz
-4.part50	NA	200000	gRNA.tab.gz.split	4.part50.tab.gz
-4.part51	NA	200000	gRNA.tab.gz.split	4.part51.tab.gz
-4.part52	NA	200000	gRNA.tab.gz.split	4.part52.tab.gz
-4.part53	NA	200000	gRNA.tab.gz.split	4.part53.tab.gz
-4.part54	NA	200000	gRNA.tab.gz.split	4.part54.tab.gz
-4.part55	NA	200000	gRNA.tab.gz.split	4.part55.tab.gz
-4.part56	NA	200000	gRNA.tab.gz.split	4.part56.tab.gz
-4.part57	NA	200000	gRNA.tab.gz.split	4.part57.tab.gz
-4.part58	NA	200000	gRNA.tab.gz.split	4.part58.tab.gz
-4.part59	NA	200000	gRNA.tab.gz.split	4.part59.tab.gz
-4.part60	NA	200000	gRNA.tab.gz.split	4.part60.tab.gz
-4.part61	NA	200000	gRNA.tab.gz.split	4.part61.tab.gz
-4.part62	NA	200000	gRNA.tab.gz.split	4.part62.tab.gz
-4.part63	NA	200000	gRNA.tab.gz.split	4.part63.tab.gz
-4.part64	NA	200000	gRNA.tab.gz.split	4.part64.tab.gz
-4.part65	NA	200000	gRNA.tab.gz.split	4.part65.tab.gz
-4.part66	NA	200000	gRNA.tab.gz.split	4.part66.tab.gz
-4.part67	NA	200000	gRNA.tab.gz.split	4.part67.tab.gz
-4.part68	NA	200000	gRNA.tab.gz.split	4.part68.tab.gz
-4.part69	NA	200000	gRNA.tab.gz.split	4.part69.tab.gz
-4.part70	NA	200000	gRNA.tab.gz.split	4.part70.tab.gz
-4.part71	NA	200000	gRNA.tab.gz.split	4.part71.tab.gz
-4.part72	NA	200000	gRNA.tab.gz.split	4.part72.tab.gz
-4.part73	NA	200000	gRNA.tab.gz.split	4.part73.tab.gz
-4.part74	NA	200000	gRNA.tab.gz.split	4.part74.tab.gz
-4.part75	NA	200000	gRNA.tab.gz.split	4.part75.tab.gz
-4.part76	NA	200000	gRNA.tab.gz.split	4.part76.tab.gz
-4.part77	NA	200000	gRNA.tab.gz.split	4.part77.tab.gz
-4.part78	NA	200000	gRNA.tab.gz.split	4.part78.tab.gz
-4.part79	NA	200000	gRNA.tab.gz.split	4.part79.tab.gz
-4.part80	NA	200000	gRNA.tab.gz.split	4.part80.tab.gz
-4.part81	NA	200000	gRNA.tab.gz.split	4.part81.tab.gz
-4.part82	NA	200000	gRNA.tab.gz.split	4.part82.tab.gz
-4.part83	NA	200000	gRNA.tab.gz.split	4.part83.tab.gz
-4.part84	NA	200000	gRNA.tab.gz.split	4.part84.tab.gz
-4.part85	NA	94343	gRNA.tab.gz.split	4.part85.tab.gz
-5.part0	NA	200000	gRNA.tab.gz.split	5.part0.tab.gz
-5.part1	NA	200000	gRNA.tab.gz.split	5.part1.tab.gz
-5.part2	NA	200000	gRNA.tab.gz.split	5.part2.tab.gz
-5.part3	NA	200000	gRNA.tab.gz.split	5.part3.tab.gz
-5.part4	NA	200000	gRNA.tab.gz.split	5.part4.tab.gz
-5.part5	NA	200000	gRNA.tab.gz.split	5.part5.tab.gz
-5.part6	NA	200000	gRNA.tab.gz.split	5.part6.tab.gz
-5.part7	NA	200000	gRNA.tab.gz.split	5.part7.tab.gz
-5.part8	NA	200000	gRNA.tab.gz.split	5.part8.tab.gz
-5.part9	NA	200000	gRNA.tab.gz.split	5.part9.tab.gz
-5.part10	NA	200000	gRNA.tab.gz.split	5.part10.tab.gz
-5.part11	NA	200000	gRNA.tab.gz.split	5.part11.tab.gz
-5.part12	NA	200000	gRNA.tab.gz.split	5.part12.tab.gz
-5.part13	NA	200000	gRNA.tab.gz.split	5.part13.tab.gz
-5.part14	NA	200000	gRNA.tab.gz.split	5.part14.tab.gz
-5.part15	NA	200000	gRNA.tab.gz.split	5.part15.tab.gz
-5.part16	NA	200000	gRNA.tab.gz.split	5.part16.tab.gz
-5.part17	NA	200000	gRNA.tab.gz.split	5.part17.tab.gz
-5.part18	NA	200000	gRNA.tab.gz.split	5.part18.tab.gz
-5.part19	NA	200000	gRNA.tab.gz.split	5.part19.tab.gz
-5.part20	NA	200000	gRNA.tab.gz.split	5.part20.tab.gz
-5.part21	NA	200000	gRNA.tab.gz.split	5.part21.tab.gz
-5.part22	NA	200000	gRNA.tab.gz.split	5.part22.tab.gz
-5.part23	NA	200000	gRNA.tab.gz.split	5.part23.tab.gz
-5.part24	NA	200000	gRNA.tab.gz.split	5.part24.tab.gz
-5.part25	NA	200000	gRNA.tab.gz.split	5.part25.tab.gz
-5.part26	NA	200000	gRNA.tab.gz.split	5.part26.tab.gz
-5.part27	NA	200000	gRNA.tab.gz.split	5.part27.tab.gz
-5.part28	NA	200000	gRNA.tab.gz.split	5.part28.tab.gz
-5.part29	NA	200000	gRNA.tab.gz.split	5.part29.tab.gz
-5.part30	NA	200000	gRNA.tab.gz.split	5.part30.tab.gz
-5.part31	NA	200000	gRNA.tab.gz.split	5.part31.tab.gz
-5.part32	NA	200000	gRNA.tab.gz.split	5.part32.tab.gz
-5.part33	NA	200000	gRNA.tab.gz.split	5.part33.tab.gz
-5.part34	NA	200000	gRNA.tab.gz.split	5.part34.tab.gz
-5.part35	NA	200000	gRNA.tab.gz.split	5.part35.tab.gz
-5.part36	NA	200000	gRNA.tab.gz.split	5.part36.tab.gz
-5.part37	NA	200000	gRNA.tab.gz.split	5.part37.tab.gz
-5.part38	NA	200000	gRNA.tab.gz.split	5.part38.tab.gz
-5.part39	NA	200000	gRNA.tab.gz.split	5.part39.tab.gz
-5.part40	NA	200000	gRNA.tab.gz.split	5.part40.tab.gz
-5.part41	NA	200000	gRNA.tab.gz.split	5.part41.tab.gz
-5.part42	NA	200000	gRNA.tab.gz.split	5.part42.tab.gz
-5.part43	NA	200000	gRNA.tab.gz.split	5.part43.tab.gz
-5.part44	NA	200000	gRNA.tab.gz.split	5.part44.tab.gz
-5.part45	NA	200000	gRNA.tab.gz.split	5.part45.tab.gz
-5.part46	NA	200000	gRNA.tab.gz.split	5.part46.tab.gz
-5.part47	NA	200000	gRNA.tab.gz.split	5.part47.tab.gz
-5.part48	NA	200000	gRNA.tab.gz.split	5.part48.tab.gz
-5.part49	NA	200000	gRNA.tab.gz.split	5.part49.tab.gz
-5.part50	NA	200000	gRNA.tab.gz.split	5.part50.tab.gz
-5.part51	NA	200000	gRNA.tab.gz.split	5.part51.tab.gz
-5.part52	NA	200000	gRNA.tab.gz.split	5.part52.tab.gz
-5.part53	NA	200000	gRNA.tab.gz.split	5.part53.tab.gz
-5.part54	NA	200000	gRNA.tab.gz.split	5.part54.tab.gz
-5.part55	NA	200000	gRNA.tab.gz.split	5.part55.tab.gz
-5.part56	NA	200000	gRNA.tab.gz.split	5.part56.tab.gz
-5.part57	NA	200000	gRNA.tab.gz.split	5.part57.tab.gz
-5.part58	NA	200000	gRNA.tab.gz.split	5.part58.tab.gz
-5.part59	NA	200000	gRNA.tab.gz.split	5.part59.tab.gz
-5.part60	NA	200000	gRNA.tab.gz.split	5.part60.tab.gz
-5.part61	NA	200000	gRNA.tab.gz.split	5.part61.tab.gz
-5.part62	NA	200000	gRNA.tab.gz.split	5.part62.tab.gz
-5.part63	NA	200000	gRNA.tab.gz.split	5.part63.tab.gz
-5.part64	NA	200000	gRNA.tab.gz.split	5.part64.tab.gz
-5.part65	NA	200000	gRNA.tab.gz.split	5.part65.tab.gz
-5.part66	NA	200000	gRNA.tab.gz.split	5.part66.tab.gz
-5.part67	NA	200000	gRNA.tab.gz.split	5.part67.tab.gz
-5.part68	NA	200000	gRNA.tab.gz.split	5.part68.tab.gz
-5.part69	NA	200000	gRNA.tab.gz.split	5.part69.tab.gz
-5.part70	NA	200000	gRNA.tab.gz.split	5.part70.tab.gz
-5.part71	NA	200000	gRNA.tab.gz.split	5.part71.tab.gz
-5.part72	NA	200000	gRNA.tab.gz.split	5.part72.tab.gz
-5.part73	NA	200000	gRNA.tab.gz.split	5.part73.tab.gz
-5.part74	NA	200000	gRNA.tab.gz.split	5.part74.tab.gz
-5.part75	NA	200000	gRNA.tab.gz.split	5.part75.tab.gz
-5.part76	NA	200000	gRNA.tab.gz.split	5.part76.tab.gz
-5.part77	NA	200000	gRNA.tab.gz.split	5.part77.tab.gz
-5.part78	NA	200000	gRNA.tab.gz.split	5.part78.tab.gz
-5.part79	NA	200000	gRNA.tab.gz.split	5.part79.tab.gz
-5.part80	NA	200000	gRNA.tab.gz.split	5.part80.tab.gz
-5.part81	NA	200000	gRNA.tab.gz.split	5.part81.tab.gz
-5.part82	NA	200000	gRNA.tab.gz.split	5.part82.tab.gz
-5.part83	NA	200000	gRNA.tab.gz.split	5.part83.tab.gz
-5.part84	NA	200000	gRNA.tab.gz.split	5.part84.tab.gz
-5.part85	NA	200000	gRNA.tab.gz.split	5.part85.tab.gz
-5.part86	NA	200000	gRNA.tab.gz.split	5.part86.tab.gz
-5.part87	NA	6823	gRNA.tab.gz.split	5.part87.tab.gz
-6.part0	NA	200000	gRNA.tab.gz.split	6.part0.tab.gz
-6.part1	NA	200000	gRNA.tab.gz.split	6.part1.tab.gz
-6.part2	NA	200000	gRNA.tab.gz.split	6.part2.tab.gz
-6.part3	NA	200000	gRNA.tab.gz.split	6.part3.tab.gz
-6.part4	NA	200000	gRNA.tab.gz.split	6.part4.tab.gz
-6.part5	NA	200000	gRNA.tab.gz.split	6.part5.tab.gz
-6.part6	NA	200000	gRNA.tab.gz.split	6.part6.tab.gz
-6.part7	NA	200000	gRNA.tab.gz.split	6.part7.tab.gz
-6.part8	NA	200000	gRNA.tab.gz.split	6.part8.tab.gz
-6.part9	NA	200000	gRNA.tab.gz.split	6.part9.tab.gz
-6.part10	NA	200000	gRNA.tab.gz.split	6.part10.tab.gz
-6.part11	NA	200000	gRNA.tab.gz.split	6.part11.tab.gz
-6.part12	NA	200000	gRNA.tab.gz.split	6.part12.tab.gz
-6.part13	NA	200000	gRNA.tab.gz.split	6.part13.tab.gz
-6.part14	NA	200000	gRNA.tab.gz.split	6.part14.tab.gz
-6.part15	NA	200000	gRNA.tab.gz.split	6.part15.tab.gz
-6.part16	NA	200000	gRNA.tab.gz.split	6.part16.tab.gz
-6.part17	NA	200000	gRNA.tab.gz.split	6.part17.tab.gz
-6.part18	NA	200000	gRNA.tab.gz.split	6.part18.tab.gz
-6.part19	NA	200000	gRNA.tab.gz.split	6.part19.tab.gz
-6.part20	NA	200000	gRNA.tab.gz.split	6.part20.tab.gz
-6.part21	NA	200000	gRNA.tab.gz.split	6.part21.tab.gz
-6.part22	NA	200000	gRNA.tab.gz.split	6.part22.tab.gz
-6.part23	NA	200000	gRNA.tab.gz.split	6.part23.tab.gz
-6.part24	NA	200000	gRNA.tab.gz.split	6.part24.tab.gz
-6.part25	NA	200000	gRNA.tab.gz.split	6.part25.tab.gz
-6.part26	NA	200000	gRNA.tab.gz.split	6.part26.tab.gz
-6.part27	NA	200000	gRNA.tab.gz.split	6.part27.tab.gz
-6.part28	NA	200000	gRNA.tab.gz.split	6.part28.tab.gz
-6.part29	NA	200000	gRNA.tab.gz.split	6.part29.tab.gz
-6.part30	NA	200000	gRNA.tab.gz.split	6.part30.tab.gz
-6.part31	NA	200000	gRNA.tab.gz.split	6.part31.tab.gz
-6.part32	NA	200000	gRNA.tab.gz.split	6.part32.tab.gz
-6.part33	NA	200000	gRNA.tab.gz.split	6.part33.tab.gz
-6.part34	NA	200000	gRNA.tab.gz.split	6.part34.tab.gz
-6.part35	NA	200000	gRNA.tab.gz.split	6.part35.tab.gz
-6.part36	NA	200000	gRNA.tab.gz.split	6.part36.tab.gz
-6.part37	NA	200000	gRNA.tab.gz.split	6.part37.tab.gz
-6.part38	NA	200000	gRNA.tab.gz.split	6.part38.tab.gz
-6.part39	NA	200000	gRNA.tab.gz.split	6.part39.tab.gz
-6.part40	NA	200000	gRNA.tab.gz.split	6.part40.tab.gz
-6.part41	NA	200000	gRNA.tab.gz.split	6.part41.tab.gz
-6.part42	NA	200000	gRNA.tab.gz.split	6.part42.tab.gz
-6.part43	NA	200000	gRNA.tab.gz.split	6.part43.tab.gz
-6.part44	NA	200000	gRNA.tab.gz.split	6.part44.tab.gz
-6.part45	NA	200000	gRNA.tab.gz.split	6.part45.tab.gz
-6.part46	NA	200000	gRNA.tab.gz.split	6.part46.tab.gz
-6.part47	NA	200000	gRNA.tab.gz.split	6.part47.tab.gz
-6.part48	NA	200000	gRNA.tab.gz.split	6.part48.tab.gz
-6.part49	NA	200000	gRNA.tab.gz.split	6.part49.tab.gz
-6.part50	NA	200000	gRNA.tab.gz.split	6.part50.tab.gz
-6.part51	NA	200000	gRNA.tab.gz.split	6.part51.tab.gz
-6.part52	NA	200000	gRNA.tab.gz.split	6.part52.tab.gz
-6.part53	NA	200000	gRNA.tab.gz.split	6.part53.tab.gz
-6.part54	NA	200000	gRNA.tab.gz.split	6.part54.tab.gz
-6.part55	NA	200000	gRNA.tab.gz.split	6.part55.tab.gz
-6.part56	NA	200000	gRNA.tab.gz.split	6.part56.tab.gz
-6.part57	NA	200000	gRNA.tab.gz.split	6.part57.tab.gz
-6.part58	NA	200000	gRNA.tab.gz.split	6.part58.tab.gz
-6.part59	NA	200000	gRNA.tab.gz.split	6.part59.tab.gz
-6.part60	NA	200000	gRNA.tab.gz.split	6.part60.tab.gz
-6.part61	NA	200000	gRNA.tab.gz.split	6.part61.tab.gz
-6.part62	NA	200000	gRNA.tab.gz.split	6.part62.tab.gz
-6.part63	NA	200000	gRNA.tab.gz.split	6.part63.tab.gz
-6.part64	NA	200000	gRNA.tab.gz.split	6.part64.tab.gz
-6.part65	NA	200000	gRNA.tab.gz.split	6.part65.tab.gz
-6.part66	NA	200000	gRNA.tab.gz.split	6.part66.tab.gz
-6.part67	NA	200000	gRNA.tab.gz.split	6.part67.tab.gz
-6.part68	NA	200000	gRNA.tab.gz.split	6.part68.tab.gz
-6.part69	NA	200000	gRNA.tab.gz.split	6.part69.tab.gz
-6.part70	NA	200000	gRNA.tab.gz.split	6.part70.tab.gz
-6.part71	NA	200000	gRNA.tab.gz.split	6.part71.tab.gz
-6.part72	NA	200000	gRNA.tab.gz.split	6.part72.tab.gz
-6.part73	NA	200000	gRNA.tab.gz.split	6.part73.tab.gz
-6.part74	NA	200000	gRNA.tab.gz.split	6.part74.tab.gz
-6.part75	NA	200000	gRNA.tab.gz.split	6.part75.tab.gz
-6.part76	NA	200000	gRNA.tab.gz.split	6.part76.tab.gz
-6.part77	NA	200000	gRNA.tab.gz.split	6.part77.tab.gz
-6.part78	NA	200000	gRNA.tab.gz.split	6.part78.tab.gz
-6.part79	NA	200000	gRNA.tab.gz.split	6.part79.tab.gz
-6.part80	NA	200000	gRNA.tab.gz.split	6.part80.tab.gz
-6.part81	NA	200000	gRNA.tab.gz.split	6.part81.tab.gz
-6.part82	NA	104399	gRNA.tab.gz.split	6.part82.tab.gz
-7.part0	NA	200000	gRNA.tab.gz.split	7.part0.tab.gz
-7.part1	NA	200000	gRNA.tab.gz.split	7.part1.tab.gz
-7.part2	NA	200000	gRNA.tab.gz.split	7.part2.tab.gz
-7.part3	NA	200000	gRNA.tab.gz.split	7.part3.tab.gz
-7.part4	NA	200000	gRNA.tab.gz.split	7.part4.tab.gz
-7.part5	NA	200000	gRNA.tab.gz.split	7.part5.tab.gz
-7.part6	NA	200000	gRNA.tab.gz.split	7.part6.tab.gz
-7.part7	NA	200000	gRNA.tab.gz.split	7.part7.tab.gz
-7.part8	NA	200000	gRNA.tab.gz.split	7.part8.tab.gz
-7.part9	NA	200000	gRNA.tab.gz.split	7.part9.tab.gz
-7.part10	NA	200000	gRNA.tab.gz.split	7.part10.tab.gz
-7.part11	NA	200000	gRNA.tab.gz.split	7.part11.tab.gz
-7.part12	NA	200000	gRNA.tab.gz.split	7.part12.tab.gz
-7.part13	NA	200000	gRNA.tab.gz.split	7.part13.tab.gz
-7.part14	NA	200000	gRNA.tab.gz.split	7.part14.tab.gz
-7.part15	NA	200000	gRNA.tab.gz.split	7.part15.tab.gz
-7.part16	NA	200000	gRNA.tab.gz.split	7.part16.tab.gz
-7.part17	NA	200000	gRNA.tab.gz.split	7.part17.tab.gz
-7.part18	NA	200000	gRNA.tab.gz.split	7.part18.tab.gz
-7.part19	NA	200000	gRNA.tab.gz.split	7.part19.tab.gz
-7.part20	NA	200000	gRNA.tab.gz.split	7.part20.tab.gz
-7.part21	NA	200000	gRNA.tab.gz.split	7.part21.tab.gz
-7.part22	NA	200000	gRNA.tab.gz.split	7.part22.tab.gz
-7.part23	NA	200000	gRNA.tab.gz.split	7.part23.tab.gz
-7.part24	NA	200000	gRNA.tab.gz.split	7.part24.tab.gz
-7.part25	NA	200000	gRNA.tab.gz.split	7.part25.tab.gz
-7.part26	NA	200000	gRNA.tab.gz.split	7.part26.tab.gz
-7.part27	NA	200000	gRNA.tab.gz.split	7.part27.tab.gz
-7.part28	NA	200000	gRNA.tab.gz.split	7.part28.tab.gz
-7.part29	NA	200000	gRNA.tab.gz.split	7.part29.tab.gz
-7.part30	NA	200000	gRNA.tab.gz.split	7.part30.tab.gz
-7.part31	NA	200000	gRNA.tab.gz.split	7.part31.tab.gz
-7.part32	NA	200000	gRNA.tab.gz.split	7.part32.tab.gz
-7.part33	NA	200000	gRNA.tab.gz.split	7.part33.tab.gz
-7.part34	NA	200000	gRNA.tab.gz.split	7.part34.tab.gz
-7.part35	NA	200000	gRNA.tab.gz.split	7.part35.tab.gz
-7.part36	NA	200000	gRNA.tab.gz.split	7.part36.tab.gz
-7.part37	NA	200000	gRNA.tab.gz.split	7.part37.tab.gz
-7.part38	NA	200000	gRNA.tab.gz.split	7.part38.tab.gz
-7.part39	NA	200000	gRNA.tab.gz.split	7.part39.tab.gz
-7.part40	NA	200000	gRNA.tab.gz.split	7.part40.tab.gz
-7.part41	NA	200000	gRNA.tab.gz.split	7.part41.tab.gz
-7.part42	NA	200000	gRNA.tab.gz.split	7.part42.tab.gz
-7.part43	NA	200000	gRNA.tab.gz.split	7.part43.tab.gz
-7.part44	NA	200000	gRNA.tab.gz.split	7.part44.tab.gz
-7.part45	NA	200000	gRNA.tab.gz.split	7.part45.tab.gz
-7.part46	NA	200000	gRNA.tab.gz.split	7.part46.tab.gz
-7.part47	NA	200000	gRNA.tab.gz.split	7.part47.tab.gz
-7.part48	NA	200000	gRNA.tab.gz.split	7.part48.tab.gz
-7.part49	NA	200000	gRNA.tab.gz.split	7.part49.tab.gz
-7.part50	NA	200000	gRNA.tab.gz.split	7.part50.tab.gz
-7.part51	NA	200000	gRNA.tab.gz.split	7.part51.tab.gz
-7.part52	NA	200000	gRNA.tab.gz.split	7.part52.tab.gz
-7.part53	NA	200000	gRNA.tab.gz.split	7.part53.tab.gz
-7.part54	NA	200000	gRNA.tab.gz.split	7.part54.tab.gz
-7.part55	NA	200000	gRNA.tab.gz.split	7.part55.tab.gz
-7.part56	NA	200000	gRNA.tab.gz.split	7.part56.tab.gz
-7.part57	NA	200000	gRNA.tab.gz.split	7.part57.tab.gz
-7.part58	NA	200000	gRNA.tab.gz.split	7.part58.tab.gz
-7.part59	NA	200000	gRNA.tab.gz.split	7.part59.tab.gz
-7.part60	NA	200000	gRNA.tab.gz.split	7.part60.tab.gz
-7.part61	NA	200000	gRNA.tab.gz.split	7.part61.tab.gz
-7.part62	NA	200000	gRNA.tab.gz.split	7.part62.tab.gz
-7.part63	NA	200000	gRNA.tab.gz.split	7.part63.tab.gz
-7.part64	NA	200000	gRNA.tab.gz.split	7.part64.tab.gz
-7.part65	NA	200000	gRNA.tab.gz.split	7.part65.tab.gz
-7.part66	NA	200000	gRNA.tab.gz.split	7.part66.tab.gz
-7.part67	NA	200000	gRNA.tab.gz.split	7.part67.tab.gz
-7.part68	NA	200000	gRNA.tab.gz.split	7.part68.tab.gz
-7.part69	NA	200000	gRNA.tab.gz.split	7.part69.tab.gz
-7.part70	NA	200000	gRNA.tab.gz.split	7.part70.tab.gz
-7.part71	NA	200000	gRNA.tab.gz.split	7.part71.tab.gz
-7.part72	NA	200000	gRNA.tab.gz.split	7.part72.tab.gz
-7.part73	NA	200000	gRNA.tab.gz.split	7.part73.tab.gz
-7.part74	NA	200000	gRNA.tab.gz.split	7.part74.tab.gz
-7.part75	NA	200000	gRNA.tab.gz.split	7.part75.tab.gz
-7.part76	NA	200000	gRNA.tab.gz.split	7.part76.tab.gz
-7.part77	NA	200000	gRNA.tab.gz.split	7.part77.tab.gz
-7.part78	NA	200000	gRNA.tab.gz.split	7.part78.tab.gz
-7.part79	NA	200000	gRNA.tab.gz.split	7.part79.tab.gz
-7.part80	NA	200000	gRNA.tab.gz.split	7.part80.tab.gz
-7.part81	NA	46098	gRNA.tab.gz.split	7.part81.tab.gz
-8.part0	NA	200000	gRNA.tab.gz.split	8.part0.tab.gz
-8.part1	NA	200000	gRNA.tab.gz.split	8.part1.tab.gz
-8.part2	NA	200000	gRNA.tab.gz.split	8.part2.tab.gz
-8.part3	NA	200000	gRNA.tab.gz.split	8.part3.tab.gz
-8.part4	NA	200000	gRNA.tab.gz.split	8.part4.tab.gz
-8.part5	NA	200000	gRNA.tab.gz.split	8.part5.tab.gz
-8.part6	NA	200000	gRNA.tab.gz.split	8.part6.tab.gz
-8.part7	NA	200000	gRNA.tab.gz.split	8.part7.tab.gz
-8.part8	NA	200000	gRNA.tab.gz.split	8.part8.tab.gz
-8.part9	NA	200000	gRNA.tab.gz.split	8.part9.tab.gz
-8.part10	NA	200000	gRNA.tab.gz.split	8.part10.tab.gz
-8.part11	NA	200000	gRNA.tab.gz.split	8.part11.tab.gz
-8.part12	NA	200000	gRNA.tab.gz.split	8.part12.tab.gz
-8.part13	NA	200000	gRNA.tab.gz.split	8.part13.tab.gz
-8.part14	NA	200000	gRNA.tab.gz.split	8.part14.tab.gz
-8.part15	NA	200000	gRNA.tab.gz.split	8.part15.tab.gz
-8.part16	NA	200000	gRNA.tab.gz.split	8.part16.tab.gz
-8.part17	NA	200000	gRNA.tab.gz.split	8.part17.tab.gz
-8.part18	NA	200000	gRNA.tab.gz.split	8.part18.tab.gz
-8.part19	NA	200000	gRNA.tab.gz.split	8.part19.tab.gz
-8.part20	NA	200000	gRNA.tab.gz.split	8.part20.tab.gz
-8.part21	NA	200000	gRNA.tab.gz.split	8.part21.tab.gz
-8.part22	NA	200000	gRNA.tab.gz.split	8.part22.tab.gz
-8.part23	NA	200000	gRNA.tab.gz.split	8.part23.tab.gz
-8.part24	NA	200000	gRNA.tab.gz.split	8.part24.tab.gz
-8.part25	NA	200000	gRNA.tab.gz.split	8.part25.tab.gz
-8.part26	NA	200000	gRNA.tab.gz.split	8.part26.tab.gz
-8.part27	NA	200000	gRNA.tab.gz.split	8.part27.tab.gz
-8.part28	NA	200000	gRNA.tab.gz.split	8.part28.tab.gz
-8.part29	NA	200000	gRNA.tab.gz.split	8.part29.tab.gz
-8.part30	NA	200000	gRNA.tab.gz.split	8.part30.tab.gz
-8.part31	NA	200000	gRNA.tab.gz.split	8.part31.tab.gz
-8.part32	NA	200000	gRNA.tab.gz.split	8.part32.tab.gz
-8.part33	NA	200000	gRNA.tab.gz.split	8.part33.tab.gz
-8.part34	NA	200000	gRNA.tab.gz.split	8.part34.tab.gz
-8.part35	NA	200000	gRNA.tab.gz.split	8.part35.tab.gz
-8.part36	NA	200000	gRNA.tab.gz.split	8.part36.tab.gz
-8.part37	NA	200000	gRNA.tab.gz.split	8.part37.tab.gz
-8.part38	NA	200000	gRNA.tab.gz.split	8.part38.tab.gz
-8.part39	NA	200000	gRNA.tab.gz.split	8.part39.tab.gz
-8.part40	NA	200000	gRNA.tab.gz.split	8.part40.tab.gz
-8.part41	NA	200000	gRNA.tab.gz.split	8.part41.tab.gz
-8.part42	NA	200000	gRNA.tab.gz.split	8.part42.tab.gz
-8.part43	NA	200000	gRNA.tab.gz.split	8.part43.tab.gz
-8.part44	NA	200000	gRNA.tab.gz.split	8.part44.tab.gz
-8.part45	NA	200000	gRNA.tab.gz.split	8.part45.tab.gz
-8.part46	NA	200000	gRNA.tab.gz.split	8.part46.tab.gz
-8.part47	NA	200000	gRNA.tab.gz.split	8.part47.tab.gz
-8.part48	NA	200000	gRNA.tab.gz.split	8.part48.tab.gz
-8.part49	NA	200000	gRNA.tab.gz.split	8.part49.tab.gz
-8.part50	NA	200000	gRNA.tab.gz.split	8.part50.tab.gz
-8.part51	NA	200000	gRNA.tab.gz.split	8.part51.tab.gz
-8.part52	NA	200000	gRNA.tab.gz.split	8.part52.tab.gz
-8.part53	NA	200000	gRNA.tab.gz.split	8.part53.tab.gz
-8.part54	NA	200000	gRNA.tab.gz.split	8.part54.tab.gz
-8.part55	NA	200000	gRNA.tab.gz.split	8.part55.tab.gz
-8.part56	NA	200000	gRNA.tab.gz.split	8.part56.tab.gz
-8.part57	NA	200000	gRNA.tab.gz.split	8.part57.tab.gz
-8.part58	NA	200000	gRNA.tab.gz.split	8.part58.tab.gz
-8.part59	NA	200000	gRNA.tab.gz.split	8.part59.tab.gz
-8.part60	NA	200000	gRNA.tab.gz.split	8.part60.tab.gz
-8.part61	NA	200000	gRNA.tab.gz.split	8.part61.tab.gz
-8.part62	NA	200000	gRNA.tab.gz.split	8.part62.tab.gz
-8.part63	NA	200000	gRNA.tab.gz.split	8.part63.tab.gz
-8.part64	NA	200000	gRNA.tab.gz.split	8.part64.tab.gz
-8.part65	NA	200000	gRNA.tab.gz.split	8.part65.tab.gz
-8.part66	NA	200000	gRNA.tab.gz.split	8.part66.tab.gz
-8.part67	NA	200000	gRNA.tab.gz.split	8.part67.tab.gz
-8.part68	NA	200000	gRNA.tab.gz.split	8.part68.tab.gz
-8.part69	NA	200000	gRNA.tab.gz.split	8.part69.tab.gz
-8.part70	NA	200000	gRNA.tab.gz.split	8.part70.tab.gz
-8.part71	NA	185835	gRNA.tab.gz.split	8.part71.tab.gz
-9.part0	NA	200000	gRNA.tab.gz.split	9.part0.tab.gz
-9.part1	NA	200000	gRNA.tab.gz.split	9.part1.tab.gz
-9.part2	NA	200000	gRNA.tab.gz.split	9.part2.tab.gz
-9.part3	NA	200000	gRNA.tab.gz.split	9.part3.tab.gz
-9.part4	NA	200000	gRNA.tab.gz.split	9.part4.tab.gz
-9.part5	NA	200000	gRNA.tab.gz.split	9.part5.tab.gz
-9.part6	NA	200000	gRNA.tab.gz.split	9.part6.tab.gz
-9.part7	NA	200000	gRNA.tab.gz.split	9.part7.tab.gz
-9.part8	NA	200000	gRNA.tab.gz.split	9.part8.tab.gz
-9.part9	NA	200000	gRNA.tab.gz.split	9.part9.tab.gz
-9.part10	NA	200000	gRNA.tab.gz.split	9.part10.tab.gz
-9.part11	NA	200000	gRNA.tab.gz.split	9.part11.tab.gz
-9.part12	NA	200000	gRNA.tab.gz.split	9.part12.tab.gz
-9.part13	NA	200000	gRNA.tab.gz.split	9.part13.tab.gz
-9.part14	NA	200000	gRNA.tab.gz.split	9.part14.tab.gz
-9.part15	NA	200000	gRNA.tab.gz.split	9.part15.tab.gz
-9.part16	NA	200000	gRNA.tab.gz.split	9.part16.tab.gz
-9.part17	NA	200000	gRNA.tab.gz.split	9.part17.tab.gz
-9.part18	NA	200000	gRNA.tab.gz.split	9.part18.tab.gz
-9.part19	NA	200000	gRNA.tab.gz.split	9.part19.tab.gz
-9.part20	NA	200000	gRNA.tab.gz.split	9.part20.tab.gz
-9.part21	NA	200000	gRNA.tab.gz.split	9.part21.tab.gz
-9.part22	NA	200000	gRNA.tab.gz.split	9.part22.tab.gz
-9.part23	NA	200000	gRNA.tab.gz.split	9.part23.tab.gz
-9.part24	NA	200000	gRNA.tab.gz.split	9.part24.tab.gz
-9.part25	NA	200000	gRNA.tab.gz.split	9.part25.tab.gz
-9.part26	NA	200000	gRNA.tab.gz.split	9.part26.tab.gz
-9.part27	NA	200000	gRNA.tab.gz.split	9.part27.tab.gz
-9.part28	NA	200000	gRNA.tab.gz.split	9.part28.tab.gz
-9.part29	NA	200000	gRNA.tab.gz.split	9.part29.tab.gz
-9.part30	NA	200000	gRNA.tab.gz.split	9.part30.tab.gz
-9.part31	NA	200000	gRNA.tab.gz.split	9.part31.tab.gz
-9.part32	NA	200000	gRNA.tab.gz.split	9.part32.tab.gz
-9.part33	NA	200000	gRNA.tab.gz.split	9.part33.tab.gz
-9.part34	NA	200000	gRNA.tab.gz.split	9.part34.tab.gz
-9.part35	NA	200000	gRNA.tab.gz.split	9.part35.tab.gz
-9.part36	NA	200000	gRNA.tab.gz.split	9.part36.tab.gz
-9.part37	NA	200000	gRNA.tab.gz.split	9.part37.tab.gz
-9.part38	NA	200000	gRNA.tab.gz.split	9.part38.tab.gz
-9.part39	NA	200000	gRNA.tab.gz.split	9.part39.tab.gz
-9.part40	NA	200000	gRNA.tab.gz.split	9.part40.tab.gz
-9.part41	NA	200000	gRNA.tab.gz.split	9.part41.tab.gz
-9.part42	NA	200000	gRNA.tab.gz.split	9.part42.tab.gz
-9.part43	NA	200000	gRNA.tab.gz.split	9.part43.tab.gz
-9.part44	NA	200000	gRNA.tab.gz.split	9.part44.tab.gz
-9.part45	NA	200000	gRNA.tab.gz.split	9.part45.tab.gz
-9.part46	NA	200000	gRNA.tab.gz.split	9.part46.tab.gz
-9.part47	NA	200000	gRNA.tab.gz.split	9.part47.tab.gz
-9.part48	NA	200000	gRNA.tab.gz.split	9.part48.tab.gz
-9.part49	NA	200000	gRNA.tab.gz.split	9.part49.tab.gz
-9.part50	NA	200000	gRNA.tab.gz.split	9.part50.tab.gz
-9.part51	NA	200000	gRNA.tab.gz.split	9.part51.tab.gz
-9.part52	NA	200000	gRNA.tab.gz.split	9.part52.tab.gz
-9.part53	NA	200000	gRNA.tab.gz.split	9.part53.tab.gz
-9.part54	NA	200000	gRNA.tab.gz.split	9.part54.tab.gz
-9.part55	NA	200000	gRNA.tab.gz.split	9.part55.tab.gz
-9.part56	NA	200000	gRNA.tab.gz.split	9.part56.tab.gz
-9.part57	NA	200000	gRNA.tab.gz.split	9.part57.tab.gz
-9.part58	NA	200000	gRNA.tab.gz.split	9.part58.tab.gz
-9.part59	NA	200000	gRNA.tab.gz.split	9.part59.tab.gz
-9.part60	NA	200000	gRNA.tab.gz.split	9.part60.tab.gz
-9.part61	NA	200000	gRNA.tab.gz.split	9.part61.tab.gz
-9.part62	NA	200000	gRNA.tab.gz.split	9.part62.tab.gz
-9.part63	NA	200000	gRNA.tab.gz.split	9.part63.tab.gz
-9.part64	NA	76944	gRNA.tab.gz.split	9.part64.tab.gz
+chr_part	length	repeat_length	gRNA_count	directory	filename
+1.part0	NA	NA	200000	gRNA.tab.gz.split	1.part0.tab.gz
+1.part1	NA	NA	200000	gRNA.tab.gz.split	1.part1.tab.gz
+1.part2	NA	NA	200000	gRNA.tab.gz.split	1.part2.tab.gz
+1.part3	NA	NA	200000	gRNA.tab.gz.split	1.part3.tab.gz
+1.part4	NA	NA	200000	gRNA.tab.gz.split	1.part4.tab.gz
+1.part5	NA	NA	200000	gRNA.tab.gz.split	1.part5.tab.gz
+1.part6	NA	NA	200000	gRNA.tab.gz.split	1.part6.tab.gz
+1.part7	NA	NA	200000	gRNA.tab.gz.split	1.part7.tab.gz
+1.part8	NA	NA	200000	gRNA.tab.gz.split	1.part8.tab.gz
+1.part9	NA	NA	200000	gRNA.tab.gz.split	1.part9.tab.gz
+1.part10	NA	NA	200000	gRNA.tab.gz.split	1.part10.tab.gz
+1.part11	NA	NA	200000	gRNA.tab.gz.split	1.part11.tab.gz
+1.part12	NA	NA	200000	gRNA.tab.gz.split	1.part12.tab.gz
+1.part13	NA	NA	200000	gRNA.tab.gz.split	1.part13.tab.gz
+1.part14	NA	NA	200000	gRNA.tab.gz.split	1.part14.tab.gz
+1.part15	NA	NA	200000	gRNA.tab.gz.split	1.part15.tab.gz
+1.part16	NA	NA	200000	gRNA.tab.gz.split	1.part16.tab.gz
+1.part17	NA	NA	200000	gRNA.tab.gz.split	1.part17.tab.gz
+1.part18	NA	NA	200000	gRNA.tab.gz.split	1.part18.tab.gz
+1.part19	NA	NA	200000	gRNA.tab.gz.split	1.part19.tab.gz
+1.part20	NA	NA	200000	gRNA.tab.gz.split	1.part20.tab.gz
+1.part21	NA	NA	200000	gRNA.tab.gz.split	1.part21.tab.gz
+1.part22	NA	NA	200000	gRNA.tab.gz.split	1.part22.tab.gz
+1.part23	NA	NA	200000	gRNA.tab.gz.split	1.part23.tab.gz
+1.part24	NA	NA	200000	gRNA.tab.gz.split	1.part24.tab.gz
+1.part25	NA	NA	200000	gRNA.tab.gz.split	1.part25.tab.gz
+1.part26	NA	NA	200000	gRNA.tab.gz.split	1.part26.tab.gz
+1.part27	NA	NA	200000	gRNA.tab.gz.split	1.part27.tab.gz
+1.part28	NA	NA	200000	gRNA.tab.gz.split	1.part28.tab.gz
+1.part29	NA	NA	200000	gRNA.tab.gz.split	1.part29.tab.gz
+1.part30	NA	NA	200000	gRNA.tab.gz.split	1.part30.tab.gz
+1.part31	NA	NA	200000	gRNA.tab.gz.split	1.part31.tab.gz
+1.part32	NA	NA	200000	gRNA.tab.gz.split	1.part32.tab.gz
+1.part33	NA	NA	200000	gRNA.tab.gz.split	1.part33.tab.gz
+1.part34	NA	NA	200000	gRNA.tab.gz.split	1.part34.tab.gz
+1.part35	NA	NA	200000	gRNA.tab.gz.split	1.part35.tab.gz
+1.part36	NA	NA	200000	gRNA.tab.gz.split	1.part36.tab.gz
+1.part37	NA	NA	200000	gRNA.tab.gz.split	1.part37.tab.gz
+1.part38	NA	NA	200000	gRNA.tab.gz.split	1.part38.tab.gz
+1.part39	NA	NA	200000	gRNA.tab.gz.split	1.part39.tab.gz
+1.part40	NA	NA	200000	gRNA.tab.gz.split	1.part40.tab.gz
+1.part41	NA	NA	200000	gRNA.tab.gz.split	1.part41.tab.gz
+1.part42	NA	NA	200000	gRNA.tab.gz.split	1.part42.tab.gz
+1.part43	NA	NA	200000	gRNA.tab.gz.split	1.part43.tab.gz
+1.part44	NA	NA	200000	gRNA.tab.gz.split	1.part44.tab.gz
+1.part45	NA	NA	200000	gRNA.tab.gz.split	1.part45.tab.gz
+1.part46	NA	NA	200000	gRNA.tab.gz.split	1.part46.tab.gz
+1.part47	NA	NA	200000	gRNA.tab.gz.split	1.part47.tab.gz
+1.part48	NA	NA	200000	gRNA.tab.gz.split	1.part48.tab.gz
+1.part49	NA	NA	200000	gRNA.tab.gz.split	1.part49.tab.gz
+1.part50	NA	NA	200000	gRNA.tab.gz.split	1.part50.tab.gz
+1.part51	NA	NA	200000	gRNA.tab.gz.split	1.part51.tab.gz
+1.part52	NA	NA	200000	gRNA.tab.gz.split	1.part52.tab.gz
+1.part53	NA	NA	200000	gRNA.tab.gz.split	1.part53.tab.gz
+1.part54	NA	NA	200000	gRNA.tab.gz.split	1.part54.tab.gz
+1.part55	NA	NA	200000	gRNA.tab.gz.split	1.part55.tab.gz
+1.part56	NA	NA	200000	gRNA.tab.gz.split	1.part56.tab.gz
+1.part57	NA	NA	200000	gRNA.tab.gz.split	1.part57.tab.gz
+1.part58	NA	NA	200000	gRNA.tab.gz.split	1.part58.tab.gz
+1.part59	NA	NA	200000	gRNA.tab.gz.split	1.part59.tab.gz
+1.part60	NA	NA	200000	gRNA.tab.gz.split	1.part60.tab.gz
+1.part61	NA	NA	200000	gRNA.tab.gz.split	1.part61.tab.gz
+1.part62	NA	NA	200000	gRNA.tab.gz.split	1.part62.tab.gz
+1.part63	NA	NA	200000	gRNA.tab.gz.split	1.part63.tab.gz
+1.part64	NA	NA	200000	gRNA.tab.gz.split	1.part64.tab.gz
+1.part65	NA	NA	200000	gRNA.tab.gz.split	1.part65.tab.gz
+1.part66	NA	NA	200000	gRNA.tab.gz.split	1.part66.tab.gz
+1.part67	NA	NA	200000	gRNA.tab.gz.split	1.part67.tab.gz
+1.part68	NA	NA	200000	gRNA.tab.gz.split	1.part68.tab.gz
+1.part69	NA	NA	200000	gRNA.tab.gz.split	1.part69.tab.gz
+1.part70	NA	NA	200000	gRNA.tab.gz.split	1.part70.tab.gz
+1.part71	NA	NA	200000	gRNA.tab.gz.split	1.part71.tab.gz
+1.part72	NA	NA	200000	gRNA.tab.gz.split	1.part72.tab.gz
+1.part73	NA	NA	200000	gRNA.tab.gz.split	1.part73.tab.gz
+1.part74	NA	NA	200000	gRNA.tab.gz.split	1.part74.tab.gz
+1.part75	NA	NA	200000	gRNA.tab.gz.split	1.part75.tab.gz
+1.part76	NA	NA	200000	gRNA.tab.gz.split	1.part76.tab.gz
+1.part77	NA	NA	200000	gRNA.tab.gz.split	1.part77.tab.gz
+1.part78	NA	NA	200000	gRNA.tab.gz.split	1.part78.tab.gz
+1.part79	NA	NA	200000	gRNA.tab.gz.split	1.part79.tab.gz
+1.part80	NA	NA	200000	gRNA.tab.gz.split	1.part80.tab.gz
+1.part81	NA	NA	200000	gRNA.tab.gz.split	1.part81.tab.gz
+1.part82	NA	NA	200000	gRNA.tab.gz.split	1.part82.tab.gz
+1.part83	NA	NA	200000	gRNA.tab.gz.split	1.part83.tab.gz
+1.part84	NA	NA	200000	gRNA.tab.gz.split	1.part84.tab.gz
+1.part85	NA	NA	200000	gRNA.tab.gz.split	1.part85.tab.gz
+1.part86	NA	NA	200000	gRNA.tab.gz.split	1.part86.tab.gz
+1.part87	NA	NA	200000	gRNA.tab.gz.split	1.part87.tab.gz
+1.part88	NA	NA	200000	gRNA.tab.gz.split	1.part88.tab.gz
+1.part89	NA	NA	200000	gRNA.tab.gz.split	1.part89.tab.gz
+1.part90	NA	NA	200000	gRNA.tab.gz.split	1.part90.tab.gz
+1.part91	NA	NA	200000	gRNA.tab.gz.split	1.part91.tab.gz
+1.part92	NA	NA	200000	gRNA.tab.gz.split	1.part92.tab.gz
+1.part93	NA	NA	200000	gRNA.tab.gz.split	1.part93.tab.gz
+1.part94	NA	NA	200000	gRNA.tab.gz.split	1.part94.tab.gz
+1.part95	NA	NA	200000	gRNA.tab.gz.split	1.part95.tab.gz
+1.part96	NA	NA	200000	gRNA.tab.gz.split	1.part96.tab.gz
+1.part97	NA	NA	200000	gRNA.tab.gz.split	1.part97.tab.gz
+1.part98	NA	NA	200000	gRNA.tab.gz.split	1.part98.tab.gz
+1.part99	NA	NA	200000	gRNA.tab.gz.split	1.part99.tab.gz
+1.part100	NA	NA	200000	gRNA.tab.gz.split	1.part100.tab.gz
+1.part101	NA	NA	200000	gRNA.tab.gz.split	1.part101.tab.gz
+1.part102	NA	NA	200000	gRNA.tab.gz.split	1.part102.tab.gz
+1.part103	NA	NA	200000	gRNA.tab.gz.split	1.part103.tab.gz
+1.part104	NA	NA	200000	gRNA.tab.gz.split	1.part104.tab.gz
+1.part105	NA	NA	200000	gRNA.tab.gz.split	1.part105.tab.gz
+1.part106	NA	NA	200000	gRNA.tab.gz.split	1.part106.tab.gz
+1.part107	NA	NA	200000	gRNA.tab.gz.split	1.part107.tab.gz
+1.part108	NA	NA	200000	gRNA.tab.gz.split	1.part108.tab.gz
+1.part109	NA	NA	200000	gRNA.tab.gz.split	1.part109.tab.gz
+1.part110	NA	NA	200000	gRNA.tab.gz.split	1.part110.tab.gz
+1.part111	NA	NA	200000	gRNA.tab.gz.split	1.part111.tab.gz
+1.part112	NA	NA	200000	gRNA.tab.gz.split	1.part112.tab.gz
+1.part113	NA	NA	200000	gRNA.tab.gz.split	1.part113.tab.gz
+1.part114	NA	NA	200000	gRNA.tab.gz.split	1.part114.tab.gz
+1.part115	NA	NA	200000	gRNA.tab.gz.split	1.part115.tab.gz
+1.part116	NA	NA	200000	gRNA.tab.gz.split	1.part116.tab.gz
+1.part117	NA	NA	200000	gRNA.tab.gz.split	1.part117.tab.gz
+1.part118	NA	NA	200000	gRNA.tab.gz.split	1.part118.tab.gz
+1.part119	NA	NA	200000	gRNA.tab.gz.split	1.part119.tab.gz
+1.part120	NA	NA	200000	gRNA.tab.gz.split	1.part120.tab.gz
+1.part121	NA	NA	200000	gRNA.tab.gz.split	1.part121.tab.gz
+1.part122	NA	NA	200000	gRNA.tab.gz.split	1.part122.tab.gz
+1.part123	NA	NA	200000	gRNA.tab.gz.split	1.part123.tab.gz
+1.part124	NA	NA	158058	gRNA.tab.gz.split	1.part124.tab.gz
+10.part0	NA	NA	200000	gRNA.tab.gz.split	10.part0.tab.gz
+10.part1	NA	NA	200000	gRNA.tab.gz.split	10.part1.tab.gz
+10.part2	NA	NA	200000	gRNA.tab.gz.split	10.part2.tab.gz
+10.part3	NA	NA	200000	gRNA.tab.gz.split	10.part3.tab.gz
+10.part4	NA	NA	200000	gRNA.tab.gz.split	10.part4.tab.gz
+10.part5	NA	NA	200000	gRNA.tab.gz.split	10.part5.tab.gz
+10.part6	NA	NA	200000	gRNA.tab.gz.split	10.part6.tab.gz
+10.part7	NA	NA	200000	gRNA.tab.gz.split	10.part7.tab.gz
+10.part8	NA	NA	200000	gRNA.tab.gz.split	10.part8.tab.gz
+10.part9	NA	NA	200000	gRNA.tab.gz.split	10.part9.tab.gz
+10.part10	NA	NA	200000	gRNA.tab.gz.split	10.part10.tab.gz
+10.part11	NA	NA	200000	gRNA.tab.gz.split	10.part11.tab.gz
+10.part12	NA	NA	200000	gRNA.tab.gz.split	10.part12.tab.gz
+10.part13	NA	NA	200000	gRNA.tab.gz.split	10.part13.tab.gz
+10.part14	NA	NA	200000	gRNA.tab.gz.split	10.part14.tab.gz
+10.part15	NA	NA	200000	gRNA.tab.gz.split	10.part15.tab.gz
+10.part16	NA	NA	200000	gRNA.tab.gz.split	10.part16.tab.gz
+10.part17	NA	NA	200000	gRNA.tab.gz.split	10.part17.tab.gz
+10.part18	NA	NA	200000	gRNA.tab.gz.split	10.part18.tab.gz
+10.part19	NA	NA	200000	gRNA.tab.gz.split	10.part19.tab.gz
+10.part20	NA	NA	200000	gRNA.tab.gz.split	10.part20.tab.gz
+10.part21	NA	NA	200000	gRNA.tab.gz.split	10.part21.tab.gz
+10.part22	NA	NA	200000	gRNA.tab.gz.split	10.part22.tab.gz
+10.part23	NA	NA	200000	gRNA.tab.gz.split	10.part23.tab.gz
+10.part24	NA	NA	200000	gRNA.tab.gz.split	10.part24.tab.gz
+10.part25	NA	NA	200000	gRNA.tab.gz.split	10.part25.tab.gz
+10.part26	NA	NA	200000	gRNA.tab.gz.split	10.part26.tab.gz
+10.part27	NA	NA	200000	gRNA.tab.gz.split	10.part27.tab.gz
+10.part28	NA	NA	200000	gRNA.tab.gz.split	10.part28.tab.gz
+10.part29	NA	NA	200000	gRNA.tab.gz.split	10.part29.tab.gz
+10.part30	NA	NA	200000	gRNA.tab.gz.split	10.part30.tab.gz
+10.part31	NA	NA	200000	gRNA.tab.gz.split	10.part31.tab.gz
+10.part32	NA	NA	200000	gRNA.tab.gz.split	10.part32.tab.gz
+10.part33	NA	NA	200000	gRNA.tab.gz.split	10.part33.tab.gz
+10.part34	NA	NA	200000	gRNA.tab.gz.split	10.part34.tab.gz
+10.part35	NA	NA	200000	gRNA.tab.gz.split	10.part35.tab.gz
+10.part36	NA	NA	200000	gRNA.tab.gz.split	10.part36.tab.gz
+10.part37	NA	NA	200000	gRNA.tab.gz.split	10.part37.tab.gz
+10.part38	NA	NA	200000	gRNA.tab.gz.split	10.part38.tab.gz
+10.part39	NA	NA	200000	gRNA.tab.gz.split	10.part39.tab.gz
+10.part40	NA	NA	200000	gRNA.tab.gz.split	10.part40.tab.gz
+10.part41	NA	NA	200000	gRNA.tab.gz.split	10.part41.tab.gz
+10.part42	NA	NA	200000	gRNA.tab.gz.split	10.part42.tab.gz
+10.part43	NA	NA	200000	gRNA.tab.gz.split	10.part43.tab.gz
+10.part44	NA	NA	200000	gRNA.tab.gz.split	10.part44.tab.gz
+10.part45	NA	NA	200000	gRNA.tab.gz.split	10.part45.tab.gz
+10.part46	NA	NA	200000	gRNA.tab.gz.split	10.part46.tab.gz
+10.part47	NA	NA	200000	gRNA.tab.gz.split	10.part47.tab.gz
+10.part48	NA	NA	200000	gRNA.tab.gz.split	10.part48.tab.gz
+10.part49	NA	NA	200000	gRNA.tab.gz.split	10.part49.tab.gz
+10.part50	NA	NA	200000	gRNA.tab.gz.split	10.part50.tab.gz
+10.part51	NA	NA	200000	gRNA.tab.gz.split	10.part51.tab.gz
+10.part52	NA	NA	200000	gRNA.tab.gz.split	10.part52.tab.gz
+10.part53	NA	NA	200000	gRNA.tab.gz.split	10.part53.tab.gz
+10.part54	NA	NA	200000	gRNA.tab.gz.split	10.part54.tab.gz
+10.part55	NA	NA	200000	gRNA.tab.gz.split	10.part55.tab.gz
+10.part56	NA	NA	200000	gRNA.tab.gz.split	10.part56.tab.gz
+10.part57	NA	NA	200000	gRNA.tab.gz.split	10.part57.tab.gz
+10.part58	NA	NA	200000	gRNA.tab.gz.split	10.part58.tab.gz
+10.part59	NA	NA	200000	gRNA.tab.gz.split	10.part59.tab.gz
+10.part60	NA	NA	200000	gRNA.tab.gz.split	10.part60.tab.gz
+10.part61	NA	NA	200000	gRNA.tab.gz.split	10.part61.tab.gz
+10.part62	NA	NA	200000	gRNA.tab.gz.split	10.part62.tab.gz
+10.part63	NA	NA	200000	gRNA.tab.gz.split	10.part63.tab.gz
+10.part64	NA	NA	200000	gRNA.tab.gz.split	10.part64.tab.gz
+10.part65	NA	NA	200000	gRNA.tab.gz.split	10.part65.tab.gz
+10.part66	NA	NA	200000	gRNA.tab.gz.split	10.part66.tab.gz
+10.part67	NA	NA	200000	gRNA.tab.gz.split	10.part67.tab.gz
+10.part68	NA	NA	200000	gRNA.tab.gz.split	10.part68.tab.gz
+10.part69	NA	NA	200000	gRNA.tab.gz.split	10.part69.tab.gz
+10.part70	NA	NA	200000	gRNA.tab.gz.split	10.part70.tab.gz
+10.part71	NA	NA	3970	gRNA.tab.gz.split	10.part71.tab.gz
+11.part0	NA	NA	200000	gRNA.tab.gz.split	11.part0.tab.gz
+11.part1	NA	NA	200000	gRNA.tab.gz.split	11.part1.tab.gz
+11.part2	NA	NA	200000	gRNA.tab.gz.split	11.part2.tab.gz
+11.part3	NA	NA	200000	gRNA.tab.gz.split	11.part3.tab.gz
+11.part4	NA	NA	200000	gRNA.tab.gz.split	11.part4.tab.gz
+11.part5	NA	NA	200000	gRNA.tab.gz.split	11.part5.tab.gz
+11.part6	NA	NA	200000	gRNA.tab.gz.split	11.part6.tab.gz
+11.part7	NA	NA	200000	gRNA.tab.gz.split	11.part7.tab.gz
+11.part8	NA	NA	200000	gRNA.tab.gz.split	11.part8.tab.gz
+11.part9	NA	NA	200000	gRNA.tab.gz.split	11.part9.tab.gz
+11.part10	NA	NA	200000	gRNA.tab.gz.split	11.part10.tab.gz
+11.part11	NA	NA	200000	gRNA.tab.gz.split	11.part11.tab.gz
+11.part12	NA	NA	200000	gRNA.tab.gz.split	11.part12.tab.gz
+11.part13	NA	NA	200000	gRNA.tab.gz.split	11.part13.tab.gz
+11.part14	NA	NA	200000	gRNA.tab.gz.split	11.part14.tab.gz
+11.part15	NA	NA	200000	gRNA.tab.gz.split	11.part15.tab.gz
+11.part16	NA	NA	200000	gRNA.tab.gz.split	11.part16.tab.gz
+11.part17	NA	NA	200000	gRNA.tab.gz.split	11.part17.tab.gz
+11.part18	NA	NA	200000	gRNA.tab.gz.split	11.part18.tab.gz
+11.part19	NA	NA	200000	gRNA.tab.gz.split	11.part19.tab.gz
+11.part20	NA	NA	200000	gRNA.tab.gz.split	11.part20.tab.gz
+11.part21	NA	NA	200000	gRNA.tab.gz.split	11.part21.tab.gz
+11.part22	NA	NA	200000	gRNA.tab.gz.split	11.part22.tab.gz
+11.part23	NA	NA	200000	gRNA.tab.gz.split	11.part23.tab.gz
+11.part24	NA	NA	200000	gRNA.tab.gz.split	11.part24.tab.gz
+11.part25	NA	NA	200000	gRNA.tab.gz.split	11.part25.tab.gz
+11.part26	NA	NA	200000	gRNA.tab.gz.split	11.part26.tab.gz
+11.part27	NA	NA	200000	gRNA.tab.gz.split	11.part27.tab.gz
+11.part28	NA	NA	200000	gRNA.tab.gz.split	11.part28.tab.gz
+11.part29	NA	NA	200000	gRNA.tab.gz.split	11.part29.tab.gz
+11.part30	NA	NA	200000	gRNA.tab.gz.split	11.part30.tab.gz
+11.part31	NA	NA	200000	gRNA.tab.gz.split	11.part31.tab.gz
+11.part32	NA	NA	200000	gRNA.tab.gz.split	11.part32.tab.gz
+11.part33	NA	NA	200000	gRNA.tab.gz.split	11.part33.tab.gz
+11.part34	NA	NA	200000	gRNA.tab.gz.split	11.part34.tab.gz
+11.part35	NA	NA	200000	gRNA.tab.gz.split	11.part35.tab.gz
+11.part36	NA	NA	200000	gRNA.tab.gz.split	11.part36.tab.gz
+11.part37	NA	NA	200000	gRNA.tab.gz.split	11.part37.tab.gz
+11.part38	NA	NA	200000	gRNA.tab.gz.split	11.part38.tab.gz
+11.part39	NA	NA	200000	gRNA.tab.gz.split	11.part39.tab.gz
+11.part40	NA	NA	200000	gRNA.tab.gz.split	11.part40.tab.gz
+11.part41	NA	NA	200000	gRNA.tab.gz.split	11.part41.tab.gz
+11.part42	NA	NA	200000	gRNA.tab.gz.split	11.part42.tab.gz
+11.part43	NA	NA	200000	gRNA.tab.gz.split	11.part43.tab.gz
+11.part44	NA	NA	200000	gRNA.tab.gz.split	11.part44.tab.gz
+11.part45	NA	NA	200000	gRNA.tab.gz.split	11.part45.tab.gz
+11.part46	NA	NA	200000	gRNA.tab.gz.split	11.part46.tab.gz
+11.part47	NA	NA	200000	gRNA.tab.gz.split	11.part47.tab.gz
+11.part48	NA	NA	200000	gRNA.tab.gz.split	11.part48.tab.gz
+11.part49	NA	NA	200000	gRNA.tab.gz.split	11.part49.tab.gz
+11.part50	NA	NA	200000	gRNA.tab.gz.split	11.part50.tab.gz
+11.part51	NA	NA	200000	gRNA.tab.gz.split	11.part51.tab.gz
+11.part52	NA	NA	200000	gRNA.tab.gz.split	11.part52.tab.gz
+11.part53	NA	NA	200000	gRNA.tab.gz.split	11.part53.tab.gz
+11.part54	NA	NA	200000	gRNA.tab.gz.split	11.part54.tab.gz
+11.part55	NA	NA	200000	gRNA.tab.gz.split	11.part55.tab.gz
+11.part56	NA	NA	200000	gRNA.tab.gz.split	11.part56.tab.gz
+11.part57	NA	NA	200000	gRNA.tab.gz.split	11.part57.tab.gz
+11.part58	NA	NA	200000	gRNA.tab.gz.split	11.part58.tab.gz
+11.part59	NA	NA	200000	gRNA.tab.gz.split	11.part59.tab.gz
+11.part60	NA	NA	200000	gRNA.tab.gz.split	11.part60.tab.gz
+11.part61	NA	NA	200000	gRNA.tab.gz.split	11.part61.tab.gz
+11.part62	NA	NA	200000	gRNA.tab.gz.split	11.part62.tab.gz
+11.part63	NA	NA	200000	gRNA.tab.gz.split	11.part63.tab.gz
+11.part64	NA	NA	200000	gRNA.tab.gz.split	11.part64.tab.gz
+11.part65	NA	NA	200000	gRNA.tab.gz.split	11.part65.tab.gz
+11.part66	NA	NA	200000	gRNA.tab.gz.split	11.part66.tab.gz
+11.part67	NA	NA	200000	gRNA.tab.gz.split	11.part67.tab.gz
+11.part68	NA	NA	200000	gRNA.tab.gz.split	11.part68.tab.gz
+11.part69	NA	NA	200000	gRNA.tab.gz.split	11.part69.tab.gz
+11.part70	NA	NA	200000	gRNA.tab.gz.split	11.part70.tab.gz
+11.part71	NA	NA	200000	gRNA.tab.gz.split	11.part71.tab.gz
+11.part72	NA	NA	9297	gRNA.tab.gz.split	11.part72.tab.gz
+12.part0	NA	NA	200000	gRNA.tab.gz.split	12.part0.tab.gz
+12.part1	NA	NA	200000	gRNA.tab.gz.split	12.part1.tab.gz
+12.part2	NA	NA	200000	gRNA.tab.gz.split	12.part2.tab.gz
+12.part3	NA	NA	200000	gRNA.tab.gz.split	12.part3.tab.gz
+12.part4	NA	NA	200000	gRNA.tab.gz.split	12.part4.tab.gz
+12.part5	NA	NA	200000	gRNA.tab.gz.split	12.part5.tab.gz
+12.part6	NA	NA	200000	gRNA.tab.gz.split	12.part6.tab.gz
+12.part7	NA	NA	200000	gRNA.tab.gz.split	12.part7.tab.gz
+12.part8	NA	NA	200000	gRNA.tab.gz.split	12.part8.tab.gz
+12.part9	NA	NA	200000	gRNA.tab.gz.split	12.part9.tab.gz
+12.part10	NA	NA	200000	gRNA.tab.gz.split	12.part10.tab.gz
+12.part11	NA	NA	200000	gRNA.tab.gz.split	12.part11.tab.gz
+12.part12	NA	NA	200000	gRNA.tab.gz.split	12.part12.tab.gz
+12.part13	NA	NA	200000	gRNA.tab.gz.split	12.part13.tab.gz
+12.part14	NA	NA	200000	gRNA.tab.gz.split	12.part14.tab.gz
+12.part15	NA	NA	200000	gRNA.tab.gz.split	12.part15.tab.gz
+12.part16	NA	NA	200000	gRNA.tab.gz.split	12.part16.tab.gz
+12.part17	NA	NA	200000	gRNA.tab.gz.split	12.part17.tab.gz
+12.part18	NA	NA	200000	gRNA.tab.gz.split	12.part18.tab.gz
+12.part19	NA	NA	200000	gRNA.tab.gz.split	12.part19.tab.gz
+12.part20	NA	NA	200000	gRNA.tab.gz.split	12.part20.tab.gz
+12.part21	NA	NA	200000	gRNA.tab.gz.split	12.part21.tab.gz
+12.part22	NA	NA	200000	gRNA.tab.gz.split	12.part22.tab.gz
+12.part23	NA	NA	200000	gRNA.tab.gz.split	12.part23.tab.gz
+12.part24	NA	NA	200000	gRNA.tab.gz.split	12.part24.tab.gz
+12.part25	NA	NA	200000	gRNA.tab.gz.split	12.part25.tab.gz
+12.part26	NA	NA	200000	gRNA.tab.gz.split	12.part26.tab.gz
+12.part27	NA	NA	200000	gRNA.tab.gz.split	12.part27.tab.gz
+12.part28	NA	NA	200000	gRNA.tab.gz.split	12.part28.tab.gz
+12.part29	NA	NA	200000	gRNA.tab.gz.split	12.part29.tab.gz
+12.part30	NA	NA	200000	gRNA.tab.gz.split	12.part30.tab.gz
+12.part31	NA	NA	200000	gRNA.tab.gz.split	12.part31.tab.gz
+12.part32	NA	NA	200000	gRNA.tab.gz.split	12.part32.tab.gz
+12.part33	NA	NA	200000	gRNA.tab.gz.split	12.part33.tab.gz
+12.part34	NA	NA	200000	gRNA.tab.gz.split	12.part34.tab.gz
+12.part35	NA	NA	200000	gRNA.tab.gz.split	12.part35.tab.gz
+12.part36	NA	NA	200000	gRNA.tab.gz.split	12.part36.tab.gz
+12.part37	NA	NA	200000	gRNA.tab.gz.split	12.part37.tab.gz
+12.part38	NA	NA	200000	gRNA.tab.gz.split	12.part38.tab.gz
+12.part39	NA	NA	200000	gRNA.tab.gz.split	12.part39.tab.gz
+12.part40	NA	NA	200000	gRNA.tab.gz.split	12.part40.tab.gz
+12.part41	NA	NA	200000	gRNA.tab.gz.split	12.part41.tab.gz
+12.part42	NA	NA	200000	gRNA.tab.gz.split	12.part42.tab.gz
+12.part43	NA	NA	200000	gRNA.tab.gz.split	12.part43.tab.gz
+12.part44	NA	NA	200000	gRNA.tab.gz.split	12.part44.tab.gz
+12.part45	NA	NA	200000	gRNA.tab.gz.split	12.part45.tab.gz
+12.part46	NA	NA	200000	gRNA.tab.gz.split	12.part46.tab.gz
+12.part47	NA	NA	200000	gRNA.tab.gz.split	12.part47.tab.gz
+12.part48	NA	NA	200000	gRNA.tab.gz.split	12.part48.tab.gz
+12.part49	NA	NA	200000	gRNA.tab.gz.split	12.part49.tab.gz
+12.part50	NA	NA	200000	gRNA.tab.gz.split	12.part50.tab.gz
+12.part51	NA	NA	200000	gRNA.tab.gz.split	12.part51.tab.gz
+12.part52	NA	NA	200000	gRNA.tab.gz.split	12.part52.tab.gz
+12.part53	NA	NA	200000	gRNA.tab.gz.split	12.part53.tab.gz
+12.part54	NA	NA	200000	gRNA.tab.gz.split	12.part54.tab.gz
+12.part55	NA	NA	200000	gRNA.tab.gz.split	12.part55.tab.gz
+12.part56	NA	NA	200000	gRNA.tab.gz.split	12.part56.tab.gz
+12.part57	NA	NA	200000	gRNA.tab.gz.split	12.part57.tab.gz
+12.part58	NA	NA	200000	gRNA.tab.gz.split	12.part58.tab.gz
+12.part59	NA	NA	200000	gRNA.tab.gz.split	12.part59.tab.gz
+12.part60	NA	NA	200000	gRNA.tab.gz.split	12.part60.tab.gz
+12.part61	NA	NA	200000	gRNA.tab.gz.split	12.part61.tab.gz
+12.part62	NA	NA	200000	gRNA.tab.gz.split	12.part62.tab.gz
+12.part63	NA	NA	200000	gRNA.tab.gz.split	12.part63.tab.gz
+12.part64	NA	NA	200000	gRNA.tab.gz.split	12.part64.tab.gz
+12.part65	NA	NA	200000	gRNA.tab.gz.split	12.part65.tab.gz
+12.part66	NA	NA	200000	gRNA.tab.gz.split	12.part66.tab.gz
+12.part67	NA	NA	200000	gRNA.tab.gz.split	12.part67.tab.gz
+12.part68	NA	NA	101730	gRNA.tab.gz.split	12.part68.tab.gz
+13.part0	NA	NA	200000	gRNA.tab.gz.split	13.part0.tab.gz
+13.part1	NA	NA	200000	gRNA.tab.gz.split	13.part1.tab.gz
+13.part2	NA	NA	200000	gRNA.tab.gz.split	13.part2.tab.gz
+13.part3	NA	NA	200000	gRNA.tab.gz.split	13.part3.tab.gz
+13.part4	NA	NA	200000	gRNA.tab.gz.split	13.part4.tab.gz
+13.part5	NA	NA	200000	gRNA.tab.gz.split	13.part5.tab.gz
+13.part6	NA	NA	200000	gRNA.tab.gz.split	13.part6.tab.gz
+13.part7	NA	NA	200000	gRNA.tab.gz.split	13.part7.tab.gz
+13.part8	NA	NA	200000	gRNA.tab.gz.split	13.part8.tab.gz
+13.part9	NA	NA	200000	gRNA.tab.gz.split	13.part9.tab.gz
+13.part10	NA	NA	200000	gRNA.tab.gz.split	13.part10.tab.gz
+13.part11	NA	NA	200000	gRNA.tab.gz.split	13.part11.tab.gz
+13.part12	NA	NA	200000	gRNA.tab.gz.split	13.part12.tab.gz
+13.part13	NA	NA	200000	gRNA.tab.gz.split	13.part13.tab.gz
+13.part14	NA	NA	200000	gRNA.tab.gz.split	13.part14.tab.gz
+13.part15	NA	NA	200000	gRNA.tab.gz.split	13.part15.tab.gz
+13.part16	NA	NA	200000	gRNA.tab.gz.split	13.part16.tab.gz
+13.part17	NA	NA	200000	gRNA.tab.gz.split	13.part17.tab.gz
+13.part18	NA	NA	200000	gRNA.tab.gz.split	13.part18.tab.gz
+13.part19	NA	NA	200000	gRNA.tab.gz.split	13.part19.tab.gz
+13.part20	NA	NA	200000	gRNA.tab.gz.split	13.part20.tab.gz
+13.part21	NA	NA	200000	gRNA.tab.gz.split	13.part21.tab.gz
+13.part22	NA	NA	200000	gRNA.tab.gz.split	13.part22.tab.gz
+13.part23	NA	NA	200000	gRNA.tab.gz.split	13.part23.tab.gz
+13.part24	NA	NA	200000	gRNA.tab.gz.split	13.part24.tab.gz
+13.part25	NA	NA	200000	gRNA.tab.gz.split	13.part25.tab.gz
+13.part26	NA	NA	200000	gRNA.tab.gz.split	13.part26.tab.gz
+13.part27	NA	NA	200000	gRNA.tab.gz.split	13.part27.tab.gz
+13.part28	NA	NA	200000	gRNA.tab.gz.split	13.part28.tab.gz
+13.part29	NA	NA	200000	gRNA.tab.gz.split	13.part29.tab.gz
+13.part30	NA	NA	200000	gRNA.tab.gz.split	13.part30.tab.gz
+13.part31	NA	NA	200000	gRNA.tab.gz.split	13.part31.tab.gz
+13.part32	NA	NA	200000	gRNA.tab.gz.split	13.part32.tab.gz
+13.part33	NA	NA	200000	gRNA.tab.gz.split	13.part33.tab.gz
+13.part34	NA	NA	200000	gRNA.tab.gz.split	13.part34.tab.gz
+13.part35	NA	NA	200000	gRNA.tab.gz.split	13.part35.tab.gz
+13.part36	NA	NA	200000	gRNA.tab.gz.split	13.part36.tab.gz
+13.part37	NA	NA	200000	gRNA.tab.gz.split	13.part37.tab.gz
+13.part38	NA	NA	200000	gRNA.tab.gz.split	13.part38.tab.gz
+13.part39	NA	NA	200000	gRNA.tab.gz.split	13.part39.tab.gz
+13.part40	NA	NA	200000	gRNA.tab.gz.split	13.part40.tab.gz
+13.part41	NA	NA	200000	gRNA.tab.gz.split	13.part41.tab.gz
+13.part42	NA	NA	200000	gRNA.tab.gz.split	13.part42.tab.gz
+13.part43	NA	NA	200000	gRNA.tab.gz.split	13.part43.tab.gz
+13.part44	NA	NA	115397	gRNA.tab.gz.split	13.part44.tab.gz
+14.part0	NA	NA	200000	gRNA.tab.gz.split	14.part0.tab.gz
+14.part1	NA	NA	200000	gRNA.tab.gz.split	14.part1.tab.gz
+14.part2	NA	NA	200000	gRNA.tab.gz.split	14.part2.tab.gz
+14.part3	NA	NA	200000	gRNA.tab.gz.split	14.part3.tab.gz
+14.part4	NA	NA	200000	gRNA.tab.gz.split	14.part4.tab.gz
+14.part5	NA	NA	200000	gRNA.tab.gz.split	14.part5.tab.gz
+14.part6	NA	NA	200000	gRNA.tab.gz.split	14.part6.tab.gz
+14.part7	NA	NA	200000	gRNA.tab.gz.split	14.part7.tab.gz
+14.part8	NA	NA	200000	gRNA.tab.gz.split	14.part8.tab.gz
+14.part9	NA	NA	200000	gRNA.tab.gz.split	14.part9.tab.gz
+14.part10	NA	NA	200000	gRNA.tab.gz.split	14.part10.tab.gz
+14.part11	NA	NA	200000	gRNA.tab.gz.split	14.part11.tab.gz
+14.part12	NA	NA	200000	gRNA.tab.gz.split	14.part12.tab.gz
+14.part13	NA	NA	200000	gRNA.tab.gz.split	14.part13.tab.gz
+14.part14	NA	NA	200000	gRNA.tab.gz.split	14.part14.tab.gz
+14.part15	NA	NA	200000	gRNA.tab.gz.split	14.part15.tab.gz
+14.part16	NA	NA	200000	gRNA.tab.gz.split	14.part16.tab.gz
+14.part17	NA	NA	200000	gRNA.tab.gz.split	14.part17.tab.gz
+14.part18	NA	NA	200000	gRNA.tab.gz.split	14.part18.tab.gz
+14.part19	NA	NA	200000	gRNA.tab.gz.split	14.part19.tab.gz
+14.part20	NA	NA	200000	gRNA.tab.gz.split	14.part20.tab.gz
+14.part21	NA	NA	200000	gRNA.tab.gz.split	14.part21.tab.gz
+14.part22	NA	NA	200000	gRNA.tab.gz.split	14.part22.tab.gz
+14.part23	NA	NA	200000	gRNA.tab.gz.split	14.part23.tab.gz
+14.part24	NA	NA	200000	gRNA.tab.gz.split	14.part24.tab.gz
+14.part25	NA	NA	200000	gRNA.tab.gz.split	14.part25.tab.gz
+14.part26	NA	NA	200000	gRNA.tab.gz.split	14.part26.tab.gz
+14.part27	NA	NA	200000	gRNA.tab.gz.split	14.part27.tab.gz
+14.part28	NA	NA	200000	gRNA.tab.gz.split	14.part28.tab.gz
+14.part29	NA	NA	200000	gRNA.tab.gz.split	14.part29.tab.gz
+14.part30	NA	NA	200000	gRNA.tab.gz.split	14.part30.tab.gz
+14.part31	NA	NA	200000	gRNA.tab.gz.split	14.part31.tab.gz
+14.part32	NA	NA	200000	gRNA.tab.gz.split	14.part32.tab.gz
+14.part33	NA	NA	200000	gRNA.tab.gz.split	14.part33.tab.gz
+14.part34	NA	NA	200000	gRNA.tab.gz.split	14.part34.tab.gz
+14.part35	NA	NA	200000	gRNA.tab.gz.split	14.part35.tab.gz
+14.part36	NA	NA	200000	gRNA.tab.gz.split	14.part36.tab.gz
+14.part37	NA	NA	200000	gRNA.tab.gz.split	14.part37.tab.gz
+14.part38	NA	NA	200000	gRNA.tab.gz.split	14.part38.tab.gz
+14.part39	NA	NA	200000	gRNA.tab.gz.split	14.part39.tab.gz
+14.part40	NA	NA	200000	gRNA.tab.gz.split	14.part40.tab.gz
+14.part41	NA	NA	200000	gRNA.tab.gz.split	14.part41.tab.gz
+14.part42	NA	NA	200000	gRNA.tab.gz.split	14.part42.tab.gz
+14.part43	NA	NA	200000	gRNA.tab.gz.split	14.part43.tab.gz
+14.part44	NA	NA	200000	gRNA.tab.gz.split	14.part44.tab.gz
+14.part45	NA	NA	200000	gRNA.tab.gz.split	14.part45.tab.gz
+14.part46	NA	NA	159748	gRNA.tab.gz.split	14.part46.tab.gz
+15.part0	NA	NA	200000	gRNA.tab.gz.split	15.part0.tab.gz
+15.part1	NA	NA	200000	gRNA.tab.gz.split	15.part1.tab.gz
+15.part2	NA	NA	200000	gRNA.tab.gz.split	15.part2.tab.gz
+15.part3	NA	NA	200000	gRNA.tab.gz.split	15.part3.tab.gz
+15.part4	NA	NA	200000	gRNA.tab.gz.split	15.part4.tab.gz
+15.part5	NA	NA	200000	gRNA.tab.gz.split	15.part5.tab.gz
+15.part6	NA	NA	200000	gRNA.tab.gz.split	15.part6.tab.gz
+15.part7	NA	NA	200000	gRNA.tab.gz.split	15.part7.tab.gz
+15.part8	NA	NA	200000	gRNA.tab.gz.split	15.part8.tab.gz
+15.part9	NA	NA	200000	gRNA.tab.gz.split	15.part9.tab.gz
+15.part10	NA	NA	200000	gRNA.tab.gz.split	15.part10.tab.gz
+15.part11	NA	NA	200000	gRNA.tab.gz.split	15.part11.tab.gz
+15.part12	NA	NA	200000	gRNA.tab.gz.split	15.part12.tab.gz
+15.part13	NA	NA	200000	gRNA.tab.gz.split	15.part13.tab.gz
+15.part14	NA	NA	200000	gRNA.tab.gz.split	15.part14.tab.gz
+15.part15	NA	NA	200000	gRNA.tab.gz.split	15.part15.tab.gz
+15.part16	NA	NA	200000	gRNA.tab.gz.split	15.part16.tab.gz
+15.part17	NA	NA	200000	gRNA.tab.gz.split	15.part17.tab.gz
+15.part18	NA	NA	200000	gRNA.tab.gz.split	15.part18.tab.gz
+15.part19	NA	NA	200000	gRNA.tab.gz.split	15.part19.tab.gz
+15.part20	NA	NA	200000	gRNA.tab.gz.split	15.part20.tab.gz
+15.part21	NA	NA	200000	gRNA.tab.gz.split	15.part21.tab.gz
+15.part22	NA	NA	200000	gRNA.tab.gz.split	15.part22.tab.gz
+15.part23	NA	NA	200000	gRNA.tab.gz.split	15.part23.tab.gz
+15.part24	NA	NA	200000	gRNA.tab.gz.split	15.part24.tab.gz
+15.part25	NA	NA	200000	gRNA.tab.gz.split	15.part25.tab.gz
+15.part26	NA	NA	200000	gRNA.tab.gz.split	15.part26.tab.gz
+15.part27	NA	NA	200000	gRNA.tab.gz.split	15.part27.tab.gz
+15.part28	NA	NA	200000	gRNA.tab.gz.split	15.part28.tab.gz
+15.part29	NA	NA	200000	gRNA.tab.gz.split	15.part29.tab.gz
+15.part30	NA	NA	200000	gRNA.tab.gz.split	15.part30.tab.gz
+15.part31	NA	NA	200000	gRNA.tab.gz.split	15.part31.tab.gz
+15.part32	NA	NA	200000	gRNA.tab.gz.split	15.part32.tab.gz
+15.part33	NA	NA	200000	gRNA.tab.gz.split	15.part33.tab.gz
+15.part34	NA	NA	200000	gRNA.tab.gz.split	15.part34.tab.gz
+15.part35	NA	NA	200000	gRNA.tab.gz.split	15.part35.tab.gz
+15.part36	NA	NA	200000	gRNA.tab.gz.split	15.part36.tab.gz
+15.part37	NA	NA	200000	gRNA.tab.gz.split	15.part37.tab.gz
+15.part38	NA	NA	200000	gRNA.tab.gz.split	15.part38.tab.gz
+15.part39	NA	NA	200000	gRNA.tab.gz.split	15.part39.tab.gz
+15.part40	NA	NA	200000	gRNA.tab.gz.split	15.part40.tab.gz
+15.part41	NA	NA	200000	gRNA.tab.gz.split	15.part41.tab.gz
+15.part42	NA	NA	200000	gRNA.tab.gz.split	15.part42.tab.gz
+15.part43	NA	NA	200000	gRNA.tab.gz.split	15.part43.tab.gz
+15.part44	NA	NA	200000	gRNA.tab.gz.split	15.part44.tab.gz
+15.part45	NA	NA	200000	gRNA.tab.gz.split	15.part45.tab.gz
+15.part46	NA	NA	29439	gRNA.tab.gz.split	15.part46.tab.gz
+16.part0	NA	NA	200000	gRNA.tab.gz.split	16.part0.tab.gz
+16.part1	NA	NA	200000	gRNA.tab.gz.split	16.part1.tab.gz
+16.part2	NA	NA	200000	gRNA.tab.gz.split	16.part2.tab.gz
+16.part3	NA	NA	200000	gRNA.tab.gz.split	16.part3.tab.gz
+16.part4	NA	NA	200000	gRNA.tab.gz.split	16.part4.tab.gz
+16.part5	NA	NA	200000	gRNA.tab.gz.split	16.part5.tab.gz
+16.part6	NA	NA	200000	gRNA.tab.gz.split	16.part6.tab.gz
+16.part7	NA	NA	200000	gRNA.tab.gz.split	16.part7.tab.gz
+16.part8	NA	NA	200000	gRNA.tab.gz.split	16.part8.tab.gz
+16.part9	NA	NA	200000	gRNA.tab.gz.split	16.part9.tab.gz
+16.part10	NA	NA	200000	gRNA.tab.gz.split	16.part10.tab.gz
+16.part11	NA	NA	200000	gRNA.tab.gz.split	16.part11.tab.gz
+16.part12	NA	NA	200000	gRNA.tab.gz.split	16.part12.tab.gz
+16.part13	NA	NA	200000	gRNA.tab.gz.split	16.part13.tab.gz
+16.part14	NA	NA	200000	gRNA.tab.gz.split	16.part14.tab.gz
+16.part15	NA	NA	200000	gRNA.tab.gz.split	16.part15.tab.gz
+16.part16	NA	NA	200000	gRNA.tab.gz.split	16.part16.tab.gz
+16.part17	NA	NA	200000	gRNA.tab.gz.split	16.part17.tab.gz
+16.part18	NA	NA	200000	gRNA.tab.gz.split	16.part18.tab.gz
+16.part19	NA	NA	200000	gRNA.tab.gz.split	16.part19.tab.gz
+16.part20	NA	NA	200000	gRNA.tab.gz.split	16.part20.tab.gz
+16.part21	NA	NA	200000	gRNA.tab.gz.split	16.part21.tab.gz
+16.part22	NA	NA	200000	gRNA.tab.gz.split	16.part22.tab.gz
+16.part23	NA	NA	200000	gRNA.tab.gz.split	16.part23.tab.gz
+16.part24	NA	NA	200000	gRNA.tab.gz.split	16.part24.tab.gz
+16.part25	NA	NA	200000	gRNA.tab.gz.split	16.part25.tab.gz
+16.part26	NA	NA	200000	gRNA.tab.gz.split	16.part26.tab.gz
+16.part27	NA	NA	200000	gRNA.tab.gz.split	16.part27.tab.gz
+16.part28	NA	NA	200000	gRNA.tab.gz.split	16.part28.tab.gz
+16.part29	NA	NA	200000	gRNA.tab.gz.split	16.part29.tab.gz
+16.part30	NA	NA	200000	gRNA.tab.gz.split	16.part30.tab.gz
+16.part31	NA	NA	200000	gRNA.tab.gz.split	16.part31.tab.gz
+16.part32	NA	NA	200000	gRNA.tab.gz.split	16.part32.tab.gz
+16.part33	NA	NA	200000	gRNA.tab.gz.split	16.part33.tab.gz
+16.part34	NA	NA	200000	gRNA.tab.gz.split	16.part34.tab.gz
+16.part35	NA	NA	200000	gRNA.tab.gz.split	16.part35.tab.gz
+16.part36	NA	NA	200000	gRNA.tab.gz.split	16.part36.tab.gz
+16.part37	NA	NA	200000	gRNA.tab.gz.split	16.part37.tab.gz
+16.part38	NA	NA	200000	gRNA.tab.gz.split	16.part38.tab.gz
+16.part39	NA	NA	200000	gRNA.tab.gz.split	16.part39.tab.gz
+16.part40	NA	NA	200000	gRNA.tab.gz.split	16.part40.tab.gz
+16.part41	NA	NA	200000	gRNA.tab.gz.split	16.part41.tab.gz
+16.part42	NA	NA	200000	gRNA.tab.gz.split	16.part42.tab.gz
+16.part43	NA	NA	200000	gRNA.tab.gz.split	16.part43.tab.gz
+16.part44	NA	NA	200000	gRNA.tab.gz.split	16.part44.tab.gz
+16.part45	NA	NA	200000	gRNA.tab.gz.split	16.part45.tab.gz
+16.part46	NA	NA	200000	gRNA.tab.gz.split	16.part46.tab.gz
+16.part47	NA	NA	200000	gRNA.tab.gz.split	16.part47.tab.gz
+16.part48	NA	NA	200000	gRNA.tab.gz.split	16.part48.tab.gz
+16.part49	NA	NA	200000	gRNA.tab.gz.split	16.part49.tab.gz
+16.part50	NA	NA	2903	gRNA.tab.gz.split	16.part50.tab.gz
+17.part0	NA	NA	200000	gRNA.tab.gz.split	17.part0.tab.gz
+17.part1	NA	NA	200000	gRNA.tab.gz.split	17.part1.tab.gz
+17.part2	NA	NA	200000	gRNA.tab.gz.split	17.part2.tab.gz
+17.part3	NA	NA	200000	gRNA.tab.gz.split	17.part3.tab.gz
+17.part4	NA	NA	200000	gRNA.tab.gz.split	17.part4.tab.gz
+17.part5	NA	NA	200000	gRNA.tab.gz.split	17.part5.tab.gz
+17.part6	NA	NA	200000	gRNA.tab.gz.split	17.part6.tab.gz
+17.part7	NA	NA	200000	gRNA.tab.gz.split	17.part7.tab.gz
+17.part8	NA	NA	200000	gRNA.tab.gz.split	17.part8.tab.gz
+17.part9	NA	NA	200000	gRNA.tab.gz.split	17.part9.tab.gz
+17.part10	NA	NA	200000	gRNA.tab.gz.split	17.part10.tab.gz
+17.part11	NA	NA	200000	gRNA.tab.gz.split	17.part11.tab.gz
+17.part12	NA	NA	200000	gRNA.tab.gz.split	17.part12.tab.gz
+17.part13	NA	NA	200000	gRNA.tab.gz.split	17.part13.tab.gz
+17.part14	NA	NA	200000	gRNA.tab.gz.split	17.part14.tab.gz
+17.part15	NA	NA	200000	gRNA.tab.gz.split	17.part15.tab.gz
+17.part16	NA	NA	200000	gRNA.tab.gz.split	17.part16.tab.gz
+17.part17	NA	NA	200000	gRNA.tab.gz.split	17.part17.tab.gz
+17.part18	NA	NA	200000	gRNA.tab.gz.split	17.part18.tab.gz
+17.part19	NA	NA	200000	gRNA.tab.gz.split	17.part19.tab.gz
+17.part20	NA	NA	200000	gRNA.tab.gz.split	17.part20.tab.gz
+17.part21	NA	NA	200000	gRNA.tab.gz.split	17.part21.tab.gz
+17.part22	NA	NA	200000	gRNA.tab.gz.split	17.part22.tab.gz
+17.part23	NA	NA	200000	gRNA.tab.gz.split	17.part23.tab.gz
+17.part24	NA	NA	200000	gRNA.tab.gz.split	17.part24.tab.gz
+17.part25	NA	NA	200000	gRNA.tab.gz.split	17.part25.tab.gz
+17.part26	NA	NA	200000	gRNA.tab.gz.split	17.part26.tab.gz
+17.part27	NA	NA	200000	gRNA.tab.gz.split	17.part27.tab.gz
+17.part28	NA	NA	200000	gRNA.tab.gz.split	17.part28.tab.gz
+17.part29	NA	NA	200000	gRNA.tab.gz.split	17.part29.tab.gz
+17.part30	NA	NA	200000	gRNA.tab.gz.split	17.part30.tab.gz
+17.part31	NA	NA	200000	gRNA.tab.gz.split	17.part31.tab.gz
+17.part32	NA	NA	200000	gRNA.tab.gz.split	17.part32.tab.gz
+17.part33	NA	NA	200000	gRNA.tab.gz.split	17.part33.tab.gz
+17.part34	NA	NA	200000	gRNA.tab.gz.split	17.part34.tab.gz
+17.part35	NA	NA	200000	gRNA.tab.gz.split	17.part35.tab.gz
+17.part36	NA	NA	200000	gRNA.tab.gz.split	17.part36.tab.gz
+17.part37	NA	NA	200000	gRNA.tab.gz.split	17.part37.tab.gz
+17.part38	NA	NA	200000	gRNA.tab.gz.split	17.part38.tab.gz
+17.part39	NA	NA	200000	gRNA.tab.gz.split	17.part39.tab.gz
+17.part40	NA	NA	200000	gRNA.tab.gz.split	17.part40.tab.gz
+17.part41	NA	NA	200000	gRNA.tab.gz.split	17.part41.tab.gz
+17.part42	NA	NA	200000	gRNA.tab.gz.split	17.part42.tab.gz
+17.part43	NA	NA	200000	gRNA.tab.gz.split	17.part43.tab.gz
+17.part44	NA	NA	200000	gRNA.tab.gz.split	17.part44.tab.gz
+17.part45	NA	NA	200000	gRNA.tab.gz.split	17.part45.tab.gz
+17.part46	NA	NA	200000	gRNA.tab.gz.split	17.part46.tab.gz
+17.part47	NA	NA	200000	gRNA.tab.gz.split	17.part47.tab.gz
+17.part48	NA	NA	200000	gRNA.tab.gz.split	17.part48.tab.gz
+17.part49	NA	NA	200000	gRNA.tab.gz.split	17.part49.tab.gz
+17.part50	NA	NA	200000	gRNA.tab.gz.split	17.part50.tab.gz
+17.part51	NA	NA	200000	gRNA.tab.gz.split	17.part51.tab.gz
+17.part52	NA	NA	96051	gRNA.tab.gz.split	17.part52.tab.gz
+18.part0	NA	NA	200000	gRNA.tab.gz.split	18.part0.tab.gz
+18.part1	NA	NA	200000	gRNA.tab.gz.split	18.part1.tab.gz
+18.part2	NA	NA	200000	gRNA.tab.gz.split	18.part2.tab.gz
+18.part3	NA	NA	200000	gRNA.tab.gz.split	18.part3.tab.gz
+18.part4	NA	NA	200000	gRNA.tab.gz.split	18.part4.tab.gz
+18.part5	NA	NA	200000	gRNA.tab.gz.split	18.part5.tab.gz
+18.part6	NA	NA	200000	gRNA.tab.gz.split	18.part6.tab.gz
+18.part7	NA	NA	200000	gRNA.tab.gz.split	18.part7.tab.gz
+18.part8	NA	NA	200000	gRNA.tab.gz.split	18.part8.tab.gz
+18.part9	NA	NA	200000	gRNA.tab.gz.split	18.part9.tab.gz
+18.part10	NA	NA	200000	gRNA.tab.gz.split	18.part10.tab.gz
+18.part11	NA	NA	200000	gRNA.tab.gz.split	18.part11.tab.gz
+18.part12	NA	NA	200000	gRNA.tab.gz.split	18.part12.tab.gz
+18.part13	NA	NA	200000	gRNA.tab.gz.split	18.part13.tab.gz
+18.part14	NA	NA	200000	gRNA.tab.gz.split	18.part14.tab.gz
+18.part15	NA	NA	200000	gRNA.tab.gz.split	18.part15.tab.gz
+18.part16	NA	NA	200000	gRNA.tab.gz.split	18.part16.tab.gz
+18.part17	NA	NA	200000	gRNA.tab.gz.split	18.part17.tab.gz
+18.part18	NA	NA	200000	gRNA.tab.gz.split	18.part18.tab.gz
+18.part19	NA	NA	200000	gRNA.tab.gz.split	18.part19.tab.gz
+18.part20	NA	NA	200000	gRNA.tab.gz.split	18.part20.tab.gz
+18.part21	NA	NA	200000	gRNA.tab.gz.split	18.part21.tab.gz
+18.part22	NA	NA	200000	gRNA.tab.gz.split	18.part22.tab.gz
+18.part23	NA	NA	200000	gRNA.tab.gz.split	18.part23.tab.gz
+18.part24	NA	NA	200000	gRNA.tab.gz.split	18.part24.tab.gz
+18.part25	NA	NA	200000	gRNA.tab.gz.split	18.part25.tab.gz
+18.part26	NA	NA	200000	gRNA.tab.gz.split	18.part26.tab.gz
+18.part27	NA	NA	200000	gRNA.tab.gz.split	18.part27.tab.gz
+18.part28	NA	NA	200000	gRNA.tab.gz.split	18.part28.tab.gz
+18.part29	NA	NA	200000	gRNA.tab.gz.split	18.part29.tab.gz
+18.part30	NA	NA	200000	gRNA.tab.gz.split	18.part30.tab.gz
+18.part31	NA	NA	200000	gRNA.tab.gz.split	18.part31.tab.gz
+18.part32	NA	NA	200000	gRNA.tab.gz.split	18.part32.tab.gz
+18.part33	NA	NA	200000	gRNA.tab.gz.split	18.part33.tab.gz
+18.part34	NA	NA	200000	gRNA.tab.gz.split	18.part34.tab.gz
+18.part35	NA	NA	200000	gRNA.tab.gz.split	18.part35.tab.gz
+18.part36	NA	NA	200000	gRNA.tab.gz.split	18.part36.tab.gz
+18.part37	NA	NA	200000	gRNA.tab.gz.split	18.part37.tab.gz
+18.part38	NA	NA	80966	gRNA.tab.gz.split	18.part38.tab.gz
+19.part0	NA	NA	200000	gRNA.tab.gz.split	19.part0.tab.gz
+19.part1	NA	NA	200000	gRNA.tab.gz.split	19.part1.tab.gz
+19.part2	NA	NA	200000	gRNA.tab.gz.split	19.part2.tab.gz
+19.part3	NA	NA	200000	gRNA.tab.gz.split	19.part3.tab.gz
+19.part4	NA	NA	200000	gRNA.tab.gz.split	19.part4.tab.gz
+19.part5	NA	NA	200000	gRNA.tab.gz.split	19.part5.tab.gz
+19.part6	NA	NA	200000	gRNA.tab.gz.split	19.part6.tab.gz
+19.part7	NA	NA	200000	gRNA.tab.gz.split	19.part7.tab.gz
+19.part8	NA	NA	200000	gRNA.tab.gz.split	19.part8.tab.gz
+19.part9	NA	NA	200000	gRNA.tab.gz.split	19.part9.tab.gz
+19.part10	NA	NA	200000	gRNA.tab.gz.split	19.part10.tab.gz
+19.part11	NA	NA	200000	gRNA.tab.gz.split	19.part11.tab.gz
+19.part12	NA	NA	200000	gRNA.tab.gz.split	19.part12.tab.gz
+19.part13	NA	NA	200000	gRNA.tab.gz.split	19.part13.tab.gz
+19.part14	NA	NA	200000	gRNA.tab.gz.split	19.part14.tab.gz
+19.part15	NA	NA	200000	gRNA.tab.gz.split	19.part15.tab.gz
+19.part16	NA	NA	200000	gRNA.tab.gz.split	19.part16.tab.gz
+19.part17	NA	NA	200000	gRNA.tab.gz.split	19.part17.tab.gz
+19.part18	NA	NA	200000	gRNA.tab.gz.split	19.part18.tab.gz
+19.part19	NA	NA	200000	gRNA.tab.gz.split	19.part19.tab.gz
+19.part20	NA	NA	200000	gRNA.tab.gz.split	19.part20.tab.gz
+19.part21	NA	NA	200000	gRNA.tab.gz.split	19.part21.tab.gz
+19.part22	NA	NA	200000	gRNA.tab.gz.split	19.part22.tab.gz
+19.part23	NA	NA	200000	gRNA.tab.gz.split	19.part23.tab.gz
+19.part24	NA	NA	200000	gRNA.tab.gz.split	19.part24.tab.gz
+19.part25	NA	NA	200000	gRNA.tab.gz.split	19.part25.tab.gz
+19.part26	NA	NA	200000	gRNA.tab.gz.split	19.part26.tab.gz
+19.part27	NA	NA	200000	gRNA.tab.gz.split	19.part27.tab.gz
+19.part28	NA	NA	200000	gRNA.tab.gz.split	19.part28.tab.gz
+19.part29	NA	NA	200000	gRNA.tab.gz.split	19.part29.tab.gz
+19.part30	NA	NA	200000	gRNA.tab.gz.split	19.part30.tab.gz
+19.part31	NA	NA	200000	gRNA.tab.gz.split	19.part31.tab.gz
+19.part32	NA	NA	200000	gRNA.tab.gz.split	19.part32.tab.gz
+19.part33	NA	NA	200000	gRNA.tab.gz.split	19.part33.tab.gz
+19.part34	NA	NA	200000	gRNA.tab.gz.split	19.part34.tab.gz
+19.part35	NA	NA	200000	gRNA.tab.gz.split	19.part35.tab.gz
+19.part36	NA	NA	200000	gRNA.tab.gz.split	19.part36.tab.gz
+19.part37	NA	NA	200000	gRNA.tab.gz.split	19.part37.tab.gz
+19.part38	NA	NA	200000	gRNA.tab.gz.split	19.part38.tab.gz
+19.part39	NA	NA	200000	gRNA.tab.gz.split	19.part39.tab.gz
+19.part40	NA	NA	200000	gRNA.tab.gz.split	19.part40.tab.gz
+19.part41	NA	NA	48882	gRNA.tab.gz.split	19.part41.tab.gz
+2.part0	NA	NA	200000	gRNA.tab.gz.split	2.part0.tab.gz
+2.part1	NA	NA	200000	gRNA.tab.gz.split	2.part1.tab.gz
+2.part2	NA	NA	200000	gRNA.tab.gz.split	2.part2.tab.gz
+2.part3	NA	NA	200000	gRNA.tab.gz.split	2.part3.tab.gz
+2.part4	NA	NA	200000	gRNA.tab.gz.split	2.part4.tab.gz
+2.part5	NA	NA	200000	gRNA.tab.gz.split	2.part5.tab.gz
+2.part6	NA	NA	200000	gRNA.tab.gz.split	2.part6.tab.gz
+2.part7	NA	NA	200000	gRNA.tab.gz.split	2.part7.tab.gz
+2.part8	NA	NA	200000	gRNA.tab.gz.split	2.part8.tab.gz
+2.part9	NA	NA	200000	gRNA.tab.gz.split	2.part9.tab.gz
+2.part10	NA	NA	200000	gRNA.tab.gz.split	2.part10.tab.gz
+2.part11	NA	NA	200000	gRNA.tab.gz.split	2.part11.tab.gz
+2.part12	NA	NA	200000	gRNA.tab.gz.split	2.part12.tab.gz
+2.part13	NA	NA	200000	gRNA.tab.gz.split	2.part13.tab.gz
+2.part14	NA	NA	200000	gRNA.tab.gz.split	2.part14.tab.gz
+2.part15	NA	NA	200000	gRNA.tab.gz.split	2.part15.tab.gz
+2.part16	NA	NA	200000	gRNA.tab.gz.split	2.part16.tab.gz
+2.part17	NA	NA	200000	gRNA.tab.gz.split	2.part17.tab.gz
+2.part18	NA	NA	200000	gRNA.tab.gz.split	2.part18.tab.gz
+2.part19	NA	NA	200000	gRNA.tab.gz.split	2.part19.tab.gz
+2.part20	NA	NA	200000	gRNA.tab.gz.split	2.part20.tab.gz
+2.part21	NA	NA	200000	gRNA.tab.gz.split	2.part21.tab.gz
+2.part22	NA	NA	200000	gRNA.tab.gz.split	2.part22.tab.gz
+2.part23	NA	NA	200000	gRNA.tab.gz.split	2.part23.tab.gz
+2.part24	NA	NA	200000	gRNA.tab.gz.split	2.part24.tab.gz
+2.part25	NA	NA	200000	gRNA.tab.gz.split	2.part25.tab.gz
+2.part26	NA	NA	200000	gRNA.tab.gz.split	2.part26.tab.gz
+2.part27	NA	NA	200000	gRNA.tab.gz.split	2.part27.tab.gz
+2.part28	NA	NA	200000	gRNA.tab.gz.split	2.part28.tab.gz
+2.part29	NA	NA	200000	gRNA.tab.gz.split	2.part29.tab.gz
+2.part30	NA	NA	200000	gRNA.tab.gz.split	2.part30.tab.gz
+2.part31	NA	NA	200000	gRNA.tab.gz.split	2.part31.tab.gz
+2.part32	NA	NA	200000	gRNA.tab.gz.split	2.part32.tab.gz
+2.part33	NA	NA	200000	gRNA.tab.gz.split	2.part33.tab.gz
+2.part34	NA	NA	200000	gRNA.tab.gz.split	2.part34.tab.gz
+2.part35	NA	NA	200000	gRNA.tab.gz.split	2.part35.tab.gz
+2.part36	NA	NA	200000	gRNA.tab.gz.split	2.part36.tab.gz
+2.part37	NA	NA	200000	gRNA.tab.gz.split	2.part37.tab.gz
+2.part38	NA	NA	200000	gRNA.tab.gz.split	2.part38.tab.gz
+2.part39	NA	NA	200000	gRNA.tab.gz.split	2.part39.tab.gz
+2.part40	NA	NA	200000	gRNA.tab.gz.split	2.part40.tab.gz
+2.part41	NA	NA	200000	gRNA.tab.gz.split	2.part41.tab.gz
+2.part42	NA	NA	200000	gRNA.tab.gz.split	2.part42.tab.gz
+2.part43	NA	NA	200000	gRNA.tab.gz.split	2.part43.tab.gz
+2.part44	NA	NA	200000	gRNA.tab.gz.split	2.part44.tab.gz
+2.part45	NA	NA	200000	gRNA.tab.gz.split	2.part45.tab.gz
+2.part46	NA	NA	200000	gRNA.tab.gz.split	2.part46.tab.gz
+2.part47	NA	NA	200000	gRNA.tab.gz.split	2.part47.tab.gz
+2.part48	NA	NA	200000	gRNA.tab.gz.split	2.part48.tab.gz
+2.part49	NA	NA	200000	gRNA.tab.gz.split	2.part49.tab.gz
+2.part50	NA	NA	200000	gRNA.tab.gz.split	2.part50.tab.gz
+2.part51	NA	NA	200000	gRNA.tab.gz.split	2.part51.tab.gz
+2.part52	NA	NA	200000	gRNA.tab.gz.split	2.part52.tab.gz
+2.part53	NA	NA	200000	gRNA.tab.gz.split	2.part53.tab.gz
+2.part54	NA	NA	200000	gRNA.tab.gz.split	2.part54.tab.gz
+2.part55	NA	NA	200000	gRNA.tab.gz.split	2.part55.tab.gz
+2.part56	NA	NA	200000	gRNA.tab.gz.split	2.part56.tab.gz
+2.part57	NA	NA	200000	gRNA.tab.gz.split	2.part57.tab.gz
+2.part58	NA	NA	200000	gRNA.tab.gz.split	2.part58.tab.gz
+2.part59	NA	NA	200000	gRNA.tab.gz.split	2.part59.tab.gz
+2.part60	NA	NA	200000	gRNA.tab.gz.split	2.part60.tab.gz
+2.part61	NA	NA	200000	gRNA.tab.gz.split	2.part61.tab.gz
+2.part62	NA	NA	200000	gRNA.tab.gz.split	2.part62.tab.gz
+2.part63	NA	NA	200000	gRNA.tab.gz.split	2.part63.tab.gz
+2.part64	NA	NA	200000	gRNA.tab.gz.split	2.part64.tab.gz
+2.part65	NA	NA	200000	gRNA.tab.gz.split	2.part65.tab.gz
+2.part66	NA	NA	200000	gRNA.tab.gz.split	2.part66.tab.gz
+2.part67	NA	NA	200000	gRNA.tab.gz.split	2.part67.tab.gz
+2.part68	NA	NA	200000	gRNA.tab.gz.split	2.part68.tab.gz
+2.part69	NA	NA	200000	gRNA.tab.gz.split	2.part69.tab.gz
+2.part70	NA	NA	200000	gRNA.tab.gz.split	2.part70.tab.gz
+2.part71	NA	NA	200000	gRNA.tab.gz.split	2.part71.tab.gz
+2.part72	NA	NA	200000	gRNA.tab.gz.split	2.part72.tab.gz
+2.part73	NA	NA	200000	gRNA.tab.gz.split	2.part73.tab.gz
+2.part74	NA	NA	200000	gRNA.tab.gz.split	2.part74.tab.gz
+2.part75	NA	NA	200000	gRNA.tab.gz.split	2.part75.tab.gz
+2.part76	NA	NA	200000	gRNA.tab.gz.split	2.part76.tab.gz
+2.part77	NA	NA	200000	gRNA.tab.gz.split	2.part77.tab.gz
+2.part78	NA	NA	200000	gRNA.tab.gz.split	2.part78.tab.gz
+2.part79	NA	NA	200000	gRNA.tab.gz.split	2.part79.tab.gz
+2.part80	NA	NA	200000	gRNA.tab.gz.split	2.part80.tab.gz
+2.part81	NA	NA	200000	gRNA.tab.gz.split	2.part81.tab.gz
+2.part82	NA	NA	200000	gRNA.tab.gz.split	2.part82.tab.gz
+2.part83	NA	NA	200000	gRNA.tab.gz.split	2.part83.tab.gz
+2.part84	NA	NA	200000	gRNA.tab.gz.split	2.part84.tab.gz
+2.part85	NA	NA	200000	gRNA.tab.gz.split	2.part85.tab.gz
+2.part86	NA	NA	200000	gRNA.tab.gz.split	2.part86.tab.gz
+2.part87	NA	NA	200000	gRNA.tab.gz.split	2.part87.tab.gz
+2.part88	NA	NA	200000	gRNA.tab.gz.split	2.part88.tab.gz
+2.part89	NA	NA	200000	gRNA.tab.gz.split	2.part89.tab.gz
+2.part90	NA	NA	200000	gRNA.tab.gz.split	2.part90.tab.gz
+2.part91	NA	NA	200000	gRNA.tab.gz.split	2.part91.tab.gz
+2.part92	NA	NA	200000	gRNA.tab.gz.split	2.part92.tab.gz
+2.part93	NA	NA	200000	gRNA.tab.gz.split	2.part93.tab.gz
+2.part94	NA	NA	200000	gRNA.tab.gz.split	2.part94.tab.gz
+2.part95	NA	NA	200000	gRNA.tab.gz.split	2.part95.tab.gz
+2.part96	NA	NA	200000	gRNA.tab.gz.split	2.part96.tab.gz
+2.part97	NA	NA	200000	gRNA.tab.gz.split	2.part97.tab.gz
+2.part98	NA	NA	200000	gRNA.tab.gz.split	2.part98.tab.gz
+2.part99	NA	NA	200000	gRNA.tab.gz.split	2.part99.tab.gz
+2.part100	NA	NA	200000	gRNA.tab.gz.split	2.part100.tab.gz
+2.part101	NA	NA	200000	gRNA.tab.gz.split	2.part101.tab.gz
+2.part102	NA	NA	200000	gRNA.tab.gz.split	2.part102.tab.gz
+2.part103	NA	NA	200000	gRNA.tab.gz.split	2.part103.tab.gz
+2.part104	NA	NA	200000	gRNA.tab.gz.split	2.part104.tab.gz
+2.part105	NA	NA	200000	gRNA.tab.gz.split	2.part105.tab.gz
+2.part106	NA	NA	200000	gRNA.tab.gz.split	2.part106.tab.gz
+2.part107	NA	NA	200000	gRNA.tab.gz.split	2.part107.tab.gz
+2.part108	NA	NA	200000	gRNA.tab.gz.split	2.part108.tab.gz
+2.part109	NA	NA	200000	gRNA.tab.gz.split	2.part109.tab.gz
+2.part110	NA	NA	200000	gRNA.tab.gz.split	2.part110.tab.gz
+2.part111	NA	NA	200000	gRNA.tab.gz.split	2.part111.tab.gz
+2.part112	NA	NA	200000	gRNA.tab.gz.split	2.part112.tab.gz
+2.part113	NA	NA	200000	gRNA.tab.gz.split	2.part113.tab.gz
+2.part114	NA	NA	200000	gRNA.tab.gz.split	2.part114.tab.gz
+2.part115	NA	NA	200000	gRNA.tab.gz.split	2.part115.tab.gz
+2.part116	NA	NA	200000	gRNA.tab.gz.split	2.part116.tab.gz
+2.part117	NA	NA	200000	gRNA.tab.gz.split	2.part117.tab.gz
+2.part118	NA	NA	200000	gRNA.tab.gz.split	2.part118.tab.gz
+2.part119	NA	NA	200000	gRNA.tab.gz.split	2.part119.tab.gz
+2.part120	NA	NA	131036	gRNA.tab.gz.split	2.part120.tab.gz
+20.part0	NA	NA	200000	gRNA.tab.gz.split	20.part0.tab.gz
+20.part1	NA	NA	200000	gRNA.tab.gz.split	20.part1.tab.gz
+20.part2	NA	NA	200000	gRNA.tab.gz.split	20.part2.tab.gz
+20.part3	NA	NA	200000	gRNA.tab.gz.split	20.part3.tab.gz
+20.part4	NA	NA	200000	gRNA.tab.gz.split	20.part4.tab.gz
+20.part5	NA	NA	200000	gRNA.tab.gz.split	20.part5.tab.gz
+20.part6	NA	NA	200000	gRNA.tab.gz.split	20.part6.tab.gz
+20.part7	NA	NA	200000	gRNA.tab.gz.split	20.part7.tab.gz
+20.part8	NA	NA	200000	gRNA.tab.gz.split	20.part8.tab.gz
+20.part9	NA	NA	200000	gRNA.tab.gz.split	20.part9.tab.gz
+20.part10	NA	NA	200000	gRNA.tab.gz.split	20.part10.tab.gz
+20.part11	NA	NA	200000	gRNA.tab.gz.split	20.part11.tab.gz
+20.part12	NA	NA	200000	gRNA.tab.gz.split	20.part12.tab.gz
+20.part13	NA	NA	200000	gRNA.tab.gz.split	20.part13.tab.gz
+20.part14	NA	NA	200000	gRNA.tab.gz.split	20.part14.tab.gz
+20.part15	NA	NA	200000	gRNA.tab.gz.split	20.part15.tab.gz
+20.part16	NA	NA	200000	gRNA.tab.gz.split	20.part16.tab.gz
+20.part17	NA	NA	200000	gRNA.tab.gz.split	20.part17.tab.gz
+20.part18	NA	NA	200000	gRNA.tab.gz.split	20.part18.tab.gz
+20.part19	NA	NA	200000	gRNA.tab.gz.split	20.part19.tab.gz
+20.part20	NA	NA	200000	gRNA.tab.gz.split	20.part20.tab.gz
+20.part21	NA	NA	200000	gRNA.tab.gz.split	20.part21.tab.gz
+20.part22	NA	NA	200000	gRNA.tab.gz.split	20.part22.tab.gz
+20.part23	NA	NA	200000	gRNA.tab.gz.split	20.part23.tab.gz
+20.part24	NA	NA	200000	gRNA.tab.gz.split	20.part24.tab.gz
+20.part25	NA	NA	200000	gRNA.tab.gz.split	20.part25.tab.gz
+20.part26	NA	NA	200000	gRNA.tab.gz.split	20.part26.tab.gz
+20.part27	NA	NA	200000	gRNA.tab.gz.split	20.part27.tab.gz
+20.part28	NA	NA	200000	gRNA.tab.gz.split	20.part28.tab.gz
+20.part29	NA	NA	200000	gRNA.tab.gz.split	20.part29.tab.gz
+20.part30	NA	NA	200000	gRNA.tab.gz.split	20.part30.tab.gz
+20.part31	NA	NA	200000	gRNA.tab.gz.split	20.part31.tab.gz
+20.part32	NA	NA	200000	gRNA.tab.gz.split	20.part32.tab.gz
+20.part33	NA	NA	200000	gRNA.tab.gz.split	20.part33.tab.gz
+20.part34	NA	NA	200000	gRNA.tab.gz.split	20.part34.tab.gz
+20.part35	NA	NA	200000	gRNA.tab.gz.split	20.part35.tab.gz
+20.part36	NA	NA	200000	gRNA.tab.gz.split	20.part36.tab.gz
+20.part37	NA	NA	155255	gRNA.tab.gz.split	20.part37.tab.gz
+21.part0	NA	NA	200000	gRNA.tab.gz.split	21.part0.tab.gz
+21.part1	NA	NA	200000	gRNA.tab.gz.split	21.part1.tab.gz
+21.part2	NA	NA	200000	gRNA.tab.gz.split	21.part2.tab.gz
+21.part3	NA	NA	200000	gRNA.tab.gz.split	21.part3.tab.gz
+21.part4	NA	NA	200000	gRNA.tab.gz.split	21.part4.tab.gz
+21.part5	NA	NA	200000	gRNA.tab.gz.split	21.part5.tab.gz
+21.part6	NA	NA	200000	gRNA.tab.gz.split	21.part6.tab.gz
+21.part7	NA	NA	200000	gRNA.tab.gz.split	21.part7.tab.gz
+21.part8	NA	NA	200000	gRNA.tab.gz.split	21.part8.tab.gz
+21.part9	NA	NA	200000	gRNA.tab.gz.split	21.part9.tab.gz
+21.part10	NA	NA	200000	gRNA.tab.gz.split	21.part10.tab.gz
+21.part11	NA	NA	200000	gRNA.tab.gz.split	21.part11.tab.gz
+21.part12	NA	NA	200000	gRNA.tab.gz.split	21.part12.tab.gz
+21.part13	NA	NA	200000	gRNA.tab.gz.split	21.part13.tab.gz
+21.part14	NA	NA	200000	gRNA.tab.gz.split	21.part14.tab.gz
+21.part15	NA	NA	200000	gRNA.tab.gz.split	21.part15.tab.gz
+21.part16	NA	NA	200000	gRNA.tab.gz.split	21.part16.tab.gz
+21.part17	NA	NA	200000	gRNA.tab.gz.split	21.part17.tab.gz
+21.part18	NA	NA	200000	gRNA.tab.gz.split	21.part18.tab.gz
+21.part19	NA	NA	200000	gRNA.tab.gz.split	21.part19.tab.gz
+21.part20	NA	NA	106073	gRNA.tab.gz.split	21.part20.tab.gz
+22.part0	NA	NA	200000	gRNA.tab.gz.split	22.part0.tab.gz
+22.part1	NA	NA	200000	gRNA.tab.gz.split	22.part1.tab.gz
+22.part2	NA	NA	200000	gRNA.tab.gz.split	22.part2.tab.gz
+22.part3	NA	NA	200000	gRNA.tab.gz.split	22.part3.tab.gz
+22.part4	NA	NA	200000	gRNA.tab.gz.split	22.part4.tab.gz
+22.part5	NA	NA	200000	gRNA.tab.gz.split	22.part5.tab.gz
+22.part6	NA	NA	200000	gRNA.tab.gz.split	22.part6.tab.gz
+22.part7	NA	NA	200000	gRNA.tab.gz.split	22.part7.tab.gz
+22.part8	NA	NA	200000	gRNA.tab.gz.split	22.part8.tab.gz
+22.part9	NA	NA	200000	gRNA.tab.gz.split	22.part9.tab.gz
+22.part10	NA	NA	200000	gRNA.tab.gz.split	22.part10.tab.gz
+22.part11	NA	NA	200000	gRNA.tab.gz.split	22.part11.tab.gz
+22.part12	NA	NA	200000	gRNA.tab.gz.split	22.part12.tab.gz
+22.part13	NA	NA	200000	gRNA.tab.gz.split	22.part13.tab.gz
+22.part14	NA	NA	200000	gRNA.tab.gz.split	22.part14.tab.gz
+22.part15	NA	NA	200000	gRNA.tab.gz.split	22.part15.tab.gz
+22.part16	NA	NA	200000	gRNA.tab.gz.split	22.part16.tab.gz
+22.part17	NA	NA	200000	gRNA.tab.gz.split	22.part17.tab.gz
+22.part18	NA	NA	200000	gRNA.tab.gz.split	22.part18.tab.gz
+22.part19	NA	NA	200000	gRNA.tab.gz.split	22.part19.tab.gz
+22.part20	NA	NA	200000	gRNA.tab.gz.split	22.part20.tab.gz
+22.part21	NA	NA	200000	gRNA.tab.gz.split	22.part21.tab.gz
+22.part22	NA	NA	200000	gRNA.tab.gz.split	22.part22.tab.gz
+22.part23	NA	NA	200000	gRNA.tab.gz.split	22.part23.tab.gz
+22.part24	NA	NA	200000	gRNA.tab.gz.split	22.part24.tab.gz
+22.part25	NA	NA	200000	gRNA.tab.gz.split	22.part25.tab.gz
+22.part26	NA	NA	95093	gRNA.tab.gz.split	22.part26.tab.gz
+3.part0	NA	NA	200000	gRNA.tab.gz.split	3.part0.tab.gz
+3.part1	NA	NA	200000	gRNA.tab.gz.split	3.part1.tab.gz
+3.part2	NA	NA	200000	gRNA.tab.gz.split	3.part2.tab.gz
+3.part3	NA	NA	200000	gRNA.tab.gz.split	3.part3.tab.gz
+3.part4	NA	NA	200000	gRNA.tab.gz.split	3.part4.tab.gz
+3.part5	NA	NA	200000	gRNA.tab.gz.split	3.part5.tab.gz
+3.part6	NA	NA	200000	gRNA.tab.gz.split	3.part6.tab.gz
+3.part7	NA	NA	200000	gRNA.tab.gz.split	3.part7.tab.gz
+3.part8	NA	NA	200000	gRNA.tab.gz.split	3.part8.tab.gz
+3.part9	NA	NA	200000	gRNA.tab.gz.split	3.part9.tab.gz
+3.part10	NA	NA	200000	gRNA.tab.gz.split	3.part10.tab.gz
+3.part11	NA	NA	200000	gRNA.tab.gz.split	3.part11.tab.gz
+3.part12	NA	NA	200000	gRNA.tab.gz.split	3.part12.tab.gz
+3.part13	NA	NA	200000	gRNA.tab.gz.split	3.part13.tab.gz
+3.part14	NA	NA	200000	gRNA.tab.gz.split	3.part14.tab.gz
+3.part15	NA	NA	200000	gRNA.tab.gz.split	3.part15.tab.gz
+3.part16	NA	NA	200000	gRNA.tab.gz.split	3.part16.tab.gz
+3.part17	NA	NA	200000	gRNA.tab.gz.split	3.part17.tab.gz
+3.part18	NA	NA	200000	gRNA.tab.gz.split	3.part18.tab.gz
+3.part19	NA	NA	200000	gRNA.tab.gz.split	3.part19.tab.gz
+3.part20	NA	NA	200000	gRNA.tab.gz.split	3.part20.tab.gz
+3.part21	NA	NA	200000	gRNA.tab.gz.split	3.part21.tab.gz
+3.part22	NA	NA	200000	gRNA.tab.gz.split	3.part22.tab.gz
+3.part23	NA	NA	200000	gRNA.tab.gz.split	3.part23.tab.gz
+3.part24	NA	NA	200000	gRNA.tab.gz.split	3.part24.tab.gz
+3.part25	NA	NA	200000	gRNA.tab.gz.split	3.part25.tab.gz
+3.part26	NA	NA	200000	gRNA.tab.gz.split	3.part26.tab.gz
+3.part27	NA	NA	200000	gRNA.tab.gz.split	3.part27.tab.gz
+3.part28	NA	NA	200000	gRNA.tab.gz.split	3.part28.tab.gz
+3.part29	NA	NA	200000	gRNA.tab.gz.split	3.part29.tab.gz
+3.part30	NA	NA	200000	gRNA.tab.gz.split	3.part30.tab.gz
+3.part31	NA	NA	200000	gRNA.tab.gz.split	3.part31.tab.gz
+3.part32	NA	NA	200000	gRNA.tab.gz.split	3.part32.tab.gz
+3.part33	NA	NA	200000	gRNA.tab.gz.split	3.part33.tab.gz
+3.part34	NA	NA	200000	gRNA.tab.gz.split	3.part34.tab.gz
+3.part35	NA	NA	200000	gRNA.tab.gz.split	3.part35.tab.gz
+3.part36	NA	NA	200000	gRNA.tab.gz.split	3.part36.tab.gz
+3.part37	NA	NA	200000	gRNA.tab.gz.split	3.part37.tab.gz
+3.part38	NA	NA	200000	gRNA.tab.gz.split	3.part38.tab.gz
+3.part39	NA	NA	200000	gRNA.tab.gz.split	3.part39.tab.gz
+3.part40	NA	NA	200000	gRNA.tab.gz.split	3.part40.tab.gz
+3.part41	NA	NA	200000	gRNA.tab.gz.split	3.part41.tab.gz
+3.part42	NA	NA	200000	gRNA.tab.gz.split	3.part42.tab.gz
+3.part43	NA	NA	200000	gRNA.tab.gz.split	3.part43.tab.gz
+3.part44	NA	NA	200000	gRNA.tab.gz.split	3.part44.tab.gz
+3.part45	NA	NA	200000	gRNA.tab.gz.split	3.part45.tab.gz
+3.part46	NA	NA	200000	gRNA.tab.gz.split	3.part46.tab.gz
+3.part47	NA	NA	200000	gRNA.tab.gz.split	3.part47.tab.gz
+3.part48	NA	NA	200000	gRNA.tab.gz.split	3.part48.tab.gz
+3.part49	NA	NA	200000	gRNA.tab.gz.split	3.part49.tab.gz
+3.part50	NA	NA	200000	gRNA.tab.gz.split	3.part50.tab.gz
+3.part51	NA	NA	200000	gRNA.tab.gz.split	3.part51.tab.gz
+3.part52	NA	NA	200000	gRNA.tab.gz.split	3.part52.tab.gz
+3.part53	NA	NA	200000	gRNA.tab.gz.split	3.part53.tab.gz
+3.part54	NA	NA	200000	gRNA.tab.gz.split	3.part54.tab.gz
+3.part55	NA	NA	200000	gRNA.tab.gz.split	3.part55.tab.gz
+3.part56	NA	NA	200000	gRNA.tab.gz.split	3.part56.tab.gz
+3.part57	NA	NA	200000	gRNA.tab.gz.split	3.part57.tab.gz
+3.part58	NA	NA	200000	gRNA.tab.gz.split	3.part58.tab.gz
+3.part59	NA	NA	200000	gRNA.tab.gz.split	3.part59.tab.gz
+3.part60	NA	NA	200000	gRNA.tab.gz.split	3.part60.tab.gz
+3.part61	NA	NA	200000	gRNA.tab.gz.split	3.part61.tab.gz
+3.part62	NA	NA	200000	gRNA.tab.gz.split	3.part62.tab.gz
+3.part63	NA	NA	200000	gRNA.tab.gz.split	3.part63.tab.gz
+3.part64	NA	NA	200000	gRNA.tab.gz.split	3.part64.tab.gz
+3.part65	NA	NA	200000	gRNA.tab.gz.split	3.part65.tab.gz
+3.part66	NA	NA	200000	gRNA.tab.gz.split	3.part66.tab.gz
+3.part67	NA	NA	200000	gRNA.tab.gz.split	3.part67.tab.gz
+3.part68	NA	NA	200000	gRNA.tab.gz.split	3.part68.tab.gz
+3.part69	NA	NA	200000	gRNA.tab.gz.split	3.part69.tab.gz
+3.part70	NA	NA	200000	gRNA.tab.gz.split	3.part70.tab.gz
+3.part71	NA	NA	200000	gRNA.tab.gz.split	3.part71.tab.gz
+3.part72	NA	NA	200000	gRNA.tab.gz.split	3.part72.tab.gz
+3.part73	NA	NA	200000	gRNA.tab.gz.split	3.part73.tab.gz
+3.part74	NA	NA	200000	gRNA.tab.gz.split	3.part74.tab.gz
+3.part75	NA	NA	200000	gRNA.tab.gz.split	3.part75.tab.gz
+3.part76	NA	NA	200000	gRNA.tab.gz.split	3.part76.tab.gz
+3.part77	NA	NA	200000	gRNA.tab.gz.split	3.part77.tab.gz
+3.part78	NA	NA	200000	gRNA.tab.gz.split	3.part78.tab.gz
+3.part79	NA	NA	200000	gRNA.tab.gz.split	3.part79.tab.gz
+3.part80	NA	NA	200000	gRNA.tab.gz.split	3.part80.tab.gz
+3.part81	NA	NA	200000	gRNA.tab.gz.split	3.part81.tab.gz
+3.part82	NA	NA	200000	gRNA.tab.gz.split	3.part82.tab.gz
+3.part83	NA	NA	200000	gRNA.tab.gz.split	3.part83.tab.gz
+3.part84	NA	NA	200000	gRNA.tab.gz.split	3.part84.tab.gz
+3.part85	NA	NA	200000	gRNA.tab.gz.split	3.part85.tab.gz
+3.part86	NA	NA	200000	gRNA.tab.gz.split	3.part86.tab.gz
+3.part87	NA	NA	200000	gRNA.tab.gz.split	3.part87.tab.gz
+3.part88	NA	NA	200000	gRNA.tab.gz.split	3.part88.tab.gz
+3.part89	NA	NA	200000	gRNA.tab.gz.split	3.part89.tab.gz
+3.part90	NA	NA	200000	gRNA.tab.gz.split	3.part90.tab.gz
+3.part91	NA	NA	200000	gRNA.tab.gz.split	3.part91.tab.gz
+3.part92	NA	NA	200000	gRNA.tab.gz.split	3.part92.tab.gz
+3.part93	NA	NA	200000	gRNA.tab.gz.split	3.part93.tab.gz
+3.part94	NA	NA	200000	gRNA.tab.gz.split	3.part94.tab.gz
+3.part95	NA	NA	200000	gRNA.tab.gz.split	3.part95.tab.gz
+3.part96	NA	NA	83402	gRNA.tab.gz.split	3.part96.tab.gz
+4.part0	NA	NA	200000	gRNA.tab.gz.split	4.part0.tab.gz
+4.part1	NA	NA	200000	gRNA.tab.gz.split	4.part1.tab.gz
+4.part2	NA	NA	200000	gRNA.tab.gz.split	4.part2.tab.gz
+4.part3	NA	NA	200000	gRNA.tab.gz.split	4.part3.tab.gz
+4.part4	NA	NA	200000	gRNA.tab.gz.split	4.part4.tab.gz
+4.part5	NA	NA	200000	gRNA.tab.gz.split	4.part5.tab.gz
+4.part6	NA	NA	200000	gRNA.tab.gz.split	4.part6.tab.gz
+4.part7	NA	NA	200000	gRNA.tab.gz.split	4.part7.tab.gz
+4.part8	NA	NA	200000	gRNA.tab.gz.split	4.part8.tab.gz
+4.part9	NA	NA	200000	gRNA.tab.gz.split	4.part9.tab.gz
+4.part10	NA	NA	200000	gRNA.tab.gz.split	4.part10.tab.gz
+4.part11	NA	NA	200000	gRNA.tab.gz.split	4.part11.tab.gz
+4.part12	NA	NA	200000	gRNA.tab.gz.split	4.part12.tab.gz
+4.part13	NA	NA	200000	gRNA.tab.gz.split	4.part13.tab.gz
+4.part14	NA	NA	200000	gRNA.tab.gz.split	4.part14.tab.gz
+4.part15	NA	NA	200000	gRNA.tab.gz.split	4.part15.tab.gz
+4.part16	NA	NA	200000	gRNA.tab.gz.split	4.part16.tab.gz
+4.part17	NA	NA	200000	gRNA.tab.gz.split	4.part17.tab.gz
+4.part18	NA	NA	200000	gRNA.tab.gz.split	4.part18.tab.gz
+4.part19	NA	NA	200000	gRNA.tab.gz.split	4.part19.tab.gz
+4.part20	NA	NA	200000	gRNA.tab.gz.split	4.part20.tab.gz
+4.part21	NA	NA	200000	gRNA.tab.gz.split	4.part21.tab.gz
+4.part22	NA	NA	200000	gRNA.tab.gz.split	4.part22.tab.gz
+4.part23	NA	NA	200000	gRNA.tab.gz.split	4.part23.tab.gz
+4.part24	NA	NA	200000	gRNA.tab.gz.split	4.part24.tab.gz
+4.part25	NA	NA	200000	gRNA.tab.gz.split	4.part25.tab.gz
+4.part26	NA	NA	200000	gRNA.tab.gz.split	4.part26.tab.gz
+4.part27	NA	NA	200000	gRNA.tab.gz.split	4.part27.tab.gz
+4.part28	NA	NA	200000	gRNA.tab.gz.split	4.part28.tab.gz
+4.part29	NA	NA	200000	gRNA.tab.gz.split	4.part29.tab.gz
+4.part30	NA	NA	200000	gRNA.tab.gz.split	4.part30.tab.gz
+4.part31	NA	NA	200000	gRNA.tab.gz.split	4.part31.tab.gz
+4.part32	NA	NA	200000	gRNA.tab.gz.split	4.part32.tab.gz
+4.part33	NA	NA	200000	gRNA.tab.gz.split	4.part33.tab.gz
+4.part34	NA	NA	200000	gRNA.tab.gz.split	4.part34.tab.gz
+4.part35	NA	NA	200000	gRNA.tab.gz.split	4.part35.tab.gz
+4.part36	NA	NA	200000	gRNA.tab.gz.split	4.part36.tab.gz
+4.part37	NA	NA	200000	gRNA.tab.gz.split	4.part37.tab.gz
+4.part38	NA	NA	200000	gRNA.tab.gz.split	4.part38.tab.gz
+4.part39	NA	NA	200000	gRNA.tab.gz.split	4.part39.tab.gz
+4.part40	NA	NA	200000	gRNA.tab.gz.split	4.part40.tab.gz
+4.part41	NA	NA	200000	gRNA.tab.gz.split	4.part41.tab.gz
+4.part42	NA	NA	200000	gRNA.tab.gz.split	4.part42.tab.gz
+4.part43	NA	NA	200000	gRNA.tab.gz.split	4.part43.tab.gz
+4.part44	NA	NA	200000	gRNA.tab.gz.split	4.part44.tab.gz
+4.part45	NA	NA	200000	gRNA.tab.gz.split	4.part45.tab.gz
+4.part46	NA	NA	200000	gRNA.tab.gz.split	4.part46.tab.gz
+4.part47	NA	NA	200000	gRNA.tab.gz.split	4.part47.tab.gz
+4.part48	NA	NA	200000	gRNA.tab.gz.split	4.part48.tab.gz
+4.part49	NA	NA	200000	gRNA.tab.gz.split	4.part49.tab.gz
+4.part50	NA	NA	200000	gRNA.tab.gz.split	4.part50.tab.gz
+4.part51	NA	NA	200000	gRNA.tab.gz.split	4.part51.tab.gz
+4.part52	NA	NA	200000	gRNA.tab.gz.split	4.part52.tab.gz
+4.part53	NA	NA	200000	gRNA.tab.gz.split	4.part53.tab.gz
+4.part54	NA	NA	200000	gRNA.tab.gz.split	4.part54.tab.gz
+4.part55	NA	NA	200000	gRNA.tab.gz.split	4.part55.tab.gz
+4.part56	NA	NA	200000	gRNA.tab.gz.split	4.part56.tab.gz
+4.part57	NA	NA	200000	gRNA.tab.gz.split	4.part57.tab.gz
+4.part58	NA	NA	200000	gRNA.tab.gz.split	4.part58.tab.gz
+4.part59	NA	NA	200000	gRNA.tab.gz.split	4.part59.tab.gz
+4.part60	NA	NA	200000	gRNA.tab.gz.split	4.part60.tab.gz
+4.part61	NA	NA	200000	gRNA.tab.gz.split	4.part61.tab.gz
+4.part62	NA	NA	200000	gRNA.tab.gz.split	4.part62.tab.gz
+4.part63	NA	NA	200000	gRNA.tab.gz.split	4.part63.tab.gz
+4.part64	NA	NA	200000	gRNA.tab.gz.split	4.part64.tab.gz
+4.part65	NA	NA	200000	gRNA.tab.gz.split	4.part65.tab.gz
+4.part66	NA	NA	200000	gRNA.tab.gz.split	4.part66.tab.gz
+4.part67	NA	NA	200000	gRNA.tab.gz.split	4.part67.tab.gz
+4.part68	NA	NA	200000	gRNA.tab.gz.split	4.part68.tab.gz
+4.part69	NA	NA	200000	gRNA.tab.gz.split	4.part69.tab.gz
+4.part70	NA	NA	200000	gRNA.tab.gz.split	4.part70.tab.gz
+4.part71	NA	NA	200000	gRNA.tab.gz.split	4.part71.tab.gz
+4.part72	NA	NA	200000	gRNA.tab.gz.split	4.part72.tab.gz
+4.part73	NA	NA	200000	gRNA.tab.gz.split	4.part73.tab.gz
+4.part74	NA	NA	200000	gRNA.tab.gz.split	4.part74.tab.gz
+4.part75	NA	NA	200000	gRNA.tab.gz.split	4.part75.tab.gz
+4.part76	NA	NA	200000	gRNA.tab.gz.split	4.part76.tab.gz
+4.part77	NA	NA	200000	gRNA.tab.gz.split	4.part77.tab.gz
+4.part78	NA	NA	200000	gRNA.tab.gz.split	4.part78.tab.gz
+4.part79	NA	NA	200000	gRNA.tab.gz.split	4.part79.tab.gz
+4.part80	NA	NA	200000	gRNA.tab.gz.split	4.part80.tab.gz
+4.part81	NA	NA	200000	gRNA.tab.gz.split	4.part81.tab.gz
+4.part82	NA	NA	200000	gRNA.tab.gz.split	4.part82.tab.gz
+4.part83	NA	NA	200000	gRNA.tab.gz.split	4.part83.tab.gz
+4.part84	NA	NA	200000	gRNA.tab.gz.split	4.part84.tab.gz
+4.part85	NA	NA	94343	gRNA.tab.gz.split	4.part85.tab.gz
+5.part0	NA	NA	200000	gRNA.tab.gz.split	5.part0.tab.gz
+5.part1	NA	NA	200000	gRNA.tab.gz.split	5.part1.tab.gz
+5.part2	NA	NA	200000	gRNA.tab.gz.split	5.part2.tab.gz
+5.part3	NA	NA	200000	gRNA.tab.gz.split	5.part3.tab.gz
+5.part4	NA	NA	200000	gRNA.tab.gz.split	5.part4.tab.gz
+5.part5	NA	NA	200000	gRNA.tab.gz.split	5.part5.tab.gz
+5.part6	NA	NA	200000	gRNA.tab.gz.split	5.part6.tab.gz
+5.part7	NA	NA	200000	gRNA.tab.gz.split	5.part7.tab.gz
+5.part8	NA	NA	200000	gRNA.tab.gz.split	5.part8.tab.gz
+5.part9	NA	NA	200000	gRNA.tab.gz.split	5.part9.tab.gz
+5.part10	NA	NA	200000	gRNA.tab.gz.split	5.part10.tab.gz
+5.part11	NA	NA	200000	gRNA.tab.gz.split	5.part11.tab.gz
+5.part12	NA	NA	200000	gRNA.tab.gz.split	5.part12.tab.gz
+5.part13	NA	NA	200000	gRNA.tab.gz.split	5.part13.tab.gz
+5.part14	NA	NA	200000	gRNA.tab.gz.split	5.part14.tab.gz
+5.part15	NA	NA	200000	gRNA.tab.gz.split	5.part15.tab.gz
+5.part16	NA	NA	200000	gRNA.tab.gz.split	5.part16.tab.gz
+5.part17	NA	NA	200000	gRNA.tab.gz.split	5.part17.tab.gz
+5.part18	NA	NA	200000	gRNA.tab.gz.split	5.part18.tab.gz
+5.part19	NA	NA	200000	gRNA.tab.gz.split	5.part19.tab.gz
+5.part20	NA	NA	200000	gRNA.tab.gz.split	5.part20.tab.gz
+5.part21	NA	NA	200000	gRNA.tab.gz.split	5.part21.tab.gz
+5.part22	NA	NA	200000	gRNA.tab.gz.split	5.part22.tab.gz
+5.part23	NA	NA	200000	gRNA.tab.gz.split	5.part23.tab.gz
+5.part24	NA	NA	200000	gRNA.tab.gz.split	5.part24.tab.gz
+5.part25	NA	NA	200000	gRNA.tab.gz.split	5.part25.tab.gz
+5.part26	NA	NA	200000	gRNA.tab.gz.split	5.part26.tab.gz
+5.part27	NA	NA	200000	gRNA.tab.gz.split	5.part27.tab.gz
+5.part28	NA	NA	200000	gRNA.tab.gz.split	5.part28.tab.gz
+5.part29	NA	NA	200000	gRNA.tab.gz.split	5.part29.tab.gz
+5.part30	NA	NA	200000	gRNA.tab.gz.split	5.part30.tab.gz
+5.part31	NA	NA	200000	gRNA.tab.gz.split	5.part31.tab.gz
+5.part32	NA	NA	200000	gRNA.tab.gz.split	5.part32.tab.gz
+5.part33	NA	NA	200000	gRNA.tab.gz.split	5.part33.tab.gz
+5.part34	NA	NA	200000	gRNA.tab.gz.split	5.part34.tab.gz
+5.part35	NA	NA	200000	gRNA.tab.gz.split	5.part35.tab.gz
+5.part36	NA	NA	200000	gRNA.tab.gz.split	5.part36.tab.gz
+5.part37	NA	NA	200000	gRNA.tab.gz.split	5.part37.tab.gz
+5.part38	NA	NA	200000	gRNA.tab.gz.split	5.part38.tab.gz
+5.part39	NA	NA	200000	gRNA.tab.gz.split	5.part39.tab.gz
+5.part40	NA	NA	200000	gRNA.tab.gz.split	5.part40.tab.gz
+5.part41	NA	NA	200000	gRNA.tab.gz.split	5.part41.tab.gz
+5.part42	NA	NA	200000	gRNA.tab.gz.split	5.part42.tab.gz
+5.part43	NA	NA	200000	gRNA.tab.gz.split	5.part43.tab.gz
+5.part44	NA	NA	200000	gRNA.tab.gz.split	5.part44.tab.gz
+5.part45	NA	NA	200000	gRNA.tab.gz.split	5.part45.tab.gz
+5.part46	NA	NA	200000	gRNA.tab.gz.split	5.part46.tab.gz
+5.part47	NA	NA	200000	gRNA.tab.gz.split	5.part47.tab.gz
+5.part48	NA	NA	200000	gRNA.tab.gz.split	5.part48.tab.gz
+5.part49	NA	NA	200000	gRNA.tab.gz.split	5.part49.tab.gz
+5.part50	NA	NA	200000	gRNA.tab.gz.split	5.part50.tab.gz
+5.part51	NA	NA	200000	gRNA.tab.gz.split	5.part51.tab.gz
+5.part52	NA	NA	200000	gRNA.tab.gz.split	5.part52.tab.gz
+5.part53	NA	NA	200000	gRNA.tab.gz.split	5.part53.tab.gz
+5.part54	NA	NA	200000	gRNA.tab.gz.split	5.part54.tab.gz
+5.part55	NA	NA	200000	gRNA.tab.gz.split	5.part55.tab.gz
+5.part56	NA	NA	200000	gRNA.tab.gz.split	5.part56.tab.gz
+5.part57	NA	NA	200000	gRNA.tab.gz.split	5.part57.tab.gz
+5.part58	NA	NA	200000	gRNA.tab.gz.split	5.part58.tab.gz
+5.part59	NA	NA	200000	gRNA.tab.gz.split	5.part59.tab.gz
+5.part60	NA	NA	200000	gRNA.tab.gz.split	5.part60.tab.gz
+5.part61	NA	NA	200000	gRNA.tab.gz.split	5.part61.tab.gz
+5.part62	NA	NA	200000	gRNA.tab.gz.split	5.part62.tab.gz
+5.part63	NA	NA	200000	gRNA.tab.gz.split	5.part63.tab.gz
+5.part64	NA	NA	200000	gRNA.tab.gz.split	5.part64.tab.gz
+5.part65	NA	NA	200000	gRNA.tab.gz.split	5.part65.tab.gz
+5.part66	NA	NA	200000	gRNA.tab.gz.split	5.part66.tab.gz
+5.part67	NA	NA	200000	gRNA.tab.gz.split	5.part67.tab.gz
+5.part68	NA	NA	200000	gRNA.tab.gz.split	5.part68.tab.gz
+5.part69	NA	NA	200000	gRNA.tab.gz.split	5.part69.tab.gz
+5.part70	NA	NA	200000	gRNA.tab.gz.split	5.part70.tab.gz
+5.part71	NA	NA	200000	gRNA.tab.gz.split	5.part71.tab.gz
+5.part72	NA	NA	200000	gRNA.tab.gz.split	5.part72.tab.gz
+5.part73	NA	NA	200000	gRNA.tab.gz.split	5.part73.tab.gz
+5.part74	NA	NA	200000	gRNA.tab.gz.split	5.part74.tab.gz
+5.part75	NA	NA	200000	gRNA.tab.gz.split	5.part75.tab.gz
+5.part76	NA	NA	200000	gRNA.tab.gz.split	5.part76.tab.gz
+5.part77	NA	NA	200000	gRNA.tab.gz.split	5.part77.tab.gz
+5.part78	NA	NA	200000	gRNA.tab.gz.split	5.part78.tab.gz
+5.part79	NA	NA	200000	gRNA.tab.gz.split	5.part79.tab.gz
+5.part80	NA	NA	200000	gRNA.tab.gz.split	5.part80.tab.gz
+5.part81	NA	NA	200000	gRNA.tab.gz.split	5.part81.tab.gz
+5.part82	NA	NA	200000	gRNA.tab.gz.split	5.part82.tab.gz
+5.part83	NA	NA	200000	gRNA.tab.gz.split	5.part83.tab.gz
+5.part84	NA	NA	200000	gRNA.tab.gz.split	5.part84.tab.gz
+5.part85	NA	NA	200000	gRNA.tab.gz.split	5.part85.tab.gz
+5.part86	NA	NA	200000	gRNA.tab.gz.split	5.part86.tab.gz
+5.part87	NA	NA	6823	gRNA.tab.gz.split	5.part87.tab.gz
+6.part0	NA	NA	200000	gRNA.tab.gz.split	6.part0.tab.gz
+6.part1	NA	NA	200000	gRNA.tab.gz.split	6.part1.tab.gz
+6.part2	NA	NA	200000	gRNA.tab.gz.split	6.part2.tab.gz
+6.part3	NA	NA	200000	gRNA.tab.gz.split	6.part3.tab.gz
+6.part4	NA	NA	200000	gRNA.tab.gz.split	6.part4.tab.gz
+6.part5	NA	NA	200000	gRNA.tab.gz.split	6.part5.tab.gz
+6.part6	NA	NA	200000	gRNA.tab.gz.split	6.part6.tab.gz
+6.part7	NA	NA	200000	gRNA.tab.gz.split	6.part7.tab.gz
+6.part8	NA	NA	200000	gRNA.tab.gz.split	6.part8.tab.gz
+6.part9	NA	NA	200000	gRNA.tab.gz.split	6.part9.tab.gz
+6.part10	NA	NA	200000	gRNA.tab.gz.split	6.part10.tab.gz
+6.part11	NA	NA	200000	gRNA.tab.gz.split	6.part11.tab.gz
+6.part12	NA	NA	200000	gRNA.tab.gz.split	6.part12.tab.gz
+6.part13	NA	NA	200000	gRNA.tab.gz.split	6.part13.tab.gz
+6.part14	NA	NA	200000	gRNA.tab.gz.split	6.part14.tab.gz
+6.part15	NA	NA	200000	gRNA.tab.gz.split	6.part15.tab.gz
+6.part16	NA	NA	200000	gRNA.tab.gz.split	6.part16.tab.gz
+6.part17	NA	NA	200000	gRNA.tab.gz.split	6.part17.tab.gz
+6.part18	NA	NA	200000	gRNA.tab.gz.split	6.part18.tab.gz
+6.part19	NA	NA	200000	gRNA.tab.gz.split	6.part19.tab.gz
+6.part20	NA	NA	200000	gRNA.tab.gz.split	6.part20.tab.gz
+6.part21	NA	NA	200000	gRNA.tab.gz.split	6.part21.tab.gz
+6.part22	NA	NA	200000	gRNA.tab.gz.split	6.part22.tab.gz
+6.part23	NA	NA	200000	gRNA.tab.gz.split	6.part23.tab.gz
+6.part24	NA	NA	200000	gRNA.tab.gz.split	6.part24.tab.gz
+6.part25	NA	NA	200000	gRNA.tab.gz.split	6.part25.tab.gz
+6.part26	NA	NA	200000	gRNA.tab.gz.split	6.part26.tab.gz
+6.part27	NA	NA	200000	gRNA.tab.gz.split	6.part27.tab.gz
+6.part28	NA	NA	200000	gRNA.tab.gz.split	6.part28.tab.gz
+6.part29	NA	NA	200000	gRNA.tab.gz.split	6.part29.tab.gz
+6.part30	NA	NA	200000	gRNA.tab.gz.split	6.part30.tab.gz
+6.part31	NA	NA	200000	gRNA.tab.gz.split	6.part31.tab.gz
+6.part32	NA	NA	200000	gRNA.tab.gz.split	6.part32.tab.gz
+6.part33	NA	NA	200000	gRNA.tab.gz.split	6.part33.tab.gz
+6.part34	NA	NA	200000	gRNA.tab.gz.split	6.part34.tab.gz
+6.part35	NA	NA	200000	gRNA.tab.gz.split	6.part35.tab.gz
+6.part36	NA	NA	200000	gRNA.tab.gz.split	6.part36.tab.gz
+6.part37	NA	NA	200000	gRNA.tab.gz.split	6.part37.tab.gz
+6.part38	NA	NA	200000	gRNA.tab.gz.split	6.part38.tab.gz
+6.part39	NA	NA	200000	gRNA.tab.gz.split	6.part39.tab.gz
+6.part40	NA	NA	200000	gRNA.tab.gz.split	6.part40.tab.gz
+6.part41	NA	NA	200000	gRNA.tab.gz.split	6.part41.tab.gz
+6.part42	NA	NA	200000	gRNA.tab.gz.split	6.part42.tab.gz
+6.part43	NA	NA	200000	gRNA.tab.gz.split	6.part43.tab.gz
+6.part44	NA	NA	200000	gRNA.tab.gz.split	6.part44.tab.gz
+6.part45	NA	NA	200000	gRNA.tab.gz.split	6.part45.tab.gz
+6.part46	NA	NA	200000	gRNA.tab.gz.split	6.part46.tab.gz
+6.part47	NA	NA	200000	gRNA.tab.gz.split	6.part47.tab.gz
+6.part48	NA	NA	200000	gRNA.tab.gz.split	6.part48.tab.gz
+6.part49	NA	NA	200000	gRNA.tab.gz.split	6.part49.tab.gz
+6.part50	NA	NA	200000	gRNA.tab.gz.split	6.part50.tab.gz
+6.part51	NA	NA	200000	gRNA.tab.gz.split	6.part51.tab.gz
+6.part52	NA	NA	200000	gRNA.tab.gz.split	6.part52.tab.gz
+6.part53	NA	NA	200000	gRNA.tab.gz.split	6.part53.tab.gz
+6.part54	NA	NA	200000	gRNA.tab.gz.split	6.part54.tab.gz
+6.part55	NA	NA	200000	gRNA.tab.gz.split	6.part55.tab.gz
+6.part56	NA	NA	200000	gRNA.tab.gz.split	6.part56.tab.gz
+6.part57	NA	NA	200000	gRNA.tab.gz.split	6.part57.tab.gz
+6.part58	NA	NA	200000	gRNA.tab.gz.split	6.part58.tab.gz
+6.part59	NA	NA	200000	gRNA.tab.gz.split	6.part59.tab.gz
+6.part60	NA	NA	200000	gRNA.tab.gz.split	6.part60.tab.gz
+6.part61	NA	NA	200000	gRNA.tab.gz.split	6.part61.tab.gz
+6.part62	NA	NA	200000	gRNA.tab.gz.split	6.part62.tab.gz
+6.part63	NA	NA	200000	gRNA.tab.gz.split	6.part63.tab.gz
+6.part64	NA	NA	200000	gRNA.tab.gz.split	6.part64.tab.gz
+6.part65	NA	NA	200000	gRNA.tab.gz.split	6.part65.tab.gz
+6.part66	NA	NA	200000	gRNA.tab.gz.split	6.part66.tab.gz
+6.part67	NA	NA	200000	gRNA.tab.gz.split	6.part67.tab.gz
+6.part68	NA	NA	200000	gRNA.tab.gz.split	6.part68.tab.gz
+6.part69	NA	NA	200000	gRNA.tab.gz.split	6.part69.tab.gz
+6.part70	NA	NA	200000	gRNA.tab.gz.split	6.part70.tab.gz
+6.part71	NA	NA	200000	gRNA.tab.gz.split	6.part71.tab.gz
+6.part72	NA	NA	200000	gRNA.tab.gz.split	6.part72.tab.gz
+6.part73	NA	NA	200000	gRNA.tab.gz.split	6.part73.tab.gz
+6.part74	NA	NA	200000	gRNA.tab.gz.split	6.part74.tab.gz
+6.part75	NA	NA	200000	gRNA.tab.gz.split	6.part75.tab.gz
+6.part76	NA	NA	200000	gRNA.tab.gz.split	6.part76.tab.gz
+6.part77	NA	NA	200000	gRNA.tab.gz.split	6.part77.tab.gz
+6.part78	NA	NA	200000	gRNA.tab.gz.split	6.part78.tab.gz
+6.part79	NA	NA	200000	gRNA.tab.gz.split	6.part79.tab.gz
+6.part80	NA	NA	200000	gRNA.tab.gz.split	6.part80.tab.gz
+6.part81	NA	NA	200000	gRNA.tab.gz.split	6.part81.tab.gz
+6.part82	NA	NA	104399	gRNA.tab.gz.split	6.part82.tab.gz
+7.part0	NA	NA	200000	gRNA.tab.gz.split	7.part0.tab.gz
+7.part1	NA	NA	200000	gRNA.tab.gz.split	7.part1.tab.gz
+7.part2	NA	NA	200000	gRNA.tab.gz.split	7.part2.tab.gz
+7.part3	NA	NA	200000	gRNA.tab.gz.split	7.part3.tab.gz
+7.part4	NA	NA	200000	gRNA.tab.gz.split	7.part4.tab.gz
+7.part5	NA	NA	200000	gRNA.tab.gz.split	7.part5.tab.gz
+7.part6	NA	NA	200000	gRNA.tab.gz.split	7.part6.tab.gz
+7.part7	NA	NA	200000	gRNA.tab.gz.split	7.part7.tab.gz
+7.part8	NA	NA	200000	gRNA.tab.gz.split	7.part8.tab.gz
+7.part9	NA	NA	200000	gRNA.tab.gz.split	7.part9.tab.gz
+7.part10	NA	NA	200000	gRNA.tab.gz.split	7.part10.tab.gz
+7.part11	NA	NA	200000	gRNA.tab.gz.split	7.part11.tab.gz
+7.part12	NA	NA	200000	gRNA.tab.gz.split	7.part12.tab.gz
+7.part13	NA	NA	200000	gRNA.tab.gz.split	7.part13.tab.gz
+7.part14	NA	NA	200000	gRNA.tab.gz.split	7.part14.tab.gz
+7.part15	NA	NA	200000	gRNA.tab.gz.split	7.part15.tab.gz
+7.part16	NA	NA	200000	gRNA.tab.gz.split	7.part16.tab.gz
+7.part17	NA	NA	200000	gRNA.tab.gz.split	7.part17.tab.gz
+7.part18	NA	NA	200000	gRNA.tab.gz.split	7.part18.tab.gz
+7.part19	NA	NA	200000	gRNA.tab.gz.split	7.part19.tab.gz
+7.part20	NA	NA	200000	gRNA.tab.gz.split	7.part20.tab.gz
+7.part21	NA	NA	200000	gRNA.tab.gz.split	7.part21.tab.gz
+7.part22	NA	NA	200000	gRNA.tab.gz.split	7.part22.tab.gz
+7.part23	NA	NA	200000	gRNA.tab.gz.split	7.part23.tab.gz
+7.part24	NA	NA	200000	gRNA.tab.gz.split	7.part24.tab.gz
+7.part25	NA	NA	200000	gRNA.tab.gz.split	7.part25.tab.gz
+7.part26	NA	NA	200000	gRNA.tab.gz.split	7.part26.tab.gz
+7.part27	NA	NA	200000	gRNA.tab.gz.split	7.part27.tab.gz
+7.part28	NA	NA	200000	gRNA.tab.gz.split	7.part28.tab.gz
+7.part29	NA	NA	200000	gRNA.tab.gz.split	7.part29.tab.gz
+7.part30	NA	NA	200000	gRNA.tab.gz.split	7.part30.tab.gz
+7.part31	NA	NA	200000	gRNA.tab.gz.split	7.part31.tab.gz
+7.part32	NA	NA	200000	gRNA.tab.gz.split	7.part32.tab.gz
+7.part33	NA	NA	200000	gRNA.tab.gz.split	7.part33.tab.gz
+7.part34	NA	NA	200000	gRNA.tab.gz.split	7.part34.tab.gz
+7.part35	NA	NA	200000	gRNA.tab.gz.split	7.part35.tab.gz
+7.part36	NA	NA	200000	gRNA.tab.gz.split	7.part36.tab.gz
+7.part37	NA	NA	200000	gRNA.tab.gz.split	7.part37.tab.gz
+7.part38	NA	NA	200000	gRNA.tab.gz.split	7.part38.tab.gz
+7.part39	NA	NA	200000	gRNA.tab.gz.split	7.part39.tab.gz
+7.part40	NA	NA	200000	gRNA.tab.gz.split	7.part40.tab.gz
+7.part41	NA	NA	200000	gRNA.tab.gz.split	7.part41.tab.gz
+7.part42	NA	NA	200000	gRNA.tab.gz.split	7.part42.tab.gz
+7.part43	NA	NA	200000	gRNA.tab.gz.split	7.part43.tab.gz
+7.part44	NA	NA	200000	gRNA.tab.gz.split	7.part44.tab.gz
+7.part45	NA	NA	200000	gRNA.tab.gz.split	7.part45.tab.gz
+7.part46	NA	NA	200000	gRNA.tab.gz.split	7.part46.tab.gz
+7.part47	NA	NA	200000	gRNA.tab.gz.split	7.part47.tab.gz
+7.part48	NA	NA	200000	gRNA.tab.gz.split	7.part48.tab.gz
+7.part49	NA	NA	200000	gRNA.tab.gz.split	7.part49.tab.gz
+7.part50	NA	NA	200000	gRNA.tab.gz.split	7.part50.tab.gz
+7.part51	NA	NA	200000	gRNA.tab.gz.split	7.part51.tab.gz
+7.part52	NA	NA	200000	gRNA.tab.gz.split	7.part52.tab.gz
+7.part53	NA	NA	200000	gRNA.tab.gz.split	7.part53.tab.gz
+7.part54	NA	NA	200000	gRNA.tab.gz.split	7.part54.tab.gz
+7.part55	NA	NA	200000	gRNA.tab.gz.split	7.part55.tab.gz
+7.part56	NA	NA	200000	gRNA.tab.gz.split	7.part56.tab.gz
+7.part57	NA	NA	200000	gRNA.tab.gz.split	7.part57.tab.gz
+7.part58	NA	NA	200000	gRNA.tab.gz.split	7.part58.tab.gz
+7.part59	NA	NA	200000	gRNA.tab.gz.split	7.part59.tab.gz
+7.part60	NA	NA	200000	gRNA.tab.gz.split	7.part60.tab.gz
+7.part61	NA	NA	200000	gRNA.tab.gz.split	7.part61.tab.gz
+7.part62	NA	NA	200000	gRNA.tab.gz.split	7.part62.tab.gz
+7.part63	NA	NA	200000	gRNA.tab.gz.split	7.part63.tab.gz
+7.part64	NA	NA	200000	gRNA.tab.gz.split	7.part64.tab.gz
+7.part65	NA	NA	200000	gRNA.tab.gz.split	7.part65.tab.gz
+7.part66	NA	NA	200000	gRNA.tab.gz.split	7.part66.tab.gz
+7.part67	NA	NA	200000	gRNA.tab.gz.split	7.part67.tab.gz
+7.part68	NA	NA	200000	gRNA.tab.gz.split	7.part68.tab.gz
+7.part69	NA	NA	200000	gRNA.tab.gz.split	7.part69.tab.gz
+7.part70	NA	NA	200000	gRNA.tab.gz.split	7.part70.tab.gz
+7.part71	NA	NA	200000	gRNA.tab.gz.split	7.part71.tab.gz
+7.part72	NA	NA	200000	gRNA.tab.gz.split	7.part72.tab.gz
+7.part73	NA	NA	200000	gRNA.tab.gz.split	7.part73.tab.gz
+7.part74	NA	NA	200000	gRNA.tab.gz.split	7.part74.tab.gz
+7.part75	NA	NA	200000	gRNA.tab.gz.split	7.part75.tab.gz
+7.part76	NA	NA	200000	gRNA.tab.gz.split	7.part76.tab.gz
+7.part77	NA	NA	200000	gRNA.tab.gz.split	7.part77.tab.gz
+7.part78	NA	NA	200000	gRNA.tab.gz.split	7.part78.tab.gz
+7.part79	NA	NA	200000	gRNA.tab.gz.split	7.part79.tab.gz
+7.part80	NA	NA	200000	gRNA.tab.gz.split	7.part80.tab.gz
+7.part81	NA	NA	46098	gRNA.tab.gz.split	7.part81.tab.gz
+8.part0	NA	NA	200000	gRNA.tab.gz.split	8.part0.tab.gz
+8.part1	NA	NA	200000	gRNA.tab.gz.split	8.part1.tab.gz
+8.part2	NA	NA	200000	gRNA.tab.gz.split	8.part2.tab.gz
+8.part3	NA	NA	200000	gRNA.tab.gz.split	8.part3.tab.gz
+8.part4	NA	NA	200000	gRNA.tab.gz.split	8.part4.tab.gz
+8.part5	NA	NA	200000	gRNA.tab.gz.split	8.part5.tab.gz
+8.part6	NA	NA	200000	gRNA.tab.gz.split	8.part6.tab.gz
+8.part7	NA	NA	200000	gRNA.tab.gz.split	8.part7.tab.gz
+8.part8	NA	NA	200000	gRNA.tab.gz.split	8.part8.tab.gz
+8.part9	NA	NA	200000	gRNA.tab.gz.split	8.part9.tab.gz
+8.part10	NA	NA	200000	gRNA.tab.gz.split	8.part10.tab.gz
+8.part11	NA	NA	200000	gRNA.tab.gz.split	8.part11.tab.gz
+8.part12	NA	NA	200000	gRNA.tab.gz.split	8.part12.tab.gz
+8.part13	NA	NA	200000	gRNA.tab.gz.split	8.part13.tab.gz
+8.part14	NA	NA	200000	gRNA.tab.gz.split	8.part14.tab.gz
+8.part15	NA	NA	200000	gRNA.tab.gz.split	8.part15.tab.gz
+8.part16	NA	NA	200000	gRNA.tab.gz.split	8.part16.tab.gz
+8.part17	NA	NA	200000	gRNA.tab.gz.split	8.part17.tab.gz
+8.part18	NA	NA	200000	gRNA.tab.gz.split	8.part18.tab.gz
+8.part19	NA	NA	200000	gRNA.tab.gz.split	8.part19.tab.gz
+8.part20	NA	NA	200000	gRNA.tab.gz.split	8.part20.tab.gz
+8.part21	NA	NA	200000	gRNA.tab.gz.split	8.part21.tab.gz
+8.part22	NA	NA	200000	gRNA.tab.gz.split	8.part22.tab.gz
+8.part23	NA	NA	200000	gRNA.tab.gz.split	8.part23.tab.gz
+8.part24	NA	NA	200000	gRNA.tab.gz.split	8.part24.tab.gz
+8.part25	NA	NA	200000	gRNA.tab.gz.split	8.part25.tab.gz
+8.part26	NA	NA	200000	gRNA.tab.gz.split	8.part26.tab.gz
+8.part27	NA	NA	200000	gRNA.tab.gz.split	8.part27.tab.gz
+8.part28	NA	NA	200000	gRNA.tab.gz.split	8.part28.tab.gz
+8.part29	NA	NA	200000	gRNA.tab.gz.split	8.part29.tab.gz
+8.part30	NA	NA	200000	gRNA.tab.gz.split	8.part30.tab.gz
+8.part31	NA	NA	200000	gRNA.tab.gz.split	8.part31.tab.gz
+8.part32	NA	NA	200000	gRNA.tab.gz.split	8.part32.tab.gz
+8.part33	NA	NA	200000	gRNA.tab.gz.split	8.part33.tab.gz
+8.part34	NA	NA	200000	gRNA.tab.gz.split	8.part34.tab.gz
+8.part35	NA	NA	200000	gRNA.tab.gz.split	8.part35.tab.gz
+8.part36	NA	NA	200000	gRNA.tab.gz.split	8.part36.tab.gz
+8.part37	NA	NA	200000	gRNA.tab.gz.split	8.part37.tab.gz
+8.part38	NA	NA	200000	gRNA.tab.gz.split	8.part38.tab.gz
+8.part39	NA	NA	200000	gRNA.tab.gz.split	8.part39.tab.gz
+8.part40	NA	NA	200000	gRNA.tab.gz.split	8.part40.tab.gz
+8.part41	NA	NA	200000	gRNA.tab.gz.split	8.part41.tab.gz
+8.part42	NA	NA	200000	gRNA.tab.gz.split	8.part42.tab.gz
+8.part43	NA	NA	200000	gRNA.tab.gz.split	8.part43.tab.gz
+8.part44	NA	NA	200000	gRNA.tab.gz.split	8.part44.tab.gz
+8.part45	NA	NA	200000	gRNA.tab.gz.split	8.part45.tab.gz
+8.part46	NA	NA	200000	gRNA.tab.gz.split	8.part46.tab.gz
+8.part47	NA	NA	200000	gRNA.tab.gz.split	8.part47.tab.gz
+8.part48	NA	NA	200000	gRNA.tab.gz.split	8.part48.tab.gz
+8.part49	NA	NA	200000	gRNA.tab.gz.split	8.part49.tab.gz
+8.part50	NA	NA	200000	gRNA.tab.gz.split	8.part50.tab.gz
+8.part51	NA	NA	200000	gRNA.tab.gz.split	8.part51.tab.gz
+8.part52	NA	NA	200000	gRNA.tab.gz.split	8.part52.tab.gz
+8.part53	NA	NA	200000	gRNA.tab.gz.split	8.part53.tab.gz
+8.part54	NA	NA	200000	gRNA.tab.gz.split	8.part54.tab.gz
+8.part55	NA	NA	200000	gRNA.tab.gz.split	8.part55.tab.gz
+8.part56	NA	NA	200000	gRNA.tab.gz.split	8.part56.tab.gz
+8.part57	NA	NA	200000	gRNA.tab.gz.split	8.part57.tab.gz
+8.part58	NA	NA	200000	gRNA.tab.gz.split	8.part58.tab.gz
+8.part59	NA	NA	200000	gRNA.tab.gz.split	8.part59.tab.gz
+8.part60	NA	NA	200000	gRNA.tab.gz.split	8.part60.tab.gz
+8.part61	NA	NA	200000	gRNA.tab.gz.split	8.part61.tab.gz
+8.part62	NA	NA	200000	gRNA.tab.gz.split	8.part62.tab.gz
+8.part63	NA	NA	200000	gRNA.tab.gz.split	8.part63.tab.gz
+8.part64	NA	NA	200000	gRNA.tab.gz.split	8.part64.tab.gz
+8.part65	NA	NA	200000	gRNA.tab.gz.split	8.part65.tab.gz
+8.part66	NA	NA	200000	gRNA.tab.gz.split	8.part66.tab.gz
+8.part67	NA	NA	200000	gRNA.tab.gz.split	8.part67.tab.gz
+8.part68	NA	NA	200000	gRNA.tab.gz.split	8.part68.tab.gz
+8.part69	NA	NA	200000	gRNA.tab.gz.split	8.part69.tab.gz
+8.part70	NA	NA	200000	gRNA.tab.gz.split	8.part70.tab.gz
+8.part71	NA	NA	185835	gRNA.tab.gz.split	8.part71.tab.gz
+9.part0	NA	NA	200000	gRNA.tab.gz.split	9.part0.tab.gz
+9.part1	NA	NA	200000	gRNA.tab.gz.split	9.part1.tab.gz
+9.part2	NA	NA	200000	gRNA.tab.gz.split	9.part2.tab.gz
+9.part3	NA	NA	200000	gRNA.tab.gz.split	9.part3.tab.gz
+9.part4	NA	NA	200000	gRNA.tab.gz.split	9.part4.tab.gz
+9.part5	NA	NA	200000	gRNA.tab.gz.split	9.part5.tab.gz
+9.part6	NA	NA	200000	gRNA.tab.gz.split	9.part6.tab.gz
+9.part7	NA	NA	200000	gRNA.tab.gz.split	9.part7.tab.gz
+9.part8	NA	NA	200000	gRNA.tab.gz.split	9.part8.tab.gz
+9.part9	NA	NA	200000	gRNA.tab.gz.split	9.part9.tab.gz
+9.part10	NA	NA	200000	gRNA.tab.gz.split	9.part10.tab.gz
+9.part11	NA	NA	200000	gRNA.tab.gz.split	9.part11.tab.gz
+9.part12	NA	NA	200000	gRNA.tab.gz.split	9.part12.tab.gz
+9.part13	NA	NA	200000	gRNA.tab.gz.split	9.part13.tab.gz
+9.part14	NA	NA	200000	gRNA.tab.gz.split	9.part14.tab.gz
+9.part15	NA	NA	200000	gRNA.tab.gz.split	9.part15.tab.gz
+9.part16	NA	NA	200000	gRNA.tab.gz.split	9.part16.tab.gz
+9.part17	NA	NA	200000	gRNA.tab.gz.split	9.part17.tab.gz
+9.part18	NA	NA	200000	gRNA.tab.gz.split	9.part18.tab.gz
+9.part19	NA	NA	200000	gRNA.tab.gz.split	9.part19.tab.gz
+9.part20	NA	NA	200000	gRNA.tab.gz.split	9.part20.tab.gz
+9.part21	NA	NA	200000	gRNA.tab.gz.split	9.part21.tab.gz
+9.part22	NA	NA	200000	gRNA.tab.gz.split	9.part22.tab.gz
+9.part23	NA	NA	200000	gRNA.tab.gz.split	9.part23.tab.gz
+9.part24	NA	NA	200000	gRNA.tab.gz.split	9.part24.tab.gz
+9.part25	NA	NA	200000	gRNA.tab.gz.split	9.part25.tab.gz
+9.part26	NA	NA	200000	gRNA.tab.gz.split	9.part26.tab.gz
+9.part27	NA	NA	200000	gRNA.tab.gz.split	9.part27.tab.gz
+9.part28	NA	NA	200000	gRNA.tab.gz.split	9.part28.tab.gz
+9.part29	NA	NA	200000	gRNA.tab.gz.split	9.part29.tab.gz
+9.part30	NA	NA	200000	gRNA.tab.gz.split	9.part30.tab.gz
+9.part31	NA	NA	200000	gRNA.tab.gz.split	9.part31.tab.gz
+9.part32	NA	NA	200000	gRNA.tab.gz.split	9.part32.tab.gz
+9.part33	NA	NA	200000	gRNA.tab.gz.split	9.part33.tab.gz
+9.part34	NA	NA	200000	gRNA.tab.gz.split	9.part34.tab.gz
+9.part35	NA	NA	200000	gRNA.tab.gz.split	9.part35.tab.gz
+9.part36	NA	NA	200000	gRNA.tab.gz.split	9.part36.tab.gz
+9.part37	NA	NA	200000	gRNA.tab.gz.split	9.part37.tab.gz
+9.part38	NA	NA	200000	gRNA.tab.gz.split	9.part38.tab.gz
+9.part39	NA	NA	200000	gRNA.tab.gz.split	9.part39.tab.gz
+9.part40	NA	NA	200000	gRNA.tab.gz.split	9.part40.tab.gz
+9.part41	NA	NA	200000	gRNA.tab.gz.split	9.part41.tab.gz
+9.part42	NA	NA	200000	gRNA.tab.gz.split	9.part42.tab.gz
+9.part43	NA	NA	200000	gRNA.tab.gz.split	9.part43.tab.gz
+9.part44	NA	NA	200000	gRNA.tab.gz.split	9.part44.tab.gz
+9.part45	NA	NA	200000	gRNA.tab.gz.split	9.part45.tab.gz
+9.part46	NA	NA	200000	gRNA.tab.gz.split	9.part46.tab.gz
+9.part47	NA	NA	200000	gRNA.tab.gz.split	9.part47.tab.gz
+9.part48	NA	NA	200000	gRNA.tab.gz.split	9.part48.tab.gz
+9.part49	NA	NA	200000	gRNA.tab.gz.split	9.part49.tab.gz
+9.part50	NA	NA	200000	gRNA.tab.gz.split	9.part50.tab.gz
+9.part51	NA	NA	200000	gRNA.tab.gz.split	9.part51.tab.gz
+9.part52	NA	NA	200000	gRNA.tab.gz.split	9.part52.tab.gz
+9.part53	NA	NA	200000	gRNA.tab.gz.split	9.part53.tab.gz
+9.part54	NA	NA	200000	gRNA.tab.gz.split	9.part54.tab.gz
+9.part55	NA	NA	200000	gRNA.tab.gz.split	9.part55.tab.gz
+9.part56	NA	NA	200000	gRNA.tab.gz.split	9.part56.tab.gz
+9.part57	NA	NA	200000	gRNA.tab.gz.split	9.part57.tab.gz
+9.part58	NA	NA	200000	gRNA.tab.gz.split	9.part58.tab.gz
+9.part59	NA	NA	200000	gRNA.tab.gz.split	9.part59.tab.gz
+9.part60	NA	NA	200000	gRNA.tab.gz.split	9.part60.tab.gz
+9.part61	NA	NA	200000	gRNA.tab.gz.split	9.part61.tab.gz
+9.part62	NA	NA	200000	gRNA.tab.gz.split	9.part62.tab.gz
+9.part63	NA	NA	200000	gRNA.tab.gz.split	9.part63.tab.gz
+9.part64	NA	NA	76944	gRNA.tab.gz.split	9.part64.tab.gz
 MT	16569	177	2193	gRNA.tab.gz.split	MT.tab.gz
-X.part0	NA	200000	gRNA.tab.gz.split	X.part0.tab.gz
-X.part1	NA	200000	gRNA.tab.gz.split	X.part1.tab.gz
-X.part2	NA	200000	gRNA.tab.gz.split	X.part2.tab.gz
-X.part3	NA	200000	gRNA.tab.gz.split	X.part3.tab.gz
-X.part4	NA	200000	gRNA.tab.gz.split	X.part4.tab.gz
-X.part5	NA	200000	gRNA.tab.gz.split	X.part5.tab.gz
-X.part6	NA	200000	gRNA.tab.gz.split	X.part6.tab.gz
-X.part7	NA	200000	gRNA.tab.gz.split	X.part7.tab.gz
-X.part8	NA	200000	gRNA.tab.gz.split	X.part8.tab.gz
-X.part9	NA	200000	gRNA.tab.gz.split	X.part9.tab.gz
-X.part10	NA	200000	gRNA.tab.gz.split	X.part10.tab.gz
-X.part11	NA	200000	gRNA.tab.gz.split	X.part11.tab.gz
-X.part12	NA	200000	gRNA.tab.gz.split	X.part12.tab.gz
-X.part13	NA	200000	gRNA.tab.gz.split	X.part13.tab.gz
-X.part14	NA	200000	gRNA.tab.gz.split	X.part14.tab.gz
-X.part15	NA	200000	gRNA.tab.gz.split	X.part15.tab.gz
-X.part16	NA	200000	gRNA.tab.gz.split	X.part16.tab.gz
-X.part17	NA	200000	gRNA.tab.gz.split	X.part17.tab.gz
-X.part18	NA	200000	gRNA.tab.gz.split	X.part18.tab.gz
-X.part19	NA	200000	gRNA.tab.gz.split	X.part19.tab.gz
-X.part20	NA	200000	gRNA.tab.gz.split	X.part20.tab.gz
-X.part21	NA	200000	gRNA.tab.gz.split	X.part21.tab.gz
-X.part22	NA	200000	gRNA.tab.gz.split	X.part22.tab.gz
-X.part23	NA	200000	gRNA.tab.gz.split	X.part23.tab.gz
-X.part24	NA	200000	gRNA.tab.gz.split	X.part24.tab.gz
-X.part25	NA	200000	gRNA.tab.gz.split	X.part25.tab.gz
-X.part26	NA	200000	gRNA.tab.gz.split	X.part26.tab.gz
-X.part27	NA	200000	gRNA.tab.gz.split	X.part27.tab.gz
-X.part28	NA	200000	gRNA.tab.gz.split	X.part28.tab.gz
-X.part29	NA	200000	gRNA.tab.gz.split	X.part29.tab.gz
-X.part30	NA	200000	gRNA.tab.gz.split	X.part30.tab.gz
-X.part31	NA	200000	gRNA.tab.gz.split	X.part31.tab.gz
-X.part32	NA	200000	gRNA.tab.gz.split	X.part32.tab.gz
-X.part33	NA	200000	gRNA.tab.gz.split	X.part33.tab.gz
-X.part34	NA	200000	gRNA.tab.gz.split	X.part34.tab.gz
-X.part35	NA	200000	gRNA.tab.gz.split	X.part35.tab.gz
-X.part36	NA	200000	gRNA.tab.gz.split	X.part36.tab.gz
-X.part37	NA	200000	gRNA.tab.gz.split	X.part37.tab.gz
-X.part38	NA	200000	gRNA.tab.gz.split	X.part38.tab.gz
-X.part39	NA	200000	gRNA.tab.gz.split	X.part39.tab.gz
-X.part40	NA	200000	gRNA.tab.gz.split	X.part40.tab.gz
-X.part41	NA	200000	gRNA.tab.gz.split	X.part41.tab.gz
-X.part42	NA	200000	gRNA.tab.gz.split	X.part42.tab.gz
-X.part43	NA	200000	gRNA.tab.gz.split	X.part43.tab.gz
-X.part44	NA	200000	gRNA.tab.gz.split	X.part44.tab.gz
-X.part45	NA	200000	gRNA.tab.gz.split	X.part45.tab.gz
-X.part46	NA	200000	gRNA.tab.gz.split	X.part46.tab.gz
-X.part47	NA	200000	gRNA.tab.gz.split	X.part47.tab.gz
-X.part48	NA	200000	gRNA.tab.gz.split	X.part48.tab.gz
-X.part49	NA	200000	gRNA.tab.gz.split	X.part49.tab.gz
-X.part50	NA	200000	gRNA.tab.gz.split	X.part50.tab.gz
-X.part51	NA	200000	gRNA.tab.gz.split	X.part51.tab.gz
-X.part52	NA	200000	gRNA.tab.gz.split	X.part52.tab.gz
-X.part53	NA	200000	gRNA.tab.gz.split	X.part53.tab.gz
-X.part54	NA	200000	gRNA.tab.gz.split	X.part54.tab.gz
-X.part55	NA	200000	gRNA.tab.gz.split	X.part55.tab.gz
-X.part56	NA	200000	gRNA.tab.gz.split	X.part56.tab.gz
-X.part57	NA	200000	gRNA.tab.gz.split	X.part57.tab.gz
-X.part58	NA	200000	gRNA.tab.gz.split	X.part58.tab.gz
-X.part59	NA	200000	gRNA.tab.gz.split	X.part59.tab.gz
-X.part60	NA	200000	gRNA.tab.gz.split	X.part60.tab.gz
-X.part61	NA	200000	gRNA.tab.gz.split	X.part61.tab.gz
-X.part62	NA	200000	gRNA.tab.gz.split	X.part62.tab.gz
-X.part63	NA	200000	gRNA.tab.gz.split	X.part63.tab.gz
-X.part64	NA	200000	gRNA.tab.gz.split	X.part64.tab.gz
-X.part65	NA	200000	gRNA.tab.gz.split	X.part65.tab.gz
-X.part66	NA	200000	gRNA.tab.gz.split	X.part66.tab.gz
-X.part67	NA	200000	gRNA.tab.gz.split	X.part67.tab.gz
-X.part68	NA	200000	gRNA.tab.gz.split	X.part68.tab.gz
-X.part69	NA	200000	gRNA.tab.gz.split	X.part69.tab.gz
-X.part70	NA	200000	gRNA.tab.gz.split	X.part70.tab.gz
-X.part71	NA	200000	gRNA.tab.gz.split	X.part71.tab.gz
-X.part72	NA	200000	gRNA.tab.gz.split	X.part72.tab.gz
-X.part73	NA	200000	gRNA.tab.gz.split	X.part73.tab.gz
-X.part74	NA	172548	gRNA.tab.gz.split	X.part74.tab.gz
-Y.part0	NA	200000	gRNA.tab.gz.split	Y.part0.tab.gz
-Y.part1	NA	200000	gRNA.tab.gz.split	Y.part1.tab.gz
-Y.part2	NA	200000	gRNA.tab.gz.split	Y.part2.tab.gz
-Y.part3	NA	200000	gRNA.tab.gz.split	Y.part3.tab.gz
-Y.part4	NA	200000	gRNA.tab.gz.split	Y.part4.tab.gz
-Y.part5	NA	200000	gRNA.tab.gz.split	Y.part5.tab.gz
-Y.part6	NA	200000	gRNA.tab.gz.split	Y.part6.tab.gz
-Y.part7	NA	200000	gRNA.tab.gz.split	Y.part7.tab.gz
-Y.part8	NA	200000	gRNA.tab.gz.split	Y.part8.tab.gz
-Y.part9	NA	200000	gRNA.tab.gz.split	Y.part9.tab.gz
-Y.part10	NA	200000	gRNA.tab.gz.split	Y.part10.tab.gz
-Y.part11	NA	25605	gRNA.tab.gz.split	Y.part11.tab.gz
+X.part0	NA	NA	200000	gRNA.tab.gz.split	X.part0.tab.gz
+X.part1	NA	NA	200000	gRNA.tab.gz.split	X.part1.tab.gz
+X.part2	NA	NA	200000	gRNA.tab.gz.split	X.part2.tab.gz
+X.part3	NA	NA	200000	gRNA.tab.gz.split	X.part3.tab.gz
+X.part4	NA	NA	200000	gRNA.tab.gz.split	X.part4.tab.gz
+X.part5	NA	NA	200000	gRNA.tab.gz.split	X.part5.tab.gz
+X.part6	NA	NA	200000	gRNA.tab.gz.split	X.part6.tab.gz
+X.part7	NA	NA	200000	gRNA.tab.gz.split	X.part7.tab.gz
+X.part8	NA	NA	200000	gRNA.tab.gz.split	X.part8.tab.gz
+X.part9	NA	NA	200000	gRNA.tab.gz.split	X.part9.tab.gz
+X.part10	NA	NA	200000	gRNA.tab.gz.split	X.part10.tab.gz
+X.part11	NA	NA	200000	gRNA.tab.gz.split	X.part11.tab.gz
+X.part12	NA	NA	200000	gRNA.tab.gz.split	X.part12.tab.gz
+X.part13	NA	NA	200000	gRNA.tab.gz.split	X.part13.tab.gz
+X.part14	NA	NA	200000	gRNA.tab.gz.split	X.part14.tab.gz
+X.part15	NA	NA	200000	gRNA.tab.gz.split	X.part15.tab.gz
+X.part16	NA	NA	200000	gRNA.tab.gz.split	X.part16.tab.gz
+X.part17	NA	NA	200000	gRNA.tab.gz.split	X.part17.tab.gz
+X.part18	NA	NA	200000	gRNA.tab.gz.split	X.part18.tab.gz
+X.part19	NA	NA	200000	gRNA.tab.gz.split	X.part19.tab.gz
+X.part20	NA	NA	200000	gRNA.tab.gz.split	X.part20.tab.gz
+X.part21	NA	NA	200000	gRNA.tab.gz.split	X.part21.tab.gz
+X.part22	NA	NA	200000	gRNA.tab.gz.split	X.part22.tab.gz
+X.part23	NA	NA	200000	gRNA.tab.gz.split	X.part23.tab.gz
+X.part24	NA	NA	200000	gRNA.tab.gz.split	X.part24.tab.gz
+X.part25	NA	NA	200000	gRNA.tab.gz.split	X.part25.tab.gz
+X.part26	NA	NA	200000	gRNA.tab.gz.split	X.part26.tab.gz
+X.part27	NA	NA	200000	gRNA.tab.gz.split	X.part27.tab.gz
+X.part28	NA	NA	200000	gRNA.tab.gz.split	X.part28.tab.gz
+X.part29	NA	NA	200000	gRNA.tab.gz.split	X.part29.tab.gz
+X.part30	NA	NA	200000	gRNA.tab.gz.split	X.part30.tab.gz
+X.part31	NA	NA	200000	gRNA.tab.gz.split	X.part31.tab.gz
+X.part32	NA	NA	200000	gRNA.tab.gz.split	X.part32.tab.gz
+X.part33	NA	NA	200000	gRNA.tab.gz.split	X.part33.tab.gz
+X.part34	NA	NA	200000	gRNA.tab.gz.split	X.part34.tab.gz
+X.part35	NA	NA	200000	gRNA.tab.gz.split	X.part35.tab.gz
+X.part36	NA	NA	200000	gRNA.tab.gz.split	X.part36.tab.gz
+X.part37	NA	NA	200000	gRNA.tab.gz.split	X.part37.tab.gz
+X.part38	NA	NA	200000	gRNA.tab.gz.split	X.part38.tab.gz
+X.part39	NA	NA	200000	gRNA.tab.gz.split	X.part39.tab.gz
+X.part40	NA	NA	200000	gRNA.tab.gz.split	X.part40.tab.gz
+X.part41	NA	NA	200000	gRNA.tab.gz.split	X.part41.tab.gz
+X.part42	NA	NA	200000	gRNA.tab.gz.split	X.part42.tab.gz
+X.part43	NA	NA	200000	gRNA.tab.gz.split	X.part43.tab.gz
+X.part44	NA	NA	200000	gRNA.tab.gz.split	X.part44.tab.gz
+X.part45	NA	NA	200000	gRNA.tab.gz.split	X.part45.tab.gz
+X.part46	NA	NA	200000	gRNA.tab.gz.split	X.part46.tab.gz
+X.part47	NA	NA	200000	gRNA.tab.gz.split	X.part47.tab.gz
+X.part48	NA	NA	200000	gRNA.tab.gz.split	X.part48.tab.gz
+X.part49	NA	NA	200000	gRNA.tab.gz.split	X.part49.tab.gz
+X.part50	NA	NA	200000	gRNA.tab.gz.split	X.part50.tab.gz
+X.part51	NA	NA	200000	gRNA.tab.gz.split	X.part51.tab.gz
+X.part52	NA	NA	200000	gRNA.tab.gz.split	X.part52.tab.gz
+X.part53	NA	NA	200000	gRNA.tab.gz.split	X.part53.tab.gz
+X.part54	NA	NA	200000	gRNA.tab.gz.split	X.part54.tab.gz
+X.part55	NA	NA	200000	gRNA.tab.gz.split	X.part55.tab.gz
+X.part56	NA	NA	200000	gRNA.tab.gz.split	X.part56.tab.gz
+X.part57	NA	NA	200000	gRNA.tab.gz.split	X.part57.tab.gz
+X.part58	NA	NA	200000	gRNA.tab.gz.split	X.part58.tab.gz
+X.part59	NA	NA	200000	gRNA.tab.gz.split	X.part59.tab.gz
+X.part60	NA	NA	200000	gRNA.tab.gz.split	X.part60.tab.gz
+X.part61	NA	NA	200000	gRNA.tab.gz.split	X.part61.tab.gz
+X.part62	NA	NA	200000	gRNA.tab.gz.split	X.part62.tab.gz
+X.part63	NA	NA	200000	gRNA.tab.gz.split	X.part63.tab.gz
+X.part64	NA	NA	200000	gRNA.tab.gz.split	X.part64.tab.gz
+X.part65	NA	NA	200000	gRNA.tab.gz.split	X.part65.tab.gz
+X.part66	NA	NA	200000	gRNA.tab.gz.split	X.part66.tab.gz
+X.part67	NA	NA	200000	gRNA.tab.gz.split	X.part67.tab.gz
+X.part68	NA	NA	200000	gRNA.tab.gz.split	X.part68.tab.gz
+X.part69	NA	NA	200000	gRNA.tab.gz.split	X.part69.tab.gz
+X.part70	NA	NA	200000	gRNA.tab.gz.split	X.part70.tab.gz
+X.part71	NA	NA	200000	gRNA.tab.gz.split	X.part71.tab.gz
+X.part72	NA	NA	200000	gRNA.tab.gz.split	X.part72.tab.gz
+X.part73	NA	NA	200000	gRNA.tab.gz.split	X.part73.tab.gz
+X.part74	NA	NA	172548	gRNA.tab.gz.split	X.part74.tab.gz
+Y.part0	NA	NA	200000	gRNA.tab.gz.split	Y.part0.tab.gz
+Y.part1	NA	NA	200000	gRNA.tab.gz.split	Y.part1.tab.gz
+Y.part2	NA	NA	200000	gRNA.tab.gz.split	Y.part2.tab.gz
+Y.part3	NA	NA	200000	gRNA.tab.gz.split	Y.part3.tab.gz
+Y.part4	NA	NA	200000	gRNA.tab.gz.split	Y.part4.tab.gz
+Y.part5	NA	NA	200000	gRNA.tab.gz.split	Y.part5.tab.gz
+Y.part6	NA	NA	200000	gRNA.tab.gz.split	Y.part6.tab.gz
+Y.part7	NA	NA	200000	gRNA.tab.gz.split	Y.part7.tab.gz
+Y.part8	NA	NA	200000	gRNA.tab.gz.split	Y.part8.tab.gz
+Y.part9	NA	NA	200000	gRNA.tab.gz.split	Y.part9.tab.gz
+Y.part10	NA	NA	200000	gRNA.tab.gz.split	Y.part10.tab.gz
+Y.part11	NA	NA	25605	gRNA.tab.gz.split	Y.part11.tab.gz
 KI270728.1	1872759	1310953	165816	gRNA.tab.gz.split	KI270728.1.tab.gz
 KI270727.1	448248	230081	42070	gRNA.tab.gz.split	KI270727.1.tab.gz
 KI270442.1	392061	343611	35780	gRNA.tab.gz.split	KI270442.1.tab.gz

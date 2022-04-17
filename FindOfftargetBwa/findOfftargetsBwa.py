@@ -34,6 +34,8 @@ def parse_args():
     parser.add_argument('--bwa_idx', default="", type=str, help='path to bwa index', metavar='')
     parser.add_argument('--genome_fa', default="", type=str, help='name of genome fasta', metavar='')
     parser.add_argument('--guideLen', default="", type=str, help='guide length', metavar='')
+    parser.add_argument('--thread', default="", type=str, help='num of thread to use', metavar='')
+
 
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
@@ -50,6 +52,7 @@ SCRIPT = config['script_dir']
 GENOME = config["genome_fa"]
 GENOME_IDX_BWA = config["bwa_idx"]
 GUIDELEN = config['guideLen']
+thread2use = config["thread"]
 
 ###########################################
 #ATTENTION:################################
@@ -225,7 +228,7 @@ command = [f"{BIN}/bwa",
             "-k", f"{maxDiff}", # Maximum edit distance in the seed
             "-N", # -N Disable iterative search. All hits with no more than maxDiff differences will be found. This mode is much slower than the default.
             "-l", f"{seqLen}", #Take the first INT subsequence as seed. If INT is larger than the query sequence, seeding will be disabled. For long reads, this option is typically ranged from 25 to 35 for ‘-k 2’. [inf] 
-            "-t", "2",
+            "-t", f"{thread2use}",
             f"{bwa_genome_idx}",
             f"{GRNA_FA_PATH}"
             ]
@@ -298,16 +301,19 @@ shmFaFname = os.path.join("/dev/shm", GENOME) #bwa_genome_idx is the name ends w
 # arguments: guideSeq, mainPat, altPats, altScore, passTotalAlnCount
 path_to_stderr_file = os.path.join(bwa_wd_path,f"bwa.seqExtraction.stderr.txt")
 mystderr = open(path_to_stderr_file, 'w+')
-if os.path.isfile(shmFaFname):
-    logging.info("Using bedtools and genome fasta on ramdisk, %s" % shmFaFname)
+
+#if os.path.isfile(shmFaFname):
+    #logging.info("Using bedtools and genome fasta on ramdisk, %s" % shmFaFname)
     #use genome fa in /dev/shm
     #command = f"time {BIN}/bedtools getfasta -s -name -fi {shmFaFname} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
-    #don't use genome fa in /dev/shm
-    command = f"time {BIN}/bedtools getfasta -s -name -fi {GENOME_IDX_BWA} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
-    
-else:
-    logging.info("Using twoBitfofa, %s" % shmFaFname)
-    command = f"time {BIN}/twoBitToFa {bwa_genome_idx}.2bit stdout -bed={matchesBedFname} | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
+#don't use genome fa in /dev/shm
+command = f"time {BIN}/bedtools getfasta -s -name -fi {GENOME_IDX_BWA} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
+
+#else:
+#    logging.info("Using twoBitfofa, %s" % shmFaFname)
+#    command = f"time {BIN}/twoBitToFa {bwa_genome_idx}.2bit stdout -bed={matchesBedFname} | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}" 
+
+
 #cmd = "$SCRIPT/twoBitToFaPython %(genomeDir)s/%(genome)s/%(genome)s.2bit %(matchesBedFname)s | $SCRIPT/filterFaToBed %(faFname)s %(pam)s %(altPats)s %(altPamMinScore)s %(maxOcc)d > %(filtMatchesBedFname)s" % locals()
 p = Popen(command, stdout=subprocess.PIPE, shell=True, stderr=mystderr)
 p.communicate()  # wait for the commands to process
@@ -326,4 +332,4 @@ for tfn in tempFnames:
 endtime = datetime.datetime.now()
 elapsed = endtime - starttime
 elapsedmin = elapsed.seconds/60
-print(f"finished in {elapsedmin:.2f} min ({elapsed} sec)")
+print(f"FindOfftargetsBwa.py finished in {elapsedmin:.2f} min ({elapsed} sec)", flush=True)

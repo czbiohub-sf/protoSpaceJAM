@@ -72,7 +72,8 @@ def main():
         #process gRNAs by chr(file)
         new_tab = config["tab"].rstrip("tab") + "split.tab"
         with open(os.path.join(new_tab), "w") as wfh:
-            wfh.write("chr_part\tlength\tgRNA_count\tdirectory\tfilename\n")
+            wfh.write("chr_part\tlength\trepeat_length\tgRNA_count\tdirectory\tfilename\n")
+            wfh.flush()
             for index, row in df.iterrows():
                 chr_count += 1
                 current_chr = str(row["Chr"]).strip()
@@ -85,6 +86,7 @@ def main():
                     row_content = [str(i) for i in row.tolist()]
                     wfh.write("\t".join(row_content))
                     wfh.write(f"\t{path2dir}\t{current_chr}.tab.gz\n")
+                    wfh.flush()
                     gRNA_count += tab_gRNA_count
                 #chrs that need to be split
                 else:
@@ -97,7 +99,8 @@ def main():
                             # determine if this is the end of current chunk
                             if file_gRNA_count % part_size == 0 and file_gRNA_count != 0:
                                 gzwfh.close()
-                                wfh.write(f"{current_chr}.part{part}\tNA\t{part_gRNA_count}\t{path2dir}\t{current_chr}.part{part}.tab.gz\n")
+                                wfh.write(f"{current_chr}.part{part}\tNA\tNA\t{part_gRNA_count}\t{path2dir}\t{current_chr}.part{part}.tab.gz\n")
+                                wfh.flush()
                                 print(f"--processed chr {current_chr} part {part} with {part_gRNA_count} gRNAs")
                                 part+=1
                                 gzwfh = gzip.open(os.path.join(path2dir, f"{current_chr}.part{part}.tab.gz"), "wt")
@@ -108,12 +111,13 @@ def main():
                         #write the last part
                         if file_gRNA_count % part_size != 0 and file_gRNA_count != 0:
                             print(f"--processed chr {current_chr} part {part} with {part_gRNA_count} gRNAs")
-                            wfh.write(f"{current_chr}.part{part}\tNA\t{part_gRNA_count}\t{path2dir}\t{current_chr}.part{part}.tab.gz\n")
+                            wfh.write(f"{current_chr}.part{part}\tNA\tNA\t{part_gRNA_count}\t{path2dir}\t{current_chr}.part{part}.tab.gz\n")
+                            wfh.flush()
                     #check if the gRNA count in split files add up to that in the tab file
                     if file_gRNA_count != tab_gRNA_count:
                         sys.exit(f"error: got {file_gRNA_count} from gz file, and {tab_gRNA_count} from tab file")
                     gRNA_count += file_gRNA_count
-
+                wfh.flush()
 
 
         endtime = datetime.datetime.now()

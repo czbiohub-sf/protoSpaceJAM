@@ -29,6 +29,7 @@ def parse_args():
     parser.add_argument('--gzdir', default="", type=str, help='path to the dir containing gzfile', metavar='')
     parser.add_argument('--gRNA_count', default="", type=int, help='path to the gzfile', metavar='')
     parser.add_argument('--genome_fa', default="", type=str, help='name of genome fasta file', metavar='')
+    parser.add_argument('--thread', default="", type=str, help='num of threads to use for bwa', metavar='')
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
         parser.print_help()
@@ -43,6 +44,7 @@ log.setLevel(logging.INFO) #set the level of warning displayed
 
 config = vars(parse_args())
 genome_fa = config["genome_fa"]
+thread2use = config["thread"]
 pam_len = 3
 protospacer_len = 20
 n_gRNA_per_chunk = 200
@@ -114,12 +116,11 @@ def main():
                     f"--script_dir", f"../FindOfftargetBwa/bin/", 
                     f"--bwa_idx", f"../genome_files/indexes_bwa/{genome_fa}", 
                     f"--genome_fa", f"{genome_fa}", 
-                    f"--guideLen", f"20"]
+                    f"--guideLen", f"20",
+                    f"--thread", f"{thread2use}"]
 
                     p = Popen(command)
                     p.communicate()  # wait for the commands to process
-
-                    os.remove(f"{fastafile}")
 
                     #parse bwa out
                     Bwa_mapping = dict()
@@ -136,7 +137,6 @@ def main():
                                 Bwa_mapping[gRNAname].append(f"{matchChr}:{matchStart}-{matchEnd}_{matchInfo}")
                             else:
                                 Bwa_mapping[gRNAname] = [f"{matchChr}:{matchStart}-{matchEnd}_{matchInfo}"]
-
                     #write mapping results to a set of new gzip files
                     with gzip.open(os.path.join(outdir_path,f"{config['gzfile'].rstrip('.gz')}.tmp.gz"), "rt") as tmp_gz_fh:
                         for tmp_lines in tmp_gz_fh:
@@ -154,19 +154,24 @@ def main():
                     
                     #remove bwa working folder
                     shutil.rmtree(f"{fastafile}_bwa")
+                    #remove query fa file     
+                    os.remove(f"{fastafile}")
+                    #remove tmp gz file     
+                    os.remove(os.path.join(outdir_path,f"{config['gzfile'].rstrip('.gz')}.tmp.gz"))
 
                     endtime_chunk = datetime.datetime.now()
                     elapsed_sec_chunk = endtime_chunk - starttime_chunk
                     elapsed_min_chunk = elapsed_sec_chunk.seconds / 60
 
-                    print(f"Finished processing chunk {n_chunk} (total {total_chunk_count}), chunk size:{n_gRNA_per_chunk}, took {elapsed_min_chunk:.2f} min")
+                    print(f"Finished processing chunk {n_chunk} (total {total_chunk_count}), chunk size:{n_gRNA_per_chunk}, took {elapsed_min_chunk:.2f} min", flush=True)
 
-                    #start new chunk
                     n_chunk = str(math.floor(file_gRNA_count/n_gRNA_per_chunk))
-                    wfh = open(f"{file}.{n_chunk}.fa", "w") #open new file handle
-                    wgfh_tmp = gzip.open(os.path.join(outdir_path,f"{config['gzfile'].rstrip('.gz')}.tmp.gz"), "wt")
+                    #start new chunk
+                    if int(n_chunk) < int(total_chunk_count): #n_chunk is 0-indexed, and total_chunk_count is 1-indexed, so n_chunk should never reach total_chunk_count
+                        wfh = open(f"{file}.{n_chunk}.fa", "w") #open new file handle
+                        wgfh_tmp = gzip.open(os.path.join(outdir_path,f"{config['gzfile'].rstrip('.gz')}.tmp.gz"), "wt")
             
-            #process last chunk
+            #process the last chunk when it is smaller ( chunk size != g_gRNA_per_chunk) 
             if file_gRNA_count%n_gRNA_per_chunk!=0:
                 starttime_chunk = datetime.datetime.now()
 
@@ -183,12 +188,12 @@ def main():
                 f"--script_dir", f"../FindOfftargetBwa/bin/", 
                 f"--bwa_idx", f"../genome_files/indexes_bwa/{genome_fa}", 
                 f"--genome_fa", f"{genome_fa}", 
-                f"--guideLen", f"20"]
+                f"--guideLen", f"20",
+                f"--thread", f"{thread2use}"]
 
                 p = Popen(command)
                 p.communicate()  # wait for the commands to process
-
-                os.remove(f"{fastafile}")
+                
                 #parse bwa out
                 Bwa_mapping = dict()
                 with open(f"{fastafile}_bwa/bwa.out.bed", "r") as BEDOUT:
@@ -219,16 +224,19 @@ def main():
                             match_list = Bwa_mapping[gRNA_name]
                         wgfh.write(f"{tmp_lines.rstrip()}\t{match_list}\n")
 
-                #remove bwa working folder
-                shutil.rmtree(f"{fastafile}_bwa")
+
 
                 endtime_chunk = datetime.datetime.now()
                 elapsed_sec_chunk = endtime_chunk - starttime_chunk
                 elapsed_min_chunk = elapsed_sec_chunk.seconds / 60
 
-                print(f"Finished processing chunk {n_chunk} (total {total_chunk_count}), chunk size:{n_gRNA_per_chunk}, took {elapsed_min_chunk:.2f} min")
-
-                #remove tmp gz file
+                print(f"Finished processing chunk {n_chunk} (total {total_chunk_count}), chunk size:{n_gRNA_per_chunk}, took {elapsed_min_chunk:.2f} min", flush=True)
+                
+                #remove bwa working folder
+                shutil.rmtree(f"{fastafile}_bwa")
+                #remove query fa file     
+                os.remove(f"{fastafile}")
+                #remove tmp gz file     
                 os.remove(os.path.join(outdir_path,f"{config['gzfile'].rstrip('.gz')}.tmp.gz"))
 
             gRNA_count += file_gRNA_count
@@ -237,7 +245,7 @@ def main():
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
         log.info(f"finished in {elapsed_min:.2f} min, bwa-mapped {gRNA_count} gRNAs in file {file}")
-        print(f"finished in {elapsed_min:.2f} min, bwa-mapped {gRNA_count} gRNAs in file {file}")
+        print(f"finished in {elapsed_min:.2f} min, bwa-mapped {gRNA_count} gRNAs in file {file}", flush=True)
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
