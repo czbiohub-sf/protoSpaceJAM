@@ -10,7 +10,7 @@ import linecache
 import datetime
 import gzip
 import shutil
-import gc
+import re
 import math
 sys.path.insert(1, '..')
 #from gRNA_search import *
@@ -121,6 +121,9 @@ def main():
         #keep a dictionary of multi-mapping guides for current file
         gRNA_match = dict()
 
+        #search pattern
+        gap = re.compile("-+")
+
         #make output dir
         outdir_path =config["gzdir"] + ".scored"
         if os.path.isdir(outdir_path):
@@ -196,8 +199,13 @@ def main():
                 #print(len(gRNA_with_flank))
                 #test 
                 #print(sorted(calcAllScores(["CCACGTCTCCACACATCAGCACAACTACGCAGCGCCTCCCTCCACTCGGAAGGACTATCCTGCTGCCAAGAGGGTCAAGTTGGACAGTGTCAGAGTCCTG"]).items()))
-                scores = calcAllScores([gRNA_with_flank])
-                scores_flattened = flatten_score_dict(scores)
+                m = re.search(gap, gRNA_with_flank)
+                scores_flattened=""
+                if m: #gap exists in gRNA_with_flank
+                    scores_flattened = "|N.A. due to gap(s)|"
+                else: #no gaps, safe to calculate efficiency scores
+                    scores = calcAllScores([gRNA_with_flank])
+                    scores_flattened = flatten_score_dict(scores)
                 #print(scores_flattened)
 
                 ################################################

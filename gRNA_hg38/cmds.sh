@@ -18,14 +18,16 @@ python ${script_folder}/1.2.getOfftarget.py --gzfile 1.part0.tab.gz --gzdir gRNA
 #python ${script_folder}/1.2.getOfftarget.py --gzdir gRNA.tab.gz.split --gzfile ${filename[$idx]}  --gRNA_count ${gRNA_count[$idx]} --thread ${SLURM_CPUS_PER_TASK} --genome_fa Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
 
 #batch job,  need to first throttle to 1 (then increase throttle), this avoids simultaneous creating of output dir and cause some jobs to fail
-sbatch array.job.sh
+sbatch array.job.bwa.sh
 
-
-#calculate scores. TODO: make it cluster array job
-conda activate protospacerX
-python ${script_folder}/1.3.calcSpecificityScores.py --gzdir gRNA.tab.gz.split.BwaMapped --gzfile 1.part0.tab.mapped.gz
+#check if all gRNAs are mapped by bwa
+sbatch array.job.bwa_check.sh
 
 #calculate scores. TODO: make it cluster array job
+#conda activate protospacerX
+#python ${script_folder}/1.3.calcSpecificityScores.py --gzdir gRNA.tab.gz.split.BwaMapped --gzfile 1.part0.tab.mapped.gz
+
+#calculate scores. 
 module load anaconda
 conda activate sklearn0
 python ${script_folder}/1.3.calcScores.py --gzdir gRNA.tab.gz.split.BwaMapped --gzfile MT.part0.tab.mapped.gz
