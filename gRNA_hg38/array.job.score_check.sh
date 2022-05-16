@@ -1454,7 +1454,6 @@ declare -a filename=(
 9.part7.tab.mapped.gz \
 9.part8.tab.mapped.gz \
 9.part9.tab.mapped.gz \
-a.txt
 GL000008.2.tab.mapped.gz \
 GL000009.2.tab.mapped.gz \
 GL000194.1.tab.mapped.gz \

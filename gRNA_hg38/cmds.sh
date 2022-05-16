@@ -31,3 +31,9 @@ sbatch array.job.bwa_check.sh
 module load anaconda
 conda activate sklearn0
 python ${script_folder}/1.3.calcScores.py --gzdir gRNA.tab.gz.split.BwaMapped --gzfile MT.part0.tab.mapped.gz
+
+#check if all gRNAs are scored
+sbatch array.job.score_check.sh
+
+#run scoring for failed gRNAs
+sbatch array.job.score.failedOnly.sh
