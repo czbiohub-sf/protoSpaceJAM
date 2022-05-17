@@ -37,3 +37,6 @@ sbatch array.job.score_check.sh
 
 #run scoring for failed gRNAs
 sbatch array.job.score.failedOnly.sh
+
+#index the files
+python ${script_folder}/1.4.index.result.files.py --gzdir gRNA.tab.gz.split.BwaMapped.scored
