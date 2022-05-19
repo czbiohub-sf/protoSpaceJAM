@@ -2,6 +2,7 @@ import os.path
 import pandas as pd
 from subprocess import Popen
 from Bio import SeqIO
+from Bio.Seq import reverse_complement
 import csv
 import argparse
 import sys
@@ -64,6 +65,7 @@ def main():
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
             print(f"processing {ENST_ID}", flush=True)
+            gRNAs = get_gRNAs(ENST_ID,ENST_info)
 
         #write csv out
 
@@ -88,13 +90,17 @@ def read_pickle_files(file):
     return mydict
 
 def get_gRNAs(ENST_ID,ENST_info):
+    ATG_loc, stop_loc = get_start_stop_loc(ENST_ID,ENST_info)
 
+    seq = get_seq(ATG_loc[0],ATG_loc[1],ATG_loc[2],ATG_loc[3])
+    print (ATG_loc)
+    print (f"start codon {seq}")
 
+    seq = get_seq(stop_loc[0],stop_loc[1],stop_loc[2],stop_loc[3])
+    print (stop_loc)
+    print(f"stop codon {seq}")
 
-
-    print("checkpoint")
-
-def get_start_stop_loc(ENST_ID,ENST_info)
+def get_start_stop_loc(ENST_ID,ENST_info):
     my_transcript = ENST_info[ENST_ID]  # get the seq record
     # constructing the list of cds
     cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
@@ -102,17 +108,36 @@ def get_start_stop_loc(ENST_ID,ENST_info)
     CDS_last = cdsList[len(cdsList) - 1]
     #get start codon location
     if CDS_first.strand==1:
-        ATG_loc = [CDS_first.location.start,CDS_first.location.start+2, 1] # format [start, end, strand]
+        ATG_loc = [CDS_first.location.ref, CDS_first.location.start+0,CDS_first.location.start+2, 1] # format [start, end, strand]
     else:
-        ATG_loc = [CDS_first.location.end-2, CDS_first.location.end, -1]
+        stop_loc = [CDS_first.location.ref, CDS_first.location.start+0,CDS_first.location.start+2, -1]
     #get stop codon location
     if CDS_last.strand==1:
-        stop_loc = [CDS_first.location.end-2,CDS_first.location.end, 1]
+        stop_loc = [CDS_last.location.ref, CDS_last.location.end-2,CDS_last.location.end+0, 1]
     else:
-        stop_loc = [CDS_first.location.start,CDS_first.location.start+2, -1]
+        ATG_loc = [CDS_last.location.ref, CDS_last.location.end-2,CDS_last.location.end+0, -1]
 
-def get_seq(chr,start,stop)
+    return([ATG_loc, stop_loc])
 
+def get_seq(chr,start,end,strand):
+    '''
+    chr
+    start
+    end
+    strand 1 or -1 (str)
+    '''
+    chr_file_path = os.path.join("genome_files",f"{config['genome_ver']}_byChr",f"{chr}.pk")
+    print(f"opening file {chr_file_path}")
+    if os.path.isfile(chr_file_path):
+        #read file
+        chr_seqrecord = read_pickle_files(chr_file_path)
+        subseq = chr_seqrecord.seq._data.decode()[(start-1):end]
+        if strand == "-1" or strand == -1:
+            return(reverse_complement(subseq))
+        else:
+            return(subseq)
+    else:
+        sys.exit(f"ERROR: file not found: {chr_file_path}")
 
 
 
