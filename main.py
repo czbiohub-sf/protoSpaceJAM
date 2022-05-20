@@ -48,12 +48,15 @@ def main():
         freq_dict = dict()
 
         #load gene model info
+        log.info("loading gene model info")
         ENST_info = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_info.pickle"))
 
         #load gRNA info index (mapping of chromosomal location to file parts)
+        log.info("loading the mapping of chromosomal location to file parts")
         loc2file_index = read_pickle_files(os.path.join(f"gRNA_{config['genome_ver']}","loc2file_index.pickle"))
 
         #load ENST list (the user input list)
+        log.info("begin processing user-supplied list of gene IDs")
         df = pd.read_csv(os.path.join(config['path2csv']))
         # check csv columns
         keys2check = set(["Ensemble_ID"])
@@ -65,7 +68,7 @@ def main():
         #loop through each ENST
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
-            print(f"processing {ENST_ID}", flush=True)
+            log.info(f"processing {ENST_ID}", flush=True)
             gRNAs = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, dist = 100)
 
         #write csv out
@@ -74,7 +77,6 @@ def main():
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
 
-        print(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec), pickle file(s) loaded", flush=True)
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , pickle file(s) loaded")
 
     except Exception as e:
@@ -102,25 +104,60 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     #get location of start and stop location
     ATG_loc, stop_loc = get_start_stop_loc(ENST_ID,ENST_info)
 
-    #get start codon seq (for debug)
-    seq = get_seq(ATG_loc[0],ATG_loc[1],ATG_loc[2],ATG_loc[3])
-    #print (ATG_loc)
-    #print (f"start codon {seq}")
-    update_dict_count(seq,freq_dict)
-
-    #get the exact stop codon (for debug)
-    seq = get_seq(stop_loc[0],stop_loc[1],stop_loc[2],stop_loc[3])
-    #print (stop_loc)
-    #print(f"stop codon {seq}")
-    update_dict_count(seq, freq_dict)
+    # #get start codon seq (for debug)
+    # seq = get_seq(ATG_loc[0],ATG_loc[1],ATG_loc[2],ATG_loc[3])
+    # print (ATG_loc)
+    # print (f"start codon {seq}")
+    # update_dict_count(seq,freq_dict)
+    #
+    # #get the exact stop codon (for debug)
+    # seq = get_seq(stop_loc[0],stop_loc[1],stop_loc[2],stop_loc[3])
+    # print (stop_loc)
+    # print(f"stop codon {seq}")
+    # update_dict_count(seq, freq_dict)
 
     #get gRNAs around the start codon
-    print(ATG_loc)
-    end_of_ATG_loc = [ATG_loc[0],ATG_loc[2],ATG_loc[3]] # [chr, pos,strand]
-    get_gRNAs_near_loc(loc=end_of_ATG_loc,dist=100, loc2file_index=loc2file_index)
+    log.debug(f"ATG_loc: {ATG_loc}")
+    end_of_ATG_loc = get_end_pos_of_ATG(ATG_loc) # [chr, pos,strand]
+    log.debug(f"end of the ATG: {end_of_ATG_loc}")
+    df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc,dist=100, loc2file_index=loc2file_index)
+
     #get gRNAs around the stop codon
+    log.debug(f"stop_loc: {stop_loc}")
+    start_of_stop_loc = get_start_pos_of_stop(stop_loc)
+    log.debug(f"start of stop: {start_of_stop_loc}")# [chr, pos,strand]
+    df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc,dist=100, loc2file_index=loc2file_index)
+    log.debug("a")
+
+def get_end_pos_of_ATG(ATG_loc):
+    """
+    input: ATG_loc              [chr,start,end,strand] #start < end
+    output: the pos of G in ATG [chr,pos,strand]       #start < end
+    """
+    strand = ATG_loc[3]
+    if str(strand) == "+" or str(strand) == "1":
+        return [ATG_loc[0],ATG_loc[2],ATG_loc[3]]
+    else:
+        return [ATG_loc[0],ATG_loc[1],ATG_loc[3]]
+
+def get_start_pos_of_stop(stop_loc):
+    """
+    input: stop_loc                                 [chr,start,end,strand]  #start < end
+    output: the pos of first base in the stop codon [chr,pos,strand]        #start < end
+    """
+    strand = stop_loc[3]
+    if str(strand) == "+" or str(strand) == "1":
+        return [stop_loc[0],stop_loc[1],stop_loc[3]]
+    else:
+        return [stop_loc[0],stop_loc[2],stop_loc[3]]
 
 def get_start_stop_loc(ENST_ID,ENST_info):
+    """
+    input
+    output: a list of two items
+            ATG_loc: [chr,start,end,strand]  #start < end
+            stop_loc: [chr,start,end,strand] #start < end
+    """
     my_transcript = ENST_info[ENST_ID]  # get the seq record
     # constructing the list of cds
     cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
@@ -166,7 +203,15 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index):
         df_tmp = pd.read_csv(file_path, sep="\t", compression='infer', header=None, names = ["seq","pam","start","end", "strand", "CSS", "ES"])
         dfs.append(df_tmp)
     df_gRNA = pd.concat(dfs)
-    #subset gRNA, get gRNAs which cuts <[dist] to the loc
+
+    #subset gRNA based on strand  !ATTN: start > end when strand is '-'
+    df_gRNA_on_sense = df_gRNA[(df_gRNA['strand'] == '+')]
+    df_gRNA_on_antisense = df_gRNA[(df_gRNA['strand'] == '-')]
+    #subset gRNAs and retain those cuts <[dist] to the loc
+    df_gRNA_on_sense = df_gRNA_on_sense[(df_gRNA_on_sense['start'] > (pos-17-dist)) & (df_gRNA_on_sense['start'] < (pos-17+dist))]
+    df_gRNA_on_antisense = df_gRNA_on_antisense[(df_gRNA_on_antisense['start'] > (pos+17-dist)) & (df_gRNA_on_antisense['start'] < (pos+17+dist))]
+
+    return(pd.concat([df_gRNA_on_sense,df_gRNA_on_antisense]))
 
 def in_interval(pos,interval):
     """
@@ -180,7 +225,7 @@ def in_interval(pos,interval):
     interval[0] = int(interval[0])
     interval[1] = int(interval[1])
     if pos >= interval[0] and pos <= interval[1]:
-        print(f"{pos} is in {interval}")
+        log.debug(f"{pos} is in {interval}")
         return True
     else:
         return False
@@ -200,7 +245,7 @@ def get_seq(chr,start,end,strand):
     strand 1 or -1 (str)
     '''
     chr_file_path = os.path.join("genome_files",f"{config['genome_ver']}_byChr",f"{chr}.pk")
-    print(f"opening file {chr_file_path}")
+    log.debug(f"opening file {chr_file_path}")
     if os.path.isfile(chr_file_path):
         #read file
         chr_seqrecord = read_pickle_files(chr_file_path)
