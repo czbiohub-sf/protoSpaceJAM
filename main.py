@@ -33,9 +33,9 @@ def parse_args():
 
 logging.setLoggerClass(ColoredLogger)
 #logging.basicConfig()
-log = logging.getLogger("get_scores")
+log = logging.getLogger("ProtospaceX")
 log.propagate = False
-log.setLevel(logging.INFO) #set the level of warning displayed
+log.setLevel(logging.DEBUG) #set the level of warning displayed
 
 config = vars(parse_args())
 
@@ -65,10 +65,13 @@ def main():
             log.info(f"Please fix the input csv file and try again")
             sys.exit()
 
+        elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
+        log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
+
         #loop through each ENST
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
-            log.info(f"processing {ENST_ID}", flush=True)
+            log.info(f"processing {ENST_ID}")
             gRNAs = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, dist = 100)
 
         #write csv out
@@ -87,6 +90,14 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
+def cal_elapsed_time(starttime,endtime):
+    """
+    output: [elapsed_min,elapsed_sec]
+    """
+    elapsed_sec = endtime - starttime
+    elapsed_min = elapsed_sec.seconds / 60
+    return[elapsed_min,elapsed_sec]
+
 def read_pickle_files(file):
     with open(file, 'rb') as handle:
         mydict = pickle.load(handle)
@@ -95,8 +106,8 @@ def read_pickle_files(file):
 def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     """
     input
-        ENST_ID:
-        ENST_info:
+        ENST_ID: ENST ID
+        ENST_info: gene model info loaded from pickle file
     return:
         a dictionary of guide RNAs which cuts <[dist] to end of start codon
         a dictionary of guide RNAs which cuts <[dist] to start of stop codon
@@ -104,7 +115,8 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     #get location of start and stop location
     ATG_loc, stop_loc = get_start_stop_loc(ENST_ID,ENST_info)
 
-    # #get start codon seq (for debug)
+    #(for debug)
+    # #get start codon seq
     # seq = get_seq(ATG_loc[0],ATG_loc[1],ATG_loc[2],ATG_loc[3])
     # print (ATG_loc)
     # print (f"start codon {seq}")
@@ -116,18 +128,29 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     # print(f"stop codon {seq}")
     # update_dict_count(seq, freq_dict)
 
-    #get gRNAs around the start codon
+    ##################################
+    #get gRNAs around the start codon#
+    ##################################
+    #get the start codon chromosomal location
     log.debug(f"ATG_loc: {ATG_loc}")
     end_of_ATG_loc = get_end_pos_of_ATG(ATG_loc) # [chr, pos,strand]
     log.debug(f"end of the ATG: {end_of_ATG_loc}")
     df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc,dist=100, loc2file_index=loc2file_index)
+    #design gRNA around the chromosomeal location (near ATG)
+    gRNAs_near_ATG = get_gRNAs_near_loc(loc)
 
+    ##################################
+    #get gRNAs around the stop  codon#
+    ##################################
     #get gRNAs around the stop codon
     log.debug(f"stop_loc: {stop_loc}")
     start_of_stop_loc = get_start_pos_of_stop(stop_loc)
     log.debug(f"start of stop: {start_of_stop_loc}")# [chr, pos,strand]
     df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc,dist=100, loc2file_index=loc2file_index)
-    log.debug("a")
+    #design gRNA around the chromosomeal location (near stop location)
+    gRNAs_near_stop = get_gRNAs_near_loc(loc)
+
+
 
 def get_end_pos_of_ATG(ATG_loc):
     """
@@ -225,7 +248,7 @@ def in_interval(pos,interval):
     interval[0] = int(interval[0])
     interval[1] = int(interval[1])
     if pos >= interval[0] and pos <= interval[1]:
-        log.debug(f"{pos} is in {interval}")
+        #log.debug(f"{pos} is in {interval}")
         return True
     else:
         return False
