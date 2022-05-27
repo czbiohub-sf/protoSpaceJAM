@@ -135,9 +135,11 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     log.debug(f"ATG_loc: {ATG_loc}")
     end_of_ATG_loc = get_end_pos_of_ATG(ATG_loc) # [chr, pos,strand]
     log.debug(f"end of the ATG: {end_of_ATG_loc}")
+    # get gRNA around the chromosomeal location (near ATG)
     df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc,dist=100, loc2file_index=loc2file_index)
-    #design gRNA around the chromosomeal location (near ATG)
-    gRNAs_near_ATG = get_gRNAs_near_loc(loc)
+    # rank gRNAs
+    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(end_of_ATG_loc, df_gRNAs_ATG)
+
 
     ##################################
     #get gRNAs around the stop  codon#
@@ -146,11 +148,45 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     log.debug(f"stop_loc: {stop_loc}")
     start_of_stop_loc = get_start_pos_of_stop(stop_loc)
     log.debug(f"start of stop: {start_of_stop_loc}")# [chr, pos,strand]
+    # get gRNA around the chromosomeal location (near stop location)
     df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc,dist=100, loc2file_index=loc2file_index)
-    #design gRNA around the chromosomeal location (near stop location)
-    gRNAs_near_stop = get_gRNAs_near_loc(loc)
+    # rank gRNAs
+    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(start_of_stop_loc, df_gRNAs_ATG)
 
 
+def rank_gRNAs_for_tagging(loc,gRNA_df):
+    """
+    input:  loc         [chr,pos,strand]  #start < end
+            gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
+    output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
+    """
+    insPos = loc[1]
+    #assign a score to each gRNA
+    for index, row in gRNA_df.iterrows():
+        start = row[2]
+        end = row[3]
+        strand = row[4]
+        #Get cut to insert distance
+        cutPos = None
+        if strand == "+" or strand == "1" or strand == 1:
+            cutPos = start + 17
+        else:
+            cutPos = start - 17
+        cut2insDist = cutPos - insPos
+        log.debug(f"strand {strand} {start}-{end} cutPos {cutPos} loc {loc} cut2insDist {cut2insDist}")
+
+
+        #Get CFD specificity score
+        CSS = row[5]
+
+        #
+
+
+        #
+
+        #rank gRNAs based on the score
+
+    pass
 
 def get_end_pos_of_ATG(ATG_loc):
     """
@@ -176,7 +212,8 @@ def get_start_pos_of_stop(stop_loc):
 
 def get_start_stop_loc(ENST_ID,ENST_info):
     """
-    input
+    Get the chromosomal location of start and stop codons
+    input: ENST_ID, ENST_info
     output: a list of two items
             ATG_loc: [chr,start,end,strand]  #start < end
             stop_loc: [chr,start,end,strand] #start < end
@@ -205,7 +242,7 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index):
         loc: [chr,pos,strand]
         dist: distance
     return:
-        a dataframe of guide RNAs which cuts <[dist] to the loc
+        a dataframe of guide RNAs which cuts <[dist] to the loc, the columns are "seq","pam","start","end", "strand", "CSS", "ES"
     """
     chr = loc[0]
     pos = loc[1]
@@ -230,6 +267,10 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index):
     #subset gRNA based on strand  !ATTN: start > end when strand is '-'
     df_gRNA_on_sense = df_gRNA[(df_gRNA['strand'] == '+')]
     df_gRNA_on_antisense = df_gRNA[(df_gRNA['strand'] == '-')]
+
+    #add the cut position
+
+
     #subset gRNAs and retain those cuts <[dist] to the loc
     df_gRNA_on_sense = df_gRNA_on_sense[(df_gRNA_on_sense['start'] > (pos-17-dist)) & (df_gRNA_on_sense['start'] < (pos-17+dist))]
     df_gRNA_on_antisense = df_gRNA_on_antisense[(df_gRNA_on_antisense['start'] > (pos+17-dist)) & (df_gRNA_on_antisense['start'] < (pos+17+dist))]
