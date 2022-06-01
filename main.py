@@ -151,7 +151,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
     # get gRNA around the chromosomeal location (near stop location)
     df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc,dist=100, loc2file_index=loc2file_index)
     # rank gRNAs
-    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(start_of_stop_loc, df_gRNAs_ATG)
+    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(start_of_stop_loc, df_gRNAs_stop)
 
 
 def rank_gRNAs_for_tagging(loc,gRNA_df):
@@ -169,24 +169,73 @@ def rank_gRNAs_for_tagging(loc,gRNA_df):
         #Get cut to insert distance
         cutPos = None
         if strand == "+" or strand == "1" or strand == 1:
-            cutPos = start + 17
+            cutPos = start + 16
         else:
             cutPos = start - 17
         cut2insDist = cutPos - insPos
-        log.debug(f"strand {strand} {start}-{end} cutPos {cutPos} loc {loc} cut2insDist {cut2insDist}")
 
 
-        #Get CFD specificity score
+
+        #calc. specificity_weight
         CSS = row[5]
+        specificity_weight = _specificity_weight(CSS)
 
-        #
+        #calc. distance_weight
+        distance_weight = _dist_weight(hdr_dist = cut2insDist)
+
+        #get position_weight
 
 
-        #
+        log.debug(f"strand {strand} {start}-{end} cutPos {cutPos} loc {loc} cut2insDist {cut2insDist} CSS {CSS} specificity_weight {specificity_weight} distance_weight {distance_weight}")
+        # final score = (specificity_weight)^alpha * distance_weight * position_weight
+
 
         #rank gRNAs based on the score
 
     pass
+
+def _dist_weight(hdr_dist: int, _dist_weight_variance = 55) -> float:
+    """
+    taken from https://github.com/czbiohub/crispycrunch
+    >>> _dist_weight(0)
+    1.0
+    >>> _dist_weight(5)
+    0.7967034698934616
+    >>> _dist_weight(10)
+    0.402890321529133
+    >>> _dist_weight(-20)
+    0.026347980814448734
+    """
+    variance = _dist_weight_variance
+
+    hdr_dist = abs(hdr_dist)  # make symmetric
+    assert hdr_dist >= 0 and hdr_dist <= 100  # 100 is resonable upper bound
+
+    # Returns a gaussian
+    weight = math.exp((-1 * hdr_dist**2) / (2 * variance))
+    assert weight >= 0 and weight <= 1
+    return weight
+
+def _specificity_weight(specificity_score: float, _specificity_weight_low = 45, _specificity_weight_high = 65 ):
+    """
+    taken from https://github.com/czbiohub/crispycrunch
+    >>> _specificity_weight(20)
+    0
+    >>> _specificity_weight(60)
+    0.75
+    >>> _specificity_weight(80)
+    1
+    """
+    low = _specificity_weight_low
+    high = _specificity_weight_high
+
+    assert specificity_score >= 0 and specificity_score <= 100
+    if specificity_score <= low:
+        return 0
+    elif specificity_score >= high:
+        return 1
+    else:
+        return 1 / (high - low) * (specificity_score - low)
 
 def get_end_pos_of_ATG(ATG_loc):
     """
