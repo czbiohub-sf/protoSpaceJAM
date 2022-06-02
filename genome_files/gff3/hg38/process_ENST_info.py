@@ -17,6 +17,7 @@ from Bio.SeqFeature import SeqFeature
 from Bio.SeqFeature import FeatureLocation
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+
 #################
 #custom logging #
 #################
@@ -92,8 +93,8 @@ logging.setLoggerClass(ColoredLogger)
 #logging.basicConfig()
 log = logging.getLogger("get_scores")
 log.propagate = False
-log.setLevel(logging.DEBUG) #set the level of warning displayed
-#log.setLevel(logging.INFO) #set the level of warning displayed
+#log.setLevel(logging.DEBUG) #set the level of warning displayed
+log.setLevel(logging.INFO) #set the level of warning displayed
 
 config = vars(parse_args())
 
@@ -229,10 +230,14 @@ def main():
             log.debug(f"5UTR {UTR5p}")
             log.debug(f"3UTR {UTR3p}")
             log.debug(f"=======================")
-            if ENST_ID == "ENST00000571679":
-                sys.exit()
+
             #mark UTRs
-            #log.debug(f"ENST {ENST_ID} UTR5p {UTR5p} UTR3p {UTR3p}")
+            for loc in UTR5p:
+                loc2posType = update_dictOfDict(mydict=loc2posType, key=loc[2], key2=f"{loc[0]}-{loc[1]}", value="5UTR")
+            for loc in UTR3p:
+                loc2posType = update_dictOfDict(mydict=loc2posType, key=loc[2], key2=f"{loc[0]}-{loc[1]}", value="3UTR")
+
+
             #mark cds and exon/intron junctions
             for idx, loc in enumerate(cds_loc):
                 chr, start, end, strand = loc
@@ -254,7 +259,7 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-1}-{end+2}", value="within_2bp_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end+3}-{end+4}", value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-3}-{end-2}" ,value="3N4bp_down_of_intron_exon_junction")
-                elif idx == 0:
+                elif idx == 0: #first cds (not necessarily the one with the start codon)
                     if strand == 1 or strand == "1" or strand == "+": #pos strand, first cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-1}-{end+2}", value="within_2bp_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-3}-{end-2}", value="3N4bp_up_of_exon_intron_junction")
@@ -263,7 +268,7 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-1}-{end+2}", value="within_2bp_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end+3}-{end+4}", value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-3}-{end-2}" ,value="3N4bp_down_of_intron_exon_junction")
-                elif idx == (len(cds_loc)-1):
+                elif idx == (len(cds_loc)-1): #last cds (not necessarily the one with the stop codon)
                     if strand == 1 or strand == "1" or strand == "+":  # pos strand, last cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{start-2}-{start+1}", value="within_2bp_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{start-4}-{start-3}", value="3N4bp_up_of_intron_exon_junction")
@@ -273,7 +278,9 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{start+2}-{start+3}", value="3N4bp_up_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{start-6}-{start-3}", value="3_to_6bp_down_of_exon_intron_junction")
 
-
+        # write dict to file
+        with open('loc2posType.pickle', 'wb') as handle:
+            pickle.dump(loc2posType, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime
@@ -325,11 +332,12 @@ def get_UTR_loc(ENST_ID, ENST_info):
         superimpose_cds = find_superimpose_cds(exon,cdsList) #find superimposed cds with the current exon
         overlap_cds = find_overlap_cds(exon,cdsList)         #find overlapping cds with the current exon
         strand = exon.location.strand
+        chr = exon.location.ref
         if len(superimpose_cds)==0 and len(overlap_cds)==0: #untranslated exon
             UTR_type = status_dict[strand][status] #get the type of UTR, 5p or 3p
-            interval = [exon.location.start+0,exon.location.end+0]
+            interval = [exon.location.start+0,exon.location.end+0,chr]
             res[tuple(interval)] = UTR_type #save UTR
-            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} translated exon UTR_type:{UTR_type}")
+            log.debug(f"{ENST_ID} exon_idx={idx} strand={strand} untranslated exon UTR_type={UTR_type}")
         elif len(superimpose_cds)==0 and len(overlap_cds)!=0: #partial-transcribed exon
             UTR_type = status_dict[strand][status] #get the type of UTR, 5p or 3p
             cds = cdsList[overlap_cds[0]]
@@ -347,19 +355,20 @@ def get_UTR_loc(ENST_ID, ENST_info):
                         UTR_type = "5UTR"
                     else:
                         UTR_type = "3UTR"
+                interval.append(chr)
                 res[tuple(interval)] = UTR_type #save UTR
-                log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} partial-translated exon UTR_type:{UTR_type}")
+                log.debug(f"{ENST_ID} exon_idx={idx} strand={strand} partial-translated exon UTR_type={UTR_type}")
             else: # both 5UTR and 3UTR are in the same exon
-                interval_1 =[exon.location.start + 0, cds.location.start - 1]
+                interval_1 =[exon.location.start + 0, cds.location.start - 1, chr]
                 res[tuple(interval_1)] = UTR_type #save UTR
                 status = 1 #maually update UTR type
                 UTR_type = status_dict[strand][status] #maually update UTR type
-                interval_2 =[cds.location.end + 1, exon.location.end + 0]
+                interval_2 =[cds.location.end + 1, exon.location.end + 0, chr]
                 res[tuple(interval_2)] = UTR_type #save UTR
-                log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} partial-translated exon UTR_type:5UTR+3UTR")
+                log.debug(f"{ENST_ID} exon_idx={idx} strand={strand} partial-translated exon UTR_type=5UTR+3UTR")
             status = 1  # this parameter signals the end of UTR (depending on the strand, it may be the end of 5p or 3p)
         elif len(superimpose_cds)!=0: #fully-transcribed exon
-            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} fully-translated exon")
+            log.debug(f"{ENST_ID} exon_idx={idx} strand={strand} fully-translated exon")
             status = 1 #this parameter signals the end of UTR (depending on the strand, it may be the end of 5p or 3p)
 
     for key,val in res.items():

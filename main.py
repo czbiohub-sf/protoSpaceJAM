@@ -47,13 +47,17 @@ def main():
         starttime = datetime.datetime.now()
         freq_dict = dict()
 
+        #load gRNA info index (mapping of chromosomal location to file parts)
+        log.info("loading the mapping of chromosomal location to (gRNA) file parts")
+        loc2file_index = read_pickle_files(os.path.join(f"gRNA_{config['genome_ver']}","loc2file_index.pickle"))
+
+        #load chr location to type (e.g. UTR, cds, exon/intron junction) mappings
+        log.info("loading the mapping of chromosomal location to type (e.g. UTR, cds, exon/intron junction)")
+        loc2posType = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"loc2posType.pickle"))
+
         #load gene model info
         log.info("loading gene model info")
         ENST_info = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_info.pickle"))
-
-        #load gRNA info index (mapping of chromosomal location to file parts)
-        log.info("loading the mapping of chromosomal location to file parts")
-        loc2file_index = read_pickle_files(os.path.join(f"gRNA_{config['genome_ver']}","loc2file_index.pickle"))
 
         #load ENST list (the user input list)
         log.info("begin processing user-supplied list of gene IDs")
