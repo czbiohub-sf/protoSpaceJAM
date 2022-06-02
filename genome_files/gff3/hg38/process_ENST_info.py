@@ -259,7 +259,7 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-1}-{end+2}", value="within_2bp_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end+3}-{end+4}", value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-3}-{end-2}" ,value="3N4bp_down_of_intron_exon_junction")
-                elif idx == 0: #first cds (not necessarily the one with the start codon)
+                elif idx == 0 and idx != (len(cds_loc)-1): #first cds (not necessarily the one with the start codon)
                     if strand == 1 or strand == "1" or strand == "+": #pos strand, first cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-1}-{end+2}", value="within_2bp_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-3}-{end-2}", value="3N4bp_up_of_exon_intron_junction")
@@ -268,7 +268,7 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-1}-{end+2}", value="within_2bp_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end+3}-{end+4}", value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{end-3}-{end-2}" ,value="3N4bp_down_of_intron_exon_junction")
-                elif idx == (len(cds_loc)-1): #last cds (not necessarily the one with the stop codon)
+                elif idx == (len(cds_loc)-1) and idx != 0: #last cds (not necessarily the one with the stop codon)
                     if strand == 1 or strand == "1" or strand == "+":  # pos strand, last cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{start-2}-{start+1}", value="within_2bp_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key=chr, key2=f"{start-4}-{start-3}", value="3N4bp_up_of_intron_exon_junction")
