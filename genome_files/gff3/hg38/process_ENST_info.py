@@ -226,10 +226,13 @@ def main():
             UTR5p, UTR3p = get_UTR_loc(ENST_ID,ENST_info) #get UTR loc
             cds_loc = get_cds_loc(ENST_ID,ENST_info) #get cds loc
             log.debug(f"{ENST_info[ENST_ID].description}")
+            log.debug(f"5UTR {UTR5p}")
+            log.debug(f"3UTR {UTR3p}")
             log.debug(f"=======================")
+            if ENST_ID == "ENST00000571679":
+                sys.exit()
             #mark UTRs
             #log.debug(f"ENST {ENST_ID} UTR5p {UTR5p} UTR3p {UTR3p}")
-
             #mark cds and exon/intron junctions
             for idx, loc in enumerate(cds_loc):
                 chr, start, end, strand = loc
@@ -300,7 +303,8 @@ def update_dictOfDict(mydict, key, key2, value):
 
 def get_UTR_loc(ENST_ID, ENST_info):
     """
-    return [UTR5p,UTR3p]  #UTR5p:[start,end]
+    get the UTR locations of a transcript
+    return [UTR5p,UTR3p]  #UTR5p:[[start,end],...]
     """
     locList = []
     my_transcript = ENST_info[ENST_ID]  # get the seq record
@@ -308,20 +312,61 @@ def get_UTR_loc(ENST_ID, ENST_info):
     cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
     # construct the list of exon
     exonList = [feat for feat in my_transcript.features if feat.type == 'exon']
-    UTR5p = None
-    UTR3p = None
+    UTR5p = []
+    UTR3p = []
 
-    for idx, exon in enumerate(exonList):
-        superimpose_cds = find_superimpose_cds(exon,cdsList)
-        overlap_cds = find_overlap_cds(exon,cdsList)
+    res = dict() # {[start,end]:UTR_type} # temp storage of UTR results
+    status = 0 # 0 1 #status indicator, this parameter signals the end of UTR (depending on the strand, it may be the end of 5p or 3p)
+    status_dict = {1:{0: "5UTR", 1: "3UTR"},  # status_dict[strand][status]
+                  -1:{0: "3UTR", 1: "5UTR"}
+                  }
+
+    for idx, exon in enumerate(exonList): #go through exons
+        superimpose_cds = find_superimpose_cds(exon,cdsList) #find superimposed cds with the current exon
+        overlap_cds = find_overlap_cds(exon,cdsList)         #find overlapping cds with the current exon
         strand = exon.location.strand
-        if len(superimpose_cds)==0 and len(overlap_cds)==0: #untranscribed exon
-            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} untranscribed exon")
-        elif len(superimpose_cds)==0 and len(overlap_cds)!=0:
-            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} partial-transcribed exon")
-        elif len(superimpose_cds)!=0:
-            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} fully-transcribed exon")
+        if len(superimpose_cds)==0 and len(overlap_cds)==0: #untranslated exon
+            UTR_type = status_dict[strand][status] #get the type of UTR, 5p or 3p
+            interval = [exon.location.start+0,exon.location.end+0]
+            res[tuple(interval)] = UTR_type #save UTR
+            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} translated exon UTR_type:{UTR_type}")
+        elif len(superimpose_cds)==0 and len(overlap_cds)!=0: #partial-transcribed exon
+            UTR_type = status_dict[strand][status] #get the type of UTR, 5p or 3p
+            cds = cdsList[overlap_cds[0]]
+            interval = get_nonoverlap([exon.location.start+0,exon.location.end+0], [cds.location.start+0,cds.location.end+0]) # will return None if both 5UTR and 3UTR are in the same exon
+            #check if the partially untranslated part is 5UTR or 3UTR
+            #only one UTR is in the exon
+            if not interval is None:
+                if strand == 1 or strand =="1" or strand == "+":
+                    if exon.location.start == cds.location.start:
+                        UTR_type = "3UTR"
+                    else:
+                        UTR_type = "5UTR"
+                else: #neg strand
+                    if exon.location.start == cds.location.start:
+                        UTR_type = "5UTR"
+                    else:
+                        UTR_type = "3UTR"
+                res[tuple(interval)] = UTR_type #save UTR
+                log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} partial-translated exon UTR_type:{UTR_type}")
+            else: # both 5UTR and 3UTR are in the same exon
+                interval_1 =[exon.location.start + 0, cds.location.start - 1]
+                res[tuple(interval_1)] = UTR_type #save UTR
+                status = 1 #maually update UTR type
+                UTR_type = status_dict[strand][status] #maually update UTR type
+                interval_2 =[cds.location.end + 1, exon.location.end + 0]
+                res[tuple(interval_2)] = UTR_type #save UTR
+                log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} partial-translated exon UTR_type:5UTR+3UTR")
+            status = 1  # this parameter signals the end of UTR (depending on the strand, it may be the end of 5p or 3p)
+        elif len(superimpose_cds)!=0: #fully-transcribed exon
+            log.debug(f"ENST {ENST_ID} exon_idx {idx} strand {strand} fully-translated exon")
+            status = 1 #this parameter signals the end of UTR (depending on the strand, it may be the end of 5p or 3p)
 
+    for key,val in res.items():
+        if val == "5UTR":
+            UTR5p.append(key)
+        if val == "3UTR":
+            UTR3p.append(key)
     return([UTR5p,UTR3p])
 
 def find_overlap_cds(exon, cdsList):
