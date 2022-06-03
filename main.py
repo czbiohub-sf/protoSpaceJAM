@@ -35,7 +35,8 @@ logging.setLoggerClass(ColoredLogger)
 #logging.basicConfig()
 log = logging.getLogger("ProtospaceX")
 log.propagate = False
-log.setLevel(logging.DEBUG) #set the level of warning displayed
+log.setLevel(logging.INFO) #set the level of warning displayed
+#log.setLevel(logging.DEBUG) #set the level of warning displayed
 
 config = vars(parse_args())
 
@@ -59,32 +60,64 @@ def main():
         log.info("loading gene model info")
         ENST_info = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_info.pickle"))
 
-        #load ENST list (the user input list)
-        log.info("begin processing user-supplied list of gene IDs")
-        df = pd.read_csv(os.path.join(config['path2csv']))
-        # check csv columns
-        keys2check = set(["Ensemble_ID"])
-        if not keys2check.issubset(df.columns):
-            log.error(f"Missing columns in the input csv file\n Required columns:\"Ensemble_ID\"")
-            log.info(f"Please fix the input csv file and try again")
-            sys.exit()
-
+        #report time used
         elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
         log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
 
+        #load ENST list (the user input list or the whole transcriptome)
+        if os.path.isfile(config['path2csv']):
+            log.info("begin processing user-supplied list of gene IDs")
+            df = pd.read_csv(os.path.join(config['path2csv']))
+            # check csv columns
+            keys2check = set(["Ensemble_ID"])
+            if not keys2check.issubset(df.columns):
+                log.error(f"Missing columns in the input csv file\n Required columns:\"Ensemble_ID\"")
+                log.info(f"Please fix the input csv file and try again")
+                sys.exit()
+        else:
+            log.warning(f"The input file {config['path2csv']} is not found, using the whole human transcriptome")
+            input("Press Enter to continue...")
+            df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
+
         #loop through each ENST
+        transcript_count = 0
+        protein_coding_transcripts_count = 0
+        df_start_gRNAs = pd.DataFrame()
+        df_stop_gRNAs = pd.DataFrame()
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
-            log.info(f"processing {ENST_ID}")
-            gRNAs = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, dist = 100)
+            transcript_type = ENST_info[ENST_ID].description.split("|")[1]
+            if transcript_type == "protein_coding":
+                log.info(f"processing {ENST_ID}")
+                log.info(f"transcript type: {transcript_type}")
+                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = 50)
+                df_start_gRNAs = pd.concat([df_start_gRNAs,ranked_df_gRNAs_ATG])
+                df_stop_gRNAs = pd.concat([df_stop_gRNAs,ranked_df_gRNAs_stop])
+                protein_coding_transcripts_count +=1
+            else:
+                log.info(f"skipping {ENST_ID} transcript type: {transcript_type} b/c transcript is not protein_coding")
+            transcript_count +=1
+            #report progress
+            if protein_coding_transcripts_count%10 == 0 and protein_coding_transcripts_count != 0:
+                log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts")
+            #if ENST_ID == "ENST00000360426":
+            #    sys.exit()
+            num_to_process = 300
+            if protein_coding_transcripts_count >=num_to_process:
+                break
 
         #write csv out
-
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
 
-        log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , pickle file(s) loaded")
+        log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
+
+        # write gRNA dfs to file
+        with open(f"start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(df_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(df_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
@@ -94,77 +127,60 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
-def cal_elapsed_time(starttime,endtime):
-    """
-    output: [elapsed_min,elapsed_sec]
-    """
-    elapsed_sec = endtime - starttime
-    elapsed_min = elapsed_sec.seconds / 60
-    return[elapsed_min,elapsed_sec]
-
-def read_pickle_files(file):
-    with open(file, 'rb') as handle:
-        mydict = pickle.load(handle)
-    return mydict
-
-def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, dist = 100):
+def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=100):
     """
     input
         ENST_ID: ENST ID
         ENST_info: gene model info loaded from pickle file
+        loc2file_index: mapping of location to the file part that stores gRNAs in that region
+        loc2posType: mapping of location to location type (e.g. 5UTR etc)
     return:
         a dictionary of guide RNAs which cuts <[dist] to end of start codon
         a dictionary of guide RNAs which cuts <[dist] to start of stop codon
     """
-    #get location of start and stop location
-    ATG_loc, stop_loc = get_start_stop_loc(ENST_ID,ENST_info)
-
-    #(for debug)
-    # #get start codon seq
-    # seq = get_seq(ATG_loc[0],ATG_loc[1],ATG_loc[2],ATG_loc[3])
-    # print (ATG_loc)
-    # print (f"start codon {seq}")
-    # update_dict_count(seq,freq_dict)
-    #
-    # #get the exact stop codon (for debug)
-    # seq = get_seq(stop_loc[0],stop_loc[1],stop_loc[2],stop_loc[3])
-    # print (stop_loc)
-    # print(f"stop codon {seq}")
-    # update_dict_count(seq, freq_dict)
+    # get location of start and stop location
+    ATG_loc, stop_loc = get_start_stop_loc(ENST_ID, ENST_info)
 
     ##################################
-    #get gRNAs around the start codon#
+    # get gRNAs around the start codon#
     ##################################
-    #get the start codon chromosomal location
+    # get the start codon chromosomal location
     log.debug(f"ATG_loc: {ATG_loc}")
-    end_of_ATG_loc = get_end_pos_of_ATG(ATG_loc) # [chr, pos,strand]
+    end_of_ATG_loc = get_end_pos_of_ATG(ATG_loc)  # [chr, pos,strand]
     log.debug(f"end of the ATG: {end_of_ATG_loc}")
     # get gRNA around the chromosomeal location (near ATG)
-    df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc,dist=100, loc2file_index=loc2file_index)
+    df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc, dist=100, loc2file_index=loc2file_index)
     # rank gRNAs
-    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(end_of_ATG_loc, df_gRNAs_ATG)
-
+    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType)
 
     ##################################
-    #get gRNAs around the stop  codon#
+    # get gRNAs around the stop  codon#
     ##################################
-    #get gRNAs around the stop codon
+    # get gRNAs around the stop codon
     log.debug(f"stop_loc: {stop_loc}")
     start_of_stop_loc = get_start_pos_of_stop(stop_loc)
-    log.debug(f"start of stop: {start_of_stop_loc}")# [chr, pos,strand]
+    log.debug(f"start of stop: {start_of_stop_loc}")  # [chr, pos,strand]
     # get gRNA around the chromosomeal location (near stop location)
-    df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc,dist=100, loc2file_index=loc2file_index)
+    df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc, dist=100, loc2file_index=loc2file_index)
     # rank gRNAs
-    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(start_of_stop_loc, df_gRNAs_stop)
+    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType)
 
+    return ([ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop])
 
-def rank_gRNAs_for_tagging(loc,gRNA_df):
+def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, alpha = 1):
     """
     input:  loc         [chr,pos,strand]  #start < end
             gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
+            alpha       specificity weight is raised to the power of alpha
     output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
     """
     insPos = loc[1]
+    Chr = loc[0]
+
+    col_spec_weight = []
+    col_dist_weight = []
+    col_pos_weight = []
+    col_final_weight = []
     #assign a score to each gRNA
     for index, row in gRNA_df.iterrows():
         start = row[2]
@@ -178,25 +194,70 @@ def rank_gRNAs_for_tagging(loc,gRNA_df):
             cutPos = start - 17
         cut2insDist = cutPos - insPos
 
-
-
         #calc. specificity_weight
         CSS = row[5]
         specificity_weight = _specificity_weight(CSS)
+        col_spec_weight.append(specificity_weight)
 
         #calc. distance_weight
         distance_weight = _dist_weight(hdr_dist = cut2insDist)
+        col_dist_weight.append(distance_weight)
 
         #get position_weight
+        position_type = _get_position_type(Chr,cutPos,loc2posType)
+        position_weight = _position_weight(position_type)
+        col_pos_weight.append(position_weight)
 
+        log.debug(f"strand {strand} {start}-{end} cutPos {cutPos} insert_loc {loc} cut2insDist {cut2insDist} distance_weight {distance_weight:.2f} CFD_score {CSS} specificity_weight {specificity_weight} pos_type {position_type} position_weight {position_weight}")
 
-        log.debug(f"strand {strand} {start}-{end} cutPos {cutPos} loc {loc} cut2insDist {cut2insDist} CSS {CSS} specificity_weight {specificity_weight} distance_weight {distance_weight}")
-        # final score = (specificity_weight)^alpha * distance_weight * position_weight
+        final_score = float(pow(specificity_weight,alpha)) * float(distance_weight) * float(position_weight)
+        col_final_weight.append(final_score)
 
+    #add weight columns to the df
+    gRNA_df["spec_weight"] = col_spec_weight
+    gRNA_df["dist_weight"] = col_dist_weight
+    gRNA_df["pos_weight"] = col_pos_weight
+    gRNA_df["final_weight"] = col_final_weight
 
-        #rank gRNAs based on the score
+    #rank gRNAs based on the score
+    gRNA_df['final_pct_rank'] = gRNA_df['final_weight'].rank(pct=True)
 
-    pass
+    return gRNA_df
+
+def _get_position_type(chr,pos,loc2posType):
+    """
+    return a list of types for the input position
+    """
+    mapping_dict = loc2posType[chr]
+    types = []
+    for key in mapping_dict.keys():
+        if in_interval_rightExclusive(pos,key):
+            types.append(mapping_dict[key])
+    return types
+
+def _position_weight(types):
+    """
+    input: a list of types
+    output: the lowest weight among all the types
+    """
+    mapping_dict = {"5UTR":0.4,
+                    "3UTR":1,
+                    "cds":1,
+                    "within_2bp_of_exon_intron_junction":0.01,
+                    "within_2bp_of_intron_exon_junction":0.01,
+                    "3N4bp_up_of_exon_intron_junction":0.1,
+                    "3_to_6bp_down_of_exon_intron_junction":0.1,
+                    "3N4bp_up_of_intron_exon_junction":0.1,
+                    "3N4bp_down_of_intron_exon_junction":0.5}
+    lowest_weight = 1
+    for type in types:
+        if type in mapping_dict.keys():
+            weight = mapping_dict[type]
+            if weight < lowest_weight:
+                lowest_weight = weight
+        else:
+            sys.exit(f"unexpected position type: {type}")
+    return(lowest_weight)
 
 def _dist_weight(hdr_dist: int, _dist_weight_variance = 55) -> float:
     """
@@ -339,9 +400,28 @@ def in_interval(pos,interval):
     return: boolean
     """
     pos = int(pos)
+    interval = list(interval)
     interval[0] = int(interval[0])
     interval[1] = int(interval[1])
     if pos >= interval[0] and pos <= interval[1]:
+        #log.debug(f"{pos} is in {interval}")
+        return True
+    else:
+        return False
+
+def in_interval_rightExclusive(pos,interval):
+    """
+    check if pos in is interval
+    input
+        pos
+        interval: [start,end]
+    return: boolean
+    """
+    pos = int(pos)
+    interval = list(interval)
+    interval[0] = int(interval[0])
+    interval[1] = int(interval[1])
+    if pos >= interval[0] and pos < interval[1]:
         #log.debug(f"{pos} is in {interval}")
         return True
     else:
@@ -374,6 +454,18 @@ def get_seq(chr,start,end,strand):
     else:
         sys.exit(f"ERROR: file not found: {chr_file_path}")
 
+def cal_elapsed_time(starttime,endtime):
+    """
+    output: [elapsed_min,elapsed_sec]
+    """
+    elapsed_sec = endtime - starttime
+    elapsed_min = elapsed_sec.seconds / 60
+    return[elapsed_min,elapsed_sec]
+
+def read_pickle_files(file):
+    with open(file, 'rb') as handle:
+        mydict = pickle.load(handle)
+    return mydict
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
