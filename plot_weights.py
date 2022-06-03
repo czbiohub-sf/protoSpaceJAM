@@ -49,6 +49,7 @@ def main():
         plot_hist(df = start_gRNA_df,  col = "pos_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df = start_gRNA_df,  col = "spec_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df = start_gRNA_df,  col = "final_weight", bin_num=40, num_to_process = num_to_process)
+        plot_hist(df=start_gRNA_df, col="final_pct_rank", bin_num=40, num_to_process=num_to_process)
 
         #plot dist_weight (with overflow bin)
         # lower = 0
@@ -109,6 +110,13 @@ def plot_hist(df, col, bin_num, num_to_process):
     plt.grid(axis='y', alpha=0.75)
     plt.savefig(f"{name}.{bin_num}bins.png")
     plt.close()
+
+def plot_scatter(df, col1,col2, bin_num, num_to_process):
+    name1 = col1
+    name2 = col2
+    d1 = df[name1]
+    d2 = df[name2]
+    data_vol = len(d1)
 
 def cal_elapsed_time(starttime,endtime):
     """

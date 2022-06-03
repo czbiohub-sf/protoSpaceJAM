@@ -102,7 +102,7 @@ def main():
                 log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts")
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 300
+            num_to_process = 1000
             if protein_coding_transcripts_count >=num_to_process:
                 break
 
