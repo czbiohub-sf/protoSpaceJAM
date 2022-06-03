@@ -463,10 +463,12 @@ def cal_elapsed_time(starttime,endtime):
     return[elapsed_min,elapsed_sec]
 
 def read_pickle_files(file):
-    with open(file, 'rb') as handle:
-        mydict = pickle.load(handle)
-    return mydict
-
+    if os.path.isfile(file):
+        with open(file, 'rb') as handle:
+            mydict = pickle.load(handle)
+        return mydict
+    else:
+        sys.exit(f"Cannot open file: {file}")
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
