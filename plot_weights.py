@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 from scripts.utils import *
+from scipy.stats import gaussian_kde
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -17,7 +18,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--num_to_process', default="300", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
+    parser.add_argument('--num_to_process', default="1000", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
     config = parser.parse_args()
     return config
 
@@ -44,12 +45,18 @@ def main():
         start_gRNA_df = read_pickle_files(os.path.join(f"start_gRNAs_of_{num_to_process}_genes.pickle"))
         stop_gRNA_df = read_pickle_files(os.path.join(f"stop_gRNAs_of_{num_to_process}_genes.pickle"))
 
-        #plot dist_weight
+        #plot histogram of weight
         plot_hist(df = start_gRNA_df,  col = "dist_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df = start_gRNA_df,  col = "pos_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df = start_gRNA_df,  col = "spec_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df = start_gRNA_df,  col = "final_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df=start_gRNA_df, col="final_pct_rank", bin_num=40, num_to_process=num_to_process)
+
+        #plot scatterplot of weight
+        plot_scatter(df = start_gRNA_df, col1 = "dist_weight", col2 = "pos_weight",  num_to_process = num_to_process)
+        plot_scatter(df = start_gRNA_df, col1 = "dist_weight", col2 = "spec_weight", num_to_process=num_to_process)
+        plot_scatter(df = start_gRNA_df, col1 = "pos_weight", col2 = "spec_weight",  num_to_process=num_to_process)
+
 
         #plot dist_weight (with overflow bin)
         # lower = 0
@@ -111,12 +118,23 @@ def plot_hist(df, col, bin_num, num_to_process):
     plt.savefig(f"{name}.{bin_num}bins.png")
     plt.close()
 
-def plot_scatter(df, col1,col2, bin_num, num_to_process):
+def plot_scatter(df, col1,col2, num_to_process):
     name1 = col1
     name2 = col2
     d1 = df[name1]
     d2 = df[name2]
-    data_vol = len(d1)
+    data_volume = len(d1)
+    # Calculate the point density
+    xy = np.vstack([d1, d2])
+    z = gaussian_kde(xy)(xy)
+    plt.scatter(d1,d2, c=z, alpha = 1, s=12, marker='o', cmap = 'coolwarm')
+    plt.title(f"{name1} vs {name2} for {data_volume} gRNAs in {num_to_process} genes")
+    plt.xlabel(name1)
+    plt.ylabel(name2)
+    #plt.grid(axis='y', alpha=0.75)
+    cb = plt.colorbar(shrink = 0.5)
+    plt.savefig(f"{name1}.vs.{name2}.png")
+    plt.close()
 
 def cal_elapsed_time(starttime,endtime):
     """
