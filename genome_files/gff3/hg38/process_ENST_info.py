@@ -82,7 +82,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--gff3_gzfile', default="", type=str, help='path to the gzfile', metavar='')
+    parser.add_argument('--gff3_gzfile', default="Homo_sapiens.GRCh38.106.gff3.gz", type=str, help='path to the gzfile', metavar='')
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
         parser.print_help()

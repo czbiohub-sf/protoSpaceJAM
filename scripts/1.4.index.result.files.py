@@ -116,8 +116,9 @@ def main():
 
         for filename in os.listdir(config["gzdir"]):
             file_path = os.path.join(config["gzdir"], filename)
-            Chr = filename.split(".")[0]
-            print(Chr)
+
+            Chr = filename.split(".tab")[0].split(".part")[0]
+            print(f"file: {filename}\tchr: {Chr}")
 
             if Chr not in file_index.keys():
                 file_index[Chr] = dict()
@@ -139,16 +140,17 @@ def main():
                     max_pos = update_max(max_pos, en)
 
             file_index[Chr][f"{min_pos}-{max_pos}"] = filename
+            file_count+=1
 
         # write dict to file
-        with open('loc2file_index.pickle', 'wb') as handle:
+        with open('../gRNA_hg38/loc2file_index.pickle', 'wb') as handle:
             pickle.dump(file_index, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
-        log.info(f"finished in {elapsed_min:.2f} min, checked {gRNA_count} gRNAs in file {file}")
-        print(f"finished in {elapsed_min:.2f} min, checked {gRNA_count} gRNAs in file {file}", flush=True)
+        log.info(f"finished in {elapsed_min:.2f} min, processed {file_count} files")
+        print(f"finished in {elapsed_min:.2f} min, processed {file_count} files", flush=True)
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))

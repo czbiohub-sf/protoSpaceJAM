@@ -5,6 +5,7 @@ import sys
 import linecache
 import datetime
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import numpy as np
 import pickle
 from scripts.utils import *
@@ -18,7 +19,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--num_to_process', default="1000", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
+    parser.add_argument('--num_to_process', default="2000", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
     config = parser.parse_args()
     return config
 
@@ -111,11 +112,18 @@ def plot_hist(df, col, bin_num, num_to_process):
     d = df[name]
     data_volume = len(d)
     d.plot.hist(grid=True, bins=bin_num, rwidth=0.9, color='#607c8e')
-    plt.title(f"Distribution of {name} for {data_volume} gRNAs in {num_to_process} genes")
-    plt.xlabel(name)
-    plt.ylabel('Counts')
+    mpl.rcParams.update({'figure.autolayout': True})
+    if name == "final_weight":
+        name = "final_score"
+    plt.title(f"Distribution of {name} for {data_volume} gRNAs in {num_to_process} transcripts", fontsize = 13)
+    plt.xlabel(name, fontsize = 14)
+    plt.ylabel('Counts', fontsize = 14)
+    mpl.rcParams["axes.labelsize"] = 14
+    mpl.rcParams["axes.titlesize"] = 14
+    plt.xticks(fontsize = 14)
+    plt.yticks(fontsize = 14)
     plt.grid(axis='y', alpha=0.75)
-    plt.savefig(f"{name}.{bin_num}bins.png")
+    plt.savefig(f"{name}.{bin_num}bins.png",bbox_inches = "tight")
     plt.close()
 
 def plot_scatter(df, col1,col2, num_to_process):
@@ -124,13 +132,20 @@ def plot_scatter(df, col1,col2, num_to_process):
     d1 = df[name1]
     d2 = df[name2]
     data_volume = len(d1)
+
+    mpl.rcParams.update({'figure.autolayout': True})
+    mpl.rcParams["axes.labelsize"] = 14
+    mpl.rcParams["axes.titlesize"] = 14
+
     # Calculate the point density
     xy = np.vstack([d1, d2])
     z = gaussian_kde(xy)(xy)
     plt.scatter(d1,d2, c=z, alpha = 1, s=12, marker='o', cmap = 'coolwarm')
-    plt.title(f"{name1} vs {name2} for {data_volume} gRNAs in {num_to_process} genes")
+    plt.title(f"{name1} vs {name2} for {data_volume} gRNAs in {num_to_process} transcripts", fontsize = 13)
     plt.xlabel(name1)
     plt.ylabel(name2)
+    plt.xticks(fontsize = 14)
+    plt.yticks(fontsize = 14)
     #plt.grid(axis='y', alpha=0.75)
     cb = plt.colorbar(shrink = 0.5)
     plt.savefig(f"{name1}.vs.{name2}.png")

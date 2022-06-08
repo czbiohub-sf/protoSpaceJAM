@@ -15,6 +15,7 @@ import math
 import re
 import pickle
 from scripts.utils import *
+import traceback
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -25,7 +26,7 @@ class MyParser(argparse.ArgumentParser):
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
     parser.add_argument('--genome_ver', default="hg38", type=str, help='pickle file containing the ENST_info dict', metavar='')
-    parser.add_argument('--path2csv', default="input.csv", type=str,
+    parser.add_argument('--path2csv', default="input/mart_export_canonical_proteincoding.csv", type=str,
                         help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',
                         metavar='')
     config = parser.parse_args()
@@ -66,7 +67,7 @@ def main():
 
         #load ENST list (the user input list or the whole transcriptome)
         if os.path.isfile(config['path2csv']):
-            log.info("begin processing user-supplied list of gene IDs")
+            log.info(f"begin processing user-supplied list of gene IDs in file {config['path2csv']}")
             df = pd.read_csv(os.path.join(config['path2csv']))
             # check csv columns
             keys2check = set(["Ensemble_ID"])
@@ -86,6 +87,9 @@ def main():
         df_stop_gRNAs = pd.DataFrame()
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
+            if not ENST_ID in ENST_info.keys():
+                log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
+                continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
             if transcript_type == "protein_coding":
                 log.info(f"processing {ENST_ID}")
@@ -100,9 +104,13 @@ def main():
             #report progress
             if protein_coding_transcripts_count%10 == 0 and protein_coding_transcripts_count != 0:
                 log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts")
+
+            ################
+            #early stopping#
+            ################
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 1000
+            num_to_process = 5000
             if protein_coding_transcripts_count >=num_to_process:
                 break
 
@@ -121,13 +129,14 @@ def main():
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
+        traceback.print_exc()
         print("additional information:", e)
         PrintException()
 
 ##########################
 ## function definitions ##
 ##########################
-def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=100):
+def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=50):
     """
     input
         ENST_ID: ENST ID
@@ -149,7 +158,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=1
     end_of_ATG_loc = get_end_pos_of_ATG(ATG_loc)  # [chr, pos,strand]
     log.debug(f"end of the ATG: {end_of_ATG_loc}")
     # get gRNA around the chromosomeal location (near ATG)
-    df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc, dist=100, loc2file_index=loc2file_index)
+    df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc, dist=dist, loc2file_index=loc2file_index)
     # rank gRNAs
     ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType)
 
@@ -161,7 +170,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=1
     start_of_stop_loc = get_start_pos_of_stop(stop_loc)
     log.debug(f"start of stop: {start_of_stop_loc}")  # [chr, pos,strand]
     # get gRNA around the chromosomeal location (near stop location)
-    df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc, dist=100, loc2file_index=loc2file_index)
+    df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc, dist=dist, loc2file_index=loc2file_index)
     # rank gRNAs
     ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType)
 
@@ -469,6 +478,7 @@ def read_pickle_files(file):
         return mydict
     else:
         sys.exit(f"Cannot open file: {file}")
+
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
