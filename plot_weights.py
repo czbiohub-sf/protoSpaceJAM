@@ -19,7 +19,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--num_to_process', default="2000", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
+    parser.add_argument('--num_to_process', default="1000", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
     config = parser.parse_args()
     return config
 
@@ -46,17 +46,21 @@ def main():
         start_gRNA_df = read_pickle_files(os.path.join(f"start_gRNAs_of_{num_to_process}_genes.pickle"))
         stop_gRNA_df = read_pickle_files(os.path.join(f"stop_gRNAs_of_{num_to_process}_genes.pickle"))
 
+        best_start_gRNA_df = read_pickle_files(os.path.join(f"best_start_gRNAs_of_{num_to_process}_genes.pickle"))
+        best_stop_gRNA_df = read_pickle_files(os.path.join(f"best_stop_gRNAs_of_{num_to_process}_genes.pickle"))
+
+        df2plot = best_start_gRNA_df
         #plot histogram of weight
-        plot_hist(df = start_gRNA_df,  col = "dist_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df = start_gRNA_df,  col = "pos_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df = start_gRNA_df,  col = "spec_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df = start_gRNA_df,  col = "final_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df=start_gRNA_df, col="final_pct_rank", bin_num=40, num_to_process=num_to_process)
+        plot_hist(df = df2plot,  col = "dist_weight", bin_num=40, num_to_process = num_to_process)
+        plot_hist(df = df2plot,  col = "pos_weight", bin_num=40, num_to_process = num_to_process)
+        plot_hist(df = df2plot,  col = "spec_weight", bin_num=40, num_to_process = num_to_process)
+        plot_hist(df = df2plot,  col = "final_weight", bin_num=40, num_to_process = num_to_process)
+        plot_hist(df=df2plot, col="final_pct_rank", bin_num=40, num_to_process=num_to_process)
 
         #plot scatterplot of weight
-        plot_scatter(df = start_gRNA_df, col1 = "dist_weight", col2 = "pos_weight",  num_to_process = num_to_process)
-        plot_scatter(df = start_gRNA_df, col1 = "dist_weight", col2 = "spec_weight", num_to_process=num_to_process)
-        plot_scatter(df = start_gRNA_df, col1 = "pos_weight", col2 = "spec_weight",  num_to_process=num_to_process)
+        plot_scatter(df = df2plot, col1 = "dist_weight", col2 = "pos_weight",  num_to_process = num_to_process)
+        plot_scatter(df = df2plot, col1 = "dist_weight", col2 = "spec_weight", num_to_process=num_to_process)
+        plot_scatter(df = df2plot, col1 = "pos_weight", col2 = "spec_weight",  num_to_process=num_to_process)
 
 
         #plot dist_weight (with overflow bin)
@@ -123,7 +127,7 @@ def plot_hist(df, col, bin_num, num_to_process):
     plt.xticks(fontsize = 14)
     plt.yticks(fontsize = 14)
     plt.grid(axis='y', alpha=0.75)
-    plt.savefig(f"{name}.{bin_num}bins.png",bbox_inches = "tight")
+    plt.savefig(f"plots/{name}.{bin_num}bins.png",bbox_inches = "tight")
     plt.close()
 
 def plot_scatter(df, col1,col2, num_to_process):
@@ -148,7 +152,7 @@ def plot_scatter(df, col1,col2, num_to_process):
     plt.yticks(fontsize = 14)
     #plt.grid(axis='y', alpha=0.75)
     cb = plt.colorbar(shrink = 0.5)
-    plt.savefig(f"{name1}.vs.{name2}.png")
+    plt.savefig(f"plots/{name1}.vs.{name2}.png")
     plt.close()
 
 def cal_elapsed_time(starttime,endtime):

@@ -80,6 +80,14 @@ def main():
             input("Press Enter to continue...")
             df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
 
+        #dataframes to store best gRNAs
+        best_start_gRNAs = pd.DataFrame()
+        best_stop_gRNAs = pd.DataFrame()
+
+        #list to store IDs failed to yield gRNAs
+        start_failed = []
+        stop_failed = []
+
         #loop through each ENST
         transcript_count = 0
         protein_coding_transcripts_count = 0
@@ -95,8 +103,25 @@ def main():
                 log.info(f"processing {ENST_ID}")
                 log.info(f"transcript type: {transcript_type}")
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = 50)
-                df_start_gRNAs = pd.concat([df_start_gRNAs,ranked_df_gRNAs_ATG])
-                df_stop_gRNAs = pd.concat([df_stop_gRNAs,ranked_df_gRNAs_stop])
+                if ranked_df_gRNAs_ATG.empty == False:
+                    df_start_gRNAs = pd.concat([df_start_gRNAs,ranked_df_gRNAs_ATG])
+                else:
+                    start_failed.append(ENST_ID)
+                if ranked_df_gRNAs_stop.empty == False:
+                    df_stop_gRNAs = pd.concat([df_stop_gRNAs,ranked_df_gRNAs_stop])
+                else:
+                    stop_failed.append(ENST_ID)
+                #get best gRNA
+                best_start_gRNA = ranked_df_gRNAs_ATG[ranked_df_gRNAs_ATG["final_weight"] == ranked_df_gRNAs_ATG['final_weight'].max()]
+                best_stop_gRNA = ranked_df_gRNAs_stop[ranked_df_gRNAs_stop["final_weight"] == ranked_df_gRNAs_stop['final_weight'].max()]
+                if best_start_gRNA.empty == False:
+                    if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
+                        best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()]
+                    best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
+                if best_stop_gRNA.empty == False:
+                    if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
+                        best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()]
+                    best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1
             else:
                 log.info(f"skipping {ENST_ID} transcript type: {transcript_type} b/c transcript is not protein_coding")
@@ -110,7 +135,7 @@ def main():
             ################
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 5000
+            num_to_process = 1000
             if protein_coding_transcripts_count >=num_to_process:
                 break
 
@@ -119,13 +144,19 @@ def main():
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
 
-        log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
-
         # write gRNA dfs to file
         with open(f"start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(df_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(df_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        # write best gRNA dfs to file
+        with open(f"best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"best_stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(best_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
@@ -160,7 +191,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=5
     # get gRNA around the chromosomeal location (near ATG)
     df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc, dist=dist, loc2file_index=loc2file_index)
     # rank gRNAs
-    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType)
+    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType, ENST_ID = ENST_ID)
 
     ##################################
     # get gRNAs around the stop  codon#
@@ -172,11 +203,11 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=5
     # get gRNA around the chromosomeal location (near stop location)
     df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc, dist=dist, loc2file_index=loc2file_index)
     # rank gRNAs
-    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType)
+    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType, ENST_ID = ENST_ID)
 
     return ([ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop])
 
-def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, alpha = 1):
+def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, alpha = 1):
     """
     input:  loc         [chr,pos,strand]  #start < end
             gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
@@ -213,7 +244,7 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, alpha = 1):
         col_dist_weight.append(distance_weight)
 
         #get position_weight
-        position_type = _get_position_type(Chr,cutPos,loc2posType)
+        position_type = _get_position_type(chr = Chr, ID = ENST_ID, pos = cutPos, loc2posType = loc2posType)
         position_weight = _position_weight(position_type)
         col_pos_weight.append(position_weight)
 
@@ -233,16 +264,21 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, alpha = 1):
 
     return gRNA_df
 
-def _get_position_type(chr,pos,loc2posType):
+def _get_position_type(chr, ID, pos, loc2posType):
     """
-    return a list of types for the input position
+    input: mostly self-explanatory, loc2posType is a dictionary that translates location into types (e.g. exon/intron junctions etc)
+    return a list of types for the input position/ID combination
     """
-    mapping_dict = loc2posType[chr]
-    types = []
-    for key in mapping_dict.keys():
-        if in_interval_rightExclusive(pos,key):
-            types.append(mapping_dict[key])
-    return types
+    chr_dict = loc2posType[chr]
+    if not ID in chr_dict.keys():
+        return []
+    else:
+        types = []
+        mapping_dict = chr_dict[ID]
+        for key in mapping_dict.keys():
+            if in_interval_leftrightInclusive(pos,key):
+                types.append(mapping_dict[key])
+        return types
 
 def _position_weight(types):
     """
@@ -418,7 +454,7 @@ def in_interval(pos,interval):
     else:
         return False
 
-def in_interval_rightExclusive(pos,interval):
+def in_interval_leftrightInclusive(pos,interval):
     """
     check if pos in is interval
     input
@@ -430,7 +466,7 @@ def in_interval_rightExclusive(pos,interval):
     interval = list(interval)
     interval[0] = int(interval[0])
     interval[1] = int(interval[1])
-    if pos >= interval[0] and pos < interval[1]:
+    if pos >= interval[0] and pos <= interval[1]:
         #log.debug(f"{pos} is in {interval}")
         return True
     else:
