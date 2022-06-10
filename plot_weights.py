@@ -19,7 +19,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--num_to_process', default="50", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
+    parser.add_argument('--num_to_process', default="200", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
     config = parser.parse_args()
     return config
 
@@ -43,21 +43,28 @@ def main():
         #load gRNA dataframes
         log.info("loading pickle files")
         num_to_process = config["num_to_process"]
-        start_gRNA_df = read_pickle_files(os.path.join(f"start_gRNAs_of_{num_to_process}_genes.pickle"))
-        stop_gRNA_df = read_pickle_files(os.path.join(f"stop_gRNAs_of_{num_to_process}_genes.pickle"))
+        start_gRNA_df = read_pickle_files(os.path.join(f"pickles/start_gRNAs_of_{num_to_process}_genes.pickle"))
+        stop_gRNA_df = read_pickle_files(os.path.join(f"pickles/stop_gRNAs_of_{num_to_process}_genes.pickle"))
 
-        best_start_gRNA_df = read_pickle_files(os.path.join(f"best_start_gRNAs_of_{num_to_process}_genes.pickle"))
-        best_stop_gRNA_df = read_pickle_files(os.path.join(f"best_stop_gRNAs_of_{num_to_process}_genes.pickle"))
+        best_start_gRNA_df = read_pickle_files(os.path.join(f"pickles/best_start_gRNAs_of_{num_to_process}_genes.pickle"))
+        best_stop_gRNA_df = read_pickle_files(os.path.join(f"pickles/best_stop_gRNAs_of_{num_to_process}_genes.pickle"))
 
+        start_failed = read_pickle_files(os.path.join(f"pickles/start_failed_IDs_of_{num_to_process}_genes.pickle"))
+        stop_failed = read_pickle_files(os.path.join(f"pickles/stop_failed_IDs_of_{num_to_process}_genes.pickle"))
+
+        #prepare df to plot
         df2plot = best_start_gRNA_df
         df2plot = subset_df(df = df2plot, col ="final_weight", max =1, min=0)
 
+        #plot params
+        bin_num = 30
+
         #plot histogram of weight
-        plot_hist(df = df2plot,  col = "dist_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df = df2plot,  col = "pos_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df = df2plot,  col = "spec_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df = df2plot,  col = "final_weight", bin_num=40, num_to_process = num_to_process)
-        plot_hist(df=df2plot, col="final_pct_rank", bin_num=40, num_to_process=num_to_process)
+        plot_hist(df = df2plot,  col = "dist_weight", bin_num=bin_num, num_to_process = num_to_process)
+        plot_hist(df = df2plot,  col = "pos_weight", bin_num=bin_num, num_to_process = num_to_process)
+        plot_hist(df = df2plot,  col = "spec_weight", bin_num=bin_num, num_to_process = num_to_process)
+        plot_hist(df = df2plot,  col = "final_weight", bin_num=bin_num, num_to_process = num_to_process)
+        plot_hist(df=df2plot, col="final_pct_rank", bin_num=bin_num, num_to_process=num_to_process)
 
         #plot scatterplot of weight
         plot_scatter(df = df2plot, col1 = "dist_weight", col2 = "pos_weight",  num_to_process = num_to_process)
@@ -89,15 +96,7 @@ def main():
         #
         # plt.savefig(f"{name}.overflow.png")
 
-
-
         #report time used
-        elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
-        log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
-
-
-
-        #
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60

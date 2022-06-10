@@ -116,11 +116,13 @@ def main():
                 best_stop_gRNA = ranked_df_gRNAs_stop[ranked_df_gRNAs_stop["final_weight"] == ranked_df_gRNAs_stop['final_weight'].max()]
                 if best_start_gRNA.empty == False:
                     if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
-                        best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()]
+                        best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
+                        best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
                 if best_stop_gRNA.empty == False:
                     if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
-                        best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()]
+                        best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
+                        best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1
             else:
@@ -138,7 +140,7 @@ def main():
             ################
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            # num_to_process = 50
+            # num_to_process = 200
             # if protein_coding_transcripts_count >=num_to_process:
             #     break
 
@@ -153,16 +155,22 @@ def main():
             num_to_process = "all"
 
         # write gRNA dfs to file
-        with open(f"start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"pickles/start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(df_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"pickles/stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(df_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write best gRNA dfs to file
-        with open(f"best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"pickles/best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"best_stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"pickles/best_stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(best_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        # write failed ENSTs to file
+        with open(f"pickles/start_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(start_failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"pickles/stop_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(stop_failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 
