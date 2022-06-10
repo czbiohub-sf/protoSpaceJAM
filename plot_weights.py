@@ -50,6 +50,8 @@ def main():
         best_stop_gRNA_df = read_pickle_files(os.path.join(f"best_stop_gRNAs_of_{num_to_process}_genes.pickle"))
 
         df2plot = best_start_gRNA_df
+        df2plot = subset_df(df = df2plot, col ="final_weight", max =1, min=0)
+
         #plot histogram of weight
         plot_hist(df = df2plot,  col = "dist_weight", bin_num=40, num_to_process = num_to_process)
         plot_hist(df = df2plot,  col = "pos_weight", bin_num=40, num_to_process = num_to_process)
@@ -111,6 +113,12 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
+
+def subset_df(df, col, max, min):
+    df = df[df[col]<=max]
+    df = df[df[col]>=min]
+    return(df)
+
 def plot_hist(df, col, bin_num, num_to_process):
     name = col
     d = df[name]
