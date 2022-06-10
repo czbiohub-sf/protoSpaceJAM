@@ -128,21 +128,29 @@ def main():
             transcript_count +=1
             #report progress
             if protein_coding_transcripts_count%10 == 0 and protein_coding_transcripts_count != 0:
-                log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts")
+                endtime = datetime.datetime.now()
+                elapsed_sec = endtime - starttime
+                elapsed_min = elapsed_sec.seconds / 60
+                log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts, elapsed time {elapsed_min:.2f} min ({elapsed_sec} sec)")
 
             ################
             #early stopping#
             ################
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 1000
-            if protein_coding_transcripts_count >=num_to_process:
-                break
+            # num_to_process = 50
+            # if protein_coding_transcripts_count >=num_to_process:
+            #     break
 
         #write csv out
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
+
+        if 'num_to_process' in locals():
+            pass
+        else:
+            num_to_process = "all"
 
         # write gRNA dfs to file
         with open(f"start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:

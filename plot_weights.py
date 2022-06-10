@@ -19,7 +19,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--num_to_process', default="1000", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
+    parser.add_argument('--num_to_process', default="50", type=str, help='this parameter decides which file to load, the files have name start/stop_gRNAs_of_{num_to_process}_genes.pickle', metavar='')
     config = parser.parse_args()
     return config
 
