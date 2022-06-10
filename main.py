@@ -118,6 +118,11 @@ def main():
                     if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
                         best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
                         best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
+
+                    #get HDR template
+                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info)
+
+
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
                 if best_stop_gRNA.empty == False:
                     if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
@@ -183,6 +188,43 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
+def get_HDR_template(df, ENST_info):
+    for index, row in df.iterrows():
+        ENST_ID = row["ID"]
+        Chr = row["chr"]
+        InsPos = row["Insert_pos"]
+        start = row["start"]
+        Strand = convert_strand(row["strand"])
+        CutPos = get_cut_pos(start,Strand)
+        print(f"chr {Chr} start {start} strand {Strand} CutPos {CutPos} InsPos {InsPos}")
+        get_HDR_arm(ENST_ID = ENST_ID, ENST_info = ENST_info, loc = [Chr,InsPos,Strand], half_len = 100)
+
+def convert_strand(strand):
+    #convert strand from +/- to 1/-1
+    if strand == "+":
+        return(1)
+    elif strand == "-":
+        return(-1)
+    else:
+        return(f"input strand:{strand} needs to be +/-")
+
+def get_HDR_arm(ENST_ID, ENST_info, loc, half_len):
+    """
+    input:  loc         [chr,pos,strand]  #start < end
+            half_len      length of the HDR arm (one sided)
+    """
+    Chr,Pos,Strand = loc
+    vanilla_left_arm = get_left_arm(Chr=Chr,Pos=Pos,Strand=Strand, half_len = half_len)
+    print(f"van left arm: {vanilla_left_arm}")
+
+def get_left_arm(Chr,Pos,Strand,half_len):
+    if Strand == 1 or Strand == "1" or Strand == "+":
+        left_arm = get_seq(chr = Chr, start = Pos-half_len, end = Pos, strand = Strand) #seq will be revcom-ed
+    else:
+        left_arm = get_seq(chr = Chr, start = Pos+1, end = Pos+1+half_len, strand = Strand)
+    return(left_arm)
+
+
 def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=50):
     """
     input
@@ -237,17 +279,16 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, alpha = 1):
     col_dist_weight = []
     col_pos_weight = []
     col_final_weight = []
+    Chrs = []
+    ENSTs = []
+    InsertPos = []
     #assign a score to each gRNA
     for index, row in gRNA_df.iterrows():
         start = row[2]
         end = row[3]
         strand = row[4]
         #Get cut to insert distance
-        cutPos = None
-        if strand == "+" or strand == "1" or strand == 1:
-            cutPos = start + 16
-        else:
-            cutPos = start - 17
+        cutPos = get_cut_pos(start,strand)
         cut2insDist = cutPos - insPos
 
         #calc. specificity_weight
@@ -264,21 +305,37 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, alpha = 1):
         position_weight = _position_weight(position_type)
         col_pos_weight.append(position_weight)
 
+        #add info to the df
+        Chrs.append(Chr)
+        ENSTs.append(ENST_ID)
+        InsertPos.append(insPos)
+
         log.debug(f"strand {strand} {start}-{end} cutPos {cutPos} insert_loc {loc} cut2insDist {cut2insDist} distance_weight {distance_weight:.2f} CFD_score {CSS} specificity_weight {specificity_weight} pos_type {position_type} position_weight {position_weight}")
 
         final_score = float(pow(specificity_weight,alpha)) * float(distance_weight) * float(position_weight)
         col_final_weight.append(final_score)
 
-    #add weight columns to the df
+    #add info and weight columns to the df
+    gRNA_df["chr"] = Chrs
+    gRNA_df["ID"] = ENSTs
+    gRNA_df["Insert_pos"] = InsertPos
     gRNA_df["spec_weight"] = col_spec_weight
     gRNA_df["dist_weight"] = col_dist_weight
     gRNA_df["pos_weight"] = col_pos_weight
     gRNA_df["final_weight"] = col_final_weight
 
+
     #rank gRNAs based on the score
     gRNA_df['final_pct_rank'] = gRNA_df['final_weight'].rank(pct=True)
 
     return gRNA_df
+
+def get_cut_pos(start,strand):
+    if strand == "+" or strand == "1" or strand == 1:
+        cutPos = start + 16
+    else:
+        cutPos = start - 16
+    return(cutPos)
 
 def _get_position_type(chr, ID, pos, loc2posType):
     """
@@ -442,9 +499,6 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index):
     #subset gRNA based on strand  !ATTN: start > end when strand is '-'
     df_gRNA_on_sense = df_gRNA[(df_gRNA['strand'] == '+')]
     df_gRNA_on_antisense = df_gRNA[(df_gRNA['strand'] == '-')]
-
-    #add the cut position
-
 
     #subset gRNAs and retain those cuts <[dist] to the loc
     df_gRNA_on_sense = df_gRNA_on_sense[(df_gRNA_on_sense['start'] > (pos-17-dist)) & (df_gRNA_on_sense['start'] < (pos-17+dist))]
