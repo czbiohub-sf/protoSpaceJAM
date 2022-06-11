@@ -197,7 +197,7 @@ def get_HDR_template(df, ENST_info):
         Strand = convert_strand(row["strand"])
         CutPos = get_cut_pos(start,Strand)
         print(f"chr {Chr} start {start} strand {Strand} CutPos {CutPos} InsPos {InsPos}")
-        get_HDR_arm(ENST_ID = ENST_ID, ENST_info = ENST_info, loc = [Chr,InsPos,Strand], half_len = 100)
+        get_HDR_arms(ENST_ID = ENST_ID, ENST_info = ENST_info, loc = [Chr,InsPos,Strand], half_len = 100)
 
 def convert_strand(strand):
     #convert strand from +/- to 1/-1
@@ -208,14 +208,19 @@ def convert_strand(strand):
     else:
         return(f"input strand:{strand} needs to be +/-")
 
-def get_HDR_arm(ENST_ID, ENST_info, loc, half_len):
+def get_HDR_arms(ENST_ID, ENST_info, loc, half_len):
     """
     input:  loc         [chr,pos,strand]  #start < end
             half_len      length of the HDR arm (one sided)
     """
     Chr,Pos,Strand = loc
+    #get left arm
     vanilla_left_arm = get_left_arm(Chr=Chr,Pos=Pos,Strand=Strand, half_len = half_len)
+    #get right arm
     print(f"van left arm: {vanilla_left_arm}")
+
+    #recoding mutations
+
 
 def get_left_arm(Chr,Pos,Strand,half_len):
     if Strand == 1 or Strand == "1" or Strand == "+":
