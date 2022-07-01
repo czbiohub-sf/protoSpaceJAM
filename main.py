@@ -15,6 +15,7 @@ import math
 import re
 import pickle
 from scripts.utils import *
+from scripts.hdr import *
 import traceback
 
 class MyParser(argparse.ArgumentParser):
@@ -60,6 +61,11 @@ def main():
         #load gene model info
         log.info("loading gene model info")
         ENST_info = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_info.pickle"))
+
+        #load codon phase info
+        log.info("loading codon phase info")
+        ENST_PhaseInCodon = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_codonPhase.pickle"))
+
 
         #report time used
         elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
@@ -120,14 +126,17 @@ def main():
                         best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info)
-
+                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon)
 
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
                 if best_stop_gRNA.empty == False:
                     if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
                         best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
                         best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
+
+                    #get HDR template
+                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon)
+
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1
             else:
@@ -145,9 +154,9 @@ def main():
             ################
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            # num_to_process = 200
-            # if protein_coding_transcripts_count >=num_to_process:
-            #     break
+            num_to_process = 200
+            if protein_coding_transcripts_count >=num_to_process:
+                break
 
         #write csv out
         endtime = datetime.datetime.now()
@@ -188,16 +197,70 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
-def get_HDR_template(df, ENST_info):
+def get_phase_in_codon(Chr,Pos,ENST_PhaseInCodon):
+    """
+    get the phase in codon for the current position and flanking 2 bp
+    returns a dictionary:
+    {0:[-1/-2/-3/1/2/3/0] 0 stands for not coding sequence (current position is not in a codon)
+    -1:[-1/-2/-3/1/2/3/0]
+    -2:[-1/-2/-3/1/2/3/0]
+    +1:[-1/-2/-3/1/2/3/0]
+    +2:[-1/-2/-3/1/2/3/0]}
+    """
+    mydict = {-2:0, -1:0, 0:0, 1:0, 2:0}
+    if Chr in ENST_PhaseInCodon.keys():
+        Chr_dict = ENST_PhaseInCodon[Chr]
+        if Pos in Chr_dict.keys():
+            mydict[0] = Chr_dict[Pos]
+        if Pos+1 in Chr_dict.keys():
+            mydict[+1] = Chr_dict[Pos+1]
+        if Pos+2 in Chr_dict.keys():
+            mydict[+2] = Chr_dict[Pos+2]
+        if Pos-1 in Chr_dict.keys():
+            mydict[-1] = Chr_dict[Pos-1]
+        if Pos-2 in Chr_dict.keys():
+            mydict[-2] = Chr_dict[Pos-2]
+    return mydict
+
+def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
+        ENST_strand = ENST_info[ENST_ID].features[0].strand
         Chr = row["chr"]
-        InsPos = row["Insert_pos"]
-        start = row["start"]
-        Strand = convert_strand(row["strand"])
-        CutPos = get_cut_pos(start,Strand)
-        print(f"chr {Chr} start {start} strand {Strand} CutPos {CutPos} InsPos {InsPos}")
-        get_HDR_arms(ENST_ID = ENST_ID, ENST_info = ENST_info, loc = [Chr,InsPos,Strand], half_len = 100)
+        InsPos = row["Insert_pos"] # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
+        gStart = row["start"]
+        gStrand = convert_strand(row["strand"]) #gRNA strand
+        CutPos = get_cut_pos(gStart,gStrand)
+
+        print(f"ENST: {ENST_ID} ENST_strand: {ENST_strand} chr {Chr} type {type}-tagging InsPos {InsPos} gStrand {gStrand} CutPos {CutPos} gStart {gStart} ")
+        #CutPos_phase = get_phase_in_codon(Chr=Chr, Pos=InsPos, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        #print(f"CutPos phase: {CutPos_phase}")
+
+
+
+        #get target_seq
+        #target_seq = get_target_seq(Chr= Chr, InsPos = InsPos, gRNAstrand = gStrand, CutPos = CutPos , type = type, ENST_ID = ENST_ID, ENST_info = ENST_info)
+
+        leftArm, rightArm, left_start, left_end, right_start, right_end = get_HDR_arms(loc = [Chr,InsPos,ENST_strand], half_len = 100, type = type)
+        print(f"{leftArm}\t{rightArm}\t{left_start}\t{left_end}\t{right_start}\t{right_end}")
+
+def get_target_seq(Chr, InsPos, gRNAstrand, CutPos, type, ENST_ID, ENST_info):
+    """
+    The target sequence is used to instantiate the HDR class (gdingle)
+    The target sequence should be in the direction of the gene. Reading from
+    left to right, it should have either a ATG or one of TAG, TGA, or TAA.
+    """
+    ATG_loc, stop_loc = get_start_stop_loc(ENST_ID, ENST_info)
+    if type == "start":
+        target_codon_loc = ATG_loc
+        target_codon_strand = ATG_loc[3]
+        if target_codon_strand == 1:
+            ATG_loc[2]
+    elif type == "stop":
+        target_codon_loc = stop_loc
+        target_codon_strand = stop_loc[3]
+    else:
+        sys.exit(f"unknown type: {type}")
 
 def convert_strand(strand):
     #convert strand from +/- to 1/-1
@@ -208,27 +271,45 @@ def convert_strand(strand):
     else:
         return(f"input strand:{strand} needs to be +/-")
 
-def get_HDR_arms(ENST_ID, ENST_info, loc, half_len):
+def get_HDR_arms(loc, half_len, type):
     """
-    input:  loc         [chr,pos,strand]  #start < end
+    input:  loc         [chr,pos,strand]  #start < end , strand is the coding strand
             half_len      length of the HDR arm (one sided)
+    return: HDR arms -> in coding strand <-
+            [5'arm, 3'arm]
     """
     Chr,Pos,Strand = loc
-    #get left arm
-    vanilla_left_arm = get_left_arm(Chr=Chr,Pos=Pos,Strand=Strand, half_len = half_len)
-    #get right arm
-    print(f"van left arm: {vanilla_left_arm}")
-
-    #recoding mutations
-
-
-def get_left_arm(Chr,Pos,Strand,half_len):
-    if Strand == 1 or Strand == "1" or Strand == "+":
-        left_arm = get_seq(chr = Chr, start = Pos-half_len, end = Pos, strand = Strand) #seq will be revcom-ed
+    #get arms
+    if type == "start":
+        if Strand == 1:
+            vanilla_left_arm = get_seq(chr = Chr, start = Pos-half_len+1, end = Pos+1, strand = 1)
+            vanilla_right_arm = get_seq(chr = Chr, start = Pos+1, end = Pos+half_len+1, strand = 1)
+            return([vanilla_left_arm,vanilla_right_arm, Pos-half_len+1,Pos,Pos+1,Pos+half_len])
+        elif Strand == -1:
+            vanilla_left_arm = get_seq(chr = Chr, start = Pos-half_len, end = Pos, strand = 1)
+            vanilla_right_arm = get_seq(chr = Chr, start = Pos, end = Pos+half_len, strand = 1)
+            return([reverse_complement(vanilla_right_arm),reverse_complement(vanilla_left_arm),Pos+half_len-1,Pos,Pos-1,Pos-half_len])
+        else:
+            sys.exit(f"unknown strand: {Strand}, acceptable values are -1 and 1")
+    elif type == "stop":
+        if Strand == 1:
+            vanilla_left_arm = get_seq(chr = Chr, start = Pos-half_len, end = Pos, strand = 1)
+            vanilla_right_arm = get_seq(chr = Chr, start = Pos, end = Pos+half_len, strand = 1)
+            return([vanilla_left_arm,vanilla_right_arm,Pos-half_len,Pos-1,Pos,Pos+half_len-1])
+        elif Strand == -1:
+            vanilla_left_arm = get_seq(chr = Chr, start = Pos-half_len+1, end = Pos+1, strand = 1)
+            vanilla_right_arm = get_seq(chr = Chr, start = Pos+1, end = Pos+half_len+1, strand = 1)
+            return([reverse_complement(vanilla_right_arm),reverse_complement(vanilla_left_arm),Pos+half_len,Pos+1,Pos,Pos-half_len+1])
     else:
-        left_arm = get_seq(chr = Chr, start = Pos+1, end = Pos+1+half_len, strand = Strand)
-    return(left_arm)
+        sys.exit("unknown type {type}, acceptable values: start, stop")
 
+    #rev_com ajustment
+    if Strand == 1:
+        return([vanilla_left_arm,vanilla_right_arm])
+    elif Strand == -1:
+        return([reverse_complement(vanilla_right_arm),reverse_complement(vanilla_left_arm)])
+    else:
+        sys.exit(f"unknown strand: {Strand}, acceptable values are -1 and 1")
 
 def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=50):
     """
@@ -243,6 +324,8 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=5
     """
     # get location of start and stop location
     ATG_loc, stop_loc = get_start_stop_loc(ENST_ID, ENST_info)
+
+
 
     ##################################
     # get gRNAs around the start codon#
@@ -336,6 +419,10 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, alpha = 1):
     return gRNA_df
 
 def get_cut_pos(start,strand):
+    """
+    start:gRNA start
+    strand:gRNA strand
+    """
     if strand == "+" or strand == "1" or strand == 1:
         cutPos = start + 16
     else:
@@ -557,8 +644,8 @@ def update_dict_count(key,dict): # update the dictionary that keeps the count of
 def get_seq(chr,start,end,strand):
     '''
     chr
-    start
-    end
+    start (1-indexed)
+    end (the end position is not included
     strand 1 or -1 (str)
     '''
     chr_file_path = os.path.join("genome_files",f"{config['genome_ver']}_byChr",f"{chr}.pk")
@@ -566,7 +653,7 @@ def get_seq(chr,start,end,strand):
     if os.path.isfile(chr_file_path):
         #read file
         chr_seqrecord = read_pickle_files(chr_file_path)
-        subseq = chr_seqrecord.seq._data.decode()[(start-1):end]
+        subseq = chr_seqrecord.seq._data.decode()[(start-1):(end-1)] # use -1 to convert 1-index to 0-index
         if strand == "-1" or strand == -1:
             return(reverse_complement(subseq))
         else:

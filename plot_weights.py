@@ -53,7 +53,7 @@ def main():
         stop_failed = read_pickle_files(os.path.join(f"pickles/stop_failed_IDs_of_{num_to_process}_genes.pickle"))
 
         #prepare df to plot
-        df2plot = best_start_gRNA_df
+        df2plot = best_stop_gRNA_df
         df2plot = subset_df(df = df2plot, col ="final_weight", max =1, min=0)
 
         #plot params

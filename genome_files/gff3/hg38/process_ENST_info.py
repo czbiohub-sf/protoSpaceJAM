@@ -17,6 +17,8 @@ from Bio.SeqFeature import SeqFeature
 from Bio.SeqFeature import FeatureLocation
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+import itertools
+import traceback
 
 #################
 #custom logging #
@@ -113,6 +115,7 @@ def main():
         ENST_exon_dict = dict()  # a dict of dicts
         ENST_exon_dict2 = dict() # a dict of req records
         ENST_CDS_dict = dict()
+        ENST_codons_dict = dict()
         loc2exonID_dict = dict() # the same location may have different ENSE IDs, and need ENST to distinguish
         loc2posType = dict() # a dict that maps location to position types (e.g. 5UTR, exon intron, junction, 3UTR)
 
@@ -132,6 +135,7 @@ def main():
         line_count = 0
 
         #go through gff3 file, store all ENST IDs
+        print("processing ENST IDs")
         with gzip.open(file, "rt") as fh:
             for line in fh:
                 fields = line.rstrip().split("\t")
@@ -157,7 +161,8 @@ def main():
                         ENST_info[ENST_id] = SeqRecord("", id=ENST_id, description="|".join(description), name = name)
                         line_count +=1
 
-        #go through gff3 file, sand store all exons in ENST_exon_dict
+        #go through gff3 file, and store all exons in ENST_exon_dict
+        print("processing exons")
         with gzip.open(file, "rt") as fh:
             parent_ENST_id = ""
             for line in fh:
@@ -183,6 +188,7 @@ def main():
                         ENST_info[parent_ENST_id].features.append(SeqFeature(location=FeatureLocation(exon_start,exon_end,strand=exon_strand, ref=chr),type=type, id=exon_id))
 
         # parse GFF3 again, extracting CDS info, and referencing exon info
+        print("processing cds")
         with gzip.open(file, "rt") as fh:
             parent_ENST_id = ""
             for line in fh:
@@ -222,7 +228,69 @@ def main():
         with open('ENST_info.pickle', 'wb') as handle:
             pickle.dump(ENST_info, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+
+        #parse codons and assign phase to each (coding) chr position
+        print("parsing codons")
+        with open("debug.txt","w") as wfh:
+            for ENST_ID in ENST_info.keys():
+                my_transcript = ENST_info[ENST_ID]
+                transcript_type = my_transcript.description.split("|")[1]
+                if transcript_type == "protein_coding":
+
+                    # constructing the list of cds
+                    cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
+                    CDS_first = cdsList[0]
+                    CDS_last = cdsList[len(cdsList) - 1]
+                    #
+                    strand = CDS_first.strand
+                    Chr = CDS_first.location.ref
+                    if not Chr in ENST_codons_dict.keys():
+                        ENST_codons_dict[Chr] = dict()
+                    #parse codons
+                    if strand == 1:
+                        start_phase=1
+                        count=1
+                        for cds in cdsList:
+                            start= cds.location.start + 0
+                            end= cds.location.end + 0
+                            codon_assignment,end_phase = assign_codon_position(start=start, end=end, start_phase=start_phase)
+                            start_phase = end_phase + 1
+                            if start_phase == 4:
+                                start_phase = 1
+                            for key,val in codon_assignment.items():
+                                ENST_codons_dict[Chr][key] = val
+                            if count==1: #debug
+                                wfh.write(f"{ENST_ID} +1\nstrand first cds:{codon_assignment}\n")
+                            if count==len(cdsList):
+                                wfh.write(f"last cds:{codon_assignment}\n")
+                            count+=1
+
+                    else: #-1 strand
+                        start_phase=-1
+                        count=1
+                        for cds in reversed(cdsList):
+                            start= cds.location.start + 0
+                            end= cds.location.end + 0
+                            codon_assignment, end_phase = assign_codon_position(start=end, end=start , start_phase=start_phase) # start needs to be the coordinate of the first nt in the first codon
+                            start_phase = end_phase - 1
+                            if start_phase == -4:
+                                start_phase = -1
+                            for key,val in codon_assignment.items():
+                                ENST_codons_dict[Chr][key] = val
+                            if count==1: #debug
+                                wfh.write(f"{ENST_ID} -1 strand\nfirst cds:{codon_assignment}\n")
+                            if count==len(cdsList):
+                                wfh.write(f"last cds:{codon_assignment}\n")
+                            count+=1
+
+        # write dict to file
+        with open('ENST_codonPhase.pickle', 'wb') as handle:
+            pickle.dump(ENST_codons_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+
         #populate loc2posType dict
+        print("parsing location types(e.g. exon/intron junctions")
         for ENST_ID in ENST_info.keys():
             UTR5p, UTR3p = get_UTR_loc(ENST_ID,ENST_info) #get UTR loc
             cds_loc = get_cds_loc(ENST_ID,ENST_info) #get cds loc
@@ -290,12 +358,47 @@ def main():
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
+        traceback.print_exc()
         print("additional information:", e)
         PrintException()
 
 ##########################
 ## function definitions ##
 ##########################
+
+def assign_codon_position(start, end, start_phase):
+    """
+    phase = 1 , 2 or 3
+    >>>assign_codon_position(1,10,1)
+    ({1: 1, 2: 2, 3: 3, 4: 1, 5: 2, 6: 3, 7: 1, 8: 2, 9: 3, 10: 1}, 1)
+    >>>assign_codon_position(1,10,2)
+    ({1: 2, 2: 3, 3: 1, 4: 2, 5: 3, 6: 1, 7: 2, 8: 3, 9: 1, 10: 2}, 2)
+    >>>assign_codon_position(1,10,3)
+    ({1: 3, 2: 1, 3: 2, 4: 3, 5: 1, 6: 2, 7: 3, 8: 1, 9: 2, 10: 3}, 3)
+     phase = -1 , -2 or -3
+    >>>assign_codon_position(10,1,-1)
+    ({10: -1, 9: -2, 8: -3, 7: -1, 6: -2, 5: -3, 4: -1, 3: -2, 2: -3, 1: -1}, -1)
+    >>>assign_codon_position(10,1,-2)
+    ({10: -2, 9: -3, 8: -1, 7: -2, 6: -3, 5: -1, 4: -2, 3: -3, 2: -1, 1: -2}, -2)
+    >>>assign_codon_position(10,1,-3)
+    ({10: -3, 9: -1, 8: -2, 7: -3, 6: -1, 5: -2, 4: -3, 3: -1, 2: -2, 1: -3}, -3)
+    """
+    if start<=end and start_phase>0: # positive strand
+        length = end-start + 1
+        codon_pos = list(itertools.islice(itertools.cycle([1,2,3]), start_phase-1, length+start_phase-1))
+        mydict = dict(zip(list(range(start,end+1)), codon_pos))
+        end_phase=codon_pos[-1]
+        return mydict, end_phase
+    elif start>=end and start_phase<0: #negative strand
+        length = start-end + 1
+        codon_pos = list(itertools.islice(itertools.cycle([-1,-2,-3]), (0-start_phase)-1, length+(0-start_phase)-1))
+        mydict = dict(zip(list(range(start,end-1,-1)), codon_pos))
+        end_phase=codon_pos[-1]
+        return mydict, end_phase
+    else:
+        sys.exit("ERROR in assign_codon_position(start, end, start_phase), if start_phase>0, start must < end, vice versa")
+
+
 
 def update_dictOfDict(mydict, key, key2, key3, value):
     """
