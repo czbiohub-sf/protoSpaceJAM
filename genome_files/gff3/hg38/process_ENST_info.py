@@ -258,7 +258,9 @@ def main():
                             if start_phase == 4:
                                 start_phase = 1
                             for key,val in codon_assignment.items():
-                                ENST_codons_dict[Chr][key] = val
+                                if not key in ENST_codons_dict[Chr].keys():
+                                    ENST_codons_dict[Chr][key] = dict()
+                                ENST_codons_dict[Chr][key][ENST_ID] = val
                             if count==1: #debug
                                 wfh.write(f"{ENST_ID} +1\nstrand first cds:{codon_assignment}\n")
                             if count==len(cdsList):
@@ -276,7 +278,9 @@ def main():
                             if start_phase == -4:
                                 start_phase = -1
                             for key,val in codon_assignment.items():
-                                ENST_codons_dict[Chr][key] = val
+                                if not key in ENST_codons_dict[Chr].keys():
+                                    ENST_codons_dict[Chr][key] = dict()
+                                ENST_codons_dict[Chr][key][ENST_ID] = val
                             if count==1: #debug
                                 wfh.write(f"{ENST_ID} -1 strand\nfirst cds:{codon_assignment}\n")
                             if count==len(cdsList):

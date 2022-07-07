@@ -40,6 +40,9 @@ log.propagate = False
 log.setLevel(logging.INFO) #set the level of warning displayed
 #log.setLevel(logging.DEBUG) #set the level of warning displayed
 
+max_cut2ins_dist = 50
+HDR_arm_len = 100
+
 config = vars(parse_args())
 
 #####################
@@ -94,6 +97,11 @@ def main():
         start_failed = []
         stop_failed = []
 
+        #list to store IDs whose gRNA is outside of the HDR window
+        gRNA_out_of_arms = dict()
+        gRNA_out_of_arms["start"]=dict()
+        gRNA_out_of_arms["stop"]=dict()
+
         #loop through each ENST
         transcript_count = 0
         protein_coding_transcripts_count = 0
@@ -106,9 +114,8 @@ def main():
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
             if transcript_type == "protein_coding":
-                log.info(f"processing {ENST_ID}")
-                log.info(f"transcript type: {transcript_type}")
-                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = 50)
+                log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
+                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist)
                 if ranked_df_gRNAs_ATG.empty == False:
                     df_start_gRNAs = pd.concat([df_start_gRNAs,ranked_df_gRNAs_ATG])
                 else:
@@ -148,15 +155,17 @@ def main():
                 elapsed_sec = endtime - starttime
                 elapsed_min = elapsed_sec.seconds / 60
                 log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts, elapsed time {elapsed_min:.2f} min ({elapsed_sec} sec)")
+                gnum = len(gRNA_out_of_arms["start"]) + len(gRNA_out_of_arms["stop"])
+                log.info(f"number of gRNAs outside the HDR arm: {gnum}")
 
             ################
             #early stopping#
             ################
             #if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 200
-            if protein_coding_transcripts_count >=num_to_process:
-                break
+            # num_to_process = 18000
+            # if protein_coding_transcripts_count >=num_to_process:
+            #     break
 
         #write csv out
         endtime = datetime.datetime.now()
@@ -186,6 +195,10 @@ def main():
         with open(f"pickles/stop_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(stop_failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+        # write ENSTs (whose gRNA is outside of the default HDR arm) to file
+        with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(gRNA_out_of_arms, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 
     except Exception as e:
@@ -197,7 +210,7 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
-def get_phase_in_codon(Chr,Pos,ENST_PhaseInCodon):
+def get_phase_in_codon(Chr,Pos,ENST_ID, ENST_PhaseInCodon):
     """
     get the phase in codon for the current position and flanking 2 bp
     returns a dictionary:
@@ -211,16 +224,46 @@ def get_phase_in_codon(Chr,Pos,ENST_PhaseInCodon):
     if Chr in ENST_PhaseInCodon.keys():
         Chr_dict = ENST_PhaseInCodon[Chr]
         if Pos in Chr_dict.keys():
-            mydict[0] = Chr_dict[Pos]
+            if ENST_ID in Chr_dict[Pos].keys():
+                mydict[0] = Chr_dict[Pos][ENST_ID]
         if Pos+1 in Chr_dict.keys():
-            mydict[+1] = Chr_dict[Pos+1]
+            if ENST_ID in Chr_dict[Pos+1].keys():
+                mydict[+1] = Chr_dict[Pos+1][ENST_ID]
         if Pos+2 in Chr_dict.keys():
-            mydict[+2] = Chr_dict[Pos+2]
+            if ENST_ID in Chr_dict[Pos+2].keys():
+                mydict[+2] = Chr_dict[Pos+2][ENST_ID]
         if Pos-1 in Chr_dict.keys():
-            mydict[-1] = Chr_dict[Pos-1]
+            if ENST_ID in Chr_dict[Pos-1].keys():
+                mydict[-1] = Chr_dict[Pos-1][ENST_ID]
         if Pos-2 in Chr_dict.keys():
-            mydict[-2] = Chr_dict[Pos-2]
+            if ENST_ID in Chr_dict[Pos-2].keys():
+                mydict[-2] = Chr_dict[Pos-2][ENST_ID]
     return mydict
+
+def get_phase_in_codon0(Chr,Pos,ENST_ID, ENST_PhaseInCodon):
+    """
+    get the phase in codon for the current position and flanking 2 bp
+    returns an int:
+    -1/-2/-3/1/2/3/0 0 stands for not coding sequence (current position is not in a codon)
+    """
+    myInt = 0
+    if Chr in ENST_PhaseInCodon.keys():
+        Chr_dict = ENST_PhaseInCodon[Chr]
+        if Pos in Chr_dict.keys():
+            if ENST_ID in Chr_dict[Pos].keys():
+                myInt = Chr_dict[Pos][ENST_ID]
+    return myInt
+
+def get_range(start,end): #TODO phase should be ENST specific
+    """
+    return a list of number, start to end, step size = 1, -1 (if start > end)
+    """
+    if start<=end:
+        return list(range(start,end+1,1))
+    else:
+        return list(range(start,end-1,-1))
+
+
 
 def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon):
     for index, row in df.iterrows():
@@ -232,35 +275,58 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon):
         gStrand = convert_strand(row["strand"]) #gRNA strand
         CutPos = get_cut_pos(gStart,gStrand)
 
-        print(f"ENST: {ENST_ID} ENST_strand: {ENST_strand} chr {Chr} type {type}-tagging InsPos {InsPos} gStrand {gStrand} CutPos {CutPos} gStart {gStart} ")
+        ##########################
+        # important debug info
+        # print(f"ENST: {ENST_ID} ENST_strand: {ENST_strand} chr {Chr} type {type}-tagging InsPos {InsPos} gStrand {gStrand} CutPos {CutPos} gStart {gStart} ")
+        ##########################
         #CutPos_phase = get_phase_in_codon(Chr=Chr, Pos=InsPos, ENST_PhaseInCodon=ENST_PhaseInCodon)
         #print(f"CutPos phase: {CutPos_phase}")
-
-
 
         #get target_seq
         #target_seq = get_target_seq(Chr= Chr, InsPos = InsPos, gRNAstrand = gStrand, CutPos = CutPos , type = type, ENST_ID = ENST_ID, ENST_info = ENST_info)
 
-        leftArm, rightArm, left_start, left_end, right_start, right_end = get_HDR_arms(loc = [Chr,InsPos,ENST_strand], half_len = 100, type = type)
-        print(f"{leftArm}\t{rightArm}\t{left_start}\t{left_end}\t{right_start}\t{right_end}")
+        leftArm, rightArm, left_start, left_end, right_start, right_end = get_HDR_arms(loc = [Chr,InsPos,ENST_strand], half_len = HDR_arm_len, type = type) # start>end is possible
+        left_start_phase = get_phase_in_codon(Chr=Chr, Pos=left_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        left_end_phase = get_phase_in_codon(Chr=Chr, Pos=left_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        right_start_phase = get_phase_in_codon(Chr=Chr, Pos=right_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        right_end_phase = get_phase_in_codon(Chr=Chr, Pos=right_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        # print(f"{leftArm}\t"
+        #       f"{left_start}({left_start_phase})\t"
+        #       f"{left_end}({left_end_phase})\t"
+        #       f"{rightArm}\t"
+        #       f"{right_start}({right_start_phase})\t"
+        #       f"{right_end}({right_end_phase})")
 
-def get_target_seq(Chr, InsPos, gRNAstrand, CutPos, type, ENST_ID, ENST_info):
-    """
-    The target sequence is used to instantiate the HDR class (gdingle)
-    The target sequence should be in the direction of the gene. Reading from
-    left to right, it should have either a ATG or one of TAG, TGA, or TAA.
-    """
-    ATG_loc, stop_loc = get_start_stop_loc(ENST_ID, ENST_info)
-    if type == "start":
-        target_codon_loc = ATG_loc
-        target_codon_strand = ATG_loc[3]
-        if target_codon_strand == 1:
-            ATG_loc[2]
-    elif type == "stop":
-        target_codon_loc = stop_loc
-        target_codon_strand = stop_loc[3]
-    else:
-        sys.exit(f"unknown type: {type}")
+        left_Arm_Phases = [get_phase_in_codon0(Chr=Chr, Pos=i,ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon) for i in get_range(left_start,left_end)]
+        right_Arm_Phases = [get_phase_in_codon0(Chr=Chr, Pos=i,ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon) for i in get_range(right_start,right_end)]
+
+        myflank = HDR_flank(left_flk_seq = leftArm , right_flk_seq = rightArm,
+                            left_flk_coord_lst = [left_start, left_end], right_flk_coord_lst = [right_start, right_end],
+                            left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
+                            type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, gStart= gStart, gStrand= gStrand)
+
+        #log IDs whose gRNA is not in the default-size HDR arms
+        if myflank.entire_gRNA_in_HDR_arms == False:
+            gRNA_out_of_arms[type][ENST_ID] = False
+
+
+# def get_target_seq(Chr, InsPos, gRNAstrand, CutPos, type, ENST_ID, ENST_info):
+#     """
+#     The target sequence is used to instantiate the HDR class (gdingle)
+#     The target sequence should be in the direction of the gene. Reading from
+#     left to right, it should have either a ATG or one of TAG, TGA, or TAA.
+#     """
+#     ATG_loc, stop_loc = get_start_stop_loc(ENST_ID, ENST_info)
+#     if type == "start":
+#         target_codon_loc = ATG_loc
+#         target_codon_strand = ATG_loc[3]
+#         if target_codon_strand == 1:
+#             ATG_loc[2]
+#     elif type == "stop":
+#         target_codon_loc = stop_loc
+#         target_codon_strand = stop_loc[3]
+#     else:
+#         sys.exit(f"unknown type: {type}")
 
 def convert_strand(strand):
     #convert strand from +/- to 1/-1
@@ -318,6 +384,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, dist=5
         ENST_info: gene model info loaded from pickle file
         loc2file_index: mapping of location to the file part that stores gRNAs in that region
         loc2posType: mapping of location to location type (e.g. 5UTR etc)
+        dist: max cut to insert distance (default 50)
     return:
         a dictionary of guide RNAs which cuts <[dist] to end of start codon
         a dictionary of guide RNAs which cuts <[dist] to start of stop codon
@@ -564,7 +631,7 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index):
     """
     input
         loc: [chr,pos,strand]
-        dist: distance
+        dist: max cut to loc distance
     return:
         a dataframe of guide RNAs which cuts <[dist] to the loc, the columns are "seq","pam","start","end", "strand", "CSS", "ES"
     """

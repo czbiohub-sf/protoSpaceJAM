@@ -5,6 +5,7 @@ Transformations of genome sequences for HDR.
 import functools
 import itertools
 import logging
+from typing import List
 
 from typing import Iterator
 
@@ -16,7 +17,99 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+#by DP
+class HDR_flank:
 
+    def __init__(
+            self,
+            left_flk_seq: str,
+            right_flk_seq: str,
+            left_flk_coord_lst: List[int],
+            right_flk_coord_lst: List[int],
+            left_flk_phases: List[int],
+            right_flk_phases: List[int],
+            type:str,
+            ENST_ID: str,
+            ENST_strand : int,
+            gStart : int,
+            gStrand : int) -> None:
+
+        self.left_flk_seq = left_flk_seq
+        self.right_flk_seq = right_flk_seq
+        self.ENST_ID = ENST_ID
+        self.ENST_strand = ENST_strand
+        self.gStrand = gStrand
+        self.gStart = gStart
+
+        assert len(left_flk_coord_lst) > 1
+        self.left_flk_coord_lst = left_flk_coord_lst
+
+        assert len(right_flk_coord_lst) > 1
+        self.right_flk_coord_lst = right_flk_coord_lst
+
+        assert type in ('start', 'stop')
+        self.type = type
+
+        assert len(left_flk_phases) > 1
+        self.left_flk_phases = left_flk_phases
+
+        assert len(right_flk_phases) > 1
+        self.right_flk_phases = right_flk_phases
+
+        #TODO: extend the flank to include the gRNA (if not already)
+        ATG_at_end_of_exon = False
+        self.cutPos, self.gPAM_end = self.get_gRNA_pos(self.gStart, self.gStrand)
+        #check if the whole 23nt gRNA is in the HDR flank
+        self.entire_gRNA_in_HDR_arms, self.gStart_in_HDR_arms, self.gPAM_end_in_HDR_arms = self.check_gRNA_in_HDR_arms(gStart=self.gStart, gPAM_end=self.gPAM_end, left_flk_coord_lst=self.left_flk_coord_lst, right_flk_coord_lst=self.right_flk_coord_lst)
+
+
+
+        #TODO: check if ATG is at the end of exon
+
+        #print for debug purposes
+        # print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\tgRNA start-end: {self.gStart}-{self.gPAM_end}\tstrand: {self.gStrand}")
+        # print(f"HDR flank:\nLeft:  {self.left_flk_seq}\t"
+        #       f"{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}\t"
+        #       f"Phases: {self.join_int_list(self.left_flk_phases)}\n"
+        #       f"Right: {self.right_flk_seq}\t"
+        #       f"{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\t"
+        #       f"Phases: {self.join_int_list(self.right_flk_phases)}")
+        # print(f"gRNA-in-arms: {self.entire_gRNA_in_HDR_arms}\n(gStart-in-arms: {self.gStart_in_HDR_arms}, gPAM-in-arms: {self.gPAM_end_in_HDR_arms})")
+
+    def join_int_list(self, mylist):
+        return ''.join([str(i) for i in mylist])
+
+    def check_gRNA_in_HDR_arms(self, gStart, gPAM_end, left_flk_coord_lst, right_flk_coord_lst):
+        """
+        return a list of three bools: [entire_gRNA_in_HDR_arms, gStart_in_HDR_arms, gPAM_end_in_HDR_arms]
+        """
+        entire_gRNA_in_HDR_arms = False
+        max_arm_pos = max(left_flk_coord_lst + right_flk_coord_lst)
+        min_arm_pos = min(left_flk_coord_lst + right_flk_coord_lst)
+        gStart_in_HDR_arms = min_arm_pos <= gStart <= max_arm_pos
+        gPAM_end_in_HDR_arms = min_arm_pos <= gPAM_end <= max_arm_pos
+
+        if gStart_in_HDR_arms and gPAM_end_in_HDR_arms:
+            entire_gRNA_in_HDR_arms = True
+        #elif not gPAM_end_in_HDR_arms:
+        return([entire_gRNA_in_HDR_arms, gStart_in_HDR_arms, gPAM_end_in_HDR_arms])
+
+    def get_gRNA_pos(self, start, strand):
+        """
+        start:gRNA start
+        strand:gRNA strand
+        return [cutPos,PAM_endPos]
+        """
+        if strand == "+" or strand == "1" or strand == 1:
+            cutPos = start + 16
+            gPAM_end = start + 22
+        else:
+            cutPos = start - 16
+            gPAM_end = start - 22
+        return([cutPos,gPAM_end])
+
+
+#taken from CRISPYcrunch
 class MutatedSeq(str):
 
     # For mypy
