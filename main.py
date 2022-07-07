@@ -69,10 +69,13 @@ def main():
         log.info("loading codon phase info")
         ENST_PhaseInCodon = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_codonPhase.pickle"))
 
-
         #report time used
         elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
         log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
+
+        #report the number of ENSTs which has ATG at the end of the exon
+        ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
+
 
         #load ENST list (the user input list or the whole transcriptome)
         if os.path.isfile(config['path2csv']):
@@ -263,8 +266,6 @@ def get_range(start,end): #TODO phase should be ENST specific
     else:
         return list(range(start,end-1,-1))
 
-
-
 def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
@@ -308,7 +309,6 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon):
         #log IDs whose gRNA is not in the default-size HDR arms
         if myflank.entire_gRNA_in_HDR_arms == False:
             gRNA_out_of_arms[type][ENST_ID] = False
-
 
 # def get_target_seq(Chr, InsPos, gRNAstrand, CutPos, type, ENST_ID, ENST_info):
 #     """
@@ -605,15 +605,17 @@ def get_start_stop_loc(ENST_ID,ENST_info):
     """
     Get the chromosomal location of start and stop codons
     input: ENST_ID, ENST_info
-    output: a list of two items
+    output: a list of three items
             ATG_loc: [chr,start,end,strand]  #start < end
             stop_loc: [chr,start,end,strand] #start < end
+            Exon_end_ATG: Bool
     """
     my_transcript = ENST_info[ENST_ID]  # get the seq record
     # constructing the list of cds
     cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
     CDS_first = cdsList[0]
     CDS_last = cdsList[len(cdsList) - 1]
+    Exon_end_ATG = False #initialize
     #get start codon location
     if CDS_first.strand==1:
         ATG_loc = [CDS_first.location.ref, CDS_first.location.start+0,CDS_first.location.start+2, 1] # format [start, end, strand]
@@ -625,7 +627,7 @@ def get_start_stop_loc(ENST_ID,ENST_info):
     else:
         ATG_loc = [CDS_last.location.ref, CDS_last.location.end-2,CDS_last.location.end+0, -1]
 
-    return([ATG_loc, stop_loc])
+    return([ATG_loc, stop_loc,Exon_end_ATG])
 
 def get_gRNAs_near_loc(loc,dist, loc2file_index):
     """
@@ -743,6 +745,30 @@ def read_pickle_files(file):
         return mydict
     else:
         sys.exit(f"Cannot open file: {file}")
+
+def count_ATG_at_exonEnd(ENST_info):
+    """
+    return a list of two items:
+        count of number of ENST_IDs with ATG at the end of the exon
+        list of such ENST_ID
+    """
+    count = 0
+    list = []
+    for ENST_ID in ENST_info.keys():
+        my_transcript = ENST_info[ENST_ID]  # get the seq record
+        transcript_type = my_transcript.description.split("|")[1]
+        if transcript_type == "protein_coding": #only look at protein-coding transcripts
+            # constructing the list of cds
+            cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
+            if len(cdsList)>=1: #has more than 1 cds
+                CDS_first = cdsList[0]
+                cds_len = abs(CDS_first.location.start - CDS_first.location.end) + 1 # for ATG to be the end of the exon, the first exon length is 3bp
+                if cds_len==3:
+                    count+=1
+                    list.append(ENST_ID)
+    return([count,list])
+
+
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()

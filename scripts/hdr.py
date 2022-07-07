@@ -56,15 +56,14 @@ class HDR_flank:
         assert len(right_flk_phases) > 1
         self.right_flk_phases = right_flk_phases
 
-        #TODO: extend the flank to include the gRNA (if not already)
+        #TODO: extend the flank to include the gRNA (de-prioritized b/c with 100bp arm and 50bp max-cut-to-insert-distance, gRNA will never be outside the HDR arm)
         ATG_at_end_of_exon = False
         self.cutPos, self.gPAM_end = self.get_gRNA_pos(self.gStart, self.gStrand)
         #check if the whole 23nt gRNA is in the HDR flank
         self.entire_gRNA_in_HDR_arms, self.gStart_in_HDR_arms, self.gPAM_end_in_HDR_arms = self.check_gRNA_in_HDR_arms(gStart=self.gStart, gPAM_end=self.gPAM_end, left_flk_coord_lst=self.left_flk_coord_lst, right_flk_coord_lst=self.right_flk_coord_lst)
 
-
-
         #TODO: check if ATG is at the end of exon
+
 
         #print for debug purposes
         # print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\tgRNA start-end: {self.gStart}-{self.gPAM_end}\tstrand: {self.gStrand}")
