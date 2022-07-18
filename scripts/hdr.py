@@ -32,7 +32,10 @@ class HDR_flank:
             ENST_ID: str,
             ENST_strand : int,
             gStart : int,
-            gStrand : int) -> None:
+            gStrand : int,
+            InsPos:int,
+            CutPos:int,
+            Cut2Ins_dist:int) -> None:
 
         self.left_flk_seq = left_flk_seq
         self.right_flk_seq = right_flk_seq
@@ -40,6 +43,9 @@ class HDR_flank:
         self.ENST_strand = ENST_strand
         self.gStrand = gStrand
         self.gStart = gStart
+        self.InsPos = InsPos
+        self.CutPos = CutPos
+        self.Cut2Ins_dist = Cut2Ins_dist
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -64,19 +70,81 @@ class HDR_flank:
 
         #TODO: check if ATG is at the end of exon
 
+        #make gRNA lowercase
+        gRNA_lc_Larm, gRNA_lc_Rarm = self.make_gRNA_lowercase()
 
         #print for debug purposes
-        # print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\tgRNA start-end: {self.gStart}-{self.gPAM_end}\tstrand: {self.gStrand}")
+        print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
         # print(f"HDR flank:\nLeft:  {self.left_flk_seq}\t"
         #       f"{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}\t"
         #       f"Phases: {self.join_int_list(self.left_flk_phases)}\n"
         #       f"Right: {self.right_flk_seq}\t"
         #       f"{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\t"
         #       f"Phases: {self.join_int_list(self.right_flk_phases)}")
-        # print(f"gRNA-in-arms: {self.entire_gRNA_in_HDR_arms}\n(gStart-in-arms: {self.gStart_in_HDR_arms}, gPAM-in-arms: {self.gPAM_end_in_HDR_arms})")
+        print(f"left | right arms: {gRNA_lc_Larm}|{gRNA_lc_Rarm}\n"
+              f"           Phases: {self.join_int_list(self.left_flk_phases)}|{self.join_int_list(self.right_flk_phases)}\n"
+              f"      Coordinates:\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
+
+
+        #print(f"gRNA-in-arms: {self.entire_gRNA_in_HDR_arms}\n(gStart-in-arms: {self.gStart_in_HDR_arms}, gPAM-in-arms: {self.gPAM_end_in_HDR_arms})")
+
+    #TODO: gRNA view
+
+    def to_0_index(self, start, end, strand, seq=""):
+        if (start<end and strand==-1) or (start>end and strand==1):
+            sys.exit("start<end while strand==-1 or start>end while strand==1")
+        if start<end:
+            newStart = start - start
+            newEnd = end - start
+            return(seq,newStart,newEnd)
+        else:
+            seq = seq[::-1]
+            newStart=end - end
+            newEnd=start - end
+            return(seq,newStart,newEnd)
+
+    def make_gRNA_lowercase(self):
+        #convert into 0-index
+        Lstart = self.left_flk_coord_lst[0]
+        Rend = self.right_flk_coord_lst[1]
+        if (Lstart<Rend and self.ENST_strand==-1) or (Lstart>Rend and self.ENST_strand==1):
+            sys.exit("start<end while strand==-1 or start>end while strand==1")
+
+        if Lstart<Rend:
+            newLstart = Lstart - Lstart
+            newRend = Rend -Lstart
+            newgRNAstart = min([self.gStart - Lstart , self.gPAM_end - Lstart])
+            newgRNAend = max([self.gStart - Lstart , self.gPAM_end - Lstart])
+            newLarm = self.left_flk_seq
+            newRarm = self.right_flk_seq
+            whole_arm = newLarm + newRarm
+        else:
+            newLstart = Rend - Rend
+            newRend = Lstart - Rend
+            newgRNAstart = min(self.gPAM_end - Rend, self.gStart - Rend)
+            newgRNAend = max(self.gPAM_end - Rend, self.gStart - Rend)
+            newLarm = self.left_flk_seq[::-1]
+            newRarm = self.right_flk_seq[::-1]
+            whole_arm = newRarm + newLarm
+        #get the gRNA
+        gRNA_seq = whole_arm[newgRNAstart:newgRNAend+1]
+        #make gRNA lowercase
+        newWhole_arm = whole_arm[0:newgRNAstart].upper() + gRNA_seq.lower() + whole_arm[newgRNAend+1:].upper()
+        if Lstart>Rend:
+            newWhole_arm = newWhole_arm[::-1] #reverse
+        newLarm = newWhole_arm[0:int((newRend+1)/2)]
+        newRarm = newWhole_arm[int((newRend+1)/2):]
+        #print for debug
+        #print(f"left | right arms: {newLarm}|{newRarm}\n")
+        return([newLarm, newRarm])
+
+
+    #TODO: saturating mutation
+
+    #TODO: check the gRNA CFD scores
 
     def join_int_list(self, mylist):
-        return ''.join([str(i) for i in mylist])
+        return ''.join([str(abs(i)) for i in mylist])
 
     def check_gRNA_in_HDR_arms(self, gStart, gPAM_end, left_flk_coord_lst, right_flk_coord_lst):
         """
