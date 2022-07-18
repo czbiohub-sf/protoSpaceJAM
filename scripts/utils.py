@@ -153,10 +153,10 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
         #target_seq = get_target_seq(Chr= Chr, InsPos = InsPos, gRNAstrand = gStrand, CutPos = CutPos , type = type, ENST_ID = ENST_ID, ENST_info = ENST_info)
 
         leftArm, rightArm, left_start, left_end, right_start, right_end = get_HDR_arms(loc = [Chr,InsPos,ENST_strand], half_len = HDR_arm_len, type = type,genome_ver=genome_ver) # start>end is possible
-        left_start_phase = get_phase_in_codon(Chr=Chr, Pos=left_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        left_end_phase = get_phase_in_codon(Chr=Chr, Pos=left_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        right_start_phase = get_phase_in_codon(Chr=Chr, Pos=right_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        right_end_phase = get_phase_in_codon(Chr=Chr, Pos=right_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        # left_start_phase = get_phase_in_codon(Chr=Chr, Pos=left_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        # left_end_phase = get_phase_in_codon(Chr=Chr, Pos=left_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        # right_start_phase = get_phase_in_codon(Chr=Chr, Pos=right_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
+        # right_end_phase = get_phase_in_codon(Chr=Chr, Pos=right_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
         # print(f"{leftArm}\t"
         #       f"{left_start}({left_start_phase})\t"
         #       f"{left_end}({left_end_phase})\t"
@@ -293,7 +293,7 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, ENST_strand, type,
             type        "start" or "stop:
     output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
     """
-    insPos = loc[1]
+    insPos = loc[1]  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
     Chr = loc[0]
 
     col_spec_weight = []

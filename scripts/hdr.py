@@ -6,7 +6,7 @@ import functools
 import itertools
 import logging
 from typing import List
-
+import sys
 from typing import Iterator
 
 try:
@@ -43,7 +43,7 @@ class HDR_flank:
         self.ENST_strand = ENST_strand
         self.gStrand = gStrand
         self.gStart = gStart
-        self.InsPos = InsPos
+        self.InsPos = InsPos # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
         self.CutPos = CutPos
         self.Cut2Ins_dist = Cut2Ins_dist
 
@@ -62,6 +62,16 @@ class HDR_flank:
         assert len(right_flk_phases) > 1
         self.right_flk_phases = right_flk_phases
 
+        # adjust insPos, for stop-tagging ,the insertion site is now before the first base of the stop codon
+        if type == "stop":
+            if self.ENST_strand == 1 or self.ENST_strand == "1" or self.ENST_strand == "+":
+                self.InsPos = int(self.InsPos) - 1
+            else:
+                self.InsPos = int(self.InsPos) + 1
+        # adjust cutPos for -1 strands genes (the gRNA cut site was based on +1 strand), we need to view the gene in coding sequence
+        if self.ENST_strand == -1 or self.ENST_strand == "-1" or self.ENST_strand == "-":
+            CutPos = CutPos + 1
+
         #TODO: extend the flank to include the gRNA (de-prioritized b/c with 100bp arm and 50bp max-cut-to-insert-distance, gRNA will never be outside the HDR arm)
         ATG_at_end_of_exon = False
         self.cutPos, self.gPAM_end = self.get_gRNA_pos(self.gStart, self.gStrand)
@@ -71,22 +81,22 @@ class HDR_flank:
         #TODO: check if ATG is at the end of exon
 
         #make gRNA lowercase
-        gRNA_lc_Larm, gRNA_lc_Rarm = self.make_gRNA_lowercase()
+        self.gRNA_lc_Larm, self.gRNA_lc_Rarm = self.make_gRNA_lowercase()
+
+        #get seq and phase between insertion and cut site
+        self.ins2cut_seq, self.ins2cut_phases, self.ins2cut_start, self.ins2cut_end = self.get_ins2cut_seq()
 
         #print for debug purposes
-        print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
-        # print(f"HDR flank:\nLeft:  {self.left_flk_seq}\t"
-        #       f"{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}\t"
-        #       f"Phases: {self.join_int_list(self.left_flk_phases)}\n"
-        #       f"Right: {self.right_flk_seq}\t"
-        #       f"{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\t"
-        #       f"Phases: {self.join_int_list(self.right_flk_phases)}")
-        print(f"left | right arms: {gRNA_lc_Larm}|{gRNA_lc_Rarm}\n"
+        print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
+        print(f"left | right arms: {self.gRNA_lc_Larm}|{self.gRNA_lc_Rarm}\n"
               f"           Phases: {self.join_int_list(self.left_flk_phases)}|{self.join_int_list(self.right_flk_phases)}\n"
-              f"      Coordinates:\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
+              f"      Coordinates:\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n"
+              f"cut2insert :{self.ins2cut_seq}\n"
+              f"phases     :{self.join_int_list(self.ins2cut_phases)}\n"
+              f"coordinates:{self.ins2cut_start}-{self.ins2cut_end}")
 
-
-        #print(f"gRNA-in-arms: {self.entire_gRNA_in_HDR_arms}\n(gStart-in-arms: {self.gStart_in_HDR_arms}, gPAM-in-arms: {self.gPAM_end_in_HDR_arms})")
+        if (len(self.ins2cut_seq) != abs(self.Cut2Ins_dist)):
+            sys.exit(f"ins2cut_seq:{self.ins2cut_seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
 
     #TODO: gRNA view
 
@@ -102,6 +112,53 @@ class HDR_flank:
             newStart=end - end
             newEnd=start - end
             return(seq,newStart,newEnd)
+
+    def get_ins2cut_seq(self):
+        '''
+        get the sequence between insertion and cut sites
+        return [seq, phases, start, end]
+        '''
+        if self.InsPos == self.CutPos: #cut and insertion are at the same site
+            return ["","",self.InsPos,self.CutPos]
+
+        #convert into 0-index
+        Lstart = self.left_flk_coord_lst[0]
+        Rend = self.right_flk_coord_lst[1]
+        if (Lstart<Rend and self.ENST_strand==-1) or (Lstart>Rend and self.ENST_strand==1):
+            sys.exit("start<end while strand==-1 or start>end while strand==1")
+
+        if Lstart<Rend:
+            newLstart = Lstart - Lstart
+            newRend = Rend -Lstart
+            ins2cutStart = min([self.InsPos - Lstart + 1, self.CutPos  - Lstart + 1])
+            ins2cutEnd = max([self.InsPos - Lstart , self.CutPos - Lstart])
+            newLarm = self.left_flk_seq
+            newRarm = self.right_flk_seq
+            newLarm_phases = self.left_flk_phases
+            newRarm_phases = self.right_flk_phases
+            whole_arm = newLarm + newRarm
+            whole_arm_phases = newLarm_phases + newRarm_phases
+        else:
+            newLstart = Rend - Rend
+            newRend = Lstart - Rend
+            ins2cutStart = min(self.InsPos - Rend, self.CutPos - Rend)
+            ins2cutEnd = max(self.InsPos - Rend, self.CutPos - Rend)
+            newLarm = self.left_flk_seq[::-1]
+            newRarm = self.right_flk_seq[::-1]
+            newLarm_phases = self.left_flk_phases[::-1]
+            newRarm_phases = self.right_flk_phases[::-1]
+            whole_arm = newRarm + newLarm
+            whole_arm_phases = newRarm_phases + newLarm_phases
+
+        #get the ins2cut_seq
+        ins2cut_seq = whole_arm[ins2cutStart:ins2cutEnd+1]
+        ins2cut_phases = whole_arm_phases[ins2cutStart:ins2cutEnd+1]
+
+        if Lstart>Rend:
+            ins2cut_seq = ins2cut_seq[::-1] #reverse
+            ins2cut_phases = ins2cut_phases[::-1] #reverse
+
+        return[ins2cut_seq, ins2cut_phases, ins2cutStart, ins2cutEnd]
 
     def make_gRNA_lowercase(self):
         #convert into 0-index
