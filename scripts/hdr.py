@@ -70,7 +70,7 @@ class HDR_flank:
                 self.InsPos = int(self.InsPos) + 1
         # adjust cutPos for -1 strands genes (the gRNA cut site was based on +1 strand), we need to view the gene in coding sequence
         if self.ENST_strand == -1 or self.ENST_strand == "-1" or self.ENST_strand == "-":
-            CutPos = CutPos + 1
+            self.CutPos = self.CutPos + 1
 
         #TODO: extend the flank to include the gRNA (de-prioritized b/c with 100bp arm and 50bp max-cut-to-insert-distance, gRNA will never be outside the HDR arm)
         ATG_at_end_of_exon = False
@@ -87,7 +87,7 @@ class HDR_flank:
         self.ins2cut_seq, self.ins2cut_phases, self.ins2cut_start, self.ins2cut_end = self.get_ins2cut_seq()
 
         #print for debug purposes
-        print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
+        print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
         print(f"left | right arms: {self.gRNA_lc_Larm}|{self.gRNA_lc_Rarm}\n"
               f"           Phases: {self.join_int_list(self.left_flk_phases)}|{self.join_int_list(self.right_flk_phases)}\n"
               f"      Coordinates:\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n"
@@ -99,6 +99,8 @@ class HDR_flank:
             sys.exit(f"ins2cut_seq:{self.ins2cut_seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
 
     #TODO: gRNA view
+
+    #END OF INIT
 
     def to_0_index(self, start, end, strand, seq=""):
         if (start<end and strand==-1) or (start>end and strand==1):
@@ -130,7 +132,7 @@ class HDR_flank:
         if Lstart<Rend:
             newLstart = Lstart - Lstart
             newRend = Rend -Lstart
-            ins2cutStart = min([self.InsPos - Lstart + 1, self.CutPos  - Lstart + 1])
+            ins2cutStart = min([self.InsPos - Lstart + 1, self.CutPos  - Lstart + 1]) # exclude the base after which the cut/insertion is made
             ins2cutEnd = max([self.InsPos - Lstart , self.CutPos - Lstart])
             newLarm = self.left_flk_seq
             newRarm = self.right_flk_seq
@@ -142,7 +144,7 @@ class HDR_flank:
             newLstart = Rend - Rend
             newRend = Lstart - Rend
             ins2cutStart = min(self.InsPos - Rend, self.CutPos - Rend)
-            ins2cutEnd = max(self.InsPos - Rend, self.CutPos - Rend)
+            ins2cutEnd = max(self.InsPos - Rend -1, self.CutPos - Rend -1) # exclude the base after which the cut/insertion is made
             newLarm = self.left_flk_seq[::-1]
             newRarm = self.right_flk_seq[::-1]
             newLarm_phases = self.left_flk_phases[::-1]
