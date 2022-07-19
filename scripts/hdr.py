@@ -8,6 +8,7 @@ import logging
 from typing import List
 import sys
 from typing import Iterator
+import copy
 
 try:
     from . import cfdscore, mitscore
@@ -16,6 +17,20 @@ except ImportError:
     import mitscore  # type: ignore
 
 logger = logging.getLogger(__name__)
+
+class seq_w_phase:
+    '''
+    seqs with phases and start + end info
+    '''
+    def __init__(self,
+                 seq:str,
+                 phases:str,
+                 start:int,
+                 end:int)->None:
+        self.seq = seq
+        self.phases = phases
+        self.start = start
+        self.end = end
 
 #by DP
 class HDR_flank:
@@ -57,10 +72,10 @@ class HDR_flank:
         self.type = type
 
         assert len(left_flk_phases) > 1
-        self.left_flk_phases = left_flk_phases
+        self.left_flk_phases = self.join_int_list(left_flk_phases)
 
         assert len(right_flk_phases) > 1
-        self.right_flk_phases = right_flk_phases
+        self.right_flk_phases = self.join_int_list(right_flk_phases)
 
         # adjust insPos, for stop-tagging ,the insertion site is now before the first base of the stop codon
         if type == "stop":
@@ -84,23 +99,61 @@ class HDR_flank:
         self.gRNA_lc_Larm, self.gRNA_lc_Rarm = self.make_gRNA_lowercase()
 
         #get seq and phase between insertion and cut site
-        self.ins2cut_seq, self.ins2cut_phases, self.ins2cut_start, self.ins2cut_end = self.get_ins2cut_seq()
+        self.ins2cut = self.get_ins2cut_seq()
+
+        #check if the ins2cut_seq is the same length as the Cut2Ins_dist calculated elsewhere
+        if len(self.ins2cut.seq)>0 and (len(self.ins2cut.seq)-4 != abs(self.Cut2Ins_dist)):
+            sys.exit(f"ins2cut_seq:{self.ins2cut.seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
+
+        #trim insert-to-cut into frame
+        self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
+        #self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
+
+        # mutate insert-to-cut sequence
+        #mutate_silently()
 
         #print for debug purposes
         print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
-        print(f"left | right arms: {self.gRNA_lc_Larm}|{self.gRNA_lc_Rarm}\n"
-              f"           Phases: {self.join_int_list(self.left_flk_phases)}|{self.join_int_list(self.right_flk_phases)}\n"
-              f"      Coordinates:\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n"
-              f"cut2insert :{self.ins2cut_seq}\n"
-              f"phases     :{self.join_int_list(self.ins2cut_phases)}\n"
-              f"coordinates:{self.ins2cut_start}-{self.ins2cut_end}")
-
-        if (len(self.ins2cut_seq) != abs(self.Cut2Ins_dist)):
-            sys.exit(f"ins2cut_seq:{self.ins2cut_seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
+        print(f"1. left | right arms: {self.gRNA_lc_Larm}|{self.gRNA_lc_Rarm}\n"
+              f"2. Phases           : {self.left_flk_phases}|{self.right_flk_phases}\n"
+              f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n"
+              f"4. cut2insert (with 2bp padding in lowercase)\n"
+              f"5. seq        :{self.ins2cut.seq}\n"
+              f"6. Phases     :{self.ins2cut.phases}\n"
+              f"7. Coordinates:{self.ins2cut.start}-{self.ins2cut.end}\n"
+              f"8. cut2insert (trimmed into frame):\n"
+              f"9. seq        :{self.ins2cut_Ltrimed.seq}\n"
+              f"10.Phases     :{self.ins2cut_Ltrimed.phases}\n"
+              f"11.Coordinates:{self.ins2cut_Ltrimed.start}-{self.ins2cut_Ltrimed.end}")
 
     #TODO: gRNA view
 
     #END OF INIT
+    def trim_left_into_frame(self, in_obj):
+        obj = copy.copy(in_obj)
+        if obj.seq == "":
+            return obj
+        for i in copy.copy(obj.phases):
+            if i != "1":
+                obj.seq = obj.seq[1:]
+                obj.phases = obj.phases[1:]
+                obj.start = obj.start + 1
+            else:
+                return(obj)
+        return(obj)
+
+    def trim_right_into_frame(self, in_obj):
+        obj = copy.copy(in_obj)
+        if obj.seq == "":
+            return obj
+        for i in reversed(copy.copy(obj.phases)):
+            if i != "3":
+                obj.seq = obj.seq[:-1]
+                obj.phases = obj.phases[:-1]
+                obj.end = obj.end - 1
+            else:
+                return(obj)
+        return (obj)
 
     def to_0_index(self, start, end, strand, seq=""):
         if (start<end and strand==-1) or (start>end and strand==1):
@@ -119,9 +172,11 @@ class HDR_flank:
         '''
         get the sequence between insertion and cut sites
         return [seq, phases, start, end]
+        Note, the sequence is padded with 2bp on each side (to avoid truncating codons)
         '''
         if self.InsPos == self.CutPos: #cut and insertion are at the same site
-            return ["","",self.InsPos,self.CutPos]
+            ins2cut = seq_w_phase(seq = "", phases = "", start = self.InsPos, end = self.CutPos)
+            return ins2cut
 
         #convert into 0-index
         Lstart = self.left_flk_coord_lst[0]
@@ -153,14 +208,15 @@ class HDR_flank:
             whole_arm_phases = newRarm_phases + newLarm_phases
 
         #get the ins2cut_seq
-        ins2cut_seq = whole_arm[ins2cutStart:ins2cutEnd+1]
-        ins2cut_phases = whole_arm_phases[ins2cutStart:ins2cutEnd+1]
+        ins2cut_seq = whole_arm[ins2cutStart-2:ins2cutStart].lower() + whole_arm[ins2cutStart:ins2cutEnd+1] + whole_arm[ins2cutEnd+1:ins2cutEnd+3].lower()
+        ins2cut_phases = whole_arm_phases[ins2cutStart-2:ins2cutStart] + whole_arm_phases[ins2cutStart:ins2cutEnd+1] + whole_arm_phases[ins2cutEnd+1:ins2cutEnd+3]
 
         if Lstart>Rend:
             ins2cut_seq = ins2cut_seq[::-1] #reverse
             ins2cut_phases = ins2cut_phases[::-1] #reverse
 
-        return[ins2cut_seq, ins2cut_phases, ins2cutStart, ins2cutEnd]
+        ins2cut = seq_w_phase(seq = ins2cut_seq, phases = self.join_int_list(ins2cut_phases), start = ins2cutStart-2, end = ins2cutEnd+2)
+        return ins2cut
 
     def make_gRNA_lowercase(self):
         #convert into 0-index
@@ -197,13 +253,10 @@ class HDR_flank:
         #print(f"left | right arms: {newLarm}|{newRarm}\n")
         return([newLarm, newRarm])
 
-
-    #TODO: saturating mutation
-
     #TODO: check the gRNA CFD scores
 
     def join_int_list(self, mylist):
-        return ''.join([str(abs(i)) for i in mylist])
+        return ''.join([str(abs(int(i))) for i in mylist])
 
     def check_gRNA_in_HDR_arms(self, gStart, gPAM_end, left_flk_coord_lst, right_flk_coord_lst):
         """
@@ -770,7 +823,7 @@ class HDR:
 def mutate_silently(
         guide_seq: str,
         guide_strand_same: bool=False,
-        skip_stop_codon: bool=True,
+        skip_start_stop_codon: bool=True,
         all_permutations: bool=False) -> Iterator[str]:
     """
     Generator that silently mutates input sequence by substituing a different
@@ -920,7 +973,7 @@ def mutate_silently(
                 if c != c.upper() and c.upper() != syn[i] and syn in syns:
                     syns.remove(syn)
 
-        if skip_stop_codon and codon in ['TAG', 'TGA', 'TAA']:
+        if skip_start_stop_codon and codon in ['TAG', 'TGA', 'TAA', 'ATG']:
             return codon
         elif len(syns):
             top = _select_syn(codon, syns)
