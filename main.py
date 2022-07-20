@@ -42,6 +42,9 @@ log.setLevel(logging.INFO) #set the level of warning displayed
 max_cut2ins_dist = 50
 HDR_arm_len = 100
 
+mNG2_11 = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
+tag = mNG2_11
+
 config = vars(parse_args())
 
 #####################
@@ -116,6 +119,8 @@ def main():
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
             if transcript_type == "protein_coding":
+                if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
+                    continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"])
                 if ranked_df_gRNAs_ATG.empty == False:
@@ -135,7 +140,7 @@ def main():
                         best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"])
+                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
 
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
                 if best_stop_gRNA.empty == False:
@@ -144,7 +149,7 @@ def main():
                         best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"])
+                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
 
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1

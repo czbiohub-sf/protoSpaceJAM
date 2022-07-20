@@ -9,6 +9,7 @@ from typing import List
 import sys
 from typing import Iterator
 import copy
+from Bio.Seq import Seq
 
 try:
     from . import cfdscore, mitscore
@@ -50,7 +51,8 @@ class HDR_flank:
             gStrand : int,
             InsPos:int,
             CutPos:int,
-            Cut2Ins_dist:int) -> None:
+            Cut2Ins_dist:int,
+            tag:str) -> None:
 
         self.left_flk_seq = left_flk_seq
         self.right_flk_seq = right_flk_seq
@@ -61,6 +63,7 @@ class HDR_flank:
         self.InsPos = InsPos # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
         self.CutPos = CutPos
         self.Cut2Ins_dist = Cut2Ins_dist
+        self.tag = tag
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -87,6 +90,7 @@ class HDR_flank:
         if self.ENST_strand == -1 or self.ENST_strand == "-1" or self.ENST_strand == "-":
             self.CutPos = self.CutPos + 1
 
+
         #TODO: extend the flank to include the gRNA (de-prioritized b/c with 100bp arm and 50bp max-cut-to-insert-distance, gRNA will never be outside the HDR arm)
         ATG_at_end_of_exon = False
         self.cutPos, self.gPAM_end = self.get_gRNA_pos(self.gStart, self.gStrand)
@@ -107,28 +111,119 @@ class HDR_flank:
 
         #trim insert-to-cut into frame
         self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
-        #self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
+        self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
 
         # mutate insert-to-cut sequence
-        #mutate_silently()
+        mutated_subseq = ""
+        for mutated_subseq in mutate_silently(self.ins2cut_LRtrimed.seq.upper()): # get the last item in the generator
+            pass
+        #put_silent_mutation_subseq_back into HDR flank
+        left_flk_seq_CodonMut, right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(mutated_subseq = mutated_subseq, start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end)
+
+        #selected strand
+        ssODN = self.select_ssODN_strand(left_flk_seq_CodonMut + right_flk_seq_CodonMut)
+
+        #check if gRNA is affected by insertion
+        self.gRNA_seq, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
+        Null, self.post_mut_ins_gRNA = self.get_post_integration_gRNA(left_flk_seq_CodonMut,right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
+
 
         #print for debug purposes
-        print(f"{self.ENST_ID}\tstrand: {self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
+        print(f"{self.ENST_ID}\tstrand:{self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}")
         print(f"1. left | right arms: {self.gRNA_lc_Larm}|{self.gRNA_lc_Rarm}\n"
               f"2. Phases           : {self.left_flk_phases}|{self.right_flk_phases}\n"
               f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} | {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n"
+              f"---------------------------------------------\n"
               f"4. cut2insert (with 2bp padding in lowercase)\n"
-              f"5. seq        :{self.ins2cut.seq}\n"
-              f"6. Phases     :{self.ins2cut.phases}\n"
-              f"7. Coordinates:{self.ins2cut.start}-{self.ins2cut.end}\n"
+              f"5. seq         :{self.ins2cut.seq}\n"
+              f"6. Phases      :{self.ins2cut.phases}\n"
+              f"7. Coordinates :{self.ins2cut.start}-{self.ins2cut.end}\n"
+              f"---------------------------------------------\n"
               f"8. cut2insert (trimmed into frame):\n"
-              f"9. seq        :{self.ins2cut_Ltrimed.seq}\n"
-              f"10.Phases     :{self.ins2cut_Ltrimed.phases}\n"
-              f"11.Coordinates:{self.ins2cut_Ltrimed.start}-{self.ins2cut_Ltrimed.end}")
+              f"9. seq         :{self.ins2cut_LRtrimed.seq}\n"
+              f"10.Phases      :{self.ins2cut_LRtrimed.phases}\n"
+              f"11.Coordinates :{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}\n"
+              f"12.mutated seq :{mutated_subseq}\n"
+              f"---------------------------------------------\n"
+              f"13.updated arms :{left_flk_seq_CodonMut}|{right_flk_seq_CodonMut}\n"
+              f"14.original arms:{left_flk_seq}|{right_flk_seq}\n"
+              f"15.ssODN strand :{ssODN}\n"
+              f"16.                                  gRNA:{self.gRNA_seq}\n"
+              f"17.gRNA post codon mutation and insertion:{self.post_mut_ins_gRNA}\n")
 
-    #TODO: gRNA view
+    #TODO: check CFD score, if too high get gRNA codon and mutate
+    #TODO:
+
 
     #END OF INIT
+    def get_post_integration_gRNA(self, leftArm, rightArm):
+        """
+        input: leftArm, rightArm (based on which the gRNA and insert-disrupted gRNA will be extracted
+        return: gRNA, chimeric_gRNA
+        """
+        Lstart = self.left_flk_coord_lst[0]
+        Rend = self.right_flk_coord_lst[1]
+
+        if (Lstart<Rend and self.ENST_strand==-1) or (Lstart>Rend and self.ENST_strand==1):
+            sys.exit("start<end while strand==-1 or start>end while strand==1")
+
+        newLarm = leftArm
+        newRarm = rightArm
+        whole_arm = newLarm + newRarm
+
+        # get the left, right coordinate of the gRNA
+        if Lstart<Rend:
+            newgRNAstart = min([self.gStart - Lstart , self.gPAM_end - Lstart])
+            newgRNAend = max([self.gStart - Lstart , self.gPAM_end - Lstart])
+            gRNAleft=newgRNAstart
+            gRNAright=newgRNAend
+        else:
+            newgRNAstart = min(self.gPAM_end - Rend, self.gStart - Rend) #the ENSTID is on the -1 strand, using Rend as reference coordinate
+            newgRNAend = max(self.gPAM_end - Rend, self.gStart - Rend)
+            gRNAleft = len(whole_arm) - newgRNAend - 1
+            gRNAright = len(whole_arm) - newgRNAstart - 1
+        #get the gRNA (as in the coding strand)
+        gRNA = whole_arm[gRNAleft:gRNAright+1]
+
+        #get truncate gRNA:
+        chimeric_gRNA = gRNA
+        if (gRNAleft < int(len(whole_arm)/2) < gRNAright) and (int(self.ENST_strand) * int(self.gStrand) > 0): #gRNA is truncated, and gRNA is on the coding strand
+            chimeric_gRNA = whole_arm[int(len(whole_arm)/2):gRNAright+1]
+            trunc_len = int(len(whole_arm)/2) - gRNAleft
+            chimeric_gRNA = self.tag[-trunc_len:] + chimeric_gRNA #make the chimeric gRNA
+        elif (gRNAleft < int(len(whole_arm)/2) < gRNAright) and (int(self.ENST_strand) * int(self.gStrand) < 0): #gRNA is truncated, and gRNA is NOT on the coding strand
+            chimeric_gRNA = whole_arm[gRNAleft:int(len(whole_arm)/2)+1]
+            trunc_len = gRNAright - int(len(whole_arm)/2)
+            chimeric_gRNA = chimeric_gRNA + self.tag[:trunc_len] #make the chimeric gRNA
+
+        #reverse complement gRNA, if gRNA is on a different strand compared to the
+        if (int(self.ENST_strand) * int(self.gStrand) < 0):
+            #revcom gRNA and trunc_gRNA
+            gRNA = str(Seq(gRNA).reverse_complement())
+            chimeric_gRNA =  str(Seq(chimeric_gRNA).reverse_complement())
+
+        return gRNA, chimeric_gRNA
+
+    def select_ssODN_strand(self, seq):
+        """
+        select strand
+        input: seq
+        output: seq in the preferred strand
+        """
+        if self.InsPos <= self.CutPos:
+            return seq
+        else:
+            return str(Seq(seq).reverse_complement())
+
+    def put_silent_mutation_subseq_back(self, mutated_subseq, start, end):
+        if start == end:
+            return self.left_flk_seq, self.right_flk_seq
+        else:
+            whole_arm = self.left_flk_seq + self.right_flk_seq
+            whole_arm = whole_arm[0:start] + mutated_subseq + whole_arm[end+1:]
+            arm_len = int(len(whole_arm)/2)
+            return whole_arm[:arm_len], whole_arm[arm_len:]
+
     def trim_left_into_frame(self, in_obj):
         obj = copy.copy(in_obj)
         if obj.seq == "":
@@ -140,6 +235,8 @@ class HDR_flank:
                 obj.start = obj.start + 1
             else:
                 return(obj)
+        if obj.seq == "": #trimmed all of the sequence
+            obj.start = obj.end
         return(obj)
 
     def trim_right_into_frame(self, in_obj):
@@ -153,6 +250,8 @@ class HDR_flank:
                 obj.end = obj.end - 1
             else:
                 return(obj)
+        if obj.seq == "": #trimmed all of the sequence
+            obj.end = obj.start
         return (obj)
 
     def to_0_index(self, start, end, strand, seq=""):

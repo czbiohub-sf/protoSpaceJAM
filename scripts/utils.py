@@ -131,7 +131,7 @@ def get_range(start,end): #TODO phase should be ENST specific
     else:
         return list(range(start,end-1,-1))
 
-def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver):
+def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
         ENST_strand = ENST_info[ENST_ID].features[0].strand
@@ -170,7 +170,8 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
         myflank = HDR_flank(left_flk_seq = leftArm , right_flk_seq = rightArm,
                             left_flk_coord_lst = [left_start, left_end], right_flk_coord_lst = [right_start, right_end],
                             left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
-                            type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist)
+                            type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
+                            tag = tag)
 
         #log IDs whose gRNA is not in the default-size HDR arms
         if myflank.entire_gRNA_in_HDR_arms == False:
@@ -490,6 +491,9 @@ def get_start_stop_loc(ENST_ID,ENST_info):
     cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
     CDS_first = cdsList[0]
     CDS_last = cdsList[len(cdsList) - 1]
+    #check if ATG is at the end of the first exon
+    if check_ATG_at_exonEnd(my_transcript):
+        CDS_first = cdsList[1] #use the second cds if ATG is at the end of the first exon
     #get start codon location
     if CDS_first.strand==1:
         ATG_loc = [CDS_first.location.ref, CDS_first.location.start+0,CDS_first.location.start+2, 1] # format [start, end, strand]
@@ -630,17 +634,32 @@ def count_ATG_at_exonEnd(ENST_info):
     list = []
     for ENST_ID in ENST_info.keys():
         my_transcript = ENST_info[ENST_ID]  # get the seq record
-        transcript_type = my_transcript.description.split("|")[1]
-        if transcript_type == "protein_coding": #only look at protein-coding transcripts
-            # constructing the list of cds
-            cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
-            if len(cdsList)>=1: #has more than 1 cds
-                CDS_first = cdsList[0]
-                cds_len = abs(CDS_first.location.start - CDS_first.location.end) + 1 # for ATG to be the end of the exon, the first exon length is 3bp
-                if cds_len==3:
-                    count+=1
-                    list.append(ENST_ID)
+        if check_ATG_at_exonEnd(my_transcript):
+            list.append(ENST_ID)
+            count+=1
     return([count,list])
+
+def check_ATG_at_exonEnd(my_transcript):
+    '''
+    input: transcript object
+    output: Bool
+    '''
+    transcript_type = my_transcript.description.split("|")[1]
+    if transcript_type == "protein_coding": #only look at protein-coding transcripts
+        # constructing the list of cds
+        cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
+        if len(cdsList)>=1: #has more than 1 cds
+            CDS_first = cdsList[0]
+            cds_len = abs(CDS_first.location.start - CDS_first.location.end) + 1 # for ATG to be the end of the exon, the first exon length is 3bp
+            if cds_len==3:
+                return True
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
 
 #TODO: check if all the function below are still needed
 
