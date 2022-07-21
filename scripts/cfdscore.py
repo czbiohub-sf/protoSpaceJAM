@@ -6,7 +6,7 @@
 # Input: 1. 23mer WT sgRNA sequence
 #       2. 23mer Off-target sgRNA sequence
 # Output: CFD score
-
+import re
 from functools import lru_cache
 
 # TODO (gdingle): adjust values of zeros?
@@ -405,6 +405,9 @@ def cfd_score(wt: str, sg: str, pam='NGG', guide_strand_same=True) -> float:
     >>> cfd_score('CCAATATGAAAAGGCCTAGTAAG', 'CCGATATGATGGGTGGCGGATTG', guide_strand_same=False)
     0.032817109477196474
     """
+    if re.search("N", wt, flags=re.IGNORECASE) or re.search("N", wt,flags=re.IGNORECASE):
+        return 0
+
     if guide_strand_same is False:
         wt = _revcom(wt)
         sg = _revcom(sg)

@@ -103,9 +103,15 @@ def main():
         stop_failed = []
 
         #list to store IDs whose gRNA is outside of the HDR window
-        gRNA_out_of_arms = dict()
-        gRNA_out_of_arms["start"]=dict()
-        gRNA_out_of_arms["stop"]=dict()
+        #gRNA_out_of_arms = dict()
+        #gRNA_out_of_arms["start"]=dict()
+        #gRNA_out_of_arms["stop"]=dict()
+
+        #list to store CFD scores
+        start_cfd1 = []
+        start_cfd2 = []
+        stop_cfd1 = []
+        stop_cfd2 = []
 
         #loop through each ENST
         transcript_count = 0
@@ -119,8 +125,8 @@ def main():
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
             if transcript_type == "protein_coding":
-                if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
-                    continue
+                # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
+                #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"])
                 if ranked_df_gRNAs_ATG.empty == False:
@@ -141,6 +147,11 @@ def main():
 
                     #get HDR template
                     HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
+                    #append cfd score to list for plotting
+                    if hasattr(HDR_template,"cdf_score_post_mut_ins"):
+                        start_cfd1.append(HDR_template.cdf_score_post_mut_ins)
+                    if hasattr(HDR_template,"cdf_score_post_mut2"):
+                        start_cfd2.append(HDR_template.cdf_score_post_mut2)
 
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
                 if best_stop_gRNA.empty == False:
@@ -150,6 +161,11 @@ def main():
 
                     #get HDR template
                     HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
+                    # append cfd score to list for plotting
+                    if hasattr(HDR_template,"cdf_score_post_mut_ins"):
+                        stop_cfd1.append(HDR_template.cdf_score_post_mut_ins)
+                    if hasattr(HDR_template,"cdf_score_post_mut2"):
+                        stop_cfd2.append(HDR_template.cdf_score_post_mut2)
 
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1
@@ -162,8 +178,8 @@ def main():
                 elapsed_sec = endtime - starttime
                 elapsed_min = elapsed_sec.seconds / 60
                 log.info(f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts, elapsed time {elapsed_min:.2f} min ({elapsed_sec} sec)")
-                gnum = len(gRNA_out_of_arms["start"]) + len(gRNA_out_of_arms["stop"])
-                log.info(f"number of gRNAs outside the HDR arm: {gnum}")
+                #gnum = len(gRNA_out_of_arms["start"]) + len(gRNA_out_of_arms["stop"])
+                #log.info(f"number of gRNAs outside the HDR arm: {gnum}")
 
             ################
             #early stopping#
@@ -203,8 +219,18 @@ def main():
             pickle.dump(stop_failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write ENSTs (whose gRNA is outside of the default HDR arm) to file
-        with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(gRNA_out_of_arms, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        #with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:
+        #    pickle.dump(gRNA_out_of_arms, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        # write lists of cfd to file
+        with open(f"pickles/start_cfd1_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(start_cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"pickles/start_cfd2_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(start_cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"pickles/stop_cfd1_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(stop_cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(f"pickles/stop_cfd2_{num_to_process}_genes.pickle", 'wb') as handle:
+            pickle.dump(stop_cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 

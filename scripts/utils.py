@@ -172,10 +172,10 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
                             left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
                             type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
                             tag = tag)
-
+        return myflank
         #log IDs whose gRNA is not in the default-size HDR arms
-        if myflank.entire_gRNA_in_HDR_arms == False:
-            gRNA_out_of_arms[type][ENST_ID] = False
+        #if myflank.entire_gRNA_in_HDR_arms == False:
+        #    gRNA_out_of_arms[type][ENST_ID] = False
 
 # def get_target_seq(Chr, InsPos, gRNAstrand, CutPos, type, ENST_ID, ENST_info):
 #     """
