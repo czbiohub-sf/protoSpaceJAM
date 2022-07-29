@@ -227,13 +227,10 @@ def main():
         #go through ENST_info, calculate span_start span_end for each ID
         for ID in ENST_info:
             if len(ENST_info[ID].features) > 0:
-                if ENST_info[ID].features[0].ref == chr: #chr match
-                    coords = [ENST_info[ID].features[0].location.nofuzzy_end,
-                    ENST_info[ID].features[0].location.nofuzzy_start,
-                    ENST_info[ID].features[len(ENST_info[ID].features)-1].location.nofuzzy_end,
-                    ENST_info[ID].features[len(ENST_info[ID].features)-1].location.nofuzzy_start]
-                    ENST_info[ID].span_start = min(coords)
-                    ENST_info[ID].span_end = max(coords)
+                coords = [i.location.nofuzzy_end for i in ENST_info[ID].features] + [i.location.nofuzzy_start for i in ENST_info[ID].features]
+                ENST_info[ID].span_start = min(coords)
+                ENST_info[ID].span_end = max(coords)
+                ENST_info[ID].chr = ENST_info[ID].features[0].ref
 
         # write dict to file
         with open('ENST_info.pickle', 'wb') as handle:

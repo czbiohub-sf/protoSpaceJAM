@@ -157,7 +157,7 @@ class HDR_flank:
               f"17.                     Phases:{self.gRNA_seq_phases}\n"
               f"18.gRNA post codon mut and ins:{self.post_mut_ins_gRNA_seq}\n"
               f"19.                     Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
-              f"20.                        CFD:{self.cdf_score_post_mut_ins}")
+              f"20.                        CFD:{self.cdf_score_post_mut_ins:.4f}")
         if self.cdf_score_post_mut_ins < 0.03:
             #selected strand
             ssODN = self.select_ssODN_strand(self.left_flk_seq_CodonMut + self.left_flk_seq_CodonMut)
@@ -183,7 +183,7 @@ class HDR_flank:
                     self.mutated_trunc_gRNA = self.get_silent_mutations(self.trunc_gRNA_LRtrimed.seq.upper())
                 else:
                     self.mutated_trunc_gRNA = self.trunc_gRNA_LRtrimed.seq.upper()
-                   #put mutated seq back to arms
+                #put mutated seq back to arms
                 self.left_flk_seq_CodonMut2, self.right_flk_seq_CodonMut2 = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq_CodonMut, R_arm=self.right_flk_seq_CodonMut,mutated_subseq = self.mutated_trunc_gRNA, start = self.trunc_gRNA_LRtrimed.start, end = self.trunc_gRNA_LRtrimed.end)
                 # extract gRNA
                 Null, self.post_mut2_gRNA_seq, Null, self.post_mut2_gRNA_seq_phases  = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut2, self.right_flk_seq_CodonMut2) #get the gRNA after mutating sequence between PAM and cut site
@@ -196,22 +196,114 @@ class HDR_flank:
                 f"17.                     Phases:{self.gRNA_seq_phases}\n"
                 f"18.       gRNA post mutation 2:{self.post_mut2_gRNA_seq}\n"
                 f"19.                     Phases:{self.post_mut2_gRNA_seq_phases}\n"
-                f"20.                        CFD:{self.cdf_score_post_mut2}\n"
+                f"20.                        CFD:{self.cdf_score_post_mut2:.4f}\n"
                 f"--------------------display mutation in HDR arms-------------------------------------------------------------------------------\n"
                 f"25.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
                 f"26.cut2insert mut  :{self.left_flk_seq_CodonMut2}||{self.left_flk_seq_CodonMut2}")
-                if self.cdf_score_post_mut2 <0.03:
-                    #selected strand
-                    ssODN = self.select_ssODN_strand(self.left_flk_seq_CodonMut2 + self.right_flk_seq_CodonMut2)
-                    print(f"--------------------CFD<0.03, get ssODN strand---------------------------------------------------------------------------------\n"
-                        f"[final] ssODN strand :{ssODN}")
+
+            else:
+                print(f"--------------------mutation already saturated in seq between gRNA and insert--------------------------------------------------")
 
             #can't mutate b/c overlap, or codon substitution didn't get CFD<0.03
-            if overlap_flag == True or self.cdf_score_post_mut2 >= 0.03:
+            if overlap_flag == True or self.cdf_score_post_mut2 >= 0.03: # mut2 didn't happen or mut2 failed to reach CFD<0.03
                 # need to continue mutation #
-                print(f"--------------------codon substitution failed to get CFD<0.03------------------------------------------------------------------")
+                if hasattr(self,"post_mut2_gRNA_seq"):
+                    phases = self.post_mut2_gRNA_seq_phases
+                    seq = self.post_mut2_gRNA_seq
+                else:
+                    phases = self.post_mut_ins_gRNA_seq_phases
+                    seq = self.post_mut_ins_gRNA_seq
+                self.post_mut3_gRNA_seq = seq
+                self.post_mut3_gRNA_seq_phases = phases
+                print(f"--------------------codon substitution failed to get CFD<0.03, mutating PAM and nearby bases if in UTR-------------------------")
+                # mutate PAM if it's in UTR
+                if phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
+                    self.post_mut3_gRNA_seq = seq[:-1] + "c"
+                if phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
+                    self.post_mut3_gRNA_seq = self.post_mut3_gRNA_seq[:-2] + "c" + self.post_mut3_gRNA_seq[-1:]
+                self.cdf_score_post_mut3 = cfd_score(self.gRNA_seq, self.post_mut3_gRNA_seq)
+                if self.cdf_score_post_mut3 < 0.03:
+                    print(f"--------------------cfd<0.03---------------------------------------------------------------------------")
+                else:
+                    #mutated protospacer if in  UTR
+                    if hasattr(self, "post_mut3_gRNA_seq"):
+                        phases = self.post_mut3_gRNA_seq_phases
+                        seq = self.post_mut3_gRNA_seq
+                    elif hasattr(self, "post_mut2_gRNA_seq"):
+                        phases = self.post_mut2_gRNA_seq_phases
+                        seq = self.post_mut2_gRNA_seq
+                    else:
+                        phases = self.post_mut_ins_gRNA_seq_phases
+                        seq = self.post_mut_ins_gRNA_seq
+
+                    self.post_mut4_gRNA_seq = seq
+                    self.post_mut4_gRNA_seq_phases = phases
+                    for idx,item in reversed(list(enumerate(phases))):
+                        if idx == (len(phases) - 1) or idx == (len(phases) - 2):
+                            continue #skip PAM
+                        if item == "0": #in UTR
+                            base = seq[idx]
+                            mutbase = self.single_base_muation(base)
+                            self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
+                            self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
+                            if self.cdf_score_post_mut4 < 0.03:
+                                print(f"-------------------- free-mutation in UTR resulted in CFD<0.03-----------------------------------------------------------------")
+                                break
+            #TODO put gRNA back
+            #selected strand
+            if hasattr(self, "cdf_score_post_mut4"):
+                #left = self.left_flk_seq_CodonMut4
+                #right = self.right_flk_seq_CodonMut4
+                cfd = self.cdf_score_post_mut4
+                seq = self.post_mut4_gRNA_seq
+                phases = self.post_mut4_gRNA_seq_phases
+            elif hasattr(self, "cdf_score_post_mut3"):
+                #left = self.left_flk_seq_CodonMut3
+                #right = self.right_flk_seq_CodonMut3
+                cfd = self.cdf_score_post_mut3
+                seq = self.post_mut3_gRNA_seq
+                phases = self.post_mut3_gRNA_seq_phases
+            elif hasattr(self, "cdf_score_post_mut2"):
+                #left = self.left_flk_seq_CodonMut2
+                #right = self.right_flk_seq_CodonMut2
+                cfd = self.cdf_score_post_mut2
+                seq = self.post_mut2_gRNA_seq
+                phases = self.post_mut2_gRNA_seq_phases
+            else:
+                #left = self.left_flk_seq_CodonMut
+                #right = self.right_flk_seq_CodonMut
+                cfd = self.cdf_score_post_mut_ins
+                seq = self.post_mut_ins_gRNA_seq
+                phases = self.post_mut_ins_gRNA_seq_phases
+
+            #ssODN = self.select_ssODN_strand(left + right)
+            self.final_cfd = cfd
+            print(
+                f"--------------------FINAL CFD {cfd:.4f}"
+                f"-------------------- display gRNA and check mutations------------------------------------------------\n"
+                f"16.                       gRNA:{self.gRNA_seq}\n"
+                f"17.                     Phases:{self.gRNA_seq_phases}\n"
+                f"18.         gRNA post mutation:{seq}\n"
+                f"19.                     Phases:{phases}\n"
+                f"20.                        CFD:{cfd:.4f}")
+            #print(f"-------------------- get ssODN strand---------------------------------------------------------------------------------\n"
+                #f"[final] ssODN strand :{ssODN}")
+
+
+
+
+
+
+
 
     #END OF INIT
+    def single_base_muation(self,base):
+        mapping = {"A":"c","a":"c",
+                   "C":"a","c":"a",
+                   "G":"t","g":"t",
+                   "T":"g","t":"g"}
+        return mapping[base]
+
     def check_overlap(self,obj1,obj2):
         """
         return true if the overlap part is longer than 50% of either obj1 or obj2
