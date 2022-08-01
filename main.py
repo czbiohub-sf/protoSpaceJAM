@@ -78,6 +78,10 @@ def main():
         #report the number of ENSTs which has ATG at the end of the exon
         ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
 
+        #open log files
+        recut_CFD_pass = open("logs/recut_CFD_pass.tab", "w")
+        recut_CFD_fail = open("logs/recut_CFD_fail.tab", "w")
+
 
         #load ENST list (the user input list or the whole transcriptome)
         if os.path.isfile(config['path2csv']):
@@ -130,7 +134,7 @@ def main():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
-            if transcript_type == "protein_coding":
+            if transcript_type == "protein_coding": #and ENST_ID == "ENST00000537075":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
@@ -164,6 +168,12 @@ def main():
                         start_cfd4.append(HDR_template.cdf_score_post_mut4)
                     if hasattr(HDR_template,"final_cfd"):
                         start_cfdfinal.append(HDR_template.final_cfd)
+                    #write log
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}"
+                    if HDR_template.final_cfd < 0.03:
+                        recut_CFD_pass.write(this_log)
+                    else:
+                        recut_CFD_fail.write(this_log)
 
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
                 if best_stop_gRNA.empty == False:
@@ -184,6 +194,12 @@ def main():
                         stop_cfd4.append(HDR_template.cdf_score_post_mut4)
                     if hasattr(HDR_template,"final_cfd"):
                         stop_cfdfinal.append(HDR_template.final_cfd)
+                    #write log
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}"
+                    if HDR_template.final_cfd < 0.03:
+                        recut_CFD_pass.write(this_log)
+                    else:
+                        recut_CFD_fail.write(this_log)
 
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1
@@ -264,6 +280,9 @@ def main():
             pickle.dump(stop_cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
+
+        recut_CFD_pass.close()
+        recut_CFD_fail.close()
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
