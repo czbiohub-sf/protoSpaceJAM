@@ -148,12 +148,13 @@ class HDR_flank:
         #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
         self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
 
-        self.info = f"\n\n{self.ENST_ID}\tstrand:{self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}"
+        # log information to self.info_[arm/p1]
+        self.info = f"\n\n{self.ENST_ID}\tstrand:{self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}\n"
         self.info_arm = "".join(
             f"--------------------HDR arms---------------------------------------------------------------------------------------------------\n"
             f"1. left | right arms:{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
             f"2. Phases           :{self.left_flk_phases}||{self.right_flk_phases}\n"
-            f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} || {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
+            f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} || {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n")
         # print for debug purposes
         self.info_p1 = "".join(
             f"--------------------phase 1 mutate seq between cut to insert--------------------------------------------------------------------\n"
@@ -175,11 +176,10 @@ class HDR_flank:
             f"17.                     Phases:{self.gRNA_seq_phases}\n"
             f"18.gRNA post codon mut and ins:{self.post_mut_ins_gRNA_seq}\n"
             f"19.                     Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
-            f"20.                        CFD:{self.cdf_score_post_mut_ins:.4f}")
+            f"20.                        CFD:{self.cdf_score_post_mut_ins:.4f}\n")
 
         if self.cdf_score_post_mut_ins < 0.03:
             #end of all phases
-            self.final_ssODN = self.select_ssODN_strand(self.left_flk_seq_CodonMut + self.left_flk_seq_CodonMut)
             self.mut_message.append("CFD<0.03 after saturating mutation in cut-to-insert region and payload insertion")
 
         #########
@@ -242,10 +242,12 @@ class HDR_flank:
                                 self.mut_message.append("Mutating protospacer in UTR resulted in CFD<0.03")
                                 break
 
-            left,right,cfd,seq,phases = self.get_uptodate_mut()
+        left,right,cfd,seq,phases = self.get_uptodate_mut()
 
-            #ssODN = self.select_ssODN_strand(left + right)
-            self.final_cfd = cfd
+        self.ODN_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
+        self.ODN_postMut = left + self.tag + right
+        self.ODN_postMut_ss = self.select_ssODN_strand(left + self.tag + right)
+        self.final_cfd = cfd
 
 
         if hasattr(self,"cdf_score_post_mut2"):
@@ -261,7 +263,7 @@ class HDR_flank:
                  f"phase 2.                        Phases:{self.post_mut2_gRNA_seq_phases}\n"
                  f"phase 2.                           CFD:{self.cdf_score_post_mut2:.4f}\n")
         else:
-            self.info_p2 = f"phase 2 skipped"
+            self.info_p2 = f"phase 2 skipped\n"
         if hasattr(self,"cdf_score_post_mut3"):
             self.info_p3 = "".join(
                  f"--------------------phase 3: if cfd > 0.03, mutating PAM if in UTR-------------------------------------------------------------\n"
@@ -271,7 +273,7 @@ class HDR_flank:
                  f"phase 3.                   Phases:{self.post_mut3_gRNA_seq_phases}\n"
                  f"phase 3.                      CFD:{self.cdf_score_post_mut3:.4f}\n")
         else:
-            self.info_p3 = "phase 3 skipped"
+            self.info_p3 = "phase 3 skipped\n"
         if hasattr(self,"cdf_score_post_mut4"):
             self.info_p4 = "".join(
                  f"--------------------phase 4: if cfd > 0.03, mutating nearby bases if in UTR-----------------------------------------------------\n"
@@ -281,7 +283,7 @@ class HDR_flank:
                  f"phase 4.                   Phases:{self.post_mut4_gRNA_seq_phases}\n"
                  f"phase 4.                      CFD:{self.cdf_score_post_mut4:.4f}\n")
         else:
-            self.info_p4 = f"phase 4 skipped"
+            self.info_p4 = f"phase 4 skipped\n"
 
     #END OF INIT
     def get_uptodate_mut(self):

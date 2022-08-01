@@ -79,8 +79,8 @@ def main():
         ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
 
         #open log files
-        recut_CFD_pass = open("logs/recut_CFD_pass.tab", "w")
-        recut_CFD_fail = open("logs/recut_CFD_fail.tab", "w")
+        recut_CFD_pass = open("logs/recut_CFD_pass.txt", "w")
+        recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
 
 
         #load ENST list (the user input list or the whole transcriptome)
@@ -169,7 +169,7 @@ def main():
                     if hasattr(HDR_template,"final_cfd"):
                         start_cfdfinal.append(HDR_template.final_cfd)
                     #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}"
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
                     if HDR_template.final_cfd < 0.03:
                         recut_CFD_pass.write(this_log)
                     else:
@@ -195,7 +195,7 @@ def main():
                     if hasattr(HDR_template,"final_cfd"):
                         stop_cfdfinal.append(HDR_template.final_cfd)
                     #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}"
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
                     if HDR_template.final_cfd < 0.03:
                         recut_CFD_pass.write(this_log)
                     else:
@@ -220,9 +220,9 @@ def main():
             ################
             # if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 2000
-            if protein_coding_transcripts_count >=num_to_process:
-                break
+            #num_to_process = 2000
+            # if protein_coding_transcripts_count >=num_to_process:
+            #     break
 
         #write csv out
         endtime = datetime.datetime.now()
