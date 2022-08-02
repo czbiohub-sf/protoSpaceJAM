@@ -137,10 +137,10 @@ class HDR_flank:
         self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
 
         # mutate insert-to-cut sequence
-        mutated_subseq = self.get_silent_mutations(self.ins2cut_LRtrimed.seq.upper())
+        mutated_subseq = self.get_silent_mutations(self.ins2cut_LRtrimed.seq.upper()) # mutated_subseq is always in coding strand
 
         #put_silent_mutation_subseq_back into HDR flank
-        self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq, mutated_subseq = mutated_subseq, start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end)
+        self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq, mutated_subseq = mutated_subseq, start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end) # mutated_subseq is in the coding strand
 
         #check if gRNA is affected by insertion
         self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
@@ -200,7 +200,7 @@ class HDR_flank:
                 self.mutated_trunc_gRNA = self.trunc_gRNA_LRtrimed.seq
 
             #put mutated seq back to arms
-            self.left_flk_seq_CodonMut2, self.right_flk_seq_CodonMut2 = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq_CodonMut, R_arm=self.right_flk_seq_CodonMut,mutated_subseq = self.mutated_trunc_gRNA, start = self.trunc_gRNA_LRtrimed.start, end = self.trunc_gRNA_LRtrimed.end)
+            self.left_flk_seq_CodonMut2, self.right_flk_seq_CodonMut2 = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq_CodonMut, R_arm=self.right_flk_seq_CodonMut,mutated_subseq = self.mutated_trunc_gRNA, start = self.trunc_gRNA_LRtrimed.start, end = self.trunc_gRNA_LRtrimed.end) # mutated_subseq is already in coding strand
             # extract gRNA
             Null, self.post_mut2_gRNA_seq, Null, self.post_mut2_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut2, self.right_flk_seq_CodonMut2) #get the gRNA after mutating sequence
             #check CFD
@@ -219,7 +219,7 @@ class HDR_flank:
                     self.post_mut3_gRNA_seq = self.post_mut3_gRNA_seq[:-2] + "c" + self.post_mut3_gRNA_seq[-1:]
                 self.cdf_score_post_mut3 = cfd_score(self.gRNA_seq, self.post_mut3_gRNA_seq)
                 #put mutated seq back to arms
-                self.left_flk_seq_CodonMut3, self.right_flk_seq_CodonMut3 = self.put_silent_mutation_subseq_back(L_arm=left, R_arm=right,mutated_subseq = self.post_mut3_gRNA_seq, start = self.g_leftcoord, end = self.g_rightcoord)
+                self.left_flk_seq_CodonMut3, self.right_flk_seq_CodonMut3 = self.put_silent_mutation_subseq_back(L_arm=left, R_arm=right,mutated_subseq = self.to_coding_strand(self.post_mut3_gRNA_seq), start = self.g_leftcoord, end = self.g_rightcoord) # mutated_subseq has to be converted to the coding strand
                 if self.cdf_score_post_mut3 < 0.03:
                     self.mut_message.append("Mutating PAM in UTR resulted in CFD<0.03")
                 else:
@@ -237,7 +237,7 @@ class HDR_flank:
                             self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
                             self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
                             # TODO: put gRNA back
-                            self.left_flk_seq_CodonMut4, self.right_flk_seq_CodonMut4 = self.put_silent_mutation_subseq_back(L_arm=left, R_arm=right,mutated_subseq = self.post_mut4_gRNA_seq, start = self.g_leftcoord, end = self.g_rightcoord)
+                            self.left_flk_seq_CodonMut4, self.right_flk_seq_CodonMut4 = self.put_silent_mutation_subseq_back(L_arm=left, R_arm=right,mutated_subseq = self.to_coding_strand(self.post_mut4_gRNA_seq), start = self.g_leftcoord, end = self.g_rightcoord) # mutated_subseq has to be converted to the coding strand
                             if self.cdf_score_post_mut4 < 0.03:
                                 self.mut_message.append("Mutating protospacer in UTR resulted in CFD<0.03")
                                 break
@@ -255,7 +255,8 @@ class HDR_flank:
                  f"--------------------phase 2: if cfd > 0.03, silently mutate gRNA seq not covered between insert and cut------------------------\n"
                  f"phase 2.         gRNA seq (up to cut site):{self.trunc_gRNA.seq}\n"
                  f"phase 2.                            Phases:{self.trunc_gRNA.phases}\n"
-                 f"phase 2. gRNA seq (up to cut site) trimmed:{self.trunc_gRNA_LRtrimed.phases}\n"
+                 f"phase 2. gRNA seq (up to cut site) trimmed:{self.trunc_gRNA_LRtrimed.seq}\n"
+                 f"phase 2.                            Phases:{self.trunc_gRNA_LRtrimed.phases}\n"
                  f"--> display gRNA and check disruption <--\n"
                  f"phase 2.                          gRNA:{self.gRNA_seq}\n"
                  f"phase 2.                        Phases:{self.gRNA_seq_phases}\n"
@@ -286,6 +287,16 @@ class HDR_flank:
             self.info_p4 = f"phase 4 skipped\n"
 
     #END OF INIT
+    def to_coding_strand(self, gRNA_seq):
+        """
+        input:  gRNA sequence in the PAM strand
+        output: gRNA sequence in coding strand
+        """
+        if int(self.ENST_strand) * int(self.gStrand) > 0:
+            return gRNA_seq
+        else:
+            return (str(Seq(gRNA_seq).reverse_complement()))
+
     def get_uptodate_mut(self):
         """
         return the latest left, right arms, cfd, gRNA seq and phases
@@ -483,6 +494,7 @@ class HDR_flank:
     def put_silent_mutation_subseq_back(self,L_arm, R_arm, mutated_subseq, start, end):
         """
         start, end are local to the whole arm = L_arm + R_arm
+        mutated_subseq has to be in coding strand
         """
         if start == end:
             return L_arm, R_arm
