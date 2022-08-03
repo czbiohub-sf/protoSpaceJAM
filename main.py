@@ -110,12 +110,6 @@ def main():
             input("Press Enter to continue...")
             df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
 
-
-        #list to store IDs whose gRNA is outside of the HDR window
-        #gRNA_out_of_arms = dict()
-        #gRNA_out_of_arms["start"]=dict()
-        #gRNA_out_of_arms["stop"]=dict()
-
         #loop through each ENST
         transcript_count = 0
         protein_coding_transcripts_count = 0
@@ -158,17 +152,14 @@ def main():
 
                     #append cfd score to list for plotting
                     cfd1 = HDR_template.cdf_score_post_mut_ins
-                    start_info.cfd1.append(cfd1)
                     if not hasattr(HDR_template,"cdf_score_post_mut2"):
                         cfd2 = cfd1
                     else:
                         cfd2 = HDR_template.cdf_score_post_mut2
-                    start_info.cfd2.append(cfd2)
                     if not hasattr(HDR_template,"cdf_score_post_mut3"):
                         cfd3 = cfd2
                     else:
                         cfd3 = HDR_template.cdf_score_post_mut3
-                    start_info.cfd3.append(cfd3)
                     if not hasattr(HDR_template,"cdf_score_post_mut4"):
                         cfd4 = cfd3
                     else:
@@ -203,22 +194,18 @@ def main():
 
                     #append cfd score to list for plotting
                     cfd1 = HDR_template.cdf_score_post_mut_ins
-                    stop_info.cfd1.append(cfd1)
                     if not hasattr(HDR_template,"cdf_score_post_mut2"):
                         cfd2 = cfd1
                     else:
                         cfd2 = HDR_template.cdf_score_post_mut2
-                    stop_info.cfd2.append(cfd2)
                     if not hasattr(HDR_template,"cdf_score_post_mut3"):
                         cfd3 = cfd2
                     else:
                         cfd3 = HDR_template.cdf_score_post_mut3
-                    stop_info.cfd3.append(cfd3)
                     if not hasattr(HDR_template,"cdf_score_post_mut4"):
                         cfd4 = cfd3
                     else:
                         cfd4 = HDR_template.cdf_score_post_mut4
-                    stop_info.cfd4.append(cfd4)
                     cfdfinal = cfd4
 
                     #write csv
@@ -278,29 +265,6 @@ def main():
         # write ENSTs (whose gRNA is outside of the default HDR arm) to file
         #with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:
         #    pickle.dump(gRNA_out_of_arms, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-        # write lists of cfd to file
-        with open(f"pickles/start_cfd1_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_info.cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/start_cfd2_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_info.cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/start_cfd3_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_info.cfd3, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/start_cfd4_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_info.cfd4, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/start_cfdfinal_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_info.cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-        with open(f"pickles/stop_cfd1_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_info.cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/stop_cfd2_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_info.cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/stop_cfd3_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_info.cfd3, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/stop_cfd4_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_info.cfd4, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/stop_cfdfinal_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_info.cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 
