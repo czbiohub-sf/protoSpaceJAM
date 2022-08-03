@@ -81,7 +81,19 @@ def main():
         #open log files
         recut_CFD_pass = open("logs/recut_CFD_pass.txt", "w")
         recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
+        csvout_N = open("logs/out_Nterm.csv", "w")
+        csvout_C = open("logs/out_Cterm.csv", "w")
+        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfd_final\n"
+        csvout_N.write(csvout_header)
+        csvout_C.write(csvout_header)
 
+        #dataframes to store best gRNAs
+        best_start_gRNAs = pd.DataFrame()
+        best_stop_gRNAs = pd.DataFrame()
+
+        #logging cfd score, failed gRNAs etc
+        start_info = info()
+        stop_info = info()
 
         #load ENST list (the user input list or the whole transcriptome)
         if os.path.isfile(config['path2csv']):
@@ -98,36 +110,15 @@ def main():
             input("Press Enter to continue...")
             df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
 
-        #dataframes to store best gRNAs
-        best_start_gRNAs = pd.DataFrame()
-        best_stop_gRNAs = pd.DataFrame()
-
-        #list to store IDs failed to yield gRNAs
-        start_failed = []
-        stop_failed = []
 
         #list to store IDs whose gRNA is outside of the HDR window
         #gRNA_out_of_arms = dict()
         #gRNA_out_of_arms["start"]=dict()
         #gRNA_out_of_arms["stop"]=dict()
 
-        #list to store CFD scores
-        start_cfd1 = []
-        start_cfd2 = []
-        start_cfd3 = []
-        start_cfd4 = []
-        start_cfdfinal = []
-        stop_cfd1 = []
-        stop_cfd2 = []
-        stop_cfd3 = []
-        stop_cfd4 = []
-        stop_cfdfinal = []
-
         #loop through each ENST
         transcript_count = 0
         protein_coding_transcripts_count = 0
-        df_start_gRNAs = pd.DataFrame()
-        df_stop_gRNAs = pd.DataFrame()
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
             if not ENST_ID in ENST_info.keys():
@@ -138,18 +129,22 @@ def main():
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
+                csvout_N.write(ENST_ID)
+                csvout_C.write(ENST_ID)
+
+                #get gRNAs
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"])
-                if ranked_df_gRNAs_ATG.empty == False:
-                    df_start_gRNAs = pd.concat([df_start_gRNAs,ranked_df_gRNAs_ATG])
-                else:
-                    start_failed.append(ENST_ID)
-                if ranked_df_gRNAs_stop.empty == False:
-                    df_stop_gRNAs = pd.concat([df_stop_gRNAs,ranked_df_gRNAs_stop])
-                else:
-                    stop_failed.append(ENST_ID)
-                #get best gRNA
+                if ranked_df_gRNAs_ATG.empty == True:
+                    start_info.failed.append(ENST_ID)
+                    csvout_N.write(",,,,,\n")
+                if ranked_df_gRNAs_stop.empty == True:
+                    stop_info.failed.append(ENST_ID)
+                    csvout_C.write(",,,,,\n")
+
+                ##################################
+                #best start gRNA and HDR template#
+                ##################################
                 best_start_gRNA = ranked_df_gRNAs_ATG[ranked_df_gRNAs_ATG["final_weight"] == ranked_df_gRNAs_ATG['final_weight'].max()]
-                best_stop_gRNA = ranked_df_gRNAs_stop[ranked_df_gRNAs_stop["final_weight"] == ranked_df_gRNAs_stop['final_weight'].max()]
                 if best_start_gRNA.empty == False:
                     if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
                         best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
@@ -157,17 +152,33 @@ def main():
 
                     #get HDR template
                     HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
+
+                    # append the best gRNA to the final df
+                    best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA])
+
                     #append cfd score to list for plotting
-                    if hasattr(HDR_template,"cdf_score_post_mut_ins"):
-                        start_cfd1.append(HDR_template.cdf_score_post_mut_ins)
-                    if hasattr(HDR_template,"cdf_score_post_mut2"):
-                        start_cfd2.append(HDR_template.cdf_score_post_mut2)
-                    if hasattr(HDR_template,"cdf_score_post_mut3"):
-                        start_cfd3.append(HDR_template.cdf_score_post_mut3)
-                    if hasattr(HDR_template,"cdf_score_post_mut4"):
-                        start_cfd4.append(HDR_template.cdf_score_post_mut4)
-                    if hasattr(HDR_template,"final_cfd"):
-                        start_cfdfinal.append(HDR_template.final_cfd)
+                    cfd1 = HDR_template.cdf_score_post_mut_ins
+                    start_info.cfd1.append(cfd1)
+                    if not hasattr(HDR_template,"cdf_score_post_mut2"):
+                        cfd2 = cfd1
+                    else:
+                        cfd2 = HDR_template.cdf_score_post_mut2
+                    start_info.cfd2.append(cfd2)
+                    if not hasattr(HDR_template,"cdf_score_post_mut3"):
+                        cfd3 = cfd2
+                    else:
+                        cfd3 = HDR_template.cdf_score_post_mut3
+                    start_info.cfd3.append(cfd3)
+                    if not hasattr(HDR_template,"cdf_score_post_mut4"):
+                        cfd4 = cfd3
+                    else:
+                        cfd4 = HDR_template.cdf_score_post_mut4
+                    start_info.cfd4.append(cfd4)
+                    cfdfinal = cfd4
+
+                    #write csv
+                    csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
+
                     #write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
                     if HDR_template.final_cfd < 0.03:
@@ -175,7 +186,10 @@ def main():
                     else:
                         recut_CFD_fail.write(this_log)
 
-                    best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA]) #append the best gRNA to the final df
+                #################################
+                #best stop gRNA and HDR template#
+                #################################
+                best_stop_gRNA = ranked_df_gRNAs_stop[ranked_df_gRNAs_stop["final_weight"] == ranked_df_gRNAs_stop['final_weight'].max()]
                 if best_stop_gRNA.empty == False:
                     if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
                         best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
@@ -183,17 +197,33 @@ def main():
 
                     #get HDR template
                     HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
-                    # append cfd score to list for plotting
-                    if hasattr(HDR_template,"cdf_score_post_mut_ins"):
-                        stop_cfd1.append(HDR_template.cdf_score_post_mut_ins)
-                    if hasattr(HDR_template,"cdf_score_post_mut2"):
-                        stop_cfd2.append(HDR_template.cdf_score_post_mut2)
-                    if hasattr(HDR_template,"cdf_score_post_mut3"):
-                        stop_cfd3.append(HDR_template.cdf_score_post_mut3)
-                    if hasattr(HDR_template,"cdf_score_post_mut4"):
-                        stop_cfd4.append(HDR_template.cdf_score_post_mut4)
-                    if hasattr(HDR_template,"final_cfd"):
-                        stop_cfdfinal.append(HDR_template.final_cfd)
+
+                    # append the best gRNA to the final df
+                    best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
+
+                    #append cfd score to list for plotting
+                    cfd1 = HDR_template.cdf_score_post_mut_ins
+                    stop_info.cfd1.append(cfd1)
+                    if not hasattr(HDR_template,"cdf_score_post_mut2"):
+                        cfd2 = cfd1
+                    else:
+                        cfd2 = HDR_template.cdf_score_post_mut2
+                    stop_info.cfd2.append(cfd2)
+                    if not hasattr(HDR_template,"cdf_score_post_mut3"):
+                        cfd3 = cfd2
+                    else:
+                        cfd3 = HDR_template.cdf_score_post_mut3
+                    stop_info.cfd3.append(cfd3)
+                    if not hasattr(HDR_template,"cdf_score_post_mut4"):
+                        cfd4 = cfd3
+                    else:
+                        cfd4 = HDR_template.cdf_score_post_mut4
+                    stop_info.cfd4.append(cfd4)
+                    cfdfinal = cfd4
+
+                    #write csv
+                    csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
+
                     #write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
                     if HDR_template.final_cfd < 0.03:
@@ -201,7 +231,6 @@ def main():
                     else:
                         recut_CFD_fail.write(this_log)
 
-                    best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
                 protein_coding_transcripts_count +=1
             else:
                 log.info(f"skipping {ENST_ID} transcript type: {transcript_type} b/c transcript is not protein_coding")
@@ -220,9 +249,9 @@ def main():
             ################
             # if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            #num_to_process = 2000
-            # if protein_coding_transcripts_count >=num_to_process:
-            #     break
+            num_to_process = 1000
+            if protein_coding_transcripts_count >=num_to_process:
+                break
 
         #write csv out
         endtime = datetime.datetime.now()
@@ -234,12 +263,6 @@ def main():
         else:
             num_to_process = "all"
 
-        # write gRNA dfs to file
-        with open(f"pickles/start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(df_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(df_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
         # write best gRNA dfs to file
         with open(f"pickles/best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -248,9 +271,9 @@ def main():
 
         # write failed ENSTs to file
         with open(f"pickles/start_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(start_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/stop_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(stop_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write ENSTs (whose gRNA is outside of the default HDR arm) to file
         #with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:
@@ -258,31 +281,33 @@ def main():
 
         # write lists of cfd to file
         with open(f"pickles/start_cfd1_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(start_info.cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/start_cfd2_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(start_info.cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/start_cfd3_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_cfd3, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(start_info.cfd3, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/start_cfd4_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_cfd4, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(start_info.cfd4, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/start_cfdfinal_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(start_cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(start_info.cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         with open(f"pickles/stop_cfd1_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(stop_info.cfd1, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/stop_cfd2_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(stop_info.cfd2, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/stop_cfd3_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_cfd3, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(stop_info.cfd3, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/stop_cfd4_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_cfd4, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(stop_info.cfd4, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"pickles/stop_cfdfinal_{num_to_process}_genes.pickle", 'wb') as handle:
-            pickle.dump(stop_cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(stop_info.cfdfinal, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 
         recut_CFD_pass.close()
         recut_CFD_fail.close()
+        csvout_N.close()
+        csvout_C.close()
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
@@ -293,7 +318,17 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
-
+class info:
+    '''
+    info log class
+    '''
+    def __init__(self)->None:
+        self.cfd1 = []
+        self.cfd2 = []
+        self.cfd3 = []
+        self.cfd4 = []
+        self.cfdfinal = []
+        self.failed = []
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
