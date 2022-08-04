@@ -97,3 +97,5 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all
 run_log.txt
 run_log.bk.txt
+logs/recut_CFD_pass.txt
+logs/recut_CFD_pass.txt
