@@ -87,6 +87,10 @@ def main():
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
 
+        #open result file and write header
+        csvout_res = open("logs/result.csv", "w")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_score,specificity_weight,distance_weight,position_weight,final_weight,ssODN\n")
+
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
         best_stop_gRNAs = pd.DataFrame()
@@ -125,6 +129,11 @@ def main():
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
                 csvout_N.write(ENST_ID)
                 csvout_C.write(ENST_ID)
+                if hasattr(ENST_info[ENST_ID],"name"):
+                    name = ENST_info[ENST_ID].name
+                else:
+                    name = ""
+                row_prefix = f"{ENST_ID},{ENST_info[ENST_ID].chr},{transcript_type},{name}"
 
                 #get gRNAs
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"])
@@ -169,6 +178,9 @@ def main():
 
                     #write csv
                     csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
+                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(best_start_gRNA)
+                    ssODN = HDR_template.ODN_postMut_ss
+                    csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
 
                     #write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
@@ -210,6 +222,9 @@ def main():
 
                     #write csv
                     csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
+                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(best_stop_gRNA)
+                    ssODN = HDR_template.ODN_postMut_ss
+                    csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
 
                     #write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
@@ -236,9 +251,9 @@ def main():
             ################
             # if ENST_ID == "ENST00000360426":
             #    sys.exit()
-            num_to_process = 1000
-            if protein_coding_transcripts_count >=num_to_process:
-                break
+            # num_to_process = 100
+            # if protein_coding_transcripts_count >=num_to_process:
+            #     break
 
         #write csv out
         endtime = datetime.datetime.now()
@@ -293,6 +308,19 @@ class info:
         self.cfd4 = []
         self.cfdfinal = []
         self.failed = []
+
+def get_res(best_start_gRNA):
+    CSS = best_start_gRNA["CSS"].values[0]
+    seq = best_start_gRNA["seq"].values[0]
+    pam = best_start_gRNA["pam"].values[0]
+    s = best_start_gRNA["start"].values[0]
+    e = best_start_gRNA["end"].values[0]
+    cut2ins_dist = best_start_gRNA["Cut2Ins_dist"].values[0]
+    spec_weight = best_start_gRNA["spec_weight"].values[0]
+    dist_weight = best_start_gRNA["dist_weight"].values[0]
+    pos_weight = best_start_gRNA["pos_weight"].values[0]
+    final_weight = best_start_gRNA["final_weight"].values[0]
+    return([CSS,seq,pam,s,e,cut2ins_dist,spec_weight,dist_weight,pos_weight,final_weight])
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
