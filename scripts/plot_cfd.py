@@ -10,6 +10,8 @@ import numpy as np
 import pickle
 from scripts.utils import *
 from scipy.stats import gaussian_kde
+import seaborn as sns
+import traceback
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -39,53 +41,78 @@ def main():
     try:
         starttime = datetime.datetime.now()
 
+        #read data
+        df_N = pd.read_csv("../logs/out_Nterm_recut_cfd.csv", low_memory=False)
+        df_C = pd.read_csv("../logs/out_Cterm_recut_cfd.csv", low_memory=False)
+        df_N["terminus"] = "N"
 
-        #load gRNA dataframes
-        log.info("loading pickle files")
-        num_to_process = config["num_to_process"]
-        start_cfd1 = read_pickle_files(os.path.join(f"../pickles/start_cfd1_{num_to_process}_genes.pickle"))
-        start_cfd2 = read_pickle_files(os.path.join(f"../pickles/start_cfd2_{num_to_process}_genes.pickle"))
-        start_cfd3 = read_pickle_files(os.path.join(f"../pickles/start_cfd3_{num_to_process}_genes.pickle"))
-        start_cfd4 = read_pickle_files(os.path.join(f"../pickles/start_cfd4_{num_to_process}_genes.pickle"))
-        start_cfdfinal = read_pickle_files(os.path.join(f"../pickles/start_cfdfinal_{num_to_process}_genes.pickle"))
 
-        stop_cfd1 = read_pickle_files(os.path.join(f"../pickles/start_cfd1_{num_to_process}_genes.pickle"))
-        stop_cfd2 = read_pickle_files(os.path.join(f"../pickles/start_cfd2_{num_to_process}_genes.pickle"))
-        stop_cfd3 = read_pickle_files(os.path.join(f"../pickles/start_cfd3_{num_to_process}_genes.pickle"))
-        stop_cfd4 = read_pickle_files(os.path.join(f"../pickles/start_cfd4_{num_to_process}_genes.pickle"))
-        #stop_cfdfinal = read_pickle_files(os.path.join(f"../pickles/start_cfdfinal_{num_to_process}_genes.pickle"))
+        df_N_melt = pd.melt(df_N, id_vars = ["ID"], value_vars=['cfd1','cfd2','cfd3','cfd4'], value_name='cfd', var_name='phase')
+        df_N_melt["terminus"] = "N"
+        df_C_melt = pd.melt(df_C, id_vars = ["ID"], value_vars=['cfd1','cfd2','cfd3','cfd4'], value_name='cfd', var_name='phase')
+        df_C_melt["terminus"] = "C"
 
-        start_cfd1_df = pd.DataFrame(start_cfd1, columns=['start_cfd1'])
-        start_cfd2_df = pd.DataFrame(start_cfd2, columns=['start_cfd2'])
-        start_cfd3_df = pd.DataFrame(start_cfd3, columns=['start_cfd3'])
-        start_cfd4_df = pd.DataFrame(start_cfd4, columns=['start_cfd4'])
-        start_cfdfinal_df = pd.DataFrame(start_cfdfinal, columns=['start_cfd-final'])
+        df = pd.concat([df_N_melt, df_C_melt])
+        plot_violin(df)
 
-        stop_cfd1_df = pd.DataFrame(stop_cfd1, columns=['stop_cfd1'])
-        stop_cfd2_df = pd.DataFrame(stop_cfd2, columns=['stop_cfd2'])
-        stop_cfd3_df = pd.DataFrame(stop_cfd3, columns=['stop_cfd3'])
-        stop_cfd4_df = pd.DataFrame(stop_cfd4, columns=['stop_cfd4'])
-        #stop_cfdfinal_df = pd.DataFrame(stop_cfdfinal, columns=['cfd'])
+        df_N_melt["ID"] = df_N_melt["ID"]+"_N"
+        df_C_melt["ID"] = df_C_melt["ID"]+"_C"
+        df = pd.concat([df_N_melt, df_C_melt],ignore_index=True )
+        plot_lines(df)
+        #plot_lines2(df)
 
-        #prepare df to plot
-        #df2plot = best_stop_gRNA_df
-        #df2plot = subset_df(df = df2plot, col ="final_weight", max =1, min=0)
+        cfd1_N = df_N["cfd1"].values
+        cfd2_N = df_N["cfd2"].values
+        cfd3_N = df_N["cfd3"].values
+        cfd4_N = df_N["cfd4"].values
+        #
+        cfd1_C = df_C["cfd1"].values
+        cfd2_C = df_C["cfd2"].values
+        cfd3_C = df_C["cfd3"].values
+        cfd4_C = df_C["cfd4"].values
+        #
+        cfd1 = np.concatenate((cfd1_N,cfd1_C), axis = None)
+        cfd2 = np.concatenate((cfd2_N, cfd2_C), axis = None)
+        cfd3 = np.concatenate((cfd3_N, cfd3_C), axis = None)
+        cfd4 = np.concatenate((cfd4_N, cfd4_C), axis = None)
 
         #plot params
-        bin_num = 30
+        bin_num = 33
+        num_to_process = len(cfd1)
 
-        #plot histogram of weight
-        plot_hist(df = start_cfd1_df,  col = "start_cfd1", bin_num=bin_num, num_to_process = num_to_process)
-        plot_hist(df = start_cfd2_df,  col = "start_cfd2", bin_num=bin_num, num_to_process = num_to_process)
-        plot_hist(df = start_cfd3_df,  col = "start_cfd3", bin_num=bin_num, num_to_process = num_to_process)
-        plot_hist(df = start_cfd4_df,  col = "start_cfd4", bin_num=bin_num, num_to_process = num_to_process)
-        plot_hist(df = start_cfdfinal_df, col="start_cfd-final", bin_num=bin_num, num_to_process=num_to_process)
+        #plot histogram
+        plot_hist(lst = cfd1,  label = "cfd1", bin_num=bin_num)
+        plot_hist(lst = cfd2,  label = "cfd2", bin_num=bin_num)
+        plot_hist(lst = cfd3,  label = "cfd3", bin_num=bin_num)
+        plot_hist(lst = cfd4,  label = "cfd4", bin_num=bin_num)
 
+        plot_hist(lst = cfd1_N,  label = "cfd1_N", bin_num=bin_num)
+        plot_hist(lst = cfd2_N,  label = "cfd2_N", bin_num=bin_num)
+        plot_hist(lst = cfd3_N,  label = "cfd3_N", bin_num=bin_num)
+        plot_hist(lst = cfd4_N,  label = "cfd4_N", bin_num=bin_num)
+        plot_hist(lst = cfd1_C,  label = "cfd1_C", bin_num=bin_num)
+        plot_hist(lst = cfd2_C,  label = "cfd2_C", bin_num=bin_num)
+        plot_hist(lst = cfd3_C,  label = "cfd3_C", bin_num=bin_num)
+        plot_hist(lst = cfd4_C,  label = "cfd4_C", bin_num=bin_num)
+        #print stats
+        print(f"number of cfd<0.03 in cfd1: {sum(i < 0.03 for i in cfd1)}")
+        print(f"number of cfd<0.03 in cfd2: {sum(i < 0.03 for i in cfd2)}")
+        print(f"number of cfd<0.03 in cfd3: {sum(i < 0.03 for i in cfd3)}")
+        print(f"number of cfd<0.03 in cfd4: {sum(i < 0.03 for i in cfd4)}")
+
+        print(f"number of cfd<0.03 in cfd1_N: {sum(i < 0.03 for i in cfd1_N)}")
+        print(f"number of cfd<0.03 in cfd2_N: {sum(i < 0.03 for i in cfd2_N)}")
+        print(f"number of cfd<0.03 in cfd3_N: {sum(i < 0.03 for i in cfd3_N)}")
+        print(f"number of cfd<0.03 in cfd4_N: {sum(i < 0.03 for i in cfd4_N)}")
+
+        print(f"number of cfd<0.03 in cfd1_C: {sum(i < 0.03 for i in cfd1_C)}")
+        print(f"number of cfd<0.03 in cfd2_C: {sum(i < 0.03 for i in cfd2_C)}")
+        print(f"number of cfd<0.03 in cfd3_C: {sum(i < 0.03 for i in cfd3_C)}")
+        print(f"number of cfd<0.03 in cfd4_C: {sum(i < 0.03 for i in cfd4_C)}")
         #plot scatterplot of weight
         #plot_scatter(df = df2plot, col1 = "dist_weight", col2 = "pos_weight",  num_to_process = num_to_process)
         #plot_scatter(df = df2plot, col1 = "dist_weight", col2 = "spec_weight", num_to_process=num_to_process)
         #plot_scatter(df = df2plot, col1 = "pos_weight", col2 = "spec_weight",  num_to_process=num_to_process)
-
 
         #plot dist_weight (with overflow bin)
         # lower = 0
@@ -122,6 +149,7 @@ def main():
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
         print("additional information:", e)
+        traceback.print_exc()
         PrintException()
 
 ##########################
@@ -133,22 +161,70 @@ def subset_df(df, col, max, min):
     df = df[df[col]>=min]
     return(df)
 
-def plot_hist(df, col, bin_num, num_to_process):
-    name = col
-    d = df[name]
-    data_volume = len(d)
-    d.plot.hist(grid=True, bins=bin_num, rwidth=0.9, color='#607c8e', range=[0, 1])
+def plot_violin(df):
+    fig, ax = plt.subplots()
+    ax = sns.violinplot(x="phase", y="cfd", hue="terminus",data=df, palette="muted", split=True, cut = 0)
     mpl.rcParams.update({'figure.autolayout': True})
-    if name == "final_weight":
-        name = "final_score"
-    plt.title(f"Distribution of {name} for {data_volume} gRNAs in {num_to_process} transcripts", fontsize = 13)
-    plt.xlabel(name, fontsize = 14)
-    plt.ylabel('Counts', fontsize = 14)
+    ax.set_title(f"Distribution of recut cfd scores", fontsize = 13)
+    ax.set_xlabel("phase", fontsize = 14)
+    ax.set_ylabel('recut cfd', fontsize = 14)
+    ax.set_xticklabels(["1","2","3","4"])
     mpl.rcParams["axes.labelsize"] = 14
     mpl.rcParams["axes.titlesize"] = 14
     plt.xticks(fontsize = 14)
+    plt.xticks(fontsize = 14)
+    plt.show()
+    plt.savefig(f"../plots/cfd.violin.png",bbox_inches = "tight")
+    plt.close()
+
+def plot_lines(df):
+    fig, ax = plt.subplots()
+    ax = sns.lineplot(x="phase", y="cfd", hue="terminus", data=df, ci=99)
+    mpl.rcParams.update({'figure.autolayout': True})
+    ax.set_title(f"recut cfd scores", fontsize = 13)
+    ax.set_xlabel("phase", fontsize = 14)
+    ax.set_ylabel('recut cfd', fontsize = 14)
+    ax.set_xticklabels(["1","2","3","4"])
+    mpl.rcParams["axes.labelsize"] = 14
+    mpl.rcParams["axes.titlesize"] = 14
+    plt.xticks(fontsize = 14)
+    plt.xticks(fontsize = 14)
+    plt.show()
+    plt.savefig(f"../plots/cfd.violin.png",bbox_inches = "tight")
+    plt.close()
+
+def plot_lines2(df):
+    fig, ax = plt.subplots()
+    ax = sns.lineplot(x="phase", y="cfd", hue="terminus", data=df, units="ID",estimator=None,)
+    mpl.rcParams.update({'figure.autolayout': True})
+    ax.set_title(f"recut cfd scores", fontsize = 13)
+    ax.set_xlabel("phase", fontsize = 14)
+    ax.set_ylabel('recut cfd', fontsize = 14)
+    ax.set_xticklabels(["1","2","3","4"])
+    mpl.rcParams["axes.labelsize"] = 14
+    mpl.rcParams["axes.titlesize"] = 14
+    plt.xticks(fontsize = 14)
+    plt.xticks(fontsize = 14)
+    plt.show()
+    plt.savefig(f"../plots/cfd.violin.png",bbox_inches = "tight")
+    plt.close()
+
+def plot_hist(lst, label, bin_num):
+    name = label
+    d = lst
+    d = pd.DataFrame(d)
+    data_volume = len(d)
+    d.plot.hist(grid=True, bins=bin_num, rwidth=0.9, color='#607c8e', range=[0, 1],legend=None)
+    mpl.rcParams.update({'figure.autolayout': True})
+    plt.title(f"Distribution of {name} for {data_volume} gRNAs", fontsize = 18)
+    plt.xlabel(name, fontsize = 16)
+    plt.ylabel('Counts', fontsize = 16)
+    mpl.rcParams["axes.labelsize"] = 16
+    mpl.rcParams["axes.titlesize"] = 16
+    plt.xticks(fontsize = 14)
     plt.yticks(fontsize = 14)
     plt.grid(axis='y', alpha=0.75)
+    #plt.ylim((0,2000))
     plt.savefig(f"../plots/{name}.{bin_num}bins.png",bbox_inches = "tight")
     plt.close()
 

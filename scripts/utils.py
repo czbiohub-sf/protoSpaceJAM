@@ -131,7 +131,7 @@ def get_range(start,end): #TODO phase should be ENST specific
     else:
         return list(range(start,end-1,-1))
 
-def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag):
+def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
         ENST_strand = ENST_info[ENST_ID].features[0].strand
@@ -170,8 +170,8 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
         myflank = HDR_flank(left_flk_seq = leftArm , right_flk_seq = rightArm,
                             left_flk_coord_lst = [left_start, left_end], right_flk_coord_lst = [right_start, right_end],
                             left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
-                            type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
-                            tag = tag)
+                            type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, ENST_chr = Chr, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
+                            tag = tag, loc2posType = loc2posType)
         return myflank
         #log IDs whose gRNA is not in the default-size HDR arms
         #if myflank.entire_gRNA_in_HDR_arms == False:
@@ -409,7 +409,8 @@ def _position_weight(types):
             if weight < lowest_weight:
                 lowest_weight = weight
         else:
-            sys.exit(f"unexpected position type: {type}")
+            pass
+            #sys.exit(f"unexpected position type: {type}")
     return(lowest_weight)
 
 def _dist_weight(hdr_dist: int, _dist_weight_variance = 55) -> float:

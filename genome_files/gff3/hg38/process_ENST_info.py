@@ -327,34 +327,44 @@ def main():
                 if idx != 0 and idx != (len(cds_loc)-1): #not first or last cds
                     if strand == 1 or strand == "1" or strand == "+": #pos strand
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-1,end+2]),  value="within_2bp_of_exon_intron_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-2,end+3]),  value="within_3bp_of_exon_intron_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-3,end-2]),  value="3N4bp_up_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end+3,end+6]),  value="3_to_6bp_down_of_exon_intron_junction")
+
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-2,start+1]),  value="within_2bp_of_intron_exon_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-3,start+2]),  value="within_3bp_of_intron_exon_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-4,start-3]),  value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start+2,start+3]),  value="3N4bp_down_of_intron_exon_junction")
                     else: #neg strand
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-2,start+1]),  value="within_2bp_of_exon_intron_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-3,start+2]),  value="within_3bp_of_exon_intron_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start+2,start+3]),  value="3N4bp_up_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-6,start-3]),  value="3_to_6bp_down_of_exon_intron_junction")
+
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-1,end+2]),  value="within_2bp_of_intron_exon_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-2,end+3]),  value="within_3bp_of_intron_exon_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end+3,end+4]),  value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-3,end-2]),  value="3N4bp_down_of_intron_exon_junction")
                 elif idx == 0 and idx != (len(cds_loc)-1): #first cds (not necessarily the one with the start codon)
                     if strand == 1 or strand == "1" or strand == "+": #pos strand, first cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-1,end+2]),  value="within_2bp_of_exon_intron_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-2,end+3]),  value="within_3bp_of_exon_intron_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-3,end-2]),  value="3N4bp_up_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end+3,end+6]),  value="3_to_6bp_down_of_exon_intron_junction")
                     else:  # neg strand last cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-1,end+2]),  value="within_2bp_of_intron_exon_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-2,end+3]),  value="within_3bp_of_intron_exon_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end+3,end+4]),  value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([end-3,end-2]) ,  value="3N4bp_down_of_intron_exon_junction")
                 elif idx == (len(cds_loc)-1) and idx != 0: #last cds (not necessarily the one with the stop codon)
                     if strand == 1 or strand == "1" or strand == "+":  # pos strand, last cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-2,start+1]),  value="within_2bp_of_intron_exon_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-3,start+2]),  value="within_3bp_of_intron_exon_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-4,start-3]),  value="3N4bp_up_of_intron_exon_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start+2,start+3]),  value="3N4bp_down_of_intron_exon_junction")
                     else:  # neg strand, first cds
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-2,start+1]),  value="within_2bp_of_exon_intron_junction")
+                        loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-3,start+2]),  value="within_3bp_of_exon_intron_junction") # for recut
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start+2,start+3]),  value="3N4bp_up_of_exon_intron_junction")
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-6,start-3]),  value="3_to_6bp_down_of_exon_intron_junction")
 

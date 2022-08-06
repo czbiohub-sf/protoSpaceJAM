@@ -81,8 +81,8 @@ def main():
         #open log files
         recut_CFD_pass = open("logs/recut_CFD_pass.txt", "w")
         recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
-        csvout_N = open("logs/out_Nterm.csv", "w")
-        csvout_C = open("logs/out_Cterm.csv", "w")
+        csvout_N = open("logs/out_Nterm_recut_cfd.csv", "w")
+        csvout_C = open("logs/out_Cterm_recut_cfd.csv", "w")
         csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfd_final\n"
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
@@ -154,7 +154,7 @@ def main():
                         best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
+                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = tag, loc2posType = loc2posType)
 
                     # append the best gRNA to the final df
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA])
@@ -199,7 +199,7 @@ def main():
                         best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = tag)
+                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = tag, loc2posType = loc2posType)
 
                     # append the best gRNA to the final df
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
