@@ -83,8 +83,9 @@ class MyParser(argparse.ArgumentParser):
         sys.exit(2)
 
 def parse_args():
-    parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
+    parser= MyParser(description='This scripts processes the gff3 file, generates a dictionary files (pickle format) of (1) ENST transcript information, (2) loc2posType, (3) codon phase information. The dictionaries are input for main.py')
     parser.add_argument('--gff3_gzfile', default="Homo_sapiens.GRCh38.106.gff3.gz", type=str, help='path to the gzfile', metavar='')
+    parser.add_argument('--gff3_gzfile', default="hg387", type=str, help='path to a directory holding the results', metavar='')
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
         parser.print_help()
@@ -103,6 +104,8 @@ config = vars(parse_args())
 #####################
 ##      main       ##
 #####################
+#TODO: run zebrafish
+#TODO: output to genome dir
 def main():
     try:
         starttime = datetime.datetime.now()
@@ -233,13 +236,15 @@ def main():
                 ENST_info[ID].chr = ENST_info[ID].features[0].ref
 
         # write dict to file
-        with open('ENST_info.pickle', 'wb') as handle:
+        with open(
+                '../genome_files/gff3/hg38/ENST_info.pickle', 'wb') as handle:
             pickle.dump(ENST_info, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
         #parse codons and assign phase to each (coding) chr position
         print("parsing codons")
-        with open("debug.txt","w") as wfh:
+        with open(
+                "../genome_files/gff3/hg38/debug.txt", "w") as wfh:
             for ENST_ID in ENST_info.keys():
                 my_transcript = ENST_info[ENST_ID]
                 transcript_type = my_transcript.description.split("|")[1]
@@ -296,7 +301,8 @@ def main():
                             count+=1
 
         # write dict to file
-        with open('ENST_codonPhase.pickle', 'wb') as handle:
+        with open(
+                '../genome_files/gff3/hg38/ENST_codonPhase.pickle', 'wb') as handle:
             pickle.dump(ENST_codons_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -369,7 +375,8 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-6,start-3]),  value="3_to_6bp_down_of_exon_intron_junction")
 
         # write dict to file
-        with open('loc2posType.pickle', 'wb') as handle:
+        with open(
+                '../genome_files/gff3/hg38/loc2posType.pickle', 'wb') as handle:
             pickle.dump(loc2posType, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
