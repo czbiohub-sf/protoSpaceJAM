@@ -596,12 +596,12 @@ def get_seq(chr,start,end,strand,genome_ver):
     end (the end position is not included
     strand 1 or -1 (str)
     '''
-    chr_file_path = os.path.join("genome_files",f"{genome_ver}_byChr",f"{chr}.pk")
+    chr_file_path = os.path.join("genome_files","fa_pickle",genome_ver,f"{chr}.pk")
     log.debug(f"opening file {chr_file_path}")
     if os.path.isfile(chr_file_path):
         #read file
         chr_seqrecord = read_pickle_files(chr_file_path)
-        subseq = chr_seqrecord.seq._data.decode()[(start-1):(end-1)] # use -1 to convert 1-index to 0-index
+        subseq = chr_seqrecord.seq._data[(start-1):(end-1)] # use -1 to convert 1-index to 0-index
         if strand == "-1" or strand == -1:
             return(reverse_complement(subseq))
         else:

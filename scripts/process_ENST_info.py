@@ -19,7 +19,9 @@ from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
 import itertools
 import traceback
-
+import os
+import urllib
+import zlib
 #################
 #custom logging #
 #################
@@ -84,12 +86,10 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts processes the gff3 file, generates a dictionary files (pickle format) of (1) ENST transcript information, (2) loc2posType, (3) codon phase information. The dictionaries are input for main.py')
-    parser.add_argument('--gff3_gzfile', default="Homo_sapiens.GRCh38.106.gff3.gz", type=str, help='path to the gzfile', metavar='')
-    parser.add_argument('--gff3_gzfile', default="hg387", type=str, help='path to a directory holding the results', metavar='')
+    parser.add_argument('--release', default="106", type=str, help='Ensembl release', metavar='')
+    parser.add_argument('--genome_ver', default="GRCh38", type=str, help='genome+version, choices are GRCh38, GRCz11, GRCm39', metavar='')
     config = parser.parse_args()
-    if len(sys.argv)==1: # print help message if arguments are not valid
-        parser.print_help()
-        sys.exit(1)
+
     return config
 
 logging.setLoggerClass(ColoredLogger)
@@ -110,7 +110,47 @@ def main():
     try:
         starttime = datetime.datetime.now()
 
-        file = config["gff3_gzfile"]
+        genome_ver = config["genome_ver"]
+        release = config["release"]
+        prefix_mapping = {"GRCz": "Danio_rerio",
+                  "GRCh": "Homo_sapiens",
+                  "GRCm": "Mus_musculus"}
+        spp = prefix_mapping[genome_ver[0:4]]
+
+        file_directory = f"genome_files/gff3/{genome_ver}" # this is the output directory
+        file = spp + '.' + genome_ver + '.' + release + ".gff3.gz"
+        file_path = f"genome_files/gff3/{genome_ver}/{file}"
+
+        print(f"target gff3.gz file is {file}")
+
+        #prepare gff3.gz
+        if os.path.isfile(file_path):
+            print(f"found {file} in directory {file_directory}\nchecking md5 checksums")
+            #check md5
+            url=f"http://ftp.ensembl.org/pub/release-{release}/gff3/" + spp.lower() + "/CHECKSUMS"
+            outmd5 = f"{file_directory}/CHECKSUMS"
+            # Download the file from `url` and save it locally under `file_name`:
+            with urllib.request.urlopen(url) as response, open(outmd5, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+            # md5_pass = False
+            # with open(outmd5, "r") as f:
+            #     for line in f:
+            #         checksum, fsize, fname = line.rstrip().split()
+            #         if fname == file and checksum == crc32(file_path):
+            #             print("md5 checksums matched")
+            #             md5_pass==True
+        else:
+            #download
+            print(f"downloading {file} to directory {file_directory}")
+            if make_output_dir(file_directory):
+                url = f"http://ftp.ensembl.org/pub/release-{release}/gff3/" + spp.lower() + "/" + file
+                # Download the file from `url` and save it locally under `file_name`:
+                with urllib.request.urlopen(url) as response, open(file_path, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
+            else:
+                sys.exit(f"failed to create directory genome_files/gff3/{genome_ver}")
+
+        file = file_path
         outfile = file.rstrip(".gz") + ".ENST2Chr.gz"
 
         #dicts
@@ -236,15 +276,13 @@ def main():
                 ENST_info[ID].chr = ENST_info[ID].features[0].ref
 
         # write dict to file
-        with open(
-                '../genome_files/gff3/hg38/ENST_info.pickle', 'wb') as handle:
+        with open(f"{file_directory}/ENST_info.pickle", 'wb') as handle:
             pickle.dump(ENST_info, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
         #parse codons and assign phase to each (coding) chr position
         print("parsing codons")
-        with open(
-                "../genome_files/gff3/hg38/debug.txt", "w") as wfh:
+        with open(f"{file_directory}/debug.txt", "w") as wfh:
             for ENST_ID in ENST_info.keys():
                 my_transcript = ENST_info[ENST_ID]
                 transcript_type = my_transcript.description.split("|")[1]
@@ -302,7 +340,7 @@ def main():
 
         # write dict to file
         with open(
-                '../genome_files/gff3/hg38/ENST_codonPhase.pickle', 'wb') as handle:
+                f"{file_directory}/ENST_codonPhase.pickle", 'wb') as handle:
             pickle.dump(ENST_codons_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -375,8 +413,7 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-6,start-3]),  value="3_to_6bp_down_of_exon_intron_junction")
 
         # write dict to file
-        with open(
-                '../genome_files/gff3/hg38/loc2posType.pickle', 'wb') as handle:
+        with open(f"{file_directory}/loc2posType.pickle", 'wb') as handle:
             pickle.dump(loc2posType, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
@@ -394,6 +431,43 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
+def make_output_dir(path):
+    if (not os.path.exists(path)): #output doesn't exist
+      os.makedirs(path)
+      return True
+    else: #output dir exists
+        inp = input(f"{path} already exists...\npress y to confirm overwritting")
+        if inp == "y" or inp == "Y":
+            shutil.rmtree(path, ignore_errors=True, onerror=onerror)
+            os.makedirs(path, exist_ok=True)
+            return True
+        else:
+            return False
+
+def onerror(func, path, exc_info):
+    """
+    Error handler for ``shutil.rmtree``.
+
+    If the error is due to an access error (read only file)
+    it attempts to add write permission and then retries.
+
+    If the error is for another reason it re-raises the error.
+
+    Usage : ``shutil.rmtree(path, onerror=onerror)``
+    """
+    import stat
+    # Is the error an access error?
+    if not os.access(path, os.W_OK):
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        raise
+
+def crc32(fileName):
+    prev = 0
+    for eachLine in open(fileName,"rb"):
+        prev = zlib.crc32(eachLine, prev)
+    return "%X"%(prev & 0xFFFFFFFF)
 
 def assign_codon_position(start, end, start_phase):
     """

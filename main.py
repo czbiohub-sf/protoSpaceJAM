@@ -25,7 +25,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
-    parser.add_argument('--genome_ver', default="hg38", type=str, help='pickle file containing the ENST_info dict', metavar='')
+    parser.add_argument('--genome_ver', default="GRCh38", type=str, help='pickle file containing the ENST_info dict', metavar='')
     parser.add_argument('--path2csv', default="input/mart_export_canonical_proteincoding.csv", type=str,
                         help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',
                         metavar='')

@@ -87,7 +87,7 @@ class HDR_flank:
         assert len(right_flk_phases) > 1
         self.right_flk_phases = self.join_int_list(right_flk_phases)
 
-        print(f"{self.left_flk_phases}||{self.right_flk_phases}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
+        #print(f"{self.left_flk_phases}||{self.right_flk_phases}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
 
         #for positions within 3bp to exon/intron junctions, change phase from "0" to "9"
         #for position in 5UTR, change phase from "0" to "9"
@@ -98,7 +98,7 @@ class HDR_flank:
         self.right_flk_phases_masked = self.mask_phase_within_3bp_exon_intron_junction(coord1, coord2, self.right_flk_phases)
         self.right_flk_phases_masked = self.mask_phase_in_5UTR(coord1, coord2, self.right_flk_phases_masked)
 
-        print(f"{self.left_flk_phases_masked}||{self.right_flk_phases_masked}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
+        #print(f"{self.left_flk_phases_masked}||{self.right_flk_phases_masked}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
         #TODO: switch later code to use "self.left_flk_phases_masked" and "self.right_flk_phases_masked"
 
         # adjust insPos, for stop-tagging ,the insertion site is now before the first base of the stop codon
