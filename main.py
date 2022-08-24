@@ -27,8 +27,10 @@ def parse_args():
     parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
     parser.add_argument('--genome_ver', default="GRCh38", type=str, help='pickle file containing the ENST_info dict', metavar='')
     parser.add_argument('--path2csv', default="input/mart_export_canonical_proteincoding.csv", type=str,
-                        help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',
-                        metavar='')
+                        help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
+    parser.add_argument('--payload', default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
+    parser.add_argument('--Npayload', default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='payload at the N terminus', metavar='')
+    parser.add_argument('--Cpayload',  default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG", type=str, help='payload at the N terminus', metavar='')
     config = parser.parse_args()
     return config
 
@@ -154,7 +156,7 @@ def main():
                         best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = tag, loc2posType = loc2posType)
+                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType)
 
                     # append the best gRNA to the final df
                     best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA])
@@ -199,7 +201,7 @@ def main():
                         best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = tag, loc2posType = loc2posType)
+                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType)
 
                     # append the best gRNA to the final df
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
@@ -249,8 +251,8 @@ def main():
             ################
             #early stopping#
             ################
-            # if ENST_ID == "ENST00000360426":
-            #    sys.exit()
+            # if ENST_ID == "ENST00000361739":
+            #     sys.exit()
             # num_to_process = 100
             # if protein_coding_transcripts_count >=num_to_process:
             #     break

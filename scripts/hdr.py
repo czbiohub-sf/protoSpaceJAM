@@ -242,10 +242,14 @@ class HDR_flank:
                     mutbase = self.single_base_muation(base)
                     self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
                     self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
-                    # TODO: put gRNA back
-                    self.left_flk_seq_CodonMut4, self.right_flk_seq_CodonMut4 = self.put_silent_mutation_subseq_back(L_arm=left, R_arm=right,
-                                                                                                                     mutated_subseq = self.to_coding_strand(self.post_mut4_gRNA_seq),  # mutated_subseq has to be converted to the coding strand
-                                                                                                                     start = self.g_leftcoord, end = self.g_rightcoord) #|-> start, end are local to the whole arm = L_arm + R_arm <-|
+                    #early stop if CFD goes below 0.03
+                    if self.cdf_score_post_mut4<0.03:
+                        break
+
+            #put gRNA back
+            self.left_flk_seq_CodonMut4, self.right_flk_seq_CodonMut4 = self.put_silent_mutation_subseq_back(L_arm=left, R_arm=right,
+                                                                                                             mutated_subseq = self.to_coding_strand(self.post_mut4_gRNA_seq),  # mutated_subseq has to be converted to the coding strand
+                                                                                                             start = self.g_leftcoord, end = self.g_rightcoord) #|-> start, end are local to the whole arm = L_arm + R_arm <-|
 
         left,right,cfd,seq,phases = self.get_uptodate_mut()
 
@@ -257,7 +261,7 @@ class HDR_flank:
         ###################
         # log information #
         ###################
-        self.info = f"\n\n{self.ENST_ID}\tstrand:{self.ENST_strand}\ttype:{type}-tagging\tInsPos:{self.InsPos}\tgRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord}\tstrand:{self.gStrand}\tCutPos:{self.CutPos}\tCut2Ins-dist:{self.Cut2Ins_dist}\n"
+        self.info = f"\n\n{self.ENST_ID}\tstrand:{self.ENST_strand}\tgRNA_strand:{self.gStrand}\t{type}-tagging\tCut2Ins-dist:{self.Cut2Ins_dist}\ngRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord})\tCutPos:{self.CutPos}\tInsPos:{self.InsPos}\n"
         self.info_arm = "".join(
             f"--------------------HDR arms---------------------------------------------------------------------------------------------------\n"
             f"1. left | right arms:{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
@@ -422,10 +426,10 @@ class HDR_flank:
             phases = self.post_mut_ins_gRNA_seq_phases
         return([left,right,cfd,seq,phases])
     def single_base_muation(self,base):
-        mapping = {"A":"c","a":"c",
-                   "C":"a","c":"a",
-                   "G":"t","g":"t",
-                   "T":"g","t":"g"}
+        mapping = {"A":"t","a":"t",
+                   "C":"g","c":"g",
+                   "G":"c","g":"c",
+                   "T":"a","t":"a"}
         return mapping[base]
 
     def check_overlap(self,obj1,obj2):
