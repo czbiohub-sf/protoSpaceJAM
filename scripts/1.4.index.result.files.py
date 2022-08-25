@@ -85,7 +85,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='')
-    parser.add_argument('--gzdir', default="../gRNA_hg38/gRNA.tab.gz.split.BwaMapped.scored", type=str, help='path to the dir containing gzfiles', metavar='')
+    parser.add_argument('--gzdir', default="", type=str, help='path to the dir containing gzfiles', metavar='')
     config = parser.parse_args()
     return config
 
@@ -143,7 +143,7 @@ def main():
             file_count+=1
 
         # write dict to file
-        with open('../gRNA_hg38/loc2file_index.pickle', 'wb') as handle:
+        with open('loc2file_index.pickle', 'wb') as handle:
             pickle.dump(file_index, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
