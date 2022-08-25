@@ -44,6 +44,8 @@ log.setLevel(logging.INFO) #set the level of warning displayed
 max_cut2ins_dist = 50
 HDR_arm_len = 100
 
+gRNA_num_out = 3
+
 mNG2_11 = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
 tag = mNG2_11
 
@@ -149,17 +151,18 @@ def main():
                 ##################################
                 #best start gRNA and HDR template#
                 ##################################
-                best_start_gRNA = ranked_df_gRNAs_ATG[ranked_df_gRNAs_ATG["final_weight"] == ranked_df_gRNAs_ATG['final_weight'].max()]
-                if best_start_gRNA.empty == False:
-                    if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
-                        best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
-                        best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
+                for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_ATG.shape[0]])):
+                    # if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
+                    #     best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
+                    #     best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
+                    current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df = best_start_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType)
+                    HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType)
 
                     # append the best gRNA to the final df
-                    best_start_gRNAs = pd.concat([best_start_gRNAs, best_start_gRNA])
+                    if i==0:
+                        best_start_gRNAs = pd.concat([best_start_gRNAs, current_gRNA])
 
                     #append cfd score to list for plotting
                     cfd1 = HDR_template.cdf_score_post_mut_ins
@@ -180,7 +183,7 @@ def main():
 
                     #write csv
                     csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
-                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(best_start_gRNA)
+                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                     ssODN = HDR_template.ODN_postMut_ss
                     csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
 
@@ -194,17 +197,17 @@ def main():
                 #################################
                 #best stop gRNA and HDR template#
                 #################################
-                best_stop_gRNA = ranked_df_gRNAs_stop[ranked_df_gRNAs_stop["final_weight"] == ranked_df_gRNAs_stop['final_weight'].max()]
-                if best_stop_gRNA.empty == False:
-                    if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
-                        best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
-                        best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
+                for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_stop.shape[0]])):
+                    # if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
+                    #     best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
+                    #     best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
+                    current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df=best_stop_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType)
+                    HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType)
 
                     # append the best gRNA to the final df
-                    best_stop_gRNAs = pd.concat([best_stop_gRNAs, best_stop_gRNA])
+                    best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
 
                     #append cfd score to list for plotting
                     cfd1 = HDR_template.cdf_score_post_mut_ins
@@ -224,7 +227,7 @@ def main():
 
                     #write csv
                     csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
-                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(best_stop_gRNA)
+                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                     ssODN = HDR_template.ODN_postMut_ss
                     csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
 

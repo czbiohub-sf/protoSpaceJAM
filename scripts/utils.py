@@ -271,6 +271,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, genome
     df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc, dist=dist, loc2file_index=loc2file_index, genome_ver=genome_ver)
     # rank gRNAs
     ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType, ENST_ID = ENST_ID,ENST_strand = ENST_strand, type = "start")
+    ranked_df_gRNAs_ATG = ranked_df_gRNAs_ATG.sort_values("final_weight", ascending=False) #sort descending on final weight
 
     ##################################
     # get gRNAs around the stop  codon#
@@ -283,6 +284,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, genome
     df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc, dist=dist, loc2file_index=loc2file_index, genome_ver=genome_ver)
     # rank gRNAs
     ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType, ENST_ID = ENST_ID, ENST_strand = ENST_strand, type = "stop")
+    ranked_df_gRNAs_stop = ranked_df_gRNAs_stop.sort_values("final_weight", ascending=False) #sort descending on final weight
 
     return ([ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop])
 
