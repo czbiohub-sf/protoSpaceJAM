@@ -235,8 +235,8 @@ class HDR_flank:
             self.post_mut4_gRNA_seq = seq
             self.post_mut4_gRNA_seq_phases = phases
             for idx,item in reversed(list(enumerate(phases))):
-                if idx == (len(phases) - 1) or idx == (len(phases) - 2):
-                    continue #skip PAM
+                #if idx == (len(phases) - 1) or idx == (len(phases) - 2):
+                    #continue #skip PAM #TODO: re-evaluate the need to skip PAM here
                 if item == "0": #in UTR
                     base = seq[idx]
                     mutbase = self.single_base_muation(base)
