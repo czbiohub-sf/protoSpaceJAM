@@ -31,6 +31,7 @@ def parse_args():
     parser.add_argument('--payload', default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
     parser.add_argument('--Npayload', default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='payload at the N terminus', metavar='')
     parser.add_argument('--Cpayload',  default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG", type=str, help='payload at the N terminus', metavar='')
+    parser.add_argument('--num_gRNA_per_term',  default=1, type=int, help='payload at the N terminus', metavar='')
     config = parser.parse_args()
     return config
 
@@ -44,13 +45,12 @@ log.setLevel(logging.INFO) #set the level of warning displayed
 max_cut2ins_dist = 50
 HDR_arm_len = 100
 
-gRNA_num_out = 3
 
 mNG2_11 = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
 tag = mNG2_11
 
 config = vars(parse_args())
-
+gRNA_num_out = config['num_gRNA_per_term']
 #####################
 ##      main       ##
 #####################
@@ -90,6 +90,7 @@ def main():
         csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfd_final\n"
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
+        fiveUTR_log = open("logs/fiveUTR.txt", "w")
 
         #open result file and write header
         csvout_res = open("logs/result.csv", "w")
@@ -127,7 +128,7 @@ def main():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
-            if transcript_type == "protein_coding": #and ENST_ID == "ENST00000361681":
+            if transcript_type == "protein_coding":# and ENST_ID == "ENST00000612640":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
@@ -188,12 +189,17 @@ def main():
                     csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
 
                     #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
                     if HDR_template.final_cfd < 0.03:
                         recut_CFD_pass.write(this_log)
                     else:
                         recut_CFD_fail.write(this_log)
 
+                    if hasattr(HDR_template,"info_phase4_5UTR"):
+                        fiveUTR_log.write(f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n")
+                    if hasattr(HDR_template,"info_phase5_5UTR"):
+                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0][0]}\t{HDR_template.info_phase5_5UTR[0][1]}\n")
+                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[1][0]}\t{HDR_template.info_phase5_5UTR[1][1]}\n")
                 #################################
                 #best stop gRNA and HDR template#
                 #################################
@@ -232,11 +238,17 @@ def main():
                     csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
 
                     #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
                     if HDR_template.final_cfd < 0.03:
                         recut_CFD_pass.write(this_log)
                     else:
                         recut_CFD_fail.write(this_log)
+
+                    if hasattr(HDR_template,"info_phase4_5UTR"):
+                        fiveUTR_log.write(f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n")
+                    if hasattr(HDR_template,"info_phase5_5UTR"):
+                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0][0]}\t{HDR_template.info_phase5_5UTR[0][1]}\n")
+                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[1][0]}\t{HDR_template.info_phase5_5UTR[1][1]}\n")
 
                 protein_coding_transcripts_count +=1
             else:
@@ -254,7 +266,7 @@ def main():
             ################
             #early stopping#
             ################
-            # if ENST_ID == "ENST00000361739":
+            # if ENST_ID == "ENST00000562221":
             #     sys.exit()
             # num_to_process = 100
             # if protein_coding_transcripts_count >=num_to_process:
