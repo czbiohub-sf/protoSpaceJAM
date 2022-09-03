@@ -5,7 +5,7 @@
 
 ### TO DO
 - [x] Ignore (non-chimeric) homology arms in sliding windowing analysis
-- [] Fix 888999 ignored by synoymoous mutations
+- [ ] Fix 888999 ignored by synoymoous mutations
 
 ### Precompute gRNA
 GRCh38  
