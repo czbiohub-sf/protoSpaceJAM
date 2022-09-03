@@ -87,14 +87,14 @@ def main():
         recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
         csvout_N = open("logs/out_Nterm_recut_cfd.csv", "w")
         csvout_C = open("logs/out_Cterm_recut_cfd.csv", "w")
-        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfd_final\n"
+        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,max_of_cfd4_cfdScan,cfd_max\n"
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
         fiveUTR_log = open("logs/fiveUTR.txt", "w")
 
         #open result file and write header
         csvout_res = open("logs/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_score,specificity_weight,distance_weight,position_weight,final_weight,ssODN\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_score,specificity_weight,distance_weight,position_weight,cfd1,cfd2,cfd3,cfd4,cfd_scan,max_of_cfd4_cfdScan,final_weight,ssODN\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -122,13 +122,18 @@ def main():
         #loop through each ENST
         transcript_count = 0
         protein_coding_transcripts_count = 0
+        target_terminus = "all"
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
+            if "Target Terminus" in df.columns:
+                target_terminus = row["Target Terminus"]
+                if target_terminus!="N" and target_terminus!="C" and target_terminus!="all":
+                    sys.exit(f"invalid target terminus: {target_terminus}")
             if not ENST_ID in ENST_info.keys():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
-            if transcript_type == "protein_coding":# and ENST_ID == "ENST00000612640":
+            if transcript_type == "protein_coding":# and ENST_ID == "ENST00000399976":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
@@ -152,103 +157,114 @@ def main():
                 ##################################
                 #best start gRNA and HDR template#
                 ##################################
-                for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_ATG.shape[0]])):
-                    # if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
-                    #     best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
-                    #     best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
-                    current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
+                if target_terminus=="all" or target_terminus=="N":
+                    for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_ATG.shape[0]])):
+                        # if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
+                        #     best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
+                        #     best_start_gRNA = best_start_gRNA.head(1) #get the first row in case of ties
+                        current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
 
-                    #get HDR template
-                    HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType)
+                        #get HDR template
+                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType)
 
-                    # append the best gRNA to the final df
-                    if i==0:
-                        best_start_gRNAs = pd.concat([best_start_gRNAs, current_gRNA])
+                        # append the best gRNA to the final df
+                        if i==0:
+                            best_start_gRNAs = pd.concat([best_start_gRNAs, current_gRNA])
 
-                    #append cfd score to list for plotting
-                    cfd1 = HDR_template.cdf_score_post_mut_ins
-                    if not hasattr(HDR_template,"cdf_score_post_mut2"):
-                        cfd2 = cfd1
-                    else:
-                        cfd2 = HDR_template.cdf_score_post_mut2
-                    if not hasattr(HDR_template,"cdf_score_post_mut3"):
-                        cfd3 = cfd2
-                    else:
-                        cfd3 = HDR_template.cdf_score_post_mut3
-                    if not hasattr(HDR_template,"cdf_score_post_mut4"):
-                        cfd4 = cfd3
-                    else:
-                        cfd4 = HDR_template.cdf_score_post_mut4
-                    start_info.cfd4.append(cfd4)
-                    cfdfinal = cfd4
+                        #append cfd score to list for plotting
+                        cfd1 = HDR_template.cdf_score_post_mut_ins
+                        if not hasattr(HDR_template,"cdf_score_post_mut2"):
+                            cfd2 = cfd1
+                        else:
+                            cfd2 = HDR_template.cdf_score_post_mut2
+                        if not hasattr(HDR_template,"cdf_score_post_mut3"):
+                            cfd3 = cfd2
+                        else:
+                            cfd3 = HDR_template.cdf_score_post_mut3
+                        if not hasattr(HDR_template,"cdf_score_post_mut4"):
+                            cfd4 = cfd3
+                        else:
+                            cfd4 = HDR_template.cdf_score_post_mut4
+                        start_info.cfd4.append(cfd4)
+                        cfd_scan = 0
+                        if hasattr(HDR_template,"cdf_score_highest_in_win_scan"):
+                            cfd_scan = HDR_template.cdf_score_highest_in_win_scan
 
-                    #write csv
-                    csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
-                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
-                    ssODN = HDR_template.ODN_postMut_ss
-                    csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
+                        cfdfinal = HDR_template.final_cfd
 
-                    #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
-                    if HDR_template.final_cfd < 0.03:
-                        recut_CFD_pass.write(this_log)
-                    else:
-                        recut_CFD_fail.write(this_log)
+                        #write csv
+                        csvout_N.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
+                        CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
+                        ssODN = HDR_template.ODN_postMut_ss
+                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
 
-                    if hasattr(HDR_template,"info_phase4_5UTR"):
-                        fiveUTR_log.write(f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n")
-                    if hasattr(HDR_template,"info_phase5_5UTR"):
-                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0][0]}\t{HDR_template.info_phase5_5UTR[0][1]}\n")
-                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[1][0]}\t{HDR_template.info_phase5_5UTR[1][1]}\n")
+                        #write log
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
+                        if HDR_template.final_cfd < 0.03:
+                            recut_CFD_pass.write(this_log)
+                        else:
+                            recut_CFD_fail.write(this_log)
+
+                        if hasattr(HDR_template,"info_phase4_5UTR"):
+                            fiveUTR_log.write(f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n")
+                        if hasattr(HDR_template,"info_phase5_5UTR"):
+                            fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0]}\t{HDR_template.info_phase5_5UTR[1]}\n")
+
                 #################################
                 #best stop gRNA and HDR template#
                 #################################
-                for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_stop.shape[0]])):
-                    # if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
-                    #     best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
-                    #     best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
-                    current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
+                if target_terminus=="all" or target_terminus=="C":
+                    for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_stop.shape[0]])):
+                        # if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
+                        #     best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
+                        #     best_stop_gRNA = best_stop_gRNA.head(1) #get the first row in case of ties
+                        current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
 
-                    #get HDR template
-                    HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType)
+                        #get HDR template
+                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType)
 
-                    # append the best gRNA to the final df
-                    best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
+                        # append the best gRNA to the final df
+                        best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
 
-                    #append cfd score to list for plotting
-                    cfd1 = HDR_template.cdf_score_post_mut_ins
-                    if not hasattr(HDR_template,"cdf_score_post_mut2"):
-                        cfd2 = cfd1
-                    else:
-                        cfd2 = HDR_template.cdf_score_post_mut2
-                    if not hasattr(HDR_template,"cdf_score_post_mut3"):
-                        cfd3 = cfd2
-                    else:
-                        cfd3 = HDR_template.cdf_score_post_mut3
-                    if not hasattr(HDR_template,"cdf_score_post_mut4"):
-                        cfd4 = cfd3
-                    else:
-                        cfd4 = HDR_template.cdf_score_post_mut4
-                    cfdfinal = cfd4
+                        #append cfd score to list for plotting
+                        cfd1 = HDR_template.cdf_score_post_mut_ins
+                        if not hasattr(HDR_template,"cdf_score_post_mut2"):
+                            cfd2 = cfd1
+                        else:
+                            cfd2 = HDR_template.cdf_score_post_mut2
+                        if not hasattr(HDR_template,"cdf_score_post_mut3"):
+                            cfd3 = cfd2
+                        else:
+                            cfd3 = HDR_template.cdf_score_post_mut3
+                        if not hasattr(HDR_template,"cdf_score_post_mut4"):
+                            cfd4 = cfd3
+                        else:
+                            cfd4 = HDR_template.cdf_score_post_mut4
 
-                    #write csv
-                    csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfdfinal}\n")
-                    CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
-                    ssODN = HDR_template.ODN_postMut_ss
-                    csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight},{dist_weight},{pos_weight},{final_weight},{ssODN}\n")
+                        cfd_scan = 0
+                        if hasattr(HDR_template,"cdf_score_highest_in_win_scan"):
+                            cfd_scan = HDR_template.cdf_score_highest_in_win_scan
 
-                    #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.4f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
-                    if HDR_template.final_cfd < 0.03:
-                        recut_CFD_pass.write(this_log)
-                    else:
-                        recut_CFD_fail.write(this_log)
+                        cfdfinal = HDR_template.final_cfd
 
-                    if hasattr(HDR_template,"info_phase4_5UTR"):
-                        fiveUTR_log.write(f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n")
-                    if hasattr(HDR_template,"info_phase5_5UTR"):
-                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0][0]}\t{HDR_template.info_phase5_5UTR[0][1]}\n")
-                        fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[1][0]}\t{HDR_template.info_phase5_5UTR[1][1]}\n")
+                        #write csv
+                        csvout_C.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
+                        CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
+                        ssODN = HDR_template.ODN_postMut_ss
+                        csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+
+                        #write log
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
+                        if HDR_template.final_cfd < 0.03:
+                            recut_CFD_pass.write(this_log)
+                        else:
+                            recut_CFD_fail.write(this_log)
+
+                        if hasattr(HDR_template,"info_phase4_5UTR"):
+                            fiveUTR_log.write(f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n")
+                        if hasattr(HDR_template,"info_phase5_5UTR"):
+                            fiveUTR_log.write(f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0]}\t{HDR_template.info_phase5_5UTR[1]}\n")
+
 
                 protein_coding_transcripts_count +=1
             else:

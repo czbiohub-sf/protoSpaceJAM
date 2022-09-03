@@ -50,18 +50,16 @@ class chimeric_gRNA:
     recut_rc .seq .cfd .phases
     '''
     def __init__(self,
-                 gRNA_seq:str, gRNA_phases:str, recut_seq:str, recut_cfd:float,recut_phases:str, recut_rc_seq:str, recut_rc_phases:str, recut_rc_cfd:float)->None:
+                 gRNA_seq:str, gRNA_phases:str, recut_seq:str, recut_cfd:float,recut_phases:str)->None:
         self.gRNA = seq_w_phase_cfd(seq = gRNA_seq, phases = gRNA_phases, cfd = 1)
         self.recut = seq_w_phase_cfd(seq = recut_seq, phases = recut_phases, cfd = recut_cfd)
-        self.recut_rc = seq_w_phase_cfd(seq = recut_rc_seq, phases = recut_rc_phases, cfd = recut_rc_cfd)
 
     def update(self):
         """
-        update cfd, rc seq, rc cfd based on seq
+        update cfd
         """
         self.recut.cfd = cfd_score(self.gRNA.seq, self.recut.seq)
-        self.recut_rc.seq = str(Seq(self.recut.seq).reverse_complement())
-        self.recut_rc.cfd = cfd_score(self.gRNA.seq, self.recut_rc.seq)
+
 
 class HDR_flank:
     """
@@ -315,183 +313,31 @@ class HDR_flank:
         #########
         #phase 5#
         #########
+        left,right,cfd,seq,phases = self.get_uptodate_mut()
         self.ODN_phases = self.left_flk_phases + "X"*len(self.tag) + self.right_flk_phases
         self.ODN_postMut = left + self.tag + right
+
+        #slide windows scan for new cut sites
         self.info_p5 = ""
+        #print(f"{self.ODN_postMut}\n{self.ODN_phases}")
+        fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.ODN_postMut, self.ODN_phases)
 
-        #get sliding window as an iterator
-        it = self.sliding_window(self.ODN_postMut,23)
+        #scan the revcom
+        #print(f"{str(Seq(self.ODN_postMut).reverse_complement())}\n{self.ODN_phases[::-1]}")
+        rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1])
 
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
-        n_window = 0
-        for n_mer in it:
-            n_mer = "".join(n_mer)
-            if "N" in n_mer or "n" in n_mer:
-                continue
-            n_mer_revcom = str(Seq(n_mer).reverse_complement()) #reverse complement
+        #get the highest cfd among all possible cutsites
+        scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
 
-            cfd = cfd_score(self.gRNA_seq, n_mer)
-            cfd_revcom = cfd_score(self.gRNA_seq, n_mer_revcom)
-
-            n_mer_phases = self.ODN_phases[n_window: n_window + 23]
-            n_mer_revcom_phases = n_mer_phases[::-1]
-
-            o = chimeric_gRNA(gRNA_seq=self.gRNA_seq, gRNA_phases="",
-                                      recut_seq=n_mer, recut_cfd = cfd, recut_phases=n_mer_phases,
-                                      recut_rc_seq=n_mer_revcom, recut_rc_cfd=cfd_revcom, recut_rc_phases=n_mer_revcom_phases)
-
-            if cfd>0.03 or cfd_revcom>0.03:
-
-                self.info_p5 = self.info_p5 + "".join(f"win      original gRNA:{self.gRNA_seq}\n"
-                                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
-                                      f"       chimeric phases:{o.recut.phases}\n"
-                                      f"       chimeric revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                                      f"chimeric revcom phases:{o.recut_rc.phases}|\n")
-                print(f"win      original gRNA:{self.gRNA_seq}\n"
-                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
-                      f"       chimeric phases:{o.recut.phases}\n"
-                      f"       chimeric revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                      f"chimeric revcom phases:{o.recut_rc.phases}|")
-
-                #start to mutate (it is sufficient to only work with the coding strand
-                #try silently mutate the coding strand
-                seq_obj = seq_w_phase(seq = o.recut.seq, phases = o.recut.phases, start = 1, end = 23)
-                seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
-                seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-
-                if len(seq_obj_lrtrim.seq)>=3:
-                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
-                else:
-                    mutated = seq_obj_lrtrim.seq
-                o.recut.seq = o.recut.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
-                o.update() #update cfd, rc seq , rc cfd according to mutated seq
-
-                self.info_p5 = self.info_p5 + "".join(
-                      f"syn          before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}\n"
-                      f"       after mut revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                      f"after mut revcom phases:{n_mer_revcom_phases}|\n"
-                )
-                print(f"syn          before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}\n"
-                      f"       after mut revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                      f"after mut revcom phases:{n_mer_revcom_phases}|")
-
-
-            #try mutate in 3UTR
-            if o.recut.cfd>0.03 or o.recut_rc.cfd>0.03:
-
-                # mutate PAM if it's in 3' UTR (phase == 0)
-                if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
-                    o.recut.seq = o.recut.seq[:-1] + "c"
-                    o.update()
-                if n_mer_phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
-                    o.recut.seq = o.recut.seq[:-2] + "c" + o.recut.seq[-1:]
-                    o.update()
-
-                if o.recut.cfd>0.03 or o.recut_rc.cfd>0.03:
-                    #mutate protospacer if in 3UTR
-                    latest_cfd = self.cdf_score_post_mut_ins
-                    if hasattr(self,"cdf_score_post_mut2"):
-                        latest_cfd = self.cdf_score_post_mut2 > 0.03
-                    if latest_cfd > 0.03:
-                        left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
-                        self.post_mut2_gRNA_seq = seq
-                        self.post_mut2_gRNA_seq_phases = phases
-
-                        for idx,item in reversed(list(enumerate(n_mer_phases))):
-                            if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
-                                continue #skip PAM
-                            if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
-                                base = o.recut.seq[idx]
-                                mutbase = self.single_base_muation(base)
-                                o.recut.seq = o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:]
-                                o.update()
-                                #early stop if CFD goes below 0.03
-                                if o.recut.cfd<0.03 and o.recut_rc.cfd<0.03:
-                                    break
-                self.info_p5 = self.info_p5 + "".join(f"3UTR         before mut:{n_mer}\n"
-                                                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                                                      f"                 phases:{n_mer_phases}\n"
-                                                      f"       after mut revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                                                      f"after mut revcom phases:{n_mer_revcom_phases}|\n")
-
-                print(f"3UTR         before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}\n"
-                      f"       after mut revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                      f"after mut revcom phases:{n_mer_revcom_phases}|")
-
-            #try mutate in 5UTR
-            if o.recut.cfd>0.03 or o.recut_rc.cfd>0.03:
-                self.info_phase5_5UTR=[[o.recut.cfd, ""],[o.recut_rc.cfd,""]]
-                # mutate PAM if it's in 5' UTR (phase == 5)
-                if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
-                    o.recut.seq = o.recut.seq[:-1] + "c"
-                    o.update()
-                if n_mer_phases[-2:-1] == "5": #second position phase = 5 (the first G in NGG)
-                    o.recut.seq = o.recut.seq[:-2] + "c" + o.recut.seq[-1:]
-                    o.update()
-
-                if o.recut.cfd>0.03 or o.recut_rc.cfd>0.03:
-                    #mutate protospacer if in 5UTR
-                    for idx,item in reversed(list(enumerate(n_mer_phases))):
-                        if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
-                            continue #skip PAM
-                        if item == "5": # 5'UTR is labeled "5"
-                            base = o.recut.seq[idx]
-                            mutbase = self.single_base_muation(base)
-                            o.recut.seq = o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:]
-                            o.update()
-                            #early stop if CFD goes below 0.03
-                            if o.recut.cfd<0.03 and o.recut_rc.cfd<0.03:
-                                break
-
-
-                    self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
-                                                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                                                          f"                 phases:{n_mer_phases}\n"
-                                                          f"       after mut revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                                                          f"after mut revcom phases:{n_mer_revcom_phases}|\n")
-
-                    print(f"3UTR         before mut:{n_mer}\n"
-                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                          f"                 phases:{n_mer_phases}\n"
-                          f"       after mut revcom:{o.recut_rc.seq}\tcfd:{o.recut_rc.cfd}\n"
-                          f"after mut revcom phases:{n_mer_revcom_phases}|")
-
-                self.info_phase5_5UTR[0][1] = o.recut.cfd
-                self.info_phase5_5UTR[1][1] = o.recut_rc.cfd
-
-            if o.recut.seq != n_mer: # mutations been made
-                n_mer_confirm = self.ODN_postMut[n_window: n_window + 23]
-                self.info_p5 = self.info_p5 + "".join(f"phase 5 final\n"
-                                                      f" orig gRNA: {o.gRNA.seq}\n"
-                                                      f"premut seq: {n_mer} cfd:{cfd}\n"
-                                                      f"    revcom: {n_mer_revcom} cfd:{cfd_revcom}\n"
-                                                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}\n"
-                                                      f"    revcom: {o.recut_rc.seq} cfd:{o.recut_rc.cfd}\n"
-                                                      f"   confirm: {n_mer_confirm}|\n")
-                print(f"phase 5 final for current window\n"
-                      f" orig gRNA: {o.gRNA.seq}\n"
-                      f"premut seq: {n_mer} cfd:{cfd}\n"
-                      f"    revcom: {n_mer_revcom} cfd:{cfd_revcom}\n"
-                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}\n"
-                      f"    revcom: {o.recut_rc.seq} cfd:{o.recut_rc.cfd}\n"
-                      f"   confirm: {n_mer_confirm}|")
-
-                #put mut seq back into ssODN
-                self.ODN_postMut = self.ODN_postMut[0:n_window] + o.recut.seq + self.ODN_postMut[n_window + 23:]
-
-            n_window+=1
-
-        left,right,cfd,seq,phases = self.get_uptodate_mut()
+        self.cdf_score_highest_in_win_scan = scan_highest_cfd
+        ###################
+        #finished recoding#
+        ###################
+        left,right,cfd,seq,phases = self.get_uptodate_mut() # not including slide window scan and mutation
 
         self.ODN_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
         self.ODN_postMut_ss = self.select_ssODN_strand(self.ODN_postMut)
-        self.final_cfd = cfd
+        self.final_cfd = max(cfd,scan_highest_cfd) #this should be the highest cfd from all phases,  cfd= phase 1-4, scan_highest_cfd = phase5
 
         ###################
         # log information #
@@ -557,14 +403,274 @@ class HDR_flank:
             self.info_p4 = f"phase 4 skipped\n"
 
         self.info_p5 = "".join(
-            f"\n--------------------phase 5: sliding window check of recutting-------------------------------------------------------------------\n"
-            f"phase 5.    ssODN:{self.ODN_vanillia}\n"
-            f"phase 5.ssODN mut:{self.ODN_postMut}\n"
-            f"phase 5.   phases:{self.ODN_phases}\n") + self.info_p5
+            f"--------------------phase 5: sliding window check of recutting-------------------------------------------------------------------\n"
+            f"phase 5.              ssODN:{self.ODN_vanillia}\n"
+            f"phase 5.  ssODN pre-phase 5:{left + self.tag + right}\n"
+            f"phase 5.ssODN after-phase 5:{self.ODN_postMut}\n"
+            f"phase 5.             phases:{self.ODN_phases}\n") + self.info_p5
 
     #############
     #END OF INIT#
     #############
+    def revcom(self,seq):
+        return str(Seq(seq).reverse_complement())
+    def slide_win_mutation_noncoding(self,seq,phases):
+        highest_cfd = 0
+        #get sliding window as an iterator
+        it = self.sliding_window(seq,23)
+        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        n_window = 0
+        for n_mer in it:
+            #skip non-chimeric part of the homology arm
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                print(f"skipping window: {n_window}")
+                continue
+            #check for "N"s in the sequence
+            n_mer = "".join(n_mer)
+            if "N" in n_mer or "n" in n_mer:
+                n_window+=1
+                continue
+            cfd = cfd_score(self.gRNA_seq, n_mer)
+            n_mer_phases = phases[n_window: n_window + 23]
+            o = chimeric_gRNA(gRNA_seq=self.gRNA_seq, gRNA_phases="",
+                              recut_seq=n_mer, recut_cfd = cfd, recut_phases=n_mer_phases)
+            if cfd>0.03:
+                self.info_p5 = self.info_p5 + "".join(f"win-     original gRNA:{self.gRNA_seq}\n"
+                                                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
+                                                      f"       chimeric phases:{o.recut.phases}\n")
+                print(f"win-     original gRNA:{self.gRNA_seq}\n"
+                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
+                      f"       chimeric phases:{o.recut.phases}")
+                #start to mutate (it is sufficient to only work with the coding strand
+                #try silently mutate **the coding strand**
+                seq_obj = seq_w_phase(seq = self.revcom(o.recut.seq), phases = o.recut.phases[::-1], start = 1, end = 23)
+                seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
+                seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
+
+                if len(seq_obj_lrtrim.seq) >= 3:
+                    print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
+                else:
+                    mutated = seq_obj_lrtrim.seq
+                untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
+                o.recut.seq = self.revcom(untrimmed)
+                o.update() #update cfd, rc seq , rc cfd according to mutated seq
+                self.info_p5 = self.info_p5 + "".join(
+                      f"syn          before mut:{n_mer}\n"
+                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                      f"                 phases:{n_mer_phases}\n")
+                print(f"syn          before mut:{n_mer}\n"
+                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                      f"                 phases:{n_mer_phases}")
+            #try mutate in 3UTR
+            if o.recut.cfd>0.03:
+                # mutate PAM if it's in 3' UTR (phase == 0)
+                if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
+                    o.recut.seq = o.recut.seq[:-1] + "c"
+                    o.update()
+                if n_mer_phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
+                    o.recut.seq = o.recut.seq[:-2] + "c" + o.recut.seq[-1:]
+                    o.update()
+                if o.recut.cfd>0.03:
+                    for idx,item in reversed(list(enumerate(n_mer_phases))):
+                        if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
+                            continue #skip PAM
+                        if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                            base = o.recut.seq[idx]
+                            mutbase = self.single_base_muation(base)
+                            o.recut.seq = o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:]
+                            o.update()
+                            #early stop if CFD goes below 0.03
+                            if o.recut.cfd<0.03:
+                                break
+                self.info_p5 = self.info_p5 + "".join(f"3UTR         before mut:{n_mer}\n"
+                                                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                                                      f"                 phases:{n_mer_phases}\n")
+                print(f"3UTR         before mut:{n_mer}\n"
+                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                      f"                 phases:{n_mer_phases}")
+            #try mutate in 5UTR
+            if o.recut.cfd>0.03:
+                self.info_phase5_5UTR=[o.recut.cfd, ""]
+                # mutate PAM if it's in 5' UTR (phase == 5)
+                if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
+                    o.recut.seq = o.recut.seq[:-1] + "c"
+                    o.update()
+                if n_mer_phases[-2:-1] == "5": #second position phase = 5 (the first G in NGG)
+                    o.recut.seq = o.recut.seq[:-2] + "c" + o.recut.seq[-1:]
+                    o.update()
+
+                if o.recut.cfd>0.03:
+                    #mutate protospacer if in 5UTR
+                    for idx,item in reversed(list(enumerate(n_mer_phases))):
+                        if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
+                            continue #skip PAM
+                        if item == "5": # 5'UTR is labeled "5"
+                            base = o.recut.seq[idx]
+                            mutbase = self.single_base_muation(base)
+                            o.recut.seq = o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:]
+                            o.update()
+                            #early stop if CFD goes below 0.03
+                            if o.recut.cfd<0.03:
+                                break
+                    self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
+                                                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                                                          f"                 phases:{n_mer_phases}\n")
+                    print(f"5UTR         before mut:{n_mer}\n"
+                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                          f"                 phases:{n_mer_phases}")
+
+                self.info_phase5_5UTR[1] = o.recut.cfd
+            if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
+                self.info_p5 = self.info_p5 + "".join(f"phase 5 final\n"
+                                                      f" orig gRNA: {o.gRNA.seq}\n"
+                                                      f"premut seq: {n_mer} cfd:{cfd}\n"
+                                                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}\n")
+                print(f"phase 5 final for current window\n"
+                      f" orig gRNA: {o.gRNA.seq}\n"
+                      f"premut seq: {n_mer} cfd:{cfd}\n"
+                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}")
+                #put mut seq back into ssODN, need revcom here b/c the input/seq is revcomed from self.ODN_postMut
+                self.ODN_postMut = self.revcom(seq[0:n_window] + o.recut.seq + seq[n_window + 23:])
+                highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd
+            else:
+                highest_cfd = max([highest_cfd, cfd]) #update highest cfd
+            n_window+=1
+        return highest_cfd
+
+    def slide_win_mutation_coding(self,seq,phases):
+        highest_cfd = 0
+        #get sliding window as an iterator
+        it = self.sliding_window(seq,23)
+        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        n_window = 0
+        for n_mer in it:
+            #skip non-chimeric part of the homology arm
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                print(f"skipping window: {n_window}")
+                continue
+            #check for "N"s in the sequence
+            n_mer = "".join(n_mer)
+            if "N" in n_mer or "n" in n_mer:
+                continue
+            cfd = cfd_score(self.gRNA_seq, n_mer)
+            n_mer_phases = phases[n_window: n_window + 23]
+            o = chimeric_gRNA(gRNA_seq=self.gRNA_seq, gRNA_phases="",
+                              recut_seq=n_mer, recut_cfd = cfd, recut_phases=n_mer_phases)
+            if cfd>0.03:
+                self.info_p5 = self.info_p5 + "".join(f"win+     original gRNA:{self.gRNA_seq}\n"
+                                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
+                                      f"       chimeric phases:{o.recut.phases}\n")
+                print(f"win+     original gRNA:{self.gRNA_seq}\n"
+                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
+                      f"       chimeric phases:{o.recut.phases}")
+                #start to mutate (it is sufficient to only work with the coding strand
+                #try silently mutate the coding strand
+                seq_obj = seq_w_phase(seq = o.recut.seq, phases = o.recut.phases, start = 1, end = 23)
+                seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
+                seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
+
+                if len(seq_obj_lrtrim.seq)>=3:
+                    print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
+                else:
+                    mutated = seq_obj_lrtrim.seq
+                o.recut.seq = o.recut.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
+                o.update() #update cfd, rc seq , rc cfd according to mutated seq
+                self.info_p5 = self.info_p5 + "".join(
+                      f"syn          before mut:{n_mer}\n"
+                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                      f"                 phases:{n_mer_phases}\n")
+                print(f"syn          before mut:{n_mer}\n"
+                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                      f"                 phases:{n_mer_phases}")
+            #try mutate in 3UTR
+            if o.recut.cfd>0.03:
+                # mutate PAM if it's in 3' UTR (phase == 0)
+                if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
+                    o.recut.seq = o.recut.seq[:-1] + "c"
+                    o.update()
+                if n_mer_phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
+                    o.recut.seq = o.recut.seq[:-2] + "c" + o.recut.seq[-1:]
+                    o.update()
+                if o.recut.cfd>0.03:
+                    #mutate protospacer if in 3UTR
+                    for idx,item in reversed(list(enumerate(n_mer_phases))):
+                        if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
+                            continue #skip PAM
+                        if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                            base = o.recut.seq[idx]
+                            mutbase = self.single_base_muation(base)
+                            o.recut.seq = o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:]
+                            o.update()
+                            #early stop if CFD goes below 0.03
+                            if o.recut.cfd<0.03:
+                                break
+                self.info_p5 = self.info_p5 + "".join(f"3UTR         before mut:{n_mer}\n"
+                                                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                                                      f"                 phases:{n_mer_phases}\n")
+                print(f"3UTR         before mut:{n_mer}\n"
+                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                      f"                 phases:{n_mer_phases}")
+            #try mutate in 5UTR
+            if o.recut.cfd>0.03:
+                self.info_phase5_5UTR=[o.recut.cfd, ""]
+                # mutate PAM if it's in 5' UTR (phase == 5)
+                if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
+                    o.recut.seq = o.recut.seq[:-1] + "c"
+                    o.update()
+                if n_mer_phases[-2:-1] == "5": #second position phase = 5 (the first G in NGG)
+                    o.recut.seq = o.recut.seq[:-2] + "c" + o.recut.seq[-1:]
+                    o.update()
+
+                if o.recut.cfd>0.03:
+                    #mutate protospacer if in 5UTR
+                    for idx,item in reversed(list(enumerate(n_mer_phases))):
+                        if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
+                            continue #skip PAM
+                        if item == "5": # 5'UTR is labeled "5"
+                            base = o.recut.seq[idx]
+                            mutbase = self.single_base_muation(base)
+                            o.recut.seq = o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:]
+                            o.update()
+                            #early stop if CFD goes below 0.03
+                            if o.recut.cfd<0.03:
+                                break
+                    self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
+                                                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                                                          f"                 phases:{n_mer_phases}\n")
+                    print(f"5UTR         before mut:{n_mer}\n"
+                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                          f"                 phases:{n_mer_phases}")
+
+                self.info_phase5_5UTR[1] = o.recut.cfd
+            if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
+                n_mer_confirm = self.ODN_postMut[n_window: n_window + 23]
+                self.info_p5 = self.info_p5 + "".join(f"phase 5 final\n"
+                                                      f" orig gRNA: {o.gRNA.seq}\n"
+                                                      f"premut seq: {n_mer} cfd:{cfd}\n"
+                                                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}\n")
+                print(f"phase 5 final for current window\n"
+                      f" orig gRNA: {o.gRNA.seq}\n"
+                      f"premut seq: {n_mer} cfd:{cfd}\n"
+                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}")
+                #put mut seq back into ssODN
+                self.ODN_postMut = self.ODN_postMut[0:n_window] + o.recut.seq + self.ODN_postMut[n_window + 23:]
+                highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd
+            else:
+                highest_cfd = max([highest_cfd, cfd]) #update highest cfd
+            n_window+=1
+        return highest_cfd
 
     def sliding_window(self, seq, n):
         "Returns a sliding window (of width n) over data from the iterable"
@@ -804,7 +910,8 @@ class HDR_flank:
         chimeric_gRNA = gRNA
         chimeric_gRNA_ph = gRNA_ph
 
-        if (gRNAleft < int(len(whole_arm)/2) < gRNAright) and (int(self.ENST_strand) * int(self.gStrand) > 0): #gRNA is truncated, and gRNA is on the coding strand
+        print(f"gRNAleft {gRNAleft} {int(len(whole_arm)/2)} gRNAright{gRNAright}")
+        if (gRNAleft < int(len(whole_arm)/2) <= gRNAright) and (int(self.ENST_strand) * int(self.gStrand) > 0): #gRNA is truncated, and gRNA is on the coding strand
             chimeric_gRNA = whole_arm[int(len(whole_arm)/2):gRNAright+1]
             trunc_len = int(len(whole_arm)/2) - gRNAleft
             chimeric_gRNA = self.tag[-trunc_len:] + chimeric_gRNA #make the chimeric gRNA
@@ -812,8 +919,7 @@ class HDR_flank:
             chimeric_gRNA_ph = whole_arm_ph[int(len(whole_arm)/2):gRNAright+1]
             chimeric_gRNA_ph = "X"*trunc_len + chimeric_gRNA_ph  # make the chimeric gRNA
 
-
-        elif (gRNAleft < int(len(whole_arm)/2) < gRNAright) and (int(self.ENST_strand) * int(self.gStrand) < 0): #gRNA is truncated, and gRNA is NOT on the coding strand
+        elif (gRNAleft < int(len(whole_arm)/2) <= gRNAright) and (int(self.ENST_strand) * int(self.gStrand) < 0): #gRNA is truncated, and gRNA is NOT on the coding strand
             chimeric_gRNA = whole_arm[gRNAleft:int(len(whole_arm)/2)]
             trunc_len = gRNAright - int(len(whole_arm)/2) + 1
             chimeric_gRNA = chimeric_gRNA + self.tag[:trunc_len] #make the chimeric gRNA
