@@ -149,6 +149,12 @@ class HDR_flank:
         #make gRNA lowercase
         self.gRNA_lc_Larm, self.gRNA_lc_Rarm = self.make_gRNA_lowercase()
 
+        #use masked phases (5UTR, 3bp exon-intron junction)
+        #print(f"{self.left_flk_phases_masked}||{self.right_flk_phases_masked}\n{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
+        if use_masked_phase == True:
+            self.left_flk_phases = self.left_flk_phases_masked
+            self.right_flk_phases = self.right_flk_phases_masked
+
         #get gRNA left/right coord respective to the whole arm (gRNA orientation can be both -1 and +1)
         null, self.g_leftcoord, self.g_rightcoord = self.get_trunc_gRNA(self.left_flk_seq, self.right_flk_seq)
 
@@ -159,10 +165,7 @@ class HDR_flank:
         if len(self.ins2cut.seq)>0 and (len(self.ins2cut.seq)-4 != abs(self.Cut2Ins_dist)):
             sys.exit(f"ins2cut_seq:{self.ins2cut.seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
 
-        #print(f"{self.left_flk_phases_masked}||{self.right_flk_phases_masked}\n{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
-        if use_masked_phase == True:
-            self.left_flk_phases = self.left_flk_phases_masked
-            self.right_flk_phases = self.right_flk_phases_masked
+
 
         ####################################################################################
         #start recoding
@@ -423,12 +426,12 @@ class HDR_flank:
         for n_mer in it:
             #skip non-chimeric part of the homology arm
             if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                print(f"skipping window: {n_window}")
+                #print(f"skipping window: {n_window}")
                 n_window+=1
                 continue
             if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
                 n_window+=1
-                print(f"skipping window: {n_window}")
+                #print(f"skipping window: {n_window}")
                 continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
@@ -552,12 +555,12 @@ class HDR_flank:
         for n_mer in it:
             #skip non-chimeric part of the homology arm
             if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                print(f"skipping window: {n_window}")
+                #print(f"skipping window: {n_window}")
                 n_window+=1
                 continue
             if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
                 n_window+=1
-                print(f"skipping window: {n_window}")
+                #print(f"skipping window: {n_window}")
                 continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)

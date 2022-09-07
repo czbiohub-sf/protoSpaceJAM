@@ -133,7 +133,7 @@ def main():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
-            if transcript_type == "protein_coding":# and ENST_ID == "ENST00000399976":
+            if transcript_type == "protein_coding" and ENST_ID == "ENST00000329276":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
