@@ -199,7 +199,7 @@ def main():
                         csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore mutation:{HDR_template.ODN_vanillia}\n after mutation:{HDR_template.ODN_postMut}\n    best strand:{HDR_template.ODN_postMut_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore recoding:{HDR_template.ODN_vanillia}\n after recoding:{HDR_template.ODN_postMut}\n    best strand:{HDR_template.ODN_postMut_ss}\n\n"
                         if HDR_template.final_cfd < 0.03:
                             recut_CFD_pass.write(this_log)
                         else:
@@ -254,7 +254,7 @@ def main():
                         csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nssODN before any recoding:{HDR_template.ODN_vanillia}\n ssODN after all recoding:{HDR_template.ODN_postMut}\n       ssODN best strand:{HDR_template.ODN_postMut_ss}\n"
                         if HDR_template.final_cfd < 0.03:
                             recut_CFD_pass.write(this_log)
                         else:
