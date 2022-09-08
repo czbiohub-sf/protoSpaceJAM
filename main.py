@@ -133,7 +133,7 @@ def main():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
-            if transcript_type == "protein_coding" and ENST_ID == "ENST00000329276":
+            if transcript_type == "protein_coding": # and ENST_ID == "ENST00000329276":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
@@ -199,7 +199,7 @@ def main():
                         csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore mutation: {HDR_template.ODN_vanillia}\n  after mutation:{HDR_template.ODN_postMut}\n     final ssODN:{HDR_template.ODN_postMut_ss}\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore mutation:{HDR_template.ODN_vanillia}\n after mutation:{HDR_template.ODN_postMut}\n    best strand:{HDR_template.ODN_postMut_ss}\n\n"
                         if HDR_template.final_cfd < 0.03:
                             recut_CFD_pass.write(this_log)
                         else:

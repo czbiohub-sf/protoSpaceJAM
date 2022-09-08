@@ -134,6 +134,7 @@ def get_range(start,end): #TODO phase should be ENST specific
 def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
+        ENST_genename = ENST_info[ENST_ID].name
         ENST_strand = ENST_info[ENST_ID].features[0].strand
         Chr = row["chr"]
         InsPos = row["Insert_pos"] # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
@@ -170,7 +171,7 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
         myflank = HDR_flank(left_flk_seq = leftArm , right_flk_seq = rightArm,
                             left_flk_coord_lst = [left_start, left_end], right_flk_coord_lst = [right_start, right_end],
                             left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
-                            type= type, ENST_ID= ENST_ID, ENST_strand=ENST_strand, ENST_chr = Chr, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
+                            type= type, ENST_ID= ENST_ID, name = ENST_genename, ENST_strand=ENST_strand, ENST_chr = Chr, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
                             tag = tag, loc2posType = loc2posType)
         return myflank
         #log IDs whose gRNA is not in the default-size HDR arms
