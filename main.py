@@ -83,7 +83,7 @@ def main():
         ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
 
         #open log files
-        recut_CFD_pass = open("logs/recut_CFD_pass.txt", "w")
+        recut_CFD_all = open("logs/recut_CFD_all.txt", "w")
         recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
         csvout_N = open("logs/out_Nterm_recut_cfd.csv", "w")
         csvout_C = open("logs/out_Cterm_recut_cfd.csv", "w")
@@ -94,7 +94,7 @@ def main():
 
         #open result file and write header
         csvout_res = open("logs/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_score,specificity_weight,distance_weight,position_weight,cfd1,cfd2,cfd3,cfd4,cfd_scan,max_of_cfd4_cfdScan,final_weight,ssODN\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_score,specificity_weight,distance_weight,position_weight,final_weight,cfd1,cfd2,cfd3,cfd4,cfd_scan,max_of_cfd4_cfdScan,ssODN\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -200,9 +200,8 @@ def main():
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore recoding:{HDR_template.ODN_vanillia}\n after recoding:{HDR_template.ODN_postMut}\n    best strand:{HDR_template.ODN_postMut_ss}\n\n"
+                        recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd < 0.03:
-                            recut_CFD_pass.write(this_log)
-                        else:
                             recut_CFD_fail.write(this_log)
 
                         if hasattr(HDR_template,"info_phase4_5UTR"):
@@ -255,9 +254,8 @@ def main():
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nssODN before any recoding:{HDR_template.ODN_vanillia}\n ssODN after all recoding:{HDR_template.ODN_postMut}\n       ssODN best strand:{HDR_template.ODN_postMut_ss}\n"
-                        if HDR_template.final_cfd < 0.03:
-                            recut_CFD_pass.write(this_log)
-                        else:
+                        recut_CFD_all.write(this_log)
+                        if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
 
                         if hasattr(HDR_template,"info_phase4_5UTR"):
@@ -316,7 +314,7 @@ def main():
 
         log.info(f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped")
 
-        recut_CFD_pass.close()
+        recut_CFD_all.close()
         recut_CFD_fail.close()
         csvout_N.close()
         csvout_C.close()
