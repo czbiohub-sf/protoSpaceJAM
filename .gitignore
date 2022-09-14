@@ -98,4 +98,4 @@ fabric.properties
 run_log.txt
 run_log.bk.txt
 logs/*
-gRNA_GRCz11/*
+pickles/*
