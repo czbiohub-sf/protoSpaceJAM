@@ -5,7 +5,8 @@
 - Pre-compute all CRISPR guide RNAs and their properties for fast runtime
 
 ## Usage
-### Precompute gRNA
+
+### Genome download and preprocessing
 Download default genomes:   
 GRCh38, GRCm39, GRCz11 (fasta + gff3)
 ```
@@ -23,3 +24,4 @@ Serialize fasta file for fast I/O
 #in directory genomefiles
 bash serialize_fa.sh
 ```
+### Precompute gRNA
