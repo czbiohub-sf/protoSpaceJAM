@@ -20,8 +20,10 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This script converts fasta sequences into pickle files for faster IO ')
-    parser.add_argument('--fastagz', required = False, default="genome_files/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz", type=str, help='path to the the genome fa.gz file', metavar='')
+    parser.add_argument('--fastagz', required = False, default="", type=str, help='path to the the genome fa.gz file', metavar='')
     parser.add_argument('--fasta', required = False, default="", type=str, help='path to the the genome fa file', metavar='')
+    parser.add_argument('--outdir', required = False, default="", type=str, help='output directory', metavar='')
+
     config = parser.parse_args()
     return config
 
@@ -44,8 +46,10 @@ def main():
         if infile is None or infile == "":
             infile = config["fasta"]
 
-        outdir = os.path.join("genome_files","fa_pickle",infile.split(".")[1])
+        outdir = config["outdir"]
         make_output_dir_if_nonexistent(outdir)
+
+        print(f"processing {infile}, writing output into {outdir}")
 
         with gzip.open(infile, "rt") as f:
             #wfh.write(f"seq_id\tlength\n")#header

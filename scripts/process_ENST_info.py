@@ -86,8 +86,10 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='This scripts processes the gff3 file, generates a dictionary files (pickle format) of (1) ENST transcript information, (2) loc2posType, (3) codon phase information. The dictionaries are input for main.py')
-    parser.add_argument('--release', default="106", type=str, help='Ensembl release', metavar='')
-    parser.add_argument('--genome_ver', default="GRCh38", type=str, help='genome+version, choices are GRCh38, GRCz11, GRCm39', metavar='')
+    #parser.add_argument('--release', default="106", type=str, help='Ensembl release', metavar='')
+    #parser.add_argument('--genome_ver', default="GRCh38", type=str, help='genome+version, choices are GRCh38, GRCz11, GRCm39', metavar='')
+    parser.add_argument('--gff3_gz', default="", type=str, help='path to gff3.gz file', metavar='')
+    parser.add_argument('--out_dir', default="", type=str, help='path to outputdir', metavar='')
     config = parser.parse_args()
 
     return config
@@ -110,45 +112,46 @@ def main():
     try:
         starttime = datetime.datetime.now()
 
-        genome_ver = config["genome_ver"]
-        release = config["release"]
-        prefix_mapping = {"GRCz": "Danio_rerio",
-                  "GRCh": "Homo_sapiens",
-                  "GRCm": "Mus_musculus"}
-        spp = prefix_mapping[genome_ver[0:4]]
+        # genome_ver = config["genome_ver"]
+        # release = config["release"]
+        # prefix_mapping = {"GRCz": "Danio_rerio",
+        #           "GRCh": "Homo_sapiens",
+        #           "GRCm": "Mus_musculus"}
+        # spp = prefix_mapping[genome_ver[0:4]]
 
-        file_directory = f"genome_files/gff3/{genome_ver}" # this is the output directory
-        file = spp + '.' + genome_ver + '.' + release + ".gff3.gz"
-        file_path = f"genome_files/gff3/{genome_ver}/{file}"
+        # file_directory = f"genome_files/gff3/{genome_ver}" # this is the output directory
+        # file = spp + '.' + genome_ver + '.' + release + ".gff3.gz"
+        file_path = config["gff3_gz"]
+        out_dir = config["out_dir"]
 
-        print(f"target gff3.gz file is {file}")
+        print(f"processing {file_path}")
 
         #prepare gff3.gz
-        if os.path.isfile(file_path):
-            print(f"found {file} in directory {file_directory}\nchecking md5 checksums")
-            #check md5
-            url=f"http://ftp.ensembl.org/pub/release-{release}/gff3/" + spp.lower() + "/CHECKSUMS"
-            outmd5 = f"{file_directory}/CHECKSUMS"
-            # Download the file from `url` and save it locally under `file_name`:
-            with urllib.request.urlopen(url) as response, open(outmd5, 'wb') as out_file:
-                shutil.copyfileobj(response, out_file)
-            # md5_pass = False
-            # with open(outmd5, "r") as f:
-            #     for line in f:
-            #         checksum, fsize, fname = line.rstrip().split()
-            #         if fname == file and checksum == crc32(file_path):
-            #             print("md5 checksums matched")
-            #             md5_pass==True
-        else:
-            #download
-            print(f"downloading {file} to directory {file_directory}")
-            if make_output_dir(file_directory):
-                url = f"http://ftp.ensembl.org/pub/release-{release}/gff3/" + spp.lower() + "/" + file
-                # Download the file from `url` and save it locally under `file_name`:
-                with urllib.request.urlopen(url) as response, open(file_path, 'wb') as out_file:
-                    shutil.copyfileobj(response, out_file)
-            else:
-                sys.exit(f"failed to create directory genome_files/gff3/{genome_ver}")
+        # if os.path.isfile(file_path):
+        #     print(f"found {file} in directory {file_directory}\nchecking md5 checksums")
+        #     #check md5
+        #     url=f"http://ftp.ensembl.org/pub/release-{release}/gff3/" + spp.lower() + "/CHECKSUMS"
+        #     outmd5 = f"{file_directory}/CHECKSUMS"
+        #     # Download the file from `url` and save it locally under `file_name`:
+        #     with urllib.request.urlopen(url) as response, open(outmd5, 'wb') as out_file:
+        #         shutil.copyfileobj(response, out_file)
+        #     # md5_pass = False
+        #     # with open(outmd5, "r") as f:
+        #     #     for line in f:
+        #     #         checksum, fsize, fname = line.rstrip().split()
+        #     #         if fname == file and checksum == crc32(file_path):
+        #     #             print("md5 checksums matched")
+        #     #             md5_pass==True
+        # else:
+        #     #download
+        #     print(f"downloading {file} to directory {file_directory}")
+        #     if make_output_dir(file_directory):
+        #         url = f"http://ftp.ensembl.org/pub/release-{release}/gff3/" + spp.lower() + "/" + file
+        #         # Download the file from `url` and save it locally under `file_name`:
+        #         with urllib.request.urlopen(url) as response, open(file_path, 'wb') as out_file:
+        #             shutil.copyfileobj(response, out_file)
+        #     else:
+        #         sys.exit(f"failed to create directory genome_files/gff3/{genome_ver}")
 
         file = file_path
         outfile = file.rstrip(".gz") + ".ENST2Chr.gz"
@@ -178,7 +181,7 @@ def main():
         line_count = 0
 
         #go through gff3 file, store all ENST IDs
-        print("processing ENST IDs")
+        print("-processing ENST IDs")
         with gzip.open(file, "rt") as fh:
             for line in fh:
                 fields = line.rstrip().split("\t")
@@ -205,7 +208,7 @@ def main():
                         line_count +=1
 
         #go through gff3 file, and store all exons in ENST_exon_dict
-        print("processing exons")
+        print("-processing exons")
         with gzip.open(file, "rt") as fh:
             parent_ENST_id = ""
             for line in fh:
@@ -231,7 +234,7 @@ def main():
                         ENST_info[parent_ENST_id].features.append(SeqFeature(location=FeatureLocation(exon_start,exon_end,strand=exon_strand, ref=chr),type=type, id=exon_id))
 
         # parse GFF3 again, extracting CDS info, and referencing exon info
-        print("processing cds")
+        print("-processing cds")
         with gzip.open(file, "rt") as fh:
             parent_ENST_id = ""
             for line in fh:
@@ -276,13 +279,13 @@ def main():
                 ENST_info[ID].chr = ENST_info[ID].features[0].ref
 
         # write dict to file
-        with open(f"{file_directory}/ENST_info.pickle", 'wb') as handle:
+        with open(f"{out_dir}/ENST_info.pickle", 'wb') as handle:
             pickle.dump(ENST_info, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
         #parse codons and assign phase to each (coding) chr position
-        print("parsing codons")
-        with open(f"{file_directory}/debug.txt", "w") as wfh:
+        print("-parsing codons")
+        with open(f"{out_dir}/debug.txt", "w") as wfh:
             for ENST_ID in ENST_info.keys():
                 my_transcript = ENST_info[ENST_ID]
                 transcript_type = my_transcript.description.split("|")[1]
@@ -340,13 +343,13 @@ def main():
 
         # write dict to file
         with open(
-                f"{file_directory}/ENST_codonPhase.pickle", 'wb') as handle:
+                f"{out_dir}/ENST_codonPhase.pickle", 'wb') as handle:
             pickle.dump(ENST_codons_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
         #populate loc2posType dict
-        print("parsing location types(e.g. exon/intron junctions")
+        print("-parsing location types(e.g. exon/intron junctions")
         for ENST_ID in ENST_info.keys():
             UTR5p, UTR3p = get_UTR_loc(ENST_ID,ENST_info) #get UTR loc
             cds_loc = get_cds_loc(ENST_ID,ENST_info) #get cds loc
@@ -413,7 +416,7 @@ def main():
                         loc2posType = update_dictOfDict(mydict=loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start-6,start-3]),  value="3_to_6bp_down_of_exon_intron_junction")
 
         # write dict to file
-        with open(f"{file_directory}/loc2posType.pickle", 'wb') as handle:
+        with open(f"{out_dir}/loc2posType.pickle", 'wb') as handle:
             pickle.dump(loc2posType, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
