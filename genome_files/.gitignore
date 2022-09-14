@@ -1,9 +1,2 @@
-*
-*/
-!fa_pickle
-!.gitignore
-!*.py
-!indexes_bowtie
-!indexes_bwa
-!hg38_byChr
-!gff3
+*.gz
+*.tab
