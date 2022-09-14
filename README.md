@@ -17,12 +17,8 @@ Preprocess GFF3 annotation file
 bash preprocess_GFF3.sh
 ```
 
-### Serialize fasta file for fast I/O
-GRCh38  
+Serialize fasta file for fast I/O
 ```
-scripts\serialize_fa.py --fastagz genome_files/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz
-```
-GRCz11  
-```
-scripts\serialize_fa.py --fastagz genome_files/Danio_rerio.GRCz11.dna_sm.primary_assembly.fa.gz
+#in directory genomefiles
+bash serialize_fa.sh
 ```
