@@ -11,17 +11,10 @@ GRCh38, GRCm39, GRCz11 (fasta + gff3)
 cd genomefiles
 bash download_genomes.sh
 ```
-
-
-
-### Preprocess GFF3 annotation file
-GRCh38  
+Preprocess GFF3 annotation file
 ```
-scripts\process_ENST_info.py --release 107 --genome_ver GRCh38
-```
-GRCz11  
-```
-scripts\process_ENST_info.py --release 107 --genome_ver GRCz11
+#in directory genomefiles
+bash preprocess_GFF3.sh
 ```
 
 ### Serialize fasta file for fast I/O
