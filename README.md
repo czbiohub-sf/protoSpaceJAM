@@ -5,31 +5,20 @@
 
 
 ### Precompute gRNA
-GRCh38  
+Download default genomes:   
+GRCh38, GRCm39, GRCz11 (fasta + gff3)
+```
+cd genomefiles
+bash download_genomes.sh
+```
+Preprocess GFF3 annotation file
+```
+#in directory genomefiles
+bash preprocess_GFF3.sh
 ```
 
+Serialize fasta file for fast I/O
 ```
-GRCz11  
-```
-
-```
-
-### Preprocess GFF3 annotation file
-GRCh38  
-```
-scripts\process_ENST_info.py --release 107 --genome_ver GRCh38
-```
-GRCz11  
-```
-scripts\process_ENST_info.py --release 107 --genome_ver GRCz11
-```
-
-### Serialize fasta file for fast I/O
-GRCh38  
-```
-scripts\serialize_fa.py --fastagz genome_files/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz
-```
-GRCz11  
-```
-scripts\serialize_fa.py --fastagz genome_files/Danio_rerio.GRCz11.dna_sm.primary_assembly.fa.gz
+#in directory genomefiles
+bash serialize_fa.sh
 ```
