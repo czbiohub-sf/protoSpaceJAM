@@ -5,7 +5,8 @@
 
 
 ### Precompute gRNA
-Download default genomes (GRCh38, GRCm39, GRCz11)
+Download default genomes:   
+GRCh38, GRCm39, GRCz11 (fasta + gff3)
 ```
 cd genomefiles
 bash download_genomes.sh
