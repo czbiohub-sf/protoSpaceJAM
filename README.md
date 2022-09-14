@@ -5,6 +5,11 @@
 
 
 ### Precompute gRNA
+Download genomes
+```
+cd
+```
+
 GRCh38  
 ```
 
