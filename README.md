@@ -5,19 +5,13 @@
 
 
 ### Precompute gRNA
-Download genomes
+Download default genomes (GRCh38, GRCm39, GRCz11)
 ```
-cd
-```
-
-GRCh38  
+cd genomefiles
+bash download_genomes.sh
 ```
 
-```
-GRCz11  
-```
 
-```
 
 ### Preprocess GFF3 annotation file
 GRCh38  
