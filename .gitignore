@@ -102,3 +102,7 @@ pickles/*
 tests/*
 precomuted_gRNAs/*.err
 precomuted_gRNAs/*.out
+precomuted_gRNAs/gRNA_GRCh38/*
+precomuted_gRNAs/gRNA_GRCm39/*
+precomuted_gRNAs/gRNA_GRCz11/*
+precomuted_gRNAs/gRNA_chm13/*
