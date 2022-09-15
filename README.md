@@ -30,3 +30,15 @@ cd ..
 cd precomuted_gRNAs
 bash 1.get_gRNAs.sh  #Note: comment out line #12 if not using an hpc cluster
 ```
+split into chunks
+```
+bash 2.split4mapping.sh
+```
+map to the genome
+```
+bash 3.map.sh
+```
+get off-target score and efficiency score predictions
+```
+bash 4.score.sh
+```
