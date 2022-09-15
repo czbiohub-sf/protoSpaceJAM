@@ -20,7 +20,7 @@ bash preprocess_GFF3.sh
 ```
 build bwa indexes
 ```
-
+bash build_bwa_index.sh
 ```
 Serialize fasta file for fast I/O
 ```
