@@ -15,7 +15,9 @@ genome_file="Homo_sapiens.GRCh38.${release_num}.gff3.gz"
 rm ${genome_file} 
 wget ${genome_file_dir_remote}${genome_file} 
 
-#GRCm39
+########
+#GRCm39#
+########
 genome_file_dir_remote="http://ftp.ensembl.org/pub/${release}/fasta/mus_musculus/dna/"
 genome_file="Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz"
 rm ${genome_file} 
@@ -26,7 +28,9 @@ genome_file="Mus_musculus.GRCm39.${release_num}.gff3.gz"
 rm ${genome_file} 
 wget ${genome_file_dir_remote}${genome_file} 
 
-#GRCz11
+########
+#GRCz11#
+########
 genome_file_dir_remote="http://ftp.ensembl.org/pub/${release}/fasta/danio_rerio/dna/"
 genome_file="Danio_rerio.GRCz11.dna_sm.primary_assembly.fa.gz"
 rm ${genome_file} 

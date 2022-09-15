@@ -1,9 +1,0 @@
-gRNA.tab.gz/*
-gRNA.tab.gz.circos/*
-gRNA.tab.gz.split/*
-gRNA.tab.gz.split.BwaMapped/*
-gRNA.tab.gz.split.BwaMapped_failedCheck/*
-slurm.out/*
-BK/*
-gRNA.tab.gz.split.BwaMapped.scored/*
-gRNA.tab.gz.split.BwaMapped.scored_failedCheck/*

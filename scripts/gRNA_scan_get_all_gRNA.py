@@ -24,12 +24,12 @@ def parse_args():
     parser= MyParser(description='This script get all the gRNA in the human genome, please specify either --fastagz or --fasta')
     parser.add_argument('--fastagz', default="", type=str, help='path to the human genome fasta file', metavar='')
     parser.add_argument('--fasta', default="", type=str, help='path to the human genome fasta.gz file', metavar='')
+    parser.add_argument('--outdir', default="", type=str, help='path to the human genome fasta.gz file', metavar='')
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
         parser.print_help()
         sys.exit(1)
     return config
-
 
 protosp_len = 20
 PAM = "NGG"
@@ -63,12 +63,14 @@ def main():
         N = re.compile("N")
 
         #make output dir
-        outdir_path = f"gRNA.tab.gz"
+        outdir = config['outdir']
+        outdir_path = os.path.join(outdir, f"gRNA.tab.gz")
         if os.path.isdir(outdir_path):
             shutil.rmtree(outdir_path)  # remove existing dir
         os.makedirs(outdir_path)
 
-        with gzip.open(infile, "rt") as f, open(f"{infile}.out.tab", "w") as wfh:
+        infile_basename = os.path.basename(infile)
+        with gzip.open(infile, "rt") as f, open(os.path.join(outdir,f"{infile_basename}.out.tab"), "w") as wfh:
             wfh.write(f"Chr\tlength\trepeat_length\tgRNA_count\n")#header
             for record in SeqIO.parse(f, "fasta"):
                 seq = str(record.seq)
