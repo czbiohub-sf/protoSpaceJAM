@@ -40,6 +40,7 @@ bash 2.split4mapping.sh
 ```
 map to the genome
 ```
+#run this on an hpc cluster
 mkdir slurm.out
 sbatch 3.map_gRNA.GRCh38.sh
 ```
