@@ -5,6 +5,7 @@
 
 ## Usage
 
+make sure all script/binary files in folder utils are excutable
 ### Genome download and preprocessing
 Download default genomes:   
 GRCh38, GRCm39, GRCz11 (fasta + gff3)
@@ -17,7 +18,10 @@ Preprocess GFF3 annotation file
 #in directory genomefiles
 bash preprocess_GFF3.sh
 ```
+build bwa indexes
+```
 
+```
 Serialize fasta file for fast I/O
 ```
 #in directory genomefiles
