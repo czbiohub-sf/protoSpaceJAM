@@ -1,7 +1,6 @@
 # ProtospaceXS
 - Guide RNA and repair donor design
-- Rank guide RNAs for various applications
-- ssODN design, and recoding to facilitate payload insertion and prevent recut
+- ssODN recoding to facilitate payload insertion and prevent recut
 - Pre-compute all CRISPR guide RNAs and their properties for fast runtime
 
 ## Usage
