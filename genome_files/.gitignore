@@ -1,2 +1,4 @@
 *.gz
 *.tab
+*.out
+*.err

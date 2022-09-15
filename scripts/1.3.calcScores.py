@@ -12,10 +12,16 @@ import gzip
 import shutil
 import re
 import math
-sys.path.insert(1, '..')
+sys.path.insert(1, '../utils')
 #from gRNA_search import *
 #from utils import *
 from crisporEffScores.crisporEffScores import *
+
+#add to sys path, so the scoring modules can load
+scoring_script_dir = os.path.join(sys.path[0],"..","utils","crisporEffScores")
+sys.path.insert(1, scoring_script_dir)
+from cfd import *
+from crisporEffScores import *
 
 #################
 #custom logging #
@@ -71,13 +77,6 @@ class ColoredLogger(logging.Logger):
 
         self.addHandler(console)
         return
-
-
-#add to sys path, so the scoring modules can load
-scoring_script_dir = os.path.join(sys.path[0],"..","crisporEffScores")
-sys.path.insert(1, scoring_script_dir)
-from cfd import *
-from crisporEffScores import *
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -174,7 +173,18 @@ def main():
                 else:
                     print(f"warning: bwa hits does not contain the ontarget of {gRNA_name}")
 
-                cfd_scores = [calcCfdScore(f"{seq}{pam}", otseq) for otseq in bwa_mapping_seqs]
+                # MIT score must *not* include the PAM
+                mit_Ot_scores = []
+                guideNoPam = seq
+                for otseq in bwa_mapping_seqs:
+                    otSeqNoPam = otSeq[:len(otSeq)-len(pam)]
+                    mitScore = calcHitScore(guideNoPam, otSeqNoPam)
+                    if pam.upper()=="NGG" and otSeq[-2:].upper()!="GG":
+                        mitScore = mitScore * 0.2
+                    mit_Ot_scores.append(mitScore)
+                    
+                # CFD score must include the PAM
+                cfd_Ot_scores = [calcCfdScore(f"{seq}{pam}", otseq) for otseq in bwa_mapping_seqs]
 
                 #print out the cfd scores together with alignments
                 # print(gRNA_name2)
@@ -182,12 +192,23 @@ def main():
                 #     score = calcCfdScore(f"{seq}{pam}", otseq)
                 #     coord = bwa_mapping_coords[idx]
                 #     print(f"{seq}{pam}\t{gRNA_name2}\n{otseq}\t{coord} \tCFD: {score}\n")
+                
+                #calc MIT specificity score for the current guide
+                mit_Ot_scores = [s for s in mit_Ot_scores if s]  #remove entries where cfd score failed to calcuate. For example, there is an offending "N" in NGTGGTGGTGGTAGAGGTGGTGG at position 6:167591372-167591394_-
+                guideMITScore = calcMitGuideScore(sum(mit_Ot_scores))
 
-                #calc specificity score for the current guide
-                cfd_scores = [s for s in cfd_scores if s]  #remove entries where cfd score failed to calcuate. For example, there is an offending "N" in NGTGGTGGTGGTAGAGGTGGTGG at position 6:167591372-167591394_-
-                guideCfdScore = calcMitGuideScore(sum(cfd_scores))
+                #calc CFD specificity score for the current guide
+                cfd_Ot_scores = [s for s in cfd_Ot_scores if s]  #remove entries where cfd score failed to calcuate. For example, there is an offending "N" in NGTGGTGGTGGTAGAGGTGGTGG at position 6:167591372-167591394_-
+                guideCfdScore = calcMitGuideScore(sum(cfd_Ot_scores))
+
+                #calc CFD specificity score v2
+                guideCfdScorev2 = calcMitGuideScore_v2(sum(cfd_Ot_scores))
+
+                #calc CFD specificity score v3
+                cfd_Ot_score_mod = [s if s<1 else 100 for s in cfd_Ot_scores]
+                guideCfdScorev3 = calcMitGuideScore(sum(cfd_Ot_score_mod))
+
                 #print(guideCfdScore)
-
                 ######################
                 #calculate eff scores#
                 ######################
@@ -211,7 +232,7 @@ def main():
                 ################################################
                 #write to scores (with gRNA info) to a new file#
                 ################################################
-                wgfh.write(f"{seq}\t{pam}\t{st}\t{en}\t{strand}\t{guideCfdScore}\t{scores_flattened}\n")
+                wgfh.write(f"{seq}\t{pam}\t{st}\t{en}\t{strand}\t{guideMITScore}\t{guideCfdScore}\t{guideCfdScorev2}\t{guideCfdScorev3}\t{scores_flattened}\n")
 
                 gRNA_count += 1
 

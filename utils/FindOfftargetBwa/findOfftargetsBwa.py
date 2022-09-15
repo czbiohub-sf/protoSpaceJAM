@@ -49,7 +49,7 @@ GRNA_FA = config["fa"]
 GRNA_FA_PATH = os.path.join(config["fa_dir"], config["fa"])
 BIN= config['bin_dir']
 SCRIPT = config['script_dir']
-GENOME = config["genome_fa"]
+#GENOME = config["genome_fa"]
 GENOME_IDX_BWA = config["bwa_idx"]
 GUIDELEN = config['guideLen']
 thread2use = config["thread"]
@@ -291,9 +291,8 @@ p.communicate()  # wait for the commands to process
 
 #queue.startStep(batchId, "filter", "Removing matches without a PAM motif")
 altPats = ",".join(offtargetPams.get(pam, ["na"]))
-#bedFnameTmp = bedFname+".tmp"
 altPamMinScore = str(ALTPAMMINSCORE)
-shmFaFname = os.path.join("/dev/shm", GENOME) #bwa_genome_idx is the name ends with .fa
+#shmFaFname = os.path.join("/dev/shm", GENOME) #bwa_genome_idx is the name ends with .fa
 
 # EXTRACTION OF SEQUENCES + ANNOTATION - big headache!!
 # twoBitToFa was 15x slower than python's twobitreader, after markd's fix it is better

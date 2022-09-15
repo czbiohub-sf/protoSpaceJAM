@@ -18,10 +18,10 @@ cd ${working_dir}
 ########
 #GRCh38#
 ########
-dir=gRNA_GRCh38
-genome_file="Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
-script_folder="../scripts"
-python ${script_folder}/gRNA_scan_split4mapping.py --dir ${dir}/gRNA.tab.gz --tab ${dir}/${genome_file}.out.tab --part_size 200000
+# dir=gRNA_GRCh38
+# genome_file="Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
+# script_folder="../scripts"
+# python ${script_folder}/gRNA_scan_split4mapping.py --dir ${dir}/gRNA.tab.gz --tab ${dir}/${genome_file}.out.tab --part_size 200000
 
 ########
 #GRCm39#

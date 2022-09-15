@@ -109,16 +109,17 @@ def main():
                     fastafile = f"{file}.{n_chunk}.fa"
                     fastafile_dir = os.path.split(fastafile)[0]
                     fastafile_name = os.path.split(fastafile)[1]
-                    command = ["python", "../FindOfftargetBwa/findOfftargetsBwa.py", 
+                    command = ["python", "../utils/FindOfftargetBwa/findOfftargetsBwa.py", 
                     f"--fa", f"{fastafile_name}",
                     f"--fa_dir", f"{fastafile_dir}", 
-                    f"--bin_dir", f"../FindOfftargetBwa/bin/Linux", 
-                    f"--script_dir", f"../FindOfftargetBwa/bin/", 
+                    f"--bin_dir", f"../utils/FindOfftargetBwa/bin/Linux", 
+                    f"--script_dir", f"../utils/FindOfftargetBwa/bin/", 
                     f"--bwa_idx", f"../genome_files/indexes_bwa/{genome_fa}", 
-                    f"--genome_fa", f"{genome_fa}", 
+                    #f"--genome_fa", f"{genome_fa}", 
                     f"--guideLen", f"20",
                     f"--thread", f"{thread2use}"]
 
+                    #print(" ".join(command))
                     p = Popen(command)
                     p.communicate()  # wait for the commands to process
 
@@ -187,7 +188,7 @@ def main():
                 f"--bin_dir", f"../FindOfftargetBwa/bin/Linux", 
                 f"--script_dir", f"../FindOfftargetBwa/bin/", 
                 f"--bwa_idx", f"../genome_files/indexes_bwa/{genome_fa}", 
-                f"--genome_fa", f"{genome_fa}", 
+                #f"--genome_fa", f"{genome_fa}", 
                 f"--guideLen", f"20",
                 f"--thread", f"{thread2use}"]
 
