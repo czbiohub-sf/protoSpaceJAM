@@ -1,10 +1,12 @@
 # ProtospaceXS
-### Pre-compute all CRISPR guide RNAs and their properties in the human genome
-### Rationale: The pre-computed guide RNAs can be later selected/filtered for various applications
-##### "S" in the name stands for standalone (as opposed to protospaceX that relied on other web servers)
+- Guide RNA and repair donor design
+- Rank guide RNAs for various applications
+- ssODN design, and recoding to facilitate payload insertion and prevent recut
+- Pre-compute all CRISPR guide RNAs and their properties for fast runtime
 
+## Usage
 
-### Precompute gRNA
+### Genome download and preprocessing
 Download default genomes:   
 GRCh38, GRCm39, GRCz11 (fasta + gff3)
 ```
@@ -22,3 +24,4 @@ Serialize fasta file for fast I/O
 #in directory genomefiles
 bash serialize_fa.sh
 ```
+### Precompute gRNA
