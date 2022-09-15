@@ -25,3 +25,9 @@ Serialize fasta file for fast I/O
 bash serialize_fa.sh
 ```
 ### Precompute gRNA
+get all gRNAs
+```
+cd ..
+cd precomuted_gRNAs
+bash 1.get_gRNAs.sh  #Note: comment out line #12 if not using an hpc cluster
+```
