@@ -40,7 +40,8 @@ bash 2.split4mapping.sh
 ```
 map to the genome
 ```
-bash 3.map.sh
+mkdir slurm.out
+sbatch 3.map_gRNA.GRCh38.sh
 ```
 get off-target score and efficiency score predictions
 ```
