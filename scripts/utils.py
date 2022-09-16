@@ -534,7 +534,7 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index, genome_ver):
     #load the gRNAs in the file
     dfs =[]
     for file in target_files:
-        file_path = os.path.join(f"gRNA_{genome_ver}","gRNA.tab.gz.split.BwaMapped.scored",file)
+        file_path = os.path.join("precomuted_gRNAs",f"gRNA_{genome_ver}","gRNA.tab.gz.split.BwaMapped.scored",file)
         df_tmp = pd.read_csv(file_path, sep="\t", compression='infer', header=None, names = ["seq","pam","start","end", "strand", "CSS", "ES"])
         dfs.append(df_tmp)
     df_gRNA = pd.concat(dfs)

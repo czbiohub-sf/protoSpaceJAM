@@ -24,14 +24,22 @@ class MyParser(argparse.ArgumentParser):
         sys.exit(2)
 
 def parse_args():
-    parser= MyParser(description='This scripts creates a mapping of ENST to chr from gff3')
+    parser= MyParser(description='ProtospaceX')
     parser.add_argument('--genome_ver', default="GRCh38", type=str, help='pickle file containing the ENST_info dict', metavar='')
-    parser.add_argument('--path2csv', default="input/mart_export_canonical_proteincoding.csv", type=str,
-                        help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
+    parser.add_argument('--path2csv', default="input/mart_export_canonical_proteincoding.csv", type=str,help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
+
+    #gRNA
+    parser.add_argument('--num_gRNA_per_term',  default=1, type=int, help='payload at the N terminus', metavar='')
+
+    #donor
+    parser.add_argument('--HA_len',  default=500, type=int, help='length of the homology arm on one side', metavar='')
+    parser.add_argument('--ssODN_max_size',  default="", type=int, help='length restraint of the ssODN, setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
+
+    #payload
     parser.add_argument('--payload', default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
     parser.add_argument('--Npayload', default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='payload at the N terminus', metavar='')
     parser.add_argument('--Cpayload',  default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG", type=str, help='payload at the N terminus', metavar='')
-    parser.add_argument('--num_gRNA_per_term',  default=1, type=int, help='payload at the N terminus', metavar='')
+
     config = parser.parse_args()
     return config
 
@@ -42,15 +50,11 @@ log.propagate = False
 log.setLevel(logging.INFO) #set the level of warning displayed
 #log.setLevel(logging.DEBUG) #set the level of warning displayed
 
-max_cut2ins_dist = 50
-HDR_arm_len = 100
-
-
-mNG2_11 = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
-tag = mNG2_11
-
 config = vars(parse_args())
 gRNA_num_out = config['num_gRNA_per_term']
+max_cut2ins_dist = 50 #deprecated?
+HDR_arm_len = config['HA_len']
+
 #####################
 ##      main       ##
 #####################
@@ -61,19 +65,19 @@ def main():
 
         #load gRNA info index (mapping of chromosomal location to file parts)
         log.info("loading the mapping of chromosomal location to (gRNA) file parts")
-        loc2file_index = read_pickle_files(os.path.join(f"gRNA_{config['genome_ver']}","loc2file_index.pickle"))
+        loc2file_index = read_pickle_files(os.path.join("genome_files", "fa_pickle", config['genome_ver'],"loc2file_index.pickle"))
 
         #load chr location to type (e.g. UTR, cds, exon/intron junction) mappings
         log.info("loading the mapping of chromosomal location to type (e.g. UTR, cds, exon/intron junction)")
-        loc2posType = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"loc2posType.pickle"))
+        loc2posType = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"loc2posType.pickle"))
 
         #load gene model info
         log.info("loading gene model info")
-        ENST_info = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_info.pickle"))
+        ENST_info = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_info.pickle"))
 
         #load codon phase info
         log.info("loading codon phase info")
-        ENST_PhaseInCodon = read_pickle_files(os.path.join("genome_files","gff3",config['genome_ver'],"ENST_codonPhase.pickle"))
+        ENST_PhaseInCodon = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_codonPhase.pickle"))
 
         #report time used
         elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
@@ -94,7 +98,7 @@ def main():
 
         #open result file and write header
         csvout_res = open("logs/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_score,specificity_weight,distance_weight,position_weight,final_weight,cfd1,cfd2,cfd3,cfd4,cfd_scan,max_of_cfd4_cfdScan,ssODN\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -196,7 +200,8 @@ def main():
                         csvout_N.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
                         CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_postMut_ss
-                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore recoding:{HDR_template.ODN_vanillia}\n after recoding:{HDR_template.ODN_postMut}\n    best strand:{HDR_template.ODN_postMut_ss}\n\n"
@@ -250,7 +255,8 @@ def main():
                         csvout_C.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
                         CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_postMut_ss
-                        csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+                        #csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nssODN before any recoding:{HDR_template.ODN_vanillia}\n ssODN after all recoding:{HDR_template.ODN_postMut}\n       ssODN best strand:{HDR_template.ODN_postMut_ss}\n"
