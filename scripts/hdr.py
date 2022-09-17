@@ -12,6 +12,7 @@ import copy
 from Bio.Seq import Seq
 from scripts.cfdscore import *
 from itertools import islice
+import math
 
 try:
     from . import cfdscore, mitscore
@@ -89,6 +90,7 @@ class HDR_flank:
             Cut2Ins_dist:int,
             tag:str,
             name:str,
+            ssODN_max_size,
             loc2posType) -> None:
 
         self.left_flk_seq = left_flk_seq
@@ -104,6 +106,7 @@ class HDR_flank:
         self.tag = tag
         self.loc2posType = loc2posType
         self.name = name
+        self.ssODN_max_size = ssODN_max_size
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -283,32 +286,32 @@ class HDR_flank:
         left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
         if cdf > 0.03:   # CDS>=0.03, try mutating gRNA silently(codons) in parts not covered between insert and cut
 
-            print(f"phase 3: gRNA in coding {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
+            #print(f"phase 3: gRNA in coding {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
 
             #get gRNA in coding strand
             if self.gRNA_in_coding_strand == True:
                 seq_obj = seq_w_phase(seq = seq, phases =phases, start = 1, end = 23)
                 seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                 seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                 if len(seq_obj_lrtrim.seq) >= 3:
                     mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
                 else:
                     mutated = seq_obj_lrtrim.seq
                 untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
-                print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+                #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
             else:
                 seq_obj = seq_w_phase(seq = self.revcom(seq), phases = phases[::-1], start = 1, end = 23)
                 seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                 seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                 if len(seq_obj_lrtrim.seq) >= 3:
                     mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
                 else:
                     mutated = seq_obj_lrtrim.seq
                 untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
                 untrimmed = self.revcom(untrimmed)
-                print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+                #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
 
             # # get the sequence between PAM and cut site
             # self.trunc_gRNA, null, null = self.get_trunc_gRNA(left, right)
@@ -403,8 +406,49 @@ class HDR_flank:
         left,right,cfd,seq,phases = self.get_uptodate_mut() # not including slide window scan and mutation
 
         self.ODN_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
-        self.ODN_postMut_ss = self.select_ssODN_strand(self.ODN_postMut)
         self.final_cfd = max(cfd,scan_highest_cfd) #this should be the highest cfd from all phases,  cfd= phase 1-4, scan_highest_cfd = phase5
+        self.effective_HA_len = len(self.gRNA_lc_Larm)
+
+        #################################
+        #center payload & recoded region#
+        #################################
+        if self.ssODN_max_size is not None:
+            print(f"Centering")
+            print(f"ODN_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
+                  f"ODN_postmut  {self.ODN_postMut}")
+            diff_loc = self.get_diff_loc(str1 = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", str2 =f"{self.ODN_postMut}")
+            print(f"{diff_loc}")
+            print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
+
+            if len(diff_loc) == 0: #no recoding
+                _HA_len = (self.ssODN_max_size - len(self.tag))/2
+                start = len(self.gRNA_lc_Larm) - _HA_len - 1
+                end = start + _HA_len + len (self.tag) + _HA_len
+                print(f"no recoding, start={start}\tend={end}")
+            else: #with recoding
+                recoding_left = min(diff_loc) # 0-indexed
+                recoding_right = max(diff_loc) # 0-indexed
+                tag_start = len(self.gRNA_lc_Larm) # 0-indexed
+                tag_end = len(self.gRNA_lc_Larm) + len(tag) - 1 # 0-indexed
+                centerpiece_start = min([recoding_left,recoding_right,tag_start,tag_end])
+                centerpiece_end = max([recoding_left,recoding_right,tag_start,tag_end])
+                centerpiece_len = centerpiece_end - centerpiece_start + 1
+                _HA_len = math.floor((self.ssODN_max_size - centerpiece_len)/2)
+                start = centerpiece_start - _HA_len
+                end = centerpiece_end + _HA_len + 1 # need to get the base at position:end
+                _len= end - start
+                print(f"recoding, start={start}\tend={end}\t centerpiece:{centerpiece_start}-{centerpiece_end} len={_len} HA_len={_HA_len}")
+            self.ODN_postMut_centered = self.ODN_postMut[int(start):int(end)]
+            self.effective_HA_len = _HA_len
+
+        ############
+        #final ODN #
+        ############
+        self.ODN_final = self.ODN_postMut
+        if hasattr(self,"ODN_postMut_centered"):
+            self.ODN_final = self.ODN_postMut_centered
+        self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
+
 
         ###################
         # log information #
@@ -487,9 +531,23 @@ class HDR_flank:
             self.info_p5 = "".join(
                 f"--------------------phase 5: sliding window check of recutting--------------------------------------------------------------------\n"
                 f"phase 5.  no recoding was performed b/c maximum cfd in window scan analysis is {self.cdf_score_highest_in_win_scan:.6f} \n") + self.info_p5
+
     #############
     #END OF INIT#
     #############
+    def get_diff_loc(self, str1,str2):
+        """
+        get the locations where two strings differ
+        """
+        assert len(str1) == len(str2)
+        diff_loc = []
+        for idx,val in enumerate(str1):
+            char1 = val.upper()
+            char2 = str2[idx].upper()
+            if char1 != char2:
+                diff_loc.append(idx)
+        return(diff_loc)
+
     def revcom(self,seq):
         return str(Seq(seq).reverse_complement())
     def slide_win_mutation_noncoding(self,seq,phases):
@@ -521,9 +579,9 @@ class HDR_flank:
                 self.info_p5 = self.info_p5 + "".join(f"win-     original gRNA:{self.gRNA_seq}\n"
                                                       f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
                                                       f"       chimeric phases:{o.recut.phases}\n")
-                print(f"win-     original gRNA:{self.gRNA_seq}\n"
-                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
-                      f"       chimeric phases:{o.recut.phases}")
+                # print(f"win-     original gRNA:{self.gRNA_seq}\n"
+                #       f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
+                #       f"       chimeric phases:{o.recut.phases}")
                 #start to mutate (it is sufficient to only work with the coding strand
                 #try silently mutate **the coding strand**
                 seq_obj = seq_w_phase(seq = self.revcom(o.recut.seq), phases = o.recut.phases[::-1], start = 1, end = 23)
@@ -531,7 +589,7 @@ class HDR_flank:
                 seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
 
                 if len(seq_obj_lrtrim.seq) >= 3:
-                    print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    #print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                     mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
                 else:
                     mutated = seq_obj_lrtrim.seq
@@ -541,9 +599,9 @@ class HDR_flank:
                       f"syn          before mut:{n_mer}\n"
                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                       f"                 phases:{n_mer_phases}\n")
-                print(f"syn          before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}")
+                # print(f"syn          before mut:{n_mer}\n"
+                #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                #       f"                 phases:{n_mer_phases}")
             #try mutate in 3UTR
             if o.recut.cfd>0.03:
                 # mutate PAM if it's in 3' UTR or intron (phase == 0)
@@ -565,9 +623,9 @@ class HDR_flank:
                 self.info_p5 = self.info_p5 + "".join(f"3UTR/intron  before mut:{n_mer}\n"
                                                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                                                       f"                 phases:{n_mer_phases}\n")
-                print(f"3UTR/intron  before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}")
+                # print(f"3UTR/intron  before mut:{n_mer}\n"
+                #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                #       f"                 phases:{n_mer_phases}")
             #try mutate in 5UTR
             if o.recut.cfd>0.03:
                 self.info_phase5_5UTR=[o.recut.cfd, ""]
@@ -592,9 +650,9 @@ class HDR_flank:
                     self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
                                                           f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                                                           f"                 phases:{n_mer_phases}\n")
-                    print(f"5UTR         before mut:{n_mer}\n"
-                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                          f"                 phases:{n_mer_phases}")
+                    # print(f"5UTR         before mut:{n_mer}\n"
+                    #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                    #       f"                 phases:{n_mer_phases}")
 
                 self.info_phase5_5UTR[1] = o.recut.cfd
             if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
@@ -602,10 +660,10 @@ class HDR_flank:
                                                       f"  orig gRNA: {o.gRNA.seq}\n"
                                                       f"pre-mut seq: {n_mer} cfd:{cfd}\n"
                                                       f"   post-mut: {o.recut.seq} cfd:{o.recut.cfd}\n")
-                print(f"phase 5 final for current window\n"
-                      f"  orig gRNA: {o.gRNA.seq}\n"
-                      f"pre-mut seq: {n_mer} cfd:{cfd}\n"
-                      f"   post-mut: {o.recut.seq} cfd:{o.recut.cfd}")
+                # print(f"phase 5 final for current window\n"
+                #       f"  orig gRNA: {o.gRNA.seq}\n"
+                #       f"pre-mut seq: {n_mer} cfd:{cfd}\n"
+                #       f"   post-mut: {o.recut.seq} cfd:{o.recut.cfd}")
                 #put mut seq back into ssODN, need revcom here b/c the input/seq is revcomed from self.ODN_postMut
                 self.ODN_postMut = self.revcom(seq[0:n_window] + o.recut.seq + seq[n_window + 23:])
                 highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd
@@ -642,9 +700,9 @@ class HDR_flank:
                 self.info_p5 = self.info_p5 + "".join(f"win+     original gRNA:{self.gRNA_seq}\n"
                                       f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
                                       f"       chimeric phases:{o.recut.phases}\n")
-                print(f"win+     original gRNA:{self.gRNA_seq}\n"
-                      f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
-                      f"       chimeric phases:{o.recut.phases}")
+                # print(f"win+     original gRNA:{self.gRNA_seq}\n"
+                #       f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
+                #       f"       chimeric phases:{o.recut.phases}")
                 #start to mutate (it is sufficient to only work with the coding strand
                 #try silently mutate the coding strand
                 seq_obj = seq_w_phase(seq = o.recut.seq, phases = o.recut.phases, start = 1, end = 23)
@@ -652,7 +710,7 @@ class HDR_flank:
                 seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
 
                 if len(seq_obj_lrtrim.seq)>=3:
-                    print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    #print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                     mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
                 else:
                     mutated = seq_obj_lrtrim.seq
@@ -661,9 +719,9 @@ class HDR_flank:
                       f"syn          before mut:{n_mer}\n"
                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                       f"                 phases:{n_mer_phases}\n")
-                print(f"syn          before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}")
+                # print(f"syn          before mut:{n_mer}\n"
+                #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                #       f"                 phases:{n_mer_phases}")
             #try mutate in 3UTR/intron
             if o.recut.cfd>0.03:
                 # mutate PAM if it's in 3' UTR (phase == 0)
@@ -686,9 +744,9 @@ class HDR_flank:
                 self.info_p5 = self.info_p5 + "".join(f"3UTR/intron  before mut:{n_mer}\n"
                                                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                                                       f"                 phases:{n_mer_phases}\n")
-                print(f"3UTR/intron  before mut:{n_mer}\n"
-                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                      f"                 phases:{n_mer_phases}")
+                # print(f"3UTR/intron  before mut:{n_mer}\n"
+                #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                #       f"                 phases:{n_mer_phases}")
             #try mutate in 5UTR
             if o.recut.cfd>0.03:
                 self.info_phase5_5UTR=[o.recut.cfd, ""]
@@ -713,9 +771,9 @@ class HDR_flank:
                     self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
                                                           f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                                                           f"                 phases:{n_mer_phases}\n")
-                    print(f"5UTR         before mut:{n_mer}\n"
-                          f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
-                          f"                 phases:{n_mer_phases}")
+                    # print(f"5UTR         before mut:{n_mer}\n"
+                    #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                    #       f"                 phases:{n_mer_phases}")
 
                 self.info_phase5_5UTR[1] = o.recut.cfd
             if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
@@ -724,10 +782,10 @@ class HDR_flank:
                                                       f" orig gRNA: {o.gRNA.seq}\n"
                                                       f"premut seq: {n_mer} cfd:{cfd}\n"
                                                       f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}\n")
-                print(f"phase 5 final for current window\n"
-                      f" orig gRNA: {o.gRNA.seq}\n"
-                      f"premut seq: {n_mer} cfd:{cfd}\n"
-                      f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}")
+                # print(f"phase 5 final for current window\n"
+                #       f" orig gRNA: {o.gRNA.seq}\n"
+                #       f"premut seq: {n_mer} cfd:{cfd}\n"
+                #       f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}")
                 #put mut seq back into ssODN
                 self.ODN_postMut = self.ODN_postMut[0:n_window] + o.recut.seq + self.ODN_postMut[n_window + 23:]
                 highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd

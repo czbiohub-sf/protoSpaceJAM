@@ -32,8 +32,8 @@ def parse_args():
     parser.add_argument('--num_gRNA_per_term',  default=1, type=int, help='payload at the N terminus', metavar='')
 
     #donor
-    parser.add_argument('--HA_len',  default=500, type=int, help='length of the homology arm on one side', metavar='')
-    parser.add_argument('--ssODN_max_size',  default="", type=int, help='length restraint of the ssODN, setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
+    parser.add_argument('--HA_len',  default=500, help='length of the homology arm on one side', type=int, metavar='')
+    parser.add_argument('--ssODN_max_size', type=int, help='length restraint of the ssODN (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
 
     #payload
     parser.add_argument('--payload', default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
@@ -54,6 +54,16 @@ config = vars(parse_args())
 gRNA_num_out = config['num_gRNA_per_term']
 max_cut2ins_dist = 50 #deprecated?
 HDR_arm_len = config['HA_len']
+ssODN_max_size = config["ssODN_max_size"]
+
+#check if HA_len is too short to satisfy ssODN_max_size
+if ssODN_max_size is not None:
+    max_payload_size = max([len(config["Npayload"]),len(config["Cpayload"])])
+    derived_HDR_arm_len = ssODN_max_size- max_payload_size / 2
+    if derived_HDR_arm_len >= HDR_arm_len:
+        print(f"HA_len={HDR_arm_len} is to short to meet the requirement of ssODN_max_size={ssODN_max_size}, payload size={max_payload_size}\n ssODN_max_size={ssODN_max_size} requires HA_len = ssODN_max_size- max_payload_size / 2 = {derived_HDR_arm_len}")
+        HDR_arm_len = derived_HDR_arm_len + 100
+        print(f"HA_len is adjusted to {HDR_arm_len}")
 
 #####################
 ##      main       ##
@@ -98,7 +108,7 @@ def main():
 
         #open result file and write header
         csvout_res = open("logs/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -169,7 +179,7 @@ def main():
                         current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
 
                         #get HDR template
-                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType)
+                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size)
 
                         # append the best gRNA to the final df
                         if i==0:
@@ -199,14 +209,14 @@ def main():
                         #write csv
                         csvout_N.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
                         CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
-                        ssODN = HDR_template.ODN_postMut_ss
-                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+                        ssODN = HDR_template.ODN_final_ss
+                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
 
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nbefore recoding:{HDR_template.ODN_vanillia}\n after recoding:{HDR_template.ODN_postMut}\n    best strand:{HDR_template.ODN_postMut_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"
                         recut_CFD_all.write(this_log)
-                        if HDR_template.final_cfd < 0.03:
+                        if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
 
                         if hasattr(HDR_template,"info_phase4_5UTR"):
@@ -225,7 +235,7 @@ def main():
                         current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
 
                         #get HDR template
-                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType)
+                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size)
 
                         # append the best gRNA to the final df
                         best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
@@ -254,12 +264,12 @@ def main():
                         #write csv
                         csvout_C.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
                         CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
-                        ssODN = HDR_template.ODN_postMut_ss
+                        ssODN = HDR_template.ODN_final_ss
                         #csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
-                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
+                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\nssODN before any recoding:{HDR_template.ODN_vanillia}\n ssODN after all recoding:{HDR_template.ODN_postMut}\n       ssODN best strand:{HDR_template.ODN_postMut_ss}\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
