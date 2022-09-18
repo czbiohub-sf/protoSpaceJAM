@@ -378,9 +378,72 @@ def get_cut_pos(start,strand):
 
 def _get_position_type(chr, ID, pos, loc2posType):
     """
-    input: mostly self-explanatory, loc2posType is a dictionary that translates location into types (e.g. exon/intron junctions etc)
-    return a list of types for the input position/ID combination
+    #input: mostly self-explanatory, loc2posType is a dictionary that translates location into types (e.g. exon/intron junctions etc)
+    #return a list of types for the input position/ID combination
+    >>> loc2posType = read_pickle_files(os.path.join("..","genome_files","parsed_gff3", "GRCh38","loc2posType.pickle"))
+
+    #intron - exon junction
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399367, loc2posType = loc2posType) #-4bp
+    >>> print(postype)
+    ['3N4bp_up_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399368, loc2posType = loc2posType) #-3bp
+    >>> print(postype)
+    ['within_3bp_of_intron_exon_junction', '3N4bp_up_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399369, loc2posType = loc2posType) #-2bp
+    >>> print(postype)
+    ['within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399370, loc2posType = loc2posType) #-1bp
+    >>> print(postype)
+    ['within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399371, loc2posType = loc2posType) #1bp
+    >>> print(postype)
+    ['cds', 'within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399372, loc2posType = loc2posType) #2bp
+    >>> print(postype)
+    ['cds', 'within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399373, loc2posType = loc2posType) #3bp
+    >>> print(postype)
+    ['cds', 'within_3bp_of_intron_exon_junction', '3N4bp_down_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399374, loc2posType = loc2posType) #4bp
+    >>> print(postype)
+    ['cds', '3N4bp_down_of_intron_exon_junction']
+
+    #intron - exon junction
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399481, loc2posType = loc2posType) #-4bp
+    >>> print(postype)
+    ['cds', '3N4bp_up_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399482, loc2posType = loc2posType) #-3bp
+    >>> print(postype)
+    ['cds', 'within_3bp_of_exon_intron_junction', '3N4bp_up_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399483, loc2posType = loc2posType) #-2bp
+    >>> print(postype)
+    ['cds', 'within_2bp_of_exon_intron_junction', 'within_3bp_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399484, loc2posType = loc2posType) #-1bp
+    >>> print(postype)
+    ['cds', 'within_2bp_of_exon_intron_junction', 'within_3bp_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399485, loc2posType = loc2posType) #1bp
+    >>> print(postype)
+    ['within_2bp_of_exon_intron_junction', 'within_3bp_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399486, loc2posType = loc2posType) #2bp
+    >>> print(postype)
+    ['within_2bp_of_exon_intron_junction', 'within_3bp_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399487, loc2posType = loc2posType) #3bp
+    >>> print(postype)
+    ['within_3bp_of_exon_intron_junction', '3_to_6bp_down_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399488, loc2posType = loc2posType) #4bp
+    >>> print(postype)
+    ['3_to_6bp_down_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399489, loc2posType = loc2posType) #5bp
+    >>> print(postype)
+    ['3_to_6bp_down_of_exon_intron_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50399490, loc2posType = loc2posType) #6bp
+    >>> print(postype)
+    ['3_to_6bp_down_of_exon_intron_junction']
+
+    
+
     """
+    #print(f"{type(chr)} {ID} {type(pos)}")
     chr_dict = loc2posType[chr]
     if not ID in chr_dict.keys():
         return []
@@ -1002,4 +1065,6 @@ def get_cds_frame(mytranscript, which_cds):
     return (frame)
 
 
-
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
