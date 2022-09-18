@@ -88,8 +88,8 @@ def parse_args():
     parser= MyParser(description='This scripts processes the gff3 file, generates a dictionary files (pickle format) of (1) ENST transcript information, (2) loc2posType, (3) codon phase information. The dictionaries are input for main.py')
     #parser.add_argument('--release', default="106", type=str, help='Ensembl release', metavar='')
     #parser.add_argument('--genome_ver', default="GRCh38", type=str, help='genome+version, choices are GRCh38, GRCz11, GRCm39', metavar='')
-    parser.add_argument('--gff3_gz', default="", type=str, help='path to gff3.gz file', metavar='')
-    parser.add_argument('--out_dir', default="", type=str, help='path to outputdir', metavar='')
+    parser.add_argument('--gff3_gz', default="../genome_files/Homo_sapiens.GRCh38.107.gff3.gz", type=str, help='path to gff3.gz file', metavar='')
+    parser.add_argument('--out_dir', default="../genome_files/parsed_gff3/GRCh38", type=str, help='path to outputdir', metavar='')
     config = parser.parse_args()
 
     return config
@@ -349,10 +349,11 @@ def main():
 
 
         #populate loc2posType dict
-        print("-parsing location types(e.g. exon/intron junctions")
+        print("-parsing location types(e.g. exon/intron junctions)")
         for ENST_ID in ENST_info.keys():
             UTR5p, UTR3p = get_UTR_loc(ENST_ID,ENST_info) #get UTR loc
             cds_loc = get_cds_loc(ENST_ID,ENST_info) #get cds loc
+            exon_loc = get_cds_loc(ENST_ID,ENST_info) #get cds loc
             log.debug(f"{ENST_info[ENST_ID].description}")
             log.debug(f"5UTR {UTR5p}")
             log.debug(f"3UTR {UTR3p}")
@@ -366,7 +367,7 @@ def main():
 
 
             #mark cds and exon/intron junctions
-            for idx, loc in enumerate(cds_loc):
+            for idx, loc in enumerate(exon_loc):
                 chr, start, end, strand = loc
                 #mark cds
                 loc2posType = update_dictOfDict(mydict= loc2posType, key = chr, key2 = ENST_ID, key3 = tuple([start+0,end+0]), value = "cds")
@@ -633,6 +634,20 @@ def get_cds_loc(ENST_ID,ENST_info):
     cdsList = [feat for feat in my_transcript.features if feat.type == 'CDS']
     for cds in cdsList:
         locList.append([cds.location.ref, cds.location.start, cds.location.end, cds.strand])
+    return(locList)
+
+def get_exon_loc(ENST_ID,ENST_info):
+    """
+    Get the chromosomal location of exon
+    input: ENST_ID, ENST_info
+    output: a list loc [chr,start,end,strand] #start < end
+    """
+    locList = []
+    my_transcript = ENST_info[ENST_ID]  # get the seq record
+    # constructing the list of cds
+    exonList = [feat for feat in my_transcript.features if feat.type == 'exon']
+    for exon in exonList:
+        locList.append([exon.location.ref, exon.location.start, exon.location.end, exon.strand])
     return(locList)
 
 def get_start_stop_loc(ENST_ID,ENST_info):

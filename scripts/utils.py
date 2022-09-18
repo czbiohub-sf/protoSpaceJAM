@@ -440,7 +440,11 @@ def _get_position_type(chr, ID, pos, loc2posType):
     >>> print(postype)
     ['3_to_6bp_down_of_exon_intron_junction']
 
-    
+    #non cds exon
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50398852, loc2posType = loc2posType) #6bp
+    >>> print(postype)
+    ['cds', 'within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
+
 
     """
     #print(f"{type(chr)} {ID} {type(pos)}")
