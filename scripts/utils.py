@@ -336,6 +336,12 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, ENST_strand, type,
         #get position_weight
         position_type = _get_position_type(chr = Chr, ID = ENST_ID, pos = cutPos, loc2posType = loc2posType)
         position_weight = _position_weight(position_type)
+
+        position_type_nextbp = _get_position_type(chr = Chr, ID = ENST_ID, pos = cutPos, loc2posType = loc2posType)
+        position_weight_nextbp = _position_weight(position_type_nextbp)
+
+        position_weight = min([position_weight, position_weight_nextbp])
+
         col_pos_weight.append(position_weight)
 
         #add info to the df
@@ -441,6 +447,18 @@ def _get_position_type(chr, ID, pos, loc2posType):
     ['3_to_6bp_down_of_exon_intron_junction']
 
     #non cds exon
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50398847, loc2posType = loc2posType) #-4bp
+    >>> print(postype)
+    ['3N4bp_up_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50398848, loc2posType = loc2posType) #-3bp
+    >>> print(postype)
+    ['within_3bp_of_intron_exon_junction', '3N4bp_up_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50398849, loc2posType = loc2posType) #-2bp
+    >>> print(postype)
+    ['within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
+    >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50398850, loc2posType = loc2posType) #-1bp
+    >>> print(postype)
+    ['within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
     >>> postype = _get_position_type(chr="19", ID="ENST00000440232", pos=50398851, loc2posType = loc2posType) #1bp
     >>> print(postype)
     ['5UTR', 'within_2bp_of_intron_exon_junction', 'within_3bp_of_intron_exon_junction']
