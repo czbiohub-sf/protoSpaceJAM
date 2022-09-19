@@ -252,7 +252,7 @@ class HDR_flank:
                 self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
                 self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
 
-            #mutate protospacer if in 3UTR/intron
+            #mutate protospacer if in 3UTR/intron, #TODO mutate 1 in every 3 bp
             latest_cfd = self.cdf_score_post_mut_ins
             if hasattr(self,"cdf_score_post_mut2"):
                 latest_cfd = self.cdf_score_post_mut2 > 0.03
@@ -260,9 +260,13 @@ class HDR_flank:
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut2_gRNA_seq = seq
                 self.post_mut2_gRNA_seq_phases = phases
+                counter = -1
                 for idx,item in reversed(list(enumerate(phases))):
                     if idx == (len(phases) - 1) or idx == (len(phases) - 2):
                         continue #skip PAM
+                    counter += 1
+                    if counter % 3 != 0:
+                        continue #  mutate 1 in every 3 bp
                     if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
                         base = seq[idx]
                         mutbase = self.single_base_muation(base)
@@ -324,7 +328,7 @@ class HDR_flank:
             # else:
             #     self.mutated_trunc_gRNA = self.trunc_gRNA_LRtrimed.seq
 
-            #put mutated seq back to arms #TODO: test this part
+            #put mutated seq back to arms
             ssODN = f"{left}{self.tag}{right}"
             ssODN = ssODN.replace(seq,untrimmed)
             ssODN = ssODN.replace(self.revcom(seq),self.revcom(untrimmed))
@@ -344,16 +348,20 @@ class HDR_flank:
         #########
         #phase 4#
         #########
-        #If CFD>0.03, mutate PAM & protospacer in 5’ UTR
+        #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp
         left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
         if cfd >= 0.03: #
             #mutated protospacer if in  UTR
             left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
             self.post_mut4_gRNA_seq = seq
             self.post_mut4_gRNA_seq_phases = phases
+            counter = -1
             for idx,item in reversed(list(enumerate(phases))):
                 #if idx == (len(phases) - 1) or idx == (len(phases) - 2):
                     #continue #skip PAM
+                counter += 1
+                if counter % 3 != 0:
+                        continue #  mutate 1 in every 3 bp
                 if item == "0" or item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions)
                     base = seq[idx]
                     mutbase = self.single_base_muation(base)
