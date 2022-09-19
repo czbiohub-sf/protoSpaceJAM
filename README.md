@@ -28,22 +28,25 @@ Serialize fasta file for fast I/O
 bash serialize_fa.sh
 ```
 ### Precompute gRNA
-get all gRNAs
+Get all gRNAs
 ```
 cd ..
 cd precomuted_gRNAs
 bash 1.get_gRNAs.sh  #Note: comment out line #12 if not using an hpc cluster
 ```
-split into chunks
+Split into chunks
 ```
 bash 2.split4mapping.sh
 ```
-map to the genome (run this on an hpc cluster)
+Map to the genome  
+This step is computationally intensive, it's recommended to run on an hpc cluster
+
 ```
 mkdir slurm.out
 sbatch 3.map_gRNA.GRCh38.sh
 ```
-get off-target score and efficiency score predictions
+Get off-target score and efficiency score predictions
+This step is computationally intensive, it's recommended to run on an hpc cluster
 ```
 bash 4.score.sh
 ```
