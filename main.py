@@ -26,7 +26,7 @@ class MyParser(argparse.ArgumentParser):
 def parse_args():
     parser= MyParser(description='ProtospaceX')
     parser.add_argument('--genome_ver', default="GRCh38", type=str, help='pickle file containing the ENST_info dict', metavar='')
-    parser.add_argument('--path2csv', default="input/mart_export_canonical_proteincoding.csv", type=str,help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
+    parser.add_argument('--path2csv',   default="input/mart_export_canonical_proteincoding.csv", type=str,help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
 
     #gRNA
     parser.add_argument('--num_gRNA_per_term',  default=1, type=int, help='payload at the N terminus', metavar='')
@@ -36,9 +36,14 @@ def parse_args():
     parser.add_argument('--ssODN_max_size', type=int, help='length restraint of the ssODN (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
 
     #payload
-    parser.add_argument('--payload', default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
-    parser.add_argument('--Npayload', default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='payload at the N terminus', metavar='')
+    parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
+    parser.add_argument('--Npayload',  default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='payload at the N terminus', metavar='')
     parser.add_argument('--Cpayload',  default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG", type=str, help='payload at the N terminus', metavar='')
+
+    #recoding
+    parser.add_argument('--recoding_off',             default = False, action='store_true', help='turn off *all* recoding')
+    parser.add_argument('--recoding_stop_recut_only', default = False, action='store_true', help='use recoding to prevent recut')
+    parser.add_argument('--recoding_all',             default = False, action='store_true', help='use recoding to prevent recut + recode region between insert and cut site')
 
     config = parser.parse_args()
     return config
@@ -55,6 +60,22 @@ gRNA_num_out = config['num_gRNA_per_term']
 max_cut2ins_dist = 50 #deprecated?
 HDR_arm_len = config['HA_len']
 ssODN_max_size = config["ssODN_max_size"]
+
+#check recoding args
+if (config["recoding_all"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
+    sys.exit(f"Found conflicts in recoding arguments: --recoding_all cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again")
+if config["recoding_off"] and config["recoding_stop_recut_only"]:
+    sys.exit(f"Found conflicts in recoding arguments: --recoding_off cannot be used with --recoding_stop_recut_only\nplease correct the issue and try again")
+if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
+    config["recoding_all"] == True
+
+#process recoding args
+if config["recoding_off"] or config["recoding_stop_recut_only"]:
+    config["recoding_all"] = False
+
+recoding_args = {"recoding_off":config["recoding_off"],
+                 "recoding_stop_recut_only":config["recoding_stop_recut_only"],
+                 "recoding_all":config["recoding_all"]}
 
 #check if HA_len is too short to satisfy ssODN_max_size
 if ssODN_max_size is not None:
@@ -179,7 +200,7 @@ def main():
                         current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
 
                         #get HDR template
-                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size)
+                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size, recoding_args = recoding_args)
 
                         # append the best gRNA to the final df
                         if i==0:
@@ -239,7 +260,7 @@ def main():
                         current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
 
                         #get HDR template
-                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size)
+                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size, recoding_args = recoding_args)
 
                         # append the best gRNA to the final df
                         best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
