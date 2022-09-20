@@ -214,7 +214,7 @@ def main():
 
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)

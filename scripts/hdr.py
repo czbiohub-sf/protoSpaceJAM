@@ -194,7 +194,7 @@ class HDR_flank:
         #         Arm: left_flk_seq_CodonMut2 right_flk_seq_CodonMut3
         #         gRNA: self.post_mut3_gRNA_seq
 
-        #phase 4: if cfd > 0.03, mutate protospacer if in UTR
+        #phase 4: if cfd > 0.03, mutate protospacer if in 5UTR
         #         Arm: left_flk_seq_CodonMut4 right_flk_seq_CodonMut4
         #         gRNA: self.post_mut4_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
@@ -252,7 +252,7 @@ class HDR_flank:
                 self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
                 self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
 
-            #mutate protospacer if in 3UTR/intron, #TODO mutate 1 in every 3 bp
+            #mutate protospacer if in 3UTR/intron, #TODO mutate 1 in every 3 bp,  phase 2 recode needs to be small case
             latest_cfd = self.cdf_score_post_mut_ins
             if hasattr(self,"cdf_score_post_mut2"):
                 latest_cfd = self.cdf_score_post_mut2 > 0.03
@@ -264,10 +264,10 @@ class HDR_flank:
                 for idx,item in reversed(list(enumerate(phases))):
                     if idx == (len(phases) - 1) or idx == (len(phases) - 2):
                         continue #skip PAM
-                    counter += 1
-                    if counter % 3 != 0:
-                        continue #  mutate 1 in every 3 bp
                     if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                        counter += 1
+                        if counter % 3 != 0:
+                            continue #  mutate 1 in every 3 bp
                         base = seq[idx]
                         mutbase = self.single_base_muation(base)
                         self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:idx] + mutbase + self.post_mut2_gRNA_seq[idx+1:]
@@ -348,7 +348,7 @@ class HDR_flank:
         #########
         #phase 4#
         #########
-        #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp
+        #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
         left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
         if cfd >= 0.03: #
             #mutated protospacer if in  UTR
@@ -359,10 +359,10 @@ class HDR_flank:
             for idx,item in reversed(list(enumerate(phases))):
                 #if idx == (len(phases) - 1) or idx == (len(phases) - 2):
                     #continue #skip PAM
-                counter += 1
-                if counter % 3 != 0:
+                if item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
+                    counter += 1
+                    if counter % 3 != 0:
                         continue #  mutate 1 in every 3 bp
-                if item == "0" or item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions)
                     base = seq[idx]
                     mutbase = self.single_base_muation(base)
                     self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
@@ -455,6 +455,9 @@ class HDR_flank:
         self.ODN_final = self.ODN_postMut
         if hasattr(self,"ODN_postMut_centered"):
             self.ODN_final = self.ODN_postMut_centered
+        else:
+            self.ODN_postMut_centered = ""
+
         self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
 
 
