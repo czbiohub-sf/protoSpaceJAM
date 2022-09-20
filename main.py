@@ -186,7 +186,9 @@ def main():
                             best_start_gRNAs = pd.concat([best_start_gRNAs, current_gRNA])
 
                         #append cfd score to list for plotting
-                        cfd1 = HDR_template.cdf_score_post_mut_ins
+                        cfd1 = "recoding turned off"
+                        if hasattr(HDR_template,"cdf_score_post_mut1"):
+                            cfd1 = HDR_template.cdf_score_post_mut_ins
                         if not hasattr(HDR_template,"cdf_score_post_mut2"):
                             cfd2 = cfd1
                         else:
@@ -207,11 +209,13 @@ def main():
                         cfdfinal = HDR_template.final_cfd
 
                         #write csv
-                        csvout_N.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
                         CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
-                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
-
+                        if cfd1 == "recoding turned off":
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                        else:
+                            csvout_N.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
@@ -241,7 +245,9 @@ def main():
                         best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
 
                         #append cfd score to list for plotting
-                        cfd1 = HDR_template.cdf_score_post_mut_ins
+                        cfd1 = "recoding turned off"
+                        if hasattr(HDR_template,"cdf_score_post_mut1"):
+                            cfd1 = HDR_template.cdf_score_post_mut_ins
                         if not hasattr(HDR_template,"cdf_score_post_mut2"):
                             cfd2 = cfd1
                         else:
@@ -262,11 +268,14 @@ def main():
                         cfdfinal = HDR_template.final_cfd
 
                         #write csv
-                        csvout_C.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
                         CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
-                        #csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN}\n")
-                        csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                        if cfd1 == "recoding turned off":
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                        else:
+                            csvout_C.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"

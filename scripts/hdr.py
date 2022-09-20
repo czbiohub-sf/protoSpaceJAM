@@ -177,6 +177,17 @@ class HDR_flank:
         if len(self.ins2cut.seq)>0 and (len(self.ins2cut.seq)-4 != abs(self.Cut2Ins_dist)):
             sys.exit(f"ins2cut_seq:{self.ins2cut.seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
 
+        # log information #
+        self.info = f"\n#################\n#{self.ENST_ID}#\n#################\n {self.ENST_ID}\t{self.name}\tstrand:{self.ENST_strand}\tgRNA_strand:{self.gStrand}\t{type}-tagging\tCut2Ins-dist:{self.Cut2Ins_dist}\ngRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord})\tCutPos:{self.CutPos}\tInsPos:{self.InsPos}\n"
+        self.info_arm = "".join(
+            f"--------------------HDR arms (in coding strand)-----------------------------------------------------------------------------------\n"
+            f"1. left | right arms:{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
+            f"2. Phases           :{self.left_flk_phases}||{self.right_flk_phases}\n"
+            f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} || {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n")
+
+        #TODO: no recoding: skip phases 1-5
+        #TODO: stop recut: skip phases 1
+        #TODO: stop recut + recode between cut and insert: no skip
 
 
         ####################################################################################
@@ -201,225 +212,326 @@ class HDR_flank:
         #phase 5: sliding window check of recutting
 
         #####################################################################################
+        self.info_p1=''
+        self.info_p2=''
+        self.info_p3=''
+        self.info_p4=''
+        self.info_p5=''
+        #if not self.skip_recoding:
+        if False:
+            #########
+            #Phase 1#
+            #########
+            #trim insert-to-cut into frame
+            self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
+            self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
 
-        #########
-        #Phase 1#
-        #########
-        #trim insert-to-cut into frame
-        self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
-        self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
+            # mutate insert-to-cut sequence
+            mutated_subseq = self.get_silent_mutations(self.ins2cut_LRtrimed.seq.upper()) # mutated_subseq is always in coding strand
 
-        # mutate insert-to-cut sequence
-        mutated_subseq = self.get_silent_mutations(self.ins2cut_LRtrimed.seq.upper()) # mutated_subseq is always in coding strand
+            #put_silent_mutation_subseq_back into HDR flank
+            self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
+                                                                                                           mutated_subseq = mutated_subseq,                                      # mutated_subseq is in the coding strand
+                                                                                                           start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|# #TODO: fix
 
-        #put_silent_mutation_subseq_back into HDR flank
-        self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
-                                                                                                       mutated_subseq = mutated_subseq,                                      # mutated_subseq is in the coding strand
-                                                                                                       start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|# #TODO: fix
+            #check if gRNA is affected by insertion
+            self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
+            Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
+            #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
+            self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
 
-        #check if gRNA is affected by insertion
-        self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
-        Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
-        #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
-        self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
-
-        #########
-        #phase 2#
-        #########
-        if self.cdf_score_post_mut_ins > 0.03: # mutate PAM if in 3' UTR or intron #
-            #get PAM position types (3UTR etc)
-            PAM_coords = self.get_pam_loc()
-            PAM_pos_types = []
-            for pos in PAM_coords:
-                position_type = _get_position_type(chr = self.ENST_chr, ID = self.ENST_ID, pos = pos, loc2posType = self.loc2posType)
-                PAM_pos_types = PAM_pos_types + position_type
-            left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-            self.post_mut2_gRNA_seq = seq
-            self.post_mut2_gRNA_seq_phases = phases
-            #mutate PAM if in 3UTR/intron
-            if (phases[-1:] == "0" or phases[-2:-1] == "0"): #   unnecessary to double-check for 3UTR/intron set(PAM_pos_types) == set(["3UTR"])
-                # mutate PAM if it's in 3 UTR (phase == 0)
-                if phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
-                    self.post_mut2_gRNA_seq = seq[:-1] + "c"
-                if phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
-                    self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:-2] + "c" + self.post_mut2_gRNA_seq[-1:]
-                self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
-
-                #put disrupted-and-mutated seq back to arms
-                ssODN = f"{left}{self.tag}{right}"
-                ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
-                ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
-                self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
-                self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
-
-            #mutate protospacer if in 3UTR/intron, #TODO mutate 1 in every 3 bp,  phase 2 recode needs to be small case
-            latest_cfd = self.cdf_score_post_mut_ins
-            if hasattr(self,"cdf_score_post_mut2"):
-                latest_cfd = self.cdf_score_post_mut2 > 0.03
-            if latest_cfd > 0.03:
-                left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
+            #########
+            #phase 2#
+            #########
+            if self.cdf_score_post_mut_ins > 0.03: # mutate PAM if in 3' UTR or intron #
+                #get PAM position types (3UTR etc)
+                PAM_coords = self.get_pam_loc()
+                PAM_pos_types = []
+                for pos in PAM_coords:
+                    position_type = _get_position_type(chr = self.ENST_chr, ID = self.ENST_ID, pos = pos, loc2posType = self.loc2posType)
+                    PAM_pos_types = PAM_pos_types + position_type
+                left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
                 self.post_mut2_gRNA_seq = seq
                 self.post_mut2_gRNA_seq_phases = phases
+                #mutate PAM if in 3UTR/intron
+                if (phases[-1:] == "0" or phases[-2:-1] == "0"): #   unnecessary to double-check for 3UTR/intron set(PAM_pos_types) == set(["3UTR"])
+                    # mutate PAM if it's in 3 UTR (phase == 0)
+                    if phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
+                        self.post_mut2_gRNA_seq = seq[:-1] + "c"
+                    if phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
+                        self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:-2] + "c" + self.post_mut2_gRNA_seq[-1:]
+                    self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
+
+                    #put disrupted-and-mutated seq back to arms
+                    ssODN = f"{left}{self.tag}{right}"
+                    ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
+                    ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
+                    self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
+                    self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
+
+                #mutate protospacer if in 3UTR/intron, #TODO mutate 1 in every 3 bp,  phase 2 recode needs to be small case
+                latest_cfd = self.cdf_score_post_mut_ins
+                if hasattr(self,"cdf_score_post_mut2"):
+                    latest_cfd = self.cdf_score_post_mut2 > 0.03
+                if latest_cfd > 0.03:
+                    left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
+                    self.post_mut2_gRNA_seq = seq
+                    self.post_mut2_gRNA_seq_phases = phases
+                    counter = -1
+                    for idx,item in reversed(list(enumerate(phases))):
+                        if idx == (len(phases) - 1) or idx == (len(phases) - 2):
+                            continue #skip PAM
+                        if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                            counter += 1
+                            if counter % 3 != 0:
+                                continue #  mutate 1 in every 3 bp
+                            base = seq[idx]
+                            mutbase = self.single_base_muation(base)
+                            self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:idx] + mutbase + self.post_mut2_gRNA_seq[idx+1:]
+                            self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
+                            #early stop if CFD goes below 0.03
+                            if self.cdf_score_post_mut2<0.03:
+                                break
+                    #put mutated seq back to arms
+                    ssODN = f"{left}{self.tag}{right}"
+                    ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
+                    ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
+                    self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
+                    self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
+
+            left,right,cfd,seq,phases = self.get_uptodate_mut()
+            self.postphase2ODN = left + tag + right
+            #########
+            #phase 3#
+            #########
+            left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+            if cdf > 0.03:   # CDS>=0.03, try mutating gRNA silently(codons) in parts not covered between insert and cut
+
+                #print(f"phase 3: gRNA in coding {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
+
+                #get gRNA in coding strand
+                if self.gRNA_in_coding_strand == True:
+                    seq_obj = seq_w_phase(seq = seq, phases =phases, start = 1, end = 23)
+                    seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
+                    seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
+                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    if len(seq_obj_lrtrim.seq) >= 3:
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                    else:
+                        mutated = seq_obj_lrtrim.seq
+                    untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
+                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+                else:
+                    seq_obj = seq_w_phase(seq = self.revcom(seq), phases = phases[::-1], start = 1, end = 23)
+                    seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
+                    seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
+                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    if len(seq_obj_lrtrim.seq) >= 3:
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                    else:
+                        mutated = seq_obj_lrtrim.seq
+                    untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
+                    untrimmed = self.revcom(untrimmed)
+                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+
+                # # get the sequence between PAM and cut site
+                # self.trunc_gRNA, null, null = self.get_trunc_gRNA(left, right)
+                # # trim insert-to-cut into frame
+                # self.trunc_gRNA_Ltrimed = self.trim_left_into_frame(self.trunc_gRNA)
+                # self.trunc_gRNA_LRtrimed = self.trim_right_into_frame(self.trunc_gRNA_Ltrimed)
+                #
+                # if len(self.trunc_gRNA_LRtrimed.seq)>=3:
+                #     self.mutated_trunc_gRNA = self.get_silent_mutations(self.trunc_gRNA_LRtrimed.seq)
+                # else:
+                #     self.mutated_trunc_gRNA = self.trunc_gRNA_LRtrimed.seq
+
+                #put mutated seq back to arms
+                ssODN = f"{left}{self.tag}{right}"
+                ssODN = ssODN.replace(seq,untrimmed)
+                ssODN = ssODN.replace(self.revcom(seq),self.revcom(untrimmed))
+                self.left_flk_seq_CodonMut3 = ssODN[0:len(self.left_flk_seq)]
+                self.right_flk_seq_CodonMut3 =ssODN[-len(self.left_flk_seq):]
+                #put mutated seq back to arms
+                # self.left_flk_seq_CodonMut3, self.right_flk_seq_CodonMut3 = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq_CodonMut, R_arm=self.right_flk_seq_CodonMut,
+                #                                                                                                  mutated_subseq = self.mutated_trunc_gRNA,                                   # mutated_subseq is already in coding strand,
+                #                                                                                                  start = self.trunc_gRNA_LRtrimed.start, end = self.trunc_gRNA_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-| #TODO: fix
+                #
+                # extract gRNA
+                Null, self.post_mut3_gRNA_seq, Null, self.post_mut3_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut3, self.right_flk_seq_CodonMut3) #get the gRNA after mutating sequence
+                #check CFD
+                self.cdf_score_post_mut3  = cfd_score(self.gRNA_seq, self.post_mut3_gRNA_seq)
+            left,right,cfd,seq,phases = self.get_uptodate_mut()
+            self.postphase3ODN = left + tag + right
+            #########
+            #phase 4#
+            #########
+            #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
+            left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+            if cfd >= 0.03: #
+                #mutated protospacer if in  UTR
+                left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
+                self.post_mut4_gRNA_seq = seq
+                self.post_mut4_gRNA_seq_phases = phases
                 counter = -1
                 for idx,item in reversed(list(enumerate(phases))):
-                    if idx == (len(phases) - 1) or idx == (len(phases) - 2):
-                        continue #skip PAM
-                    if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                    #if idx == (len(phases) - 1) or idx == (len(phases) - 2):
+                        #continue #skip PAM
+                    if item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
                         counter += 1
                         if counter % 3 != 0:
                             continue #  mutate 1 in every 3 bp
                         base = seq[idx]
                         mutbase = self.single_base_muation(base)
-                        self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:idx] + mutbase + self.post_mut2_gRNA_seq[idx+1:]
-                        self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
+                        self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
+                        self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
                         #early stop if CFD goes below 0.03
-                        if self.cdf_score_post_mut2<0.03:
+                        if self.cdf_score_post_mut4<0.03:
                             break
+
                 #put mutated seq back to arms
                 ssODN = f"{left}{self.tag}{right}"
-                ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
-                ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
-                self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
-                self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
+                ssODN = ssODN.replace(seq,self.post_mut4_gRNA_seq)
+                ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut4_gRNA_seq))
+                self.left_flk_seq_CodonMut4 = ssODN[0:len(self.left_flk_seq)]
+                self.right_flk_seq_CodonMut4 =ssODN[-len(self.left_flk_seq):]
 
-        left,right,cfd,seq,phases = self.get_uptodate_mut()
-        self.postphase2ODN = left + tag + right
-        #########
-        #phase 3#
-        #########
-        left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-        if cdf > 0.03:   # CDS>=0.03, try mutating gRNA silently(codons) in parts not covered between insert and cut
+                if hasattr(self,"cdf_score_post_mut4"):
+                    self.info_phase4_5UTR=[cfd, self.cdf_score_post_mut4]
+            left,right,cfd,seq,phases = self.get_uptodate_mut()
+            self.postphase4ODN = left + tag + right
 
-            #print(f"phase 3: gRNA in coding {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
+            #########
+            #phase 5#
+            #########
+            left,right,cfd,seq,phases = self.get_uptodate_mut()
+            self.ODN_phases = self.left_flk_phases + "X"*len(self.tag) + self.right_flk_phases
+            self.ODN_postMut = left + self.tag + right
+            self.ODN_prephase5 = self.ODN_postMut
 
-            #get gRNA in coding strand
-            if self.gRNA_in_coding_strand == True:
-                seq_obj = seq_w_phase(seq = seq, phases =phases, start = 1, end = 23)
-                seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
-                seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
-                if len(seq_obj_lrtrim.seq) >= 3:
-                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
-                else:
-                    mutated = seq_obj_lrtrim.seq
-                untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
-                #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+            #slide windows scan for new cut sites
+            self.info_p5 = ""
+            #print(f"{self.ODN_postMut}\n{self.ODN_phases}")
+            fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.ODN_postMut, self.ODN_phases) # this function modifies self.ODN_postMut
+
+            #scan the revcom
+            #print(f"{str(Seq(self.ODN_postMut).reverse_complement())}\n{self.ODN_phases[::-1]}")
+            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1]) # this function modifies self.ODN_postMut
+
+            #get the highest cfd among all possible cutsites
+            scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
+
+            self.cdf_score_highest_in_win_scan = scan_highest_cfd
+
+            self.phase5recoded = False
+            if self.ODN_prephase5.upper() != self.ODN_postMut.upper():
+                self.phase5recoded = True
+            ############################
+            # log recoding information #
+            ############################
+            self.info_p1 = "".join(
+                f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
+                f"phase1.cut-to-insert + 2bp padding on both sides (extend to full codons)\n"
+                f"phase1.seq                             :{self.ins2cut.seq}\n"
+                f"phase1.Phases                          :{self.ins2cut.phases}\n"
+                f"phase1.Coordinates                     :{self.ins2cut.start}-{self.ins2cut.end}\n"
+                f"phase1.seq         (trimmed into frame):{self.ins2cut_LRtrimed.seq}\n"
+                f"phase1.Phases      (trimmed into frame):{self.ins2cut_LRtrimed.phases}\n"
+                f"phase1.Coordinates (trimmed into frame):{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}\n"
+                f"phase1.mutated seq (trimmed into frame):{mutated_subseq}\n"
+                f"--> display gRNA and check disruption <--\n"
+                f"phase1.                      gRNA:{self.gRNA_seq}\n"
+                f"phase1.                    Phases:{self.gRNA_seq_phases}\n"
+                f"phase1.after mutation and payload:{self.post_mut_ins_gRNA_seq}\n"
+                f"phase1.                    Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
+                f"phase1.                       CFD:{self.cdf_score_post_mut_ins:.4f}\n"
+                f"--> display mutation in HDR arms <--\n"
+                f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
+                f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
+                f"phase1.arms with tag   :{self.left_flk_seq_CodonMut}|{self.tag}|{self.right_flk_seq_CodonMut}\n")
+
+            if hasattr(self,"cdf_score_post_mut2"):
+                self.info_p2 = "".join(
+                     f"--------------------phase 2: if cfd > 0.03, mutating PAM and protospacer if in 3UTR-----------------------------------------------\n"
+                     f"phase 2.                          gRNA:{self.gRNA_seq}\n"
+                     f"phase 2.                        Phases:{self.gRNA_seq_phases}\n"
+                     f"phase 2.             gRNA post phase 2:{self.post_mut2_gRNA_seq}\n"
+                     f"phase 2.                        Phases:{self.post_mut2_gRNA_seq_phases}\n"
+                     f"phase 2.                           CFD:{self.cdf_score_post_mut2:.4f}\n"
+                     f"phase 2.       post phase 2 ssODN:{self.postphase2ODN}\n"
+                )
             else:
-                seq_obj = seq_w_phase(seq = self.revcom(seq), phases = phases[::-1], start = 1, end = 23)
-                seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
-                seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
-                if len(seq_obj_lrtrim.seq) >= 3:
-                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
-                else:
-                    mutated = seq_obj_lrtrim.seq
-                untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
-                untrimmed = self.revcom(untrimmed)
-                #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
-
-            # # get the sequence between PAM and cut site
-            # self.trunc_gRNA, null, null = self.get_trunc_gRNA(left, right)
-            # # trim insert-to-cut into frame
-            # self.trunc_gRNA_Ltrimed = self.trim_left_into_frame(self.trunc_gRNA)
-            # self.trunc_gRNA_LRtrimed = self.trim_right_into_frame(self.trunc_gRNA_Ltrimed)
-            #
-            # if len(self.trunc_gRNA_LRtrimed.seq)>=3:
-            #     self.mutated_trunc_gRNA = self.get_silent_mutations(self.trunc_gRNA_LRtrimed.seq)
-            # else:
-            #     self.mutated_trunc_gRNA = self.trunc_gRNA_LRtrimed.seq
-
-            #put mutated seq back to arms
-            ssODN = f"{left}{self.tag}{right}"
-            ssODN = ssODN.replace(seq,untrimmed)
-            ssODN = ssODN.replace(self.revcom(seq),self.revcom(untrimmed))
-            self.left_flk_seq_CodonMut3 = ssODN[0:len(self.left_flk_seq)]
-            self.right_flk_seq_CodonMut3 =ssODN[-len(self.left_flk_seq):]
-            #put mutated seq back to arms
-            # self.left_flk_seq_CodonMut3, self.right_flk_seq_CodonMut3 = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq_CodonMut, R_arm=self.right_flk_seq_CodonMut,
-            #                                                                                                  mutated_subseq = self.mutated_trunc_gRNA,                                   # mutated_subseq is already in coding strand,
-            #                                                                                                  start = self.trunc_gRNA_LRtrimed.start, end = self.trunc_gRNA_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-| #TODO: fix
-            #
-            # extract gRNA
-            Null, self.post_mut3_gRNA_seq, Null, self.post_mut3_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut3, self.right_flk_seq_CodonMut3) #get the gRNA after mutating sequence
-            #check CFD
-            self.cdf_score_post_mut3  = cfd_score(self.gRNA_seq, self.post_mut3_gRNA_seq)
-        left,right,cfd,seq,phases = self.get_uptodate_mut()
-        self.postphase3ODN = left + tag + right
-        #########
-        #phase 4#
-        #########
-        #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
-        left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-        if cfd >= 0.03: #
-            #mutated protospacer if in  UTR
-            left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
-            self.post_mut4_gRNA_seq = seq
-            self.post_mut4_gRNA_seq_phases = phases
-            counter = -1
-            for idx,item in reversed(list(enumerate(phases))):
-                #if idx == (len(phases) - 1) or idx == (len(phases) - 2):
-                    #continue #skip PAM
-                if item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
-                    counter += 1
-                    if counter % 3 != 0:
-                        continue #  mutate 1 in every 3 bp
-                    base = seq[idx]
-                    mutbase = self.single_base_muation(base)
-                    self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
-                    self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
-                    #early stop if CFD goes below 0.03
-                    if self.cdf_score_post_mut4<0.03:
-                        break
-
-            #put mutated seq back to arms
-            ssODN = f"{left}{self.tag}{right}"
-            ssODN = ssODN.replace(seq,self.post_mut4_gRNA_seq)
-            ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut4_gRNA_seq))
-            self.left_flk_seq_CodonMut4 = ssODN[0:len(self.left_flk_seq)]
-            self.right_flk_seq_CodonMut4 =ssODN[-len(self.left_flk_seq):]
-
+                self.info_p2 = \
+                     f"--------------------phase 2 skipped-----------------------------------------------------------------------------------------------\n"
+            if hasattr(self,"cdf_score_post_mut3"):
+                self.info_p3 = "".join(
+                     f"--------------------phase 3: if cfd > 0.03, silently mutate gRNA seq not covered between insert and cut---------------------------\n"
+                     f"phase 3.                     gRNA:{self.gRNA_seq}\n"
+                     f"phase 3.                   Phases:{self.gRNA_seq_phases}\n"
+                     f"phase 3.        gRNA post phase 3:{self.post_mut3_gRNA_seq}\n"
+                     f"phase 3.                   Phases:{self.post_mut3_gRNA_seq_phases}\n"
+                     f"phase 3.                      CFD:{self.cdf_score_post_mut3:.4f}\n"
+                     f"phase 3.       post phase 3 ssODN:{self.postphase3ODN}\n"
+                    )
+            else:
+                self.info_p3 = \
+                     f"--------------------phase 3 skipped-----------------------------------------------------------------------------------------------\n"
             if hasattr(self,"cdf_score_post_mut4"):
-                self.info_phase4_5UTR=[cfd, self.cdf_score_post_mut4]
-        left,right,cfd,seq,phases = self.get_uptodate_mut()
-        self.postphase4ODN = left + tag + right
+                self.info_p4 = "".join(
+                     f"--------------------phase 4: if cfd > 0.03, mutating gRNA if in 5UTR--------------------------------------------------------------\n"
+                     f"phase 4.                     gRNA:{self.gRNA_seq}\n"
+                     f"phase 4.                   Phases:{self.gRNA_seq_phases}\n"
+                     f"phase 4.        gRNA post phase 4:{self.post_mut4_gRNA_seq}\n"
+                     f"phase 4.                   Phases:{self.post_mut4_gRNA_seq_phases}\n"
+                     f"phase 4.                      CFD:{self.cdf_score_post_mut4:.4f}\n"
+                     f"phase 4.       post phase 4 ssODN:{self.postphase4ODN}\n"
+                )
+            else:
+                self.info_p4 = \
+                    f"--------------------phase 4 skipped-----------------------------------------------------------------------------------------------\n"
+            if self.phase5recoded == True:
+                self.info_p5 = "".join(
+                    f"--------------------phase 5: sliding window check of recutting--------------------------------------------------------------------\n"
+                    f"phase 5.  ssODN pre-phase 5:{self.ODN_prephase5}\n"
+                    f"phase 5.ssODN after-phase 5:{self.ODN_postMut}\n"
+                    f"phase 5.             phases:{self.ODN_phases}\n"
+                    f"phase 5. maximum cfd in window scan analysis(after recoding): {self.cdf_score_highest_in_win_scan:.6f}\n") + self.info_p5
+            else:
+                self.info_p5 = "".join(
+                    f"--------------------phase 5: sliding window check of recutting--------------------------------------------------------------------\n"
+                    f"phase 5.  no recoding was performed b/c maximum cfd in window scan analysis is {self.cdf_score_highest_in_win_scan:.6f} \n") + self.info_p5
+        #########################
+        # entirely skip recoding#
+        #########################
+        else:
+            #scan to check the highest cfd
+            self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
+            ODN = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
+            ODN_phases = self.gRNA_lc_Larm + "X"*len(self.tag) + self.gRNA_lc_Rarm
 
-        #########
-        #phase 5#
-        #########
-        left,right,cfd,seq,phases = self.get_uptodate_mut()
-        self.ODN_phases = self.left_flk_phases + "X"*len(self.tag) + self.right_flk_phases
-        self.ODN_postMut = left + self.tag + right
-        self.ODN_prephase5 = self.ODN_postMut
+            fwd_scan_highest_cfd = self.slide_win_mutation_coding(ODN, ODN_phases) # this function modifies self.ODN_postMut
+            #scan the revcom
+            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(ODN).reverse_complement()), ODN_phases[::-1]) # this function modifies self.ODN_postMut
 
-        #slide windows scan for new cut sites
-        self.info_p5 = ""
-        #print(f"{self.ODN_postMut}\n{self.ODN_phases}")
-        fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.ODN_postMut, self.ODN_phases) # this function modifies self.ODN_postMut
+            #get the highest cfd among all possible cutsites
+            scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
 
-        #scan the revcom
-        #print(f"{str(Seq(self.ODN_postMut).reverse_complement())}\n{self.ODN_phases[::-1]}")
-        rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1]) # this function modifies self.ODN_postMut
+            self.cdf_score_post_ins = scan_highest_cfd
+            self.ODN_postMut = "recoding turned off"
 
-        #get the highest cfd among all possible cutsites
-        scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
-
-        self.cdf_score_highest_in_win_scan = scan_highest_cfd
-
-        self.phase5recoded = False
-        if self.ODN_prephase5.upper() != self.ODN_postMut.upper():
-            self.phase5recoded = True
-        ###################
-        #finished recoding#
-        ###################
+        ##############################
+        #finished or skipped recoding#
+        ##############################
         left,right,cfd,seq,phases = self.get_uptodate_mut() # not including slide window scan and mutation
-
         self.ODN_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
-        self.final_cfd = max(cfd,scan_highest_cfd) #this should be the highest cfd from all phases,  cfd= phase 1-4, scan_highest_cfd = phase5
-        self.effective_HA_len = len(self.gRNA_lc_Larm)
+        if self.ODN_postMut == "recoding turned off":
+            self.final_cfd = self.cdf_score_post_ins
+        else:
+            self.final_cfd = max(cfd,scan_highest_cfd) #this should be the highest cfd from all phases,  cfd= phase 1-4, scan_highest_cfd = phase5
 
         #################################
         #center payload & recoded region#
         #################################
+        self.effective_HA_len = len(self.gRNA_lc_Larm) #initizalize effective HA length with the maximum value
         if self.ssODN_max_size is not None:
             print(f"Centering")
             print(f"ODN_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
@@ -452,96 +564,16 @@ class HDR_flank:
         ############
         #final ODN #
         ############
-        self.ODN_final = self.ODN_postMut
+        self.ODN_final = self.ODN_vanillia
+        if self.ODN_postMut != "recoding turned off":
+            self.ODN_final = self.ODN_postMut
+
         if hasattr(self,"ODN_postMut_centered"):
             self.ODN_final = self.ODN_postMut_centered
         else:
-            self.ODN_postMut_centered = ""
+            self.ODN_postMut_centered = "centering turned off"
 
         self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
-
-
-        ###################
-        # log information #
-        ###################
-        self.info = f"\n#################\n#{self.ENST_ID}#\n#################\n {self.ENST_ID}\t{self.name}\tstrand:{self.ENST_strand}\tgRNA_strand:{self.gStrand}\t{type}-tagging\tCut2Ins-dist:{self.Cut2Ins_dist}\ngRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord})\tCutPos:{self.CutPos}\tInsPos:{self.InsPos}\n"
-        self.info_arm = "".join(
-            f"--------------------HDR arms (in coding strand)-----------------------------------------------------------------------------------\n"
-            f"1. left | right arms:{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
-            f"2. Phases           :{self.left_flk_phases}||{self.right_flk_phases}\n"
-            f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} || {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n")
-        # print for debug purposes
-        self.info_p1 = "".join(
-            f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
-            f"phase1.cut-to-insert + 2bp padding on both sides (extend to full codons)\n"
-            f"phase1.seq                             :{self.ins2cut.seq}\n"
-            f"phase1.Phases                          :{self.ins2cut.phases}\n"
-            f"phase1.Coordinates                     :{self.ins2cut.start}-{self.ins2cut.end}\n"
-            f"phase1.seq         (trimmed into frame):{self.ins2cut_LRtrimed.seq}\n"
-            f"phase1.Phases      (trimmed into frame):{self.ins2cut_LRtrimed.phases}\n"
-            f"phase1.Coordinates (trimmed into frame):{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}\n"
-            f"phase1.mutated seq (trimmed into frame):{mutated_subseq}\n"
-            f"--> display gRNA and check disruption <--\n"
-            f"phase1.                      gRNA:{self.gRNA_seq}\n"
-            f"phase1.                    Phases:{self.gRNA_seq_phases}\n"
-            f"phase1.after mutation and payload:{self.post_mut_ins_gRNA_seq}\n"
-            f"phase1.                    Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
-            f"phase1.                       CFD:{self.cdf_score_post_mut_ins:.4f}\n"
-            f"--> display mutation in HDR arms <--\n"
-            f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
-            f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
-            f"phase1.arms with tag   :{self.left_flk_seq_CodonMut}|{self.tag}|{self.right_flk_seq_CodonMut}\n")
-
-        if hasattr(self,"cdf_score_post_mut2"):
-            self.info_p2 = "".join(
-                 f"--------------------phase 2: if cfd > 0.03, mutating PAM and protospacer if in 3UTR-----------------------------------------------\n"
-                 f"phase 2.                          gRNA:{self.gRNA_seq}\n"
-                 f"phase 2.                        Phases:{self.gRNA_seq_phases}\n"
-                 f"phase 2.             gRNA post phase 2:{self.post_mut2_gRNA_seq}\n"
-                 f"phase 2.                        Phases:{self.post_mut2_gRNA_seq_phases}\n"
-                 f"phase 2.                           CFD:{self.cdf_score_post_mut2:.4f}\n"
-                 f"phase 2.       post phase 2 ssODN:{self.postphase2ODN}\n"
-            )
-        else:
-            self.info_p2 = \
-                 f"--------------------phase 2 skipped-----------------------------------------------------------------------------------------------\n"
-        if hasattr(self,"cdf_score_post_mut3"):
-            self.info_p3 = "".join(
-                 f"--------------------phase 3: if cfd > 0.03, silently mutate gRNA seq not covered between insert and cut---------------------------\n"
-                 f"phase 3.                     gRNA:{self.gRNA_seq}\n"
-                 f"phase 3.                   Phases:{self.gRNA_seq_phases}\n"
-                 f"phase 3.        gRNA post phase 3:{self.post_mut3_gRNA_seq}\n"
-                 f"phase 3.                   Phases:{self.post_mut3_gRNA_seq_phases}\n"
-                 f"phase 3.                      CFD:{self.cdf_score_post_mut3:.4f}\n"
-                 f"phase 3.       post phase 3 ssODN:{self.postphase3ODN}\n"
-                )
-        else:
-            self.info_p3 = \
-                 f"--------------------phase 3 skipped-----------------------------------------------------------------------------------------------\n"
-        if hasattr(self,"cdf_score_post_mut4"):
-            self.info_p4 = "".join(
-                 f"--------------------phase 4: if cfd > 0.03, mutating gRNA if in 5UTR--------------------------------------------------------------\n"
-                 f"phase 4.                     gRNA:{self.gRNA_seq}\n"
-                 f"phase 4.                   Phases:{self.gRNA_seq_phases}\n"
-                 f"phase 4.        gRNA post phase 4:{self.post_mut4_gRNA_seq}\n"
-                 f"phase 4.                   Phases:{self.post_mut4_gRNA_seq_phases}\n"
-                 f"phase 4.                      CFD:{self.cdf_score_post_mut4:.4f}\n"
-                 f"phase 4.       post phase 4 ssODN:{self.postphase4ODN}\n"
-            )
-        else:
-            self.info_p4 = \
-                f"--------------------phase 4 skipped-----------------------------------------------------------------------------------------------\n"
-        if self.phase5recoded == True:
-            self.info_p5 = "".join(
-                f"--------------------phase 5: sliding window check of recutting--------------------------------------------------------------------\n"
-                f"phase 5.  ssODN pre-phase 5:{self.ODN_prephase5}\n"
-                f"phase 5.ssODN after-phase 5:{self.ODN_postMut}\n"
-                f"phase 5.             phases:{self.ODN_phases}\n"
-                f"phase 5. maximum cfd in window scan analysis(after recoding): {self.cdf_score_highest_in_win_scan:.6f}\n") + self.info_p5
-        else:
-            self.info_p5 = "".join(
-                f"--------------------phase 5: sliding window check of recutting--------------------------------------------------------------------\n"
-                f"phase 5.  no recoding was performed b/c maximum cfd in window scan analysis is {self.cdf_score_highest_in_win_scan:.6f} \n") + self.info_p5
 
     #############
     #END OF INIT#
@@ -911,12 +943,18 @@ class HDR_flank:
             cfd = self.cdf_score_post_mut2
             seq = self.post_mut2_gRNA_seq
             phases = self.post_mut2_gRNA_seq_phases
-        else:
+        elif hasattr(self, "cdf_score_post_mut_ins"):
             left = self.left_flk_seq_CodonMut
             right = self.right_flk_seq_CodonMut
             cfd = self.cdf_score_post_mut_ins
             seq = self.post_mut_ins_gRNA_seq
             phases = self.post_mut_ins_gRNA_seq_phases
+        else:
+            left = self.left_flk_seq
+            right = self.right_flk_seq
+            cfd = self.cdf_score_post_ins
+            seq = self.gRNA_seq
+            phases = self.gRNA_seq_phases
         return([left,right,cfd,seq,phases])
     def single_base_muation(self,base):
         mapping = {"A":"t","a":"t",
