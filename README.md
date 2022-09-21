@@ -48,5 +48,5 @@ sbatch 3.map_gRNA.GRCh38.sh
 Get off-target score and efficiency score predictions
 This step is computationally intensive, it's recommended to run on an hpc cluster
 ```
-bash 4.score.sh
+bash 4.score.GRCh38.sh
 ```
