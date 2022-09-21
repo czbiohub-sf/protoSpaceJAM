@@ -15,10 +15,8 @@ import math
 sys.path.insert(1, '../utils')
 #from gRNA_search import *
 #from utils import *
-from crisporEffScores.crisporEffScores import *
-
 #add to sys path, so the scoring modules can load
-scoring_script_dir = os.path.join(sys.path[0],"..","utils","crisporEffScores")
+scoring_script_dir = os.path.join(sys.path[0],"..","utils","crisporScores")
 sys.path.insert(1, scoring_script_dir)
 from cfd import *
 from crisporEffScores import *
@@ -89,6 +87,8 @@ def parse_args():
     parser.add_argument('--gzfile', default="", type=str, help='path to the gzfile', metavar='')
     parser.add_argument('--gzdir', default="", type=str, help='path to the dir containing gzfile', metavar='')
     parser.add_argument('--genome_fa', default="", type=str, help='name of genome fasta file', metavar='')
+    parser.add_argument('--skip_eff_score', default = False, action='store_true', help='skip calculation of the efficieny score')
+
     config = parser.parse_args()
     if len(sys.argv)==1: # print help message if arguments are not valid
         parser.print_help()
@@ -176,13 +176,13 @@ def main():
                 # MIT score must *not* include the PAM
                 mit_Ot_scores = []
                 guideNoPam = seq
-                for otseq in bwa_mapping_seqs:
+                for otSeq in bwa_mapping_seqs:
                     otSeqNoPam = otSeq[:len(otSeq)-len(pam)]
-                    mitScore = calcHitScore(guideNoPam, otSeqNoPam)
-                    if pam.upper()=="NGG" and otSeq[-2:].upper()!="GG":
+                    mitScore = calcHitScore(guideNoPam.upper(), otSeqNoPam.upper())
+                    if pam[-2:].upper()=="GG" and otSeq[-2:].upper()!="GG":
                         mitScore = mitScore * 0.2
                     mit_Ot_scores.append(mitScore)
-                    
+                
                 # CFD score must include the PAM
                 cfd_Ot_scores = [calcCfdScore(f"{seq}{pam}", otseq) for otseq in bwa_mapping_seqs]
 
@@ -208,33 +208,44 @@ def main():
                 cfd_Ot_score_mod = [s if s<1 else 100 for s in cfd_Ot_scores]
                 guideCfdScorev3 = calcMitGuideScore(sum(cfd_Ot_score_mod))
 
+                
+                print("{}{}\t{}\t{}\t{}".format(seq,pam,guideMITScore,guideCfdScore,mit_Ot_scores))
                 #print(guideCfdScore)
                 ######################
                 #calculate eff scores#
                 ######################
-                
-                #input for calcAllScores() is  100bp sequences (50bp 5' of PAM, 50bp 3' of PAM) calculate all efficiency scores
-                len_L = 50 - len(seq)
-                len_R = 50 - len(pam)
-                gRNA_with_flank = leftFlank[-len_L:] + seq + pam + rightFlank[:len_R]
-                #print(len(gRNA_with_flank))
-                #test 
-                #print(sorted(calcAllScores(["CCACGTCTCCACACATCAGCACAACTACGCAGCGCCTCCCTCCACTCGGAAGGACTATCCTGCTGCCAAGAGGGTCAAGTTGGACAGTGTCAGAGTCCTG"]).items()))
-                m = re.search(gap, gRNA_with_flank)
                 scores_flattened=""
-                if m: #gap exists in gRNA_with_flank
-                    scores_flattened = "|N.A. due to gap(s)|"
-                else: #no gaps, safe to calculate efficiency scores
-                    scores = calcAllScores([gRNA_with_flank])
-                    scores_flattened = flatten_score_dict(scores)
-                #print(scores_flattened)
+
+                if not config["skip_eff_score"]:
+                    #input for calcAllScores() is  100bp sequences (50bp 5' of PAM, 50bp 3' of PAM) calculate all efficiency scores
+                    len_L = 50 - len(seq)
+                    len_R = 50 - len(pam)
+                    gRNA_with_flank = leftFlank[-len_L:] + seq + pam + rightFlank[:len_R]
+                    #print(len(gRNA_with_flank))
+                    #test 
+                    #print(sorted(calcAllScores(["CCACGTCTCCACACATCAGCACAACTACGCAGCGCCTCCCTCCACTCGGAAGGACTATCCTGCTGCCAAGAGGGTCAAGTTGGACAGTGTCAGAGTCCTG"]).items()))
+                    m = re.search(gap, gRNA_with_flank)
+                    
+                    if m: #gap exists in gRNA_with_flank
+                        scores_flattened = "|N.A. due to gap(s)|"
+                    else: #no gaps, safe to calculate efficiency scores
+                        scores = calcAllScores([gRNA_with_flank])
+                        scores_flattened = flatten_score_dict(scores)
+                    #print(scores_flattened)
 
                 ################################################
                 #write to scores (with gRNA info) to a new file#
                 ################################################
+                #print(f"{seq}\t{pam}\t{st}\t{en}\t{strand}\t{guideMITScore}\t{guideCfdScore}\t{guideCfdScorev2}\t{guideCfdScorev3}\t{scores_flattened}\n")
                 wgfh.write(f"{seq}\t{pam}\t{st}\t{en}\t{strand}\t{guideMITScore}\t{guideCfdScore}\t{guideCfdScorev2}\t{guideCfdScorev3}\t{scores_flattened}\n")
 
                 gRNA_count += 1
+
+                if gRNA_count%1000 == 0:
+                    endtime = datetime.datetime.now()
+                    elapsed_sec = endtime - starttime
+                    elapsed_min = elapsed_sec.seconds / 60
+                    print(f"finished in {elapsed_min:.2f} min, scored {gRNA_count} gRNAs in file {file}", flush=True)
 
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime

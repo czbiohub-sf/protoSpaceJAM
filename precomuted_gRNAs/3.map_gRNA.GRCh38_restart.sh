@@ -7,10 +7,206 @@
 #SBATCH --ntasks=1
 #SBATCH --mem=8G
 #SBATCH --cpus-per-task=1
-#SBATCH -e slurm.out/slurm-%A_%a.err
-#SBATCH -o slurm.out/slurm-%A_%a.out
+#SBATCH -e slurm.out/slurm-%j.err
+#SBATCH -o slurm.out/slurm-%j.out
 
 # declare arrays
+declare -a restart_list=( 
+KI270412.1.tab.gz \
+GL000221.1.tab.gz \
+KI270579.1.tab.gz \
+KI270304.1.tab.gz \
+18.part38.tab.gz \
+KI270438.1.tab.gz \
+KI270391.1.tab.gz \
+KI270383.1.tab.gz \
+17.part52.tab.gz \
+KI270716.1.tab.gz \
+KI270507.1.tab.gz \
+8.part71.tab.gz \
+KI270335.1.tab.gz \
+KI270730.1.tab.gz \
+KI270418.1.tab.gz \
+KI270387.1.tab.gz \
+KI270337.1.tab.gz \
+KI270728.1.tab.gz \
+KI270374.1.tab.gz \
+KI270303.1.tab.gz \
+KI270749.1.tab.gz \
+KI270336.1.tab.gz \
+KI270528.1.tab.gz \
+10.part71.tab.gz \
+KI270742.1.tab.gz \
+GL000205.2.tab.gz \
+GL000194.1.tab.gz \
+KI270740.1.tab.gz \
+KI270511.1.tab.gz \
+KI270465.1.tab.gz \
+KI270338.1.tab.gz \
+KI270363.1.tab.gz \
+KI270516.1.tab.gz \
+KI270725.1.tab.gz \
+KI270384.1.tab.gz \
+KI270746.1.tab.gz \
+KI270512.1.tab.gz \
+KI270519.1.tab.gz \
+KI270334.1.tab.gz \
+KI270707.1.tab.gz \
+KI270423.1.tab.gz \
+KI270515.1.tab.gz \
+KI270581.1.tab.gz \
+22.part26.tab.gz \
+KI270720.1.tab.gz \
+KI270731.1.tab.gz \
+KI270588.1.tab.gz \
+KI270722.1.tab.gz \
+KI270373.1.tab.gz \
+KI270752.1.tab.gz \
+KI270312.1.tab.gz \
+KI270580.1.tab.gz \
+KI270729.1.tab.gz \
+KI270583.1.tab.gz \
+7.part81.tab.gz \
+KI270429.1.tab.gz \
+KI270417.1.tab.gz \
+KI270723.1.tab.gz \
+KI270310.1.tab.gz \
+KI270316.1.tab.gz \
+KI270754.1.tab.gz \
+KI270329.1.tab.gz \
+KI270448.1.tab.gz \
+5.part87.tab.gz \
+GL000214.1.tab.gz \
+KI270419.1.tab.gz \
+KI270424.1.tab.gz \
+KI270322.1.tab.gz \
+GL000213.1.tab.gz \
+KI270422.1.tab.gz \
+19.part41.tab.gz \
+KI270756.1.tab.gz \
+KI270517.1.tab.gz \
+1.part124.tab.gz \
+KI270718.1.tab.gz \
+KI270739.1.tab.gz \
+KI270706.1.tab.gz \
+KI270510.1.tab.gz \
+GL000208.1.tab.gz \
+KI270753.1.tab.gz \
+KI270395.1.tab.gz \
+KI270751.1.tab.gz \
+GL000226.1.tab.gz \
+KI270302.1.tab.gz \
+9.part64.tab.gz \
+KI270388.1.tab.gz \
+KI270715.1.tab.gz \
+KI270529.1.tab.gz \
+KI270372.1.tab.gz \
+GL000219.1.tab.gz \
+KI270530.1.tab.gz \
+Y.part11.tab.gz \
+KI270420.1.tab.gz \
+KI270745.1.tab.gz \
+KI270375.1.tab.gz \
+KI270330.1.tab.gz \
+KI270712.1.tab.gz \
+KI270724.1.tab.gz \
+KI270750.1.tab.gz \
+MT.tab.gz \
+GL000008.2.tab.gz \
+KI270584.1.tab.gz \
+GL000009.2.tab.gz \
+KI270392.1.tab.gz \
+15.part46.tab.gz \
+KI270305.1.tab.gz \
+KI270755.1.tab.gz \
+KI270320.1.tab.gz \
+KI270721.1.tab.gz \
+KI270521.1.tab.gz \
+KI270386.1.tab.gz \
+KI270590.1.tab.gz \
+6.part82.tab.gz \
+KI270582.1.tab.gz \
+KI270593.1.tab.gz \
+KI270539.1.tab.gz \
+KI270747.1.tab.gz \
+KI270518.1.tab.gz \
+KI270713.1.tab.gz \
+KI270734.1.tab.gz \
+KI270376.1.tab.gz \
+KI270385.1.tab.gz \
+KI270340.1.tab.gz \
+KI270390.1.tab.gz \
+KI270733.1.tab.gz \
+KI270394.1.tab.gz \
+16.part50.tab.gz \
+KI270587.1.tab.gz \
+KI270382.1.tab.gz \
+KI270726.1.tab.gz \
+13.part44.tab.gz \
+KI270315.1.tab.gz \
+KI270442.1.tab.gz \
+2.part120.tab.gz \
+KI270744.1.tab.gz \
+KI270379.1.tab.gz \
+KI270468.1.tab.gz \
+KI270381.1.tab.gz \
+KI270466.1.tab.gz \
+KI270366.1.tab.gz \
+11.part72.tab.gz \
+KI270411.1.tab.gz \
+KI270711.1.tab.gz \
+KI270371.1.tab.gz \
+KI270467.1.tab.gz \
+3.part96.tab.gz \
+KI270508.1.tab.gz \
+KI270522.1.tab.gz \
+14.part46.tab.gz \
+KI270389.1.tab.gz \
+KI270591.1.tab.gz \
+KI270393.1.tab.gz \
+KI270538.1.tab.gz \
+GL000220.1.tab.gz \
+KI270364.1.tab.gz \
+KI270378.1.tab.gz \
+KI270709.1.tab.gz \
+KI270589.1.tab.gz \
+KI270717.1.tab.gz \
+KI270719.1.tab.gz \
+GL000216.2.tab.gz \
+GL000225.1.tab.gz \
+12.part68.tab.gz \
+KI270736.1.tab.gz \
+KI270548.1.tab.gz \
+GL000224.1.tab.gz \
+X.part74.tab.gz \
+KI270732.1.tab.gz \
+KI270544.1.tab.gz \
+KI270414.1.tab.gz \
+KI270757.1.tab.gz \
+KI270735.1.tab.gz \
+KI270333.1.tab.gz \
+21.part20.tab.gz \
+20.part37.tab.gz \
+KI270748.1.tab.gz \
+KI270708.1.tab.gz \
+GL000195.1.tab.gz \
+KI270714.1.tab.gz \
+KI270741.1.tab.gz \
+KI270425.1.tab.gz \
+KI270727.1.tab.gz \
+4.part85.tab.gz \
+KI270311.1.tab.gz \
+KI270396.1.tab.gz \
+KI270362.1.tab.gz \
+KI270435.1.tab.gz \
+GL000218.1.tab.gz \
+KI270710.1.tab.gz \
+KI270738.1.tab.gz \
+KI270509.1.tab.gz \
+KI270743.1.tab.gz \
+)
+
+
 declare -a filename=( 
 1.part0.tab.gz \
 1.part1.tab.gz \
@@ -3435,4 +3631,12 @@ genome_fa="Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa" # need to change this
 cd $working_dir
 
 #main command
-python ${script_folder}/gRNA_scan_bwa.py --gzdir ${gzdir} --gzfile ${filename[$idx]}  --gRNA_count ${gRNA_count[$idx]} --thread ${SLURM_CPUS_PER_TASK} --genome_fa ${genome_fa}
+if [[ " ${restart_list[*]} " =~ " ${filename[$idx]} " ]]
+then
+    echo "restarting ${filename[$idx]}" >> restart_list.txt
+    python ${script_folder}/gRNA_scan_bwa.py --gzdir ${gzdir} --gzfile ${filename[$idx]}  --gRNA_count ${gRNA_count[$idx]} --thread ${SLURM_CPUS_PER_TASK} --genome_fa ${genome_fa}
+else
+    echo "skipped ${filename[$idx]}" >> skipped_list.txt
+fi
+
+
