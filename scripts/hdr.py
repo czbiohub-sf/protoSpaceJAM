@@ -563,7 +563,7 @@ class HDR_flank:
                 start = centerpiece_start - _HA_len
                 end = centerpiece_end + _HA_len + 1 # need to get the base at position:end
                 _len= end - start
-                print(f"recoding, start={start}\tend={end}\t centerpiece:{centerpiece_start}-{centerpiece_end} len={_len} HA_len={_HA_len}")
+                #print(f"recoding, start={start}\tend={end}\t centerpiece:{centerpiece_start}-{centerpiece_end} len={_len} HA_len={_HA_len}")
             self.ODN_postMut_centered = self.ODN_postMut[int(start):int(end)]
             self.effective_HA_len = _HA_len
 
