@@ -5,6 +5,21 @@
 
 ## Usage
 
+### Clone the repository
+```
+git clone https://github.com/czbiohub/protospaceXS
+```
+### Go the repository directory, switch the branch if running branch other than master
+```
+cd protospaceXS
+git checkout <branch you'd like to run>
+```
+### Create conda environment and activate it
+```
+conda env create -f environment1.yml
+conda env create -f environment2.yml
+conda activate protospaceX
+```
 make sure all script/binary files in folder utils are excutable
 ### Genome download and preprocessing
 Download default genomes:   
@@ -27,7 +42,7 @@ Serialize fasta file for fast I/O
 #in directory genomefiles
 bash serialize_fa.sh
 ```
-### Precompute gRNA
+### Precompute gRNA (optional)
 Get all gRNAs
 ```
 cd ..
@@ -45,8 +60,17 @@ This step is computationally intensive, it's recommended to run on an hpc cluste
 mkdir slurm.out
 sbatch 3.map_gRNA.GRCh38.sh
 ```
-Get off-target score and efficiency score predictions
+Get off-target score and efficiency score predictions  
 This step is computationally intensive, it's recommended to run on an hpc cluster
 ```
+conda deactivate
+conda activate sklearn0
 bash 4.score.GRCh38.sh
+```
+
+### Predict gRNA, DNA donor
+```
+conda deactivate
+conda activate protospaceX
+python main.py --path2csv input/test_protospaceX.csv --ssODN_max_size 200 --recoding_all
 ```
