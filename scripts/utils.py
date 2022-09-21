@@ -247,7 +247,7 @@ def get_HDR_arms(loc, half_len, type,genome_ver):
     else:
         sys.exit(f"unknown strand: {Strand}, acceptable values are -1 and 1")
 
-def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, genome_ver, dist=50):
+def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, genome_ver,spec_score_flavor, dist=50):
     """
     input
         ENST_ID: ENST ID
@@ -273,7 +273,7 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, genome
     # get gRNA around the chromosomeal location (near ATG)
     df_gRNAs_ATG = get_gRNAs_near_loc(loc=end_of_ATG_loc, dist=dist, loc2file_index=loc2file_index, genome_ver=genome_ver)
     # rank gRNAs
-    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType, ENST_ID = ENST_ID,ENST_strand = ENST_strand, type = "start")
+    ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(loc=end_of_ATG_loc, gRNA_df=df_gRNAs_ATG, loc2posType=loc2posType, ENST_ID = ENST_ID,ENST_strand = ENST_strand, type = "start", spec_score_flavor=spec_score_flavor)
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_ATG.sort_values("final_weight", ascending=False) #sort descending on final weight
 
     ##################################
@@ -286,18 +286,18 @@ def get_gRNAs(ENST_ID, ENST_info, freq_dict, loc2file_index, loc2posType, genome
     # get gRNA around the chromosomeal location (near stop location)
     df_gRNAs_stop = get_gRNAs_near_loc(loc=start_of_stop_loc, dist=dist, loc2file_index=loc2file_index, genome_ver=genome_ver)
     # rank gRNAs
-    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType, ENST_ID = ENST_ID, ENST_strand = ENST_strand, type = "stop")
+    ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(loc=start_of_stop_loc, gRNA_df=df_gRNAs_stop, loc2posType=loc2posType, ENST_ID = ENST_ID, ENST_strand = ENST_strand, type = "stop", spec_score_flavor=spec_score_flavor)
     ranked_df_gRNAs_stop = ranked_df_gRNAs_stop.sort_values("final_weight", ascending=False) #sort descending on final weight
 
     return ([ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop])
 
-def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, ENST_strand, type, alpha = 1):
+def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, alpha = 1):
     """
     input:  loc         [chr,pos,strand]  #start < end
-            gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
+            gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"  !! neg strand: start > end
             alpha       specificity weight is raised to the power of alpha
             type        "start" or "stop:
-    output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "CSS", "ES"  !! neg strand: start > end
+    output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"  !! neg strand: start > end
     """
     insPos = loc[1]  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
     Chr = loc[0]
@@ -326,7 +326,7 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, ENST_strand, type,
             cut2insDist += 1
 
         #calc. specificity_weight
-        CSS = row[5]
+        CSS = row[spec_score_flavor]
         specificity_weight = _specificity_weight(CSS)
         col_spec_weight.append(specificity_weight)
 
@@ -611,7 +611,7 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index, genome_ver):
         loc: [chr,pos,strand]
         dist: max cut to loc distance
     return:
-        a dataframe of guide RNAs which cuts <[dist] to the loc, the columns are "seq","pam","start","end", "strand", "CSS", "ES"
+        a dataframe of guide RNAs which cuts <[dist] to the loc, the columns are "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"
     """
     chr = loc[0]
     pos = loc[1]
@@ -629,7 +629,7 @@ def get_gRNAs_near_loc(loc,dist, loc2file_index, genome_ver):
     dfs =[]
     for file in target_files:
         file_path = os.path.join("precomuted_gRNAs",f"gRNA_{genome_ver}","gRNA.tab.gz.split.BwaMapped.scored",file)
-        df_tmp = pd.read_csv(file_path, sep="\t", compression='infer', header=None, names = ["seq","pam","start","end", "strand", "CSS", "ES"])
+        df_tmp = pd.read_csv(file_path, sep="\t", compression='infer', header=None, names = ["seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"])
         dfs.append(df_tmp)
     df_gRNA = pd.concat(dfs)
 

@@ -55,23 +55,27 @@ log.propagate = False
 log.setLevel(logging.INFO) #set the level of warning displayed
 #log.setLevel(logging.DEBUG) #set the level of warning displayed
 
+#configs
 config = vars(parse_args())
 gRNA_num_out = config['num_gRNA_per_term']
 max_cut2ins_dist = 50 #deprecated?
 HDR_arm_len = config['HA_len']
 ssODN_max_size = config["ssODN_max_size"]
+spec_score_flavor = "guideMITScore"
 
 #check recoding args
 if (config["recoding_all"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
     sys.exit(f"Found conflicts in recoding arguments: --recoding_all cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again")
 if config["recoding_off"] and config["recoding_stop_recut_only"]:
     sys.exit(f"Found conflicts in recoding arguments: --recoding_off cannot be used with --recoding_stop_recut_only\nplease correct the issue and try again")
-if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
-    config["recoding_all"] == True
 
 #process recoding args
+if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
+    config["recoding_all"] = True
+
 if config["recoding_off"] or config["recoding_stop_recut_only"]:
     config["recoding_all"] = False
+
 
 recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_stop_recut_only":config["recoding_stop_recut_only"],
@@ -129,7 +133,7 @@ def main():
 
         #open result file and write header
         csvout_res = open("logs/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,CFD_specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit,specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -181,7 +185,7 @@ def main():
                 row_prefix = f"{ENST_ID},{ENST_info[ENST_ID].chr},{transcript_type},{name}"
 
                 #get gRNAs
-                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"])
+                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"], spec_score_flavor = spec_score_flavor)
                 if ranked_df_gRNAs_ATG.empty == True:
                     start_info.failed.append(ENST_ID)
                     csvout_N.write(",,,,,\n")
@@ -230,13 +234,13 @@ def main():
                         cfdfinal = HDR_template.final_cfd
 
                         #write csv
-                        CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
+                        spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
                         if cfd1 == "recoding turned off":
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
                             csvout_N.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
@@ -289,13 +293,13 @@ def main():
                         cfdfinal = HDR_template.final_cfd
 
                         #write csv
-                        CSS, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
+                        spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
                         if cfd1 == "recoding turned off":
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
                             csvout_C.write(f",{cfd1:.6f},{cfd2:.6f},{cfd3:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f}\n")
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{CSS},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
 
 
                         #write log
@@ -387,7 +391,7 @@ class info:
         self.failed = []
 
 def get_res(best_start_gRNA):
-    CSS = best_start_gRNA["CSS"].values[0]
+    spec_score = best_start_gRNA[spec_score_flavor].values[0]
     seq = best_start_gRNA["seq"].values[0]
     pam = best_start_gRNA["pam"].values[0]
     s = best_start_gRNA["start"].values[0]
@@ -397,7 +401,7 @@ def get_res(best_start_gRNA):
     dist_weight = best_start_gRNA["dist_weight"].values[0]
     pos_weight = best_start_gRNA["pos_weight"].values[0]
     final_weight = best_start_gRNA["final_weight"].values[0]
-    return([CSS,seq,pam,s,e,cut2ins_dist,spec_weight,dist_weight,pos_weight,final_weight])
+    return([spec_score,seq,pam,s,e,cut2ins_dist,spec_weight,dist_weight,pos_weight,final_weight])
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()

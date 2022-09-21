@@ -130,7 +130,7 @@ class HDR_flank:
         else:
             self.gRNA_in_coding_strand = False
 
-        use_masked_phase = True
+        use_junction_masked_phase = True
 
         #print(f"{self.left_flk_phases}||{self.right_flk_phases}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
 
@@ -165,7 +165,7 @@ class HDR_flank:
 
         #use masked phases (5UTR, 3bp exon-intron junction)
         #print(f"{self.left_flk_phases_masked}||{self.right_flk_phases_masked}\n{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]}||{self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}")
-        if use_masked_phase == True:
+        if use_junction_masked_phase == True:
             self.left_flk_phases = self.left_flk_phases_masked
             self.right_flk_phases = self.right_flk_phases_masked
 
@@ -539,18 +539,18 @@ class HDR_flank:
         #################################
         self.effective_HA_len = len(self.gRNA_lc_Larm) #initizalize effective HA length with the maximum value
         if self.ssODN_max_size is not None:
-            print(f"Centering")
-            print(f"ODN_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
-                  f"ODN_postmut  {self.ODN_postMut}")
+            #print(f"Centering")
+            #print(f"ODN_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
+            #      f"ODN_postmut  {self.ODN_postMut}")
             diff_loc = self.get_diff_loc(str1 = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", str2 =f"{self.ODN_postMut}")
-            print(f"{diff_loc}")
-            print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
+            #print(f"{diff_loc}")
+            #print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
 
             if len(diff_loc) == 0: #no recoding
                 _HA_len = (self.ssODN_max_size - len(self.tag))/2
                 start = len(self.gRNA_lc_Larm) - _HA_len - 1
                 end = start + _HA_len + len (self.tag) + _HA_len
-                print(f"no recoding, start={start}\tend={end}")
+                #print(f"no recoding, start={start}\tend={end}")
             else: #with recoding
                 recoding_left = min(diff_loc) # 0-indexed
                 recoding_right = max(diff_loc) # 0-indexed
