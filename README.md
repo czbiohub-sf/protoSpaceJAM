@@ -20,7 +20,7 @@ A standalone program to design Guide RNA and repair donors for CRISPR knock-in e
 
 ### Clone the repository
 ```
-git clone https://github.com/czbiohub/protospaceXS
+git clone https://github.com/czbiohub/protospaceX
 ```
 ### Go the repository directory, switch the branch if running branch other than master
 ```
