@@ -1,5 +1,5 @@
 # ProtospaceX  
-A standalone program to design Guide RNA and repair donors for CRISPR knock-in experiments  
+A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
 
 ## Key features:  
 - Fully standalone, no calling to other bioinformatics servers
