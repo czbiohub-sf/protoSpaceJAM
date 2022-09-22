@@ -220,10 +220,10 @@ class HDR_flank:
         self.info_p4=''
         self.info_p5=''
 
-        if not recoding_args["recoding_off"]:
+        if not self.recoding_args["recoding_off"]:
             self.left_flk_seq_CodonMut = self.left_flk_seq #initialize for later use ( the definition may be skipped in phase 1)
             self.right_flk_seq_CodonMut = self.right_flk_seq #initialize for later use ( the definition may be skipped in phase 1)
-            if not recoding_args["recoding_stop_recut_only"]:
+            if not self.recoding_args["recoding_stop_recut_only"]:
                 #########
                 #Phase 1#
                 #########
@@ -433,7 +433,7 @@ class HDR_flank:
             # log recoding information #
             ############################
             self.info_p1 = ""
-            if not recoding_args["recoding_stop_recut_only"]:
+            if not self.recoding_args["recoding_stop_recut_only"]:
                 self.info_p1 = "".join(
                     f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
                     f"phase1.cut-to-insert + 2bp padding on both sides (extend to full codons)\n"

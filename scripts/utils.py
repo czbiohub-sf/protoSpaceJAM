@@ -338,7 +338,7 @@ def rank_gRNAs_for_tagging(loc,gRNA_df, loc2posType, ENST_ID, ENST_strand, type,
         position_type = _get_position_type(chr = Chr, ID = ENST_ID, pos = cutPos, loc2posType = loc2posType)
         position_weight = _position_weight(position_type)
 
-        position_type_nextbp = _get_position_type(chr = Chr, ID = ENST_ID, pos = cutPos, loc2posType = loc2posType)
+        position_type_nextbp = _get_position_type(chr = Chr, ID = ENST_ID, pos = cutPos+1, loc2posType = loc2posType)
         position_weight_nextbp = _position_weight(position_type_nextbp)
 
         position_weight = min([position_weight, position_weight_nextbp])
