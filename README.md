@@ -1,4 +1,4 @@
-# ProtospaceXS  
+# ProtospaceX  
 A standalone program to design Guide RNA and repair donors for CRISPR knock-in experiments  
 
 ## Key features:  
