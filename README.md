@@ -1,7 +1,20 @@
-# ProtospaceXS
-- Guide RNA and repair donor design
-- ssODN recoding to facilitate payload insertion and prevent recut
+# ProtospaceXS  
+A standalone program to design Guide RNA and repair donors for CRISPR knock-in experiments  
+
+## Key features:  
+- Fully standalone, no calling to other bioinformatics servers
+- Sophisticated guide RNA ranking system
+  - specificity weight
+  - Penalize cuts near exon-intron junctions etc.
+  - Penalize cuts far away from the payload insertion site
+- Sophisticated DNA donor design
+  - recode to prevent recut
+  - recode to facilitate payload insertion and prevent recut
+  - centering the DNA donor around the region containing the payload and recoded bases. 
+  - enforce maximum DNA donor size
+  - scan and trim hard-to-synthesis motifs (coming soon)
 - Pre-compute all CRISPR guide RNAs and their properties for fast runtime
+
 
 ## Usage
 
