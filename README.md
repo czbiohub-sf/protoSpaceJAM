@@ -67,11 +67,13 @@ Split into chunks
 bash 2.split4mapping.sh
 ```
 Map to the genome  
-This step is computationally intensive, it's recommended to run on an hpc cluster
+This step is computationally intensive, it's recommended to run on an hpc cluster (with the slurm scheduler in this example)
 
 ```
-mkdir slurm.out
-sbatch 3.map_gRNA.GRCh38.sh
+mkdir map.slurm.out
+#human
+sbatch sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz.out.split.tab
+
 ```
 Get off-target score and efficiency score predictions  
 This step is computationally intensive, it's recommended to run on an hpc cluster
