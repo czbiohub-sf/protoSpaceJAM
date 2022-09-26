@@ -73,7 +73,10 @@ This step is computationally intensive, it's recommended to run on an hpc cluste
 mkdir map.slurm.out
 #human
 sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
-
+#mouse
+sbatch 3.map_gRNA.sh gRNA_GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa
+#zebrafish
+sbatch 3.map_gRNA.sh gRNA_GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa
 ```
 Get off-target score and efficiency score predictions  
 This step is computationally intensive, it's recommended to run on an hpc cluster
