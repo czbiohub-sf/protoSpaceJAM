@@ -72,7 +72,7 @@ This step is computationally intensive, it's recommended to run on an hpc cluste
 ```
 mkdir map.slurm.out
 #human
-sbatch sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz.out.split.tab
+sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
 
 ```
 Get off-target score and efficiency score predictions  
