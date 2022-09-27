@@ -1,13 +1,26 @@
-# ProtospaceXS
-- Guide RNA and repair donor design
-- ssODN recoding to facilitate payload insertion and prevent recut
+# ProtospaceX  
+A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
+
+## Key features:  
+- Fully standalone, no calling to other bioinformatics servers
+- Sophisticated guide RNA ranking system
+  - specificity weight
+  - Penalize cuts near exon-intron junctions etc.
+  - Penalize cuts far away from the payload insertion site
+- Sophisticated DNA donor design
+  - recode to prevent recut
+  - recode to facilitate payload insertion and prevent recut
+  - center the DNA donor around the region containing the payload and recoded bases. 
+  - enforce maximum length of DNA donor
+  - scan and trim hard-to-synthesis motifs (coming soon)
 - Pre-compute all CRISPR guide RNAs and their properties for fast runtime
+
 
 ## Usage
 
 ### Clone the repository
 ```
-git clone https://github.com/czbiohub/protospaceXS
+git clone https://github.com/czbiohub/protospaceX
 ```
 ### Go the repository directory, switch the branch if running branch other than master
 ```
@@ -30,7 +43,7 @@ bash download_genomes.sh
 ```
 Preprocess GFF3 annotation file
 ```
-#in directory genomefiles
+#in genomefiles
 bash preprocess_GFF3.sh
 ```
 build bwa indexes
@@ -39,14 +52,13 @@ bash build_bwa_index.sh
 ```
 Serialize fasta file for fast I/O
 ```
-#in directory genomefiles
+#in genomefiles
 bash serialize_fa.sh
 ```
 ### Precompute gRNA (optional)
 Get all gRNAs
 ```
-cd ..
-cd precomuted_gRNAs
+cd ../precomuted_gRNAs
 bash 1.get_gRNAs.sh  #Note: comment out line #12 if not using an hpc cluster
 ```
 Split into chunks
@@ -54,11 +66,16 @@ Split into chunks
 bash 2.split4mapping.sh
 ```
 Map to the genome  
-This step is computationally intensive, it's recommended to run on an hpc cluster
+This step is computationally intensive, it's recommended to run on an hpc cluster (with the slurm scheduler in this example)
 
 ```
-mkdir slurm.out
-sbatch 3.map_gRNA.GRCh38.sh
+mkdir map.slurm.out
+#human
+sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
+#mouse
+sbatch 3.map_gRNA.sh gRNA_GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa
+#zebrafish
+sbatch 3.map_gRNA.sh gRNA_GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa
 ```
 Get off-target score and efficiency score predictions  
 This step is computationally intensive, it's recommended to run on an hpc cluster
