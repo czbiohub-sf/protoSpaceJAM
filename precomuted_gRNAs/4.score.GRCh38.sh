@@ -5,7 +5,7 @@
 #SBATCH --array=1-1700%1
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=16G
+#SBATCH --mem=12G
 #SBATCH --cpus-per-task=1
 #SBATCH -e score.slurm.out/slurm-%A_%a.err
 #SBATCH -o score.slurm.out/slurm-%A_%a.out
@@ -1730,4 +1730,4 @@ script_folder="../scripts"
 cd $working_dir
 
 #main command
-python ${script_folder}/gRNA_scan_calcScores.py --gzdir ${gzdir} --gzfile ${filename[$idx]} --skip_eff_score # skip efficiency score for now
+python ${script_folder}/gRNA_calcScores.py --gzdir ${gzdir} --gzfile ${filename[$idx]} --skip_eff_score # skip efficiency score for now
