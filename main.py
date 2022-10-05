@@ -126,7 +126,7 @@ def main():
         recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
         csvout_N = open("logs/out_Nterm_recut_cfd.csv", "w")
         csvout_C = open("logs/out_Cterm_recut_cfd.csv", "w")
-        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,max_of_cfd4_cfdScan,cfd_max\n"
+        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfdScan,cfd_max\n"
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
         fiveUTR_log = open("logs/fiveUTR.txt", "w")
@@ -359,7 +359,7 @@ def main():
 
         # write best gRNA dfs to file
         outdir = "pickles"
-        mkdir(dir)
+        mkdir(outdir)
         with open(f"{outdir}/best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
         with open(f"{outdir}/best_stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
@@ -404,9 +404,9 @@ def ret_six_dec(myvar):
     else:
         return myvar
 
-def mkdir(path):
-    if not os.path.exists(path):
-        os.mkdir(path)
+def mkdir(mypath):
+    if not os.path.exists(mypath):
+        os.mkdir(mypath)
 
 class info:
     '''
