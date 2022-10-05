@@ -88,7 +88,7 @@ conda deactivate
 conda activate sklearn0
 bash 4.score.GRCh38.sh
 ```
-index the precompute gRNAs for fast access
+bash index the precompute gRNAs for fast access
 ```
 # in precomuted_gRNAs
 5.index_result_files.sh
