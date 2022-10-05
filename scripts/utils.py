@@ -698,7 +698,7 @@ def get_seq(chr,start,end,strand,genome_ver):
     if os.path.isfile(chr_file_path):
         #read file
         chr_seqrecord = read_pickle_files(chr_file_path)
-        subseq = chr_seqrecord.seq._data[(start-1):(end-1)] # use -1 to convert 1-index to 0-index
+        subseq = str(chr_seqrecord.seq)[(start-1):(end-1)] # use -1 to convert 1-index to 0-index
         if strand == "-1" or strand == -1:
             return(reverse_complement(subseq))
         else:
