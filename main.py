@@ -238,15 +238,15 @@ def main():
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
@@ -305,16 +305,16 @@ def main():
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4:.6f},{cfd_scan:.6f},{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
                             #print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{ssODN},{HDR_template.effective_HA_len}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{HDR_template.final_cfd:.6f}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
@@ -358,15 +358,17 @@ def main():
             num_to_process = "all"
 
         # write best gRNA dfs to file
-        with open(f"pickles/best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        outdir = "pickles"
+        mkdir(dir)
+        with open(f"{outdir}/best_start_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/best_stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"{outdir}/best_stop_gRNAs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(best_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write failed ENSTs to file
-        with open(f"pickles/start_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"{outdir}/start_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(start_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(f"pickles/stop_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
+        with open(f"{outdir}/stop_failed_IDs_of_{num_to_process}_genes.pickle", 'wb') as handle:
             pickle.dump(stop_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write ENSTs (whose gRNA is outside of the default HDR arm) to file
@@ -389,6 +391,23 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
+def ret_six_dec(myvar):
+    '''
+    retain six decimal points for printout
+    '''
+
+    if type(myvar) == float:
+        return f"{myvar:.6f}"
+    elif type(myvar) == int(myvar):
+        myvar = float(myvar)
+        return f"{myvar:.6f}"
+    else:
+        return myvar
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
 class info:
     '''
     info log class
