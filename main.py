@@ -170,6 +170,8 @@ def main():
                     sys.exit(f"invalid target terminus: {target_terminus}")
             if not ENST_ID in ENST_info.keys():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
+                genome_ver = config['genome_ver']
+                csvout_res.write(f"{ENST_ID},ERROR: this ID was not found in the genome {genome_ver}, most likely this ID was deprecated\n")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
             if transcript_type == "protein_coding": # and ENST_ID == "ENST00000329276":

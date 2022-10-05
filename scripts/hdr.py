@@ -1118,10 +1118,18 @@ class HDR_flank:
 
     def select_ssODN_strand(self, seq):
         """
-        select strand
-        input: seq
+        select strand:
+            if cut-to-insert is 0: use same strand as gRNA
+            if recoding is off:
+         input: seq
         output: seq in the preferred strand
         """
+        if self.Cut2Ins_dist == 0: # use same strand as gRNA,  note the ssODN is initialized to be on the coding strand (same as ENST_strand)
+            if self.ENST_strand * self.gStrand > 0:
+                return seq
+            elif self.ENST_strand * self.gStrand < 0:
+                return str(Seq(seq).reverse_complement())
+
         if self.InsPos <= self.CutPos:
             return seq
         else:
