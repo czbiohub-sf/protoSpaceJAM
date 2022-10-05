@@ -542,7 +542,10 @@ class HDR_flank:
             #print(f"Centering")
             #print(f"ODN_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
             #      f"ODN_postmut  {self.ODN_postMut}")
-            diff_loc = self.get_diff_loc(str1 = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", str2 =f"{self.ODN_postMut}")
+            if not self.recoding_args["recoding_off"]: #recoding is on
+                diff_loc = self.get_diff_loc(str1 = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", str2 =f"{self.ODN_postMut}")
+            else:
+                diff_loc = [] # skip get_diff_loc if recoding is off
             #print(f"{diff_loc}")
             #print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
 
