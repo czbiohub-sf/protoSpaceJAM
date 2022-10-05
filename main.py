@@ -178,8 +178,7 @@ def main():
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
-                csvout_N.write(ENST_ID)
-                csvout_C.write(ENST_ID)
+
                 if hasattr(ENST_info[ENST_ID],"name"):
                     name = ENST_info[ENST_ID].name
                 else:
@@ -188,17 +187,16 @@ def main():
 
                 #get gRNAs
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"], spec_score_flavor = spec_score_flavor)
-                if ranked_df_gRNAs_ATG.empty == True:
-                    start_info.failed.append(ENST_ID)
-                    csvout_N.write(",,,,,\n")
-                if ranked_df_gRNAs_stop.empty == True:
-                    stop_info.failed.append(ENST_ID)
-                    csvout_C.write(",,,,,\n")
 
                 ##################################
                 #best start gRNA and HDR template#
                 ##################################
                 if target_terminus=="all" or target_terminus=="N":
+                    csvout_N.write(ENST_ID)
+                    if ranked_df_gRNAs_ATG.empty == True:
+                        start_info.failed.append(ENST_ID)
+                        csvout_N.write(",,,,,\n")
+
                     for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_ATG.shape[0]])):
                         # if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
                         #     best_start_gRNA = best_start_gRNA[best_start_gRNA["CSS"] == best_start_gRNA["CSS"].max()] # break the tie by CSS score
@@ -239,6 +237,7 @@ def main():
                         spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
+                            csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
                             csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
@@ -261,6 +260,11 @@ def main():
                 #best stop gRNA and HDR template#
                 #################################
                 if target_terminus=="all" or target_terminus=="C":
+                    csvout_C.write(ENST_ID)
+                    if ranked_df_gRNAs_stop.empty == True:
+                        stop_info.failed.append(ENST_ID)
+                        csvout_C.write(",,,,,\n")
+
                     for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_stop.shape[0]])):
                         # if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
                         #     best_stop_gRNA = best_stop_gRNA[best_stop_gRNA["CSS"] == best_stop_gRNA["CSS"].max()] # break the tie by CSS score
@@ -300,6 +304,7 @@ def main():
                         spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
+                            csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
                             csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},recoding turned off,,{cfdfinal:.6f},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
