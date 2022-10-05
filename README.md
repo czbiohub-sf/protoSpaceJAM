@@ -12,8 +12,9 @@ A standalone program to design guide RNA and repair donors for CRISPR knock-in e
   - recode to facilitate payload insertion and prevent recut
   - center the DNA donor around the region containing the payload and recoded bases. 
   - enforce maximum length of DNA donor
+  - automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
   - scan and trim hard-to-synthesis motifs (coming soon)
-- Pre-compute all CRISPR guide RNAs and their properties for fast runtime
+- Use pre-computed genome-wide guide RNAs and their properties for fast runtime
 
 
 ## Usage
