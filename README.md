@@ -72,6 +72,7 @@ This step is computationally intensive, it's recommended to run on an hpc cluste
 
 ```
 working_dir="/hpc/projects/data_lg/duo.peng/protospaceXS/precomuted_gRNAs"
+cd $working_dir
 rm -rf map.slurm.out
 mkdir map.slurm.out
 sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa $working_dir
@@ -86,6 +87,7 @@ Get off-target score and efficiency score predictions
 This step is computationally intensive, it's recommended to run on an hpc cluster (with the slurm scheduler in this example)
 ```
 working_dir="/hpc/projects/data_lg/duo.peng/protospaceXS/precomuted_gRNAs"
+cd $working_dir
 rm -rf score.slurm.out
 mkdir score.slurm.out
 sbatch 4.score_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa $working_dir
