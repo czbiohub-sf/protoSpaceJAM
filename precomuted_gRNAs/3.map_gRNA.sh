@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=Bwa
 #SBATCH --time=14-00:00:00
-#SBATCH --array=1-1700%100
+#SBATCH --array=1-1700%1
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=8G
@@ -28,12 +28,12 @@ cd $working_dir
 
 # read file array from tab file
 readarray -t filenames < <(cat $tabfile | cut -f6)
-filenames=("${filenames[@]:1}")
+filenames=("${filenames[@]:1}") #skip header
 echo "number of files: ${#filenames[@]}"
 
 # read gRNA num from tab file
 readarray -t gRNA_counts < <(cat $tabfile | cut -f4)
-gRNA_counts=("${gRNA_counts[@]:1}")
+gRNA_counts=("${gRNA_counts[@]:1}") #skip header
 echo "number of gRNA counts: ${#gRNA_counts[@]}"
 
 #check index and filename
