@@ -64,12 +64,14 @@ bash 1.get_gRNAs.sh  #Note: comment out line #12 if not using an hpc cluster
 ```
 Split into chunks
 ```
+# in precomuted_gRNAs
 bash 2.split4mapping.sh
 ```
 Map to the genome  
 This step is computationally intensive, it's recommended to run on an hpc cluster (with the slurm scheduler in this example)
 
 ```
+# in precomuted_gRNAs
 mkdir map.slurm.out
 #human
 sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
@@ -81,9 +83,15 @@ sbatch 3.map_gRNA.sh gRNA_GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa
 Get off-target score and efficiency score predictions  
 This step is computationally intensive, it's recommended to run on an hpc cluster
 ```
+# in precomuted_gRNAs
 conda deactivate
 conda activate sklearn0
 bash 4.score.GRCh38.sh
+```
+index the precompute gRNAs for fast access
+```
+# in precomuted_gRNAs
+5.index_result_files.sh
 ```
 
 ### Predict gRNA, DNA donor
