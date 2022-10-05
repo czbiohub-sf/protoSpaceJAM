@@ -71,22 +71,24 @@ Map to the genome
 This step is computationally intensive, it's recommended to run on an hpc cluster (with the slurm scheduler in this example)
 
 ```
-# in precomuted_gRNAs
+working_dir="/hpc/projects/data_lg/duo.peng/protospaceXS/precomuted_gRNAs"
+cd $working_dir
+rm -rf map.slurm.out
 mkdir map.slurm.out
-#human
-sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
-#mouse
-sbatch 3.map_gRNA.sh gRNA_GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa
-#zebrafish
-sbatch 3.map_gRNA.sh gRNA_GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa
+sbatch 3.map_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa $working_dir
+sbatch 3.map_gRNA.sh gRNA_GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa $working_dir
+sbatch 3.map_gRNA.sh gRNA_GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa $working_dir
 ```
 Get off-target score and efficiency score predictions  
-This step is computationally intensive, it's recommended to run on an hpc cluster
+This step is computationally intensive, it's recommended to run on an hpc cluster (with the slurm scheduler in this example)
 ```
-# in precomuted_gRNAs
-conda deactivate
-conda activate sklearn0
-bash 4.score.GRCh38.sh
+working_dir="/hpc/projects/data_lg/duo.peng/protospaceXS/precomuted_gRNAs"
+cd $working_dir
+rm -rf score.slurm.out
+mkdir score.slurm.out
+sbatch 4.score_gRNA.sh gRNA_GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa $working_dir
+sbatch 4.score_gRNA.sh gRNA_GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa $working_dir
+sbatch 4.score_gRNA.sh gRNA_GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa $working_dir
 ```
 bash index the precompute gRNAs for fast access
 ```
