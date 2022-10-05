@@ -11,6 +11,7 @@ import gzip
 import shutil
 import gc
 import math
+import pickle
 sys.path.insert(1, '..')
 #from gRNA_search import *
 #from utils import *
@@ -72,10 +73,10 @@ class ColoredLogger(logging.Logger):
 
 
 #add to sys path, so the scoring modules can load
-scoring_script_dir = os.path.join(sys.path[0],"..","crisporEffScores")
-sys.path.insert(1, scoring_script_dir)
-from cfd import *
-from crisporEffScores import *
+# scoring_script_dir = os.path.join(sys.path[0],"..","crisporEffScores")
+# sys.path.insert(1, scoring_script_dir)
+# from cfd import *
+# from crisporEffScores import *
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -143,7 +144,7 @@ def main():
             file_count+=1
 
         # write dict to file
-        with open('loc2file_index.pickle', 'wb') as handle:
+        with open(os.path.join(config["gzdir"],'loc2file_index.pickle'), 'wb') as handle:
             pickle.dump(file_index, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()

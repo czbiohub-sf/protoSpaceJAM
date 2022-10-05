@@ -100,7 +100,7 @@ def main():
 
         #load gRNA info index (mapping of chromosomal location to file parts)
         log.info("loading the mapping of chromosomal location to (gRNA) file parts")
-        loc2file_index = read_pickle_files(os.path.join("genome_files", "fa_pickle", config['genome_ver'],"loc2file_index.pickle"))
+        loc2file_index = read_pickle_files(os.path.join("precomuted_gRNAs", "gRNA_" + config['genome_ver'],"gRNA.tab.gz.split.BwaMapped.scored","loc2file_index.pickle"))
 
         #load chr location to type (e.g. UTR, cds, exon/intron junction) mappings
         log.info("loading the mapping of chromosomal location to type (e.g. UTR, cds, exon/intron junction)")
