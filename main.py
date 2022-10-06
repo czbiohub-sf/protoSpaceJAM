@@ -398,7 +398,7 @@ def ret_six_dec(myvar):
 
     if type(myvar) == float:
         return f"{myvar:.6f}"
-    elif type(myvar) == int(myvar):
+    elif type(myvar) == int:
         myvar = float(myvar)
         return f"{myvar:.6f}"
     else:
