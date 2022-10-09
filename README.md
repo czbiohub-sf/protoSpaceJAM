@@ -56,7 +56,7 @@ Serialize fasta file for fast I/O
 #in genomefiles
 bash serialize_fa.sh
 ```
-### Precompute gRNA (optional)
+### Precompute gRNA (optional: precomputed results available for download)
 Get all gRNAs
 ```
 cd ../precomuted_gRNAs
