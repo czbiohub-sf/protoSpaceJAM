@@ -45,6 +45,9 @@ def parse_args():
     parser.add_argument('--recoding_stop_recut_only', default = False, action='store_true', help='use recoding to prevent recut')
     parser.add_argument('--recoding_all',             default = False, action='store_true', help='use recoding to prevent recut + recode region between insert and cut site')
 
+    #output
+    parser.add_argument('--outdir',   default="logs", type=str, help='output directory')
+
     config = parser.parse_args()
     return config
 
@@ -62,6 +65,7 @@ max_cut2ins_dist = 50 #deprecated?
 HDR_arm_len = config['HA_len']
 ssODN_max_size = config["ssODN_max_size"]
 spec_score_flavor = "guideMITScore"
+outdir = config['outdir']
 
 #check recoding args
 if (config["recoding_all"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
@@ -81,6 +85,8 @@ recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_stop_recut_only":config["recoding_stop_recut_only"],
                  "recoding_all":config["recoding_all"]}
 
+
+
 #check if HA_len is too short to satisfy ssODN_max_size
 if ssODN_max_size is not None:
     max_payload_size = max([len(config["Npayload"]),len(config["Cpayload"])])
@@ -93,7 +99,7 @@ if ssODN_max_size is not None:
 #####################
 ##      main       ##
 #####################
-def main():
+def main(outdir):
     try:
         starttime = datetime.datetime.now()
         freq_dict = dict()
@@ -122,17 +128,18 @@ def main():
         ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
 
         #open log files
-        recut_CFD_all = open("logs/recut_CFD_all.txt", "w")
-        recut_CFD_fail = open("logs/recut_CFD_fail.txt", "w")
-        csvout_N = open("logs/out_Nterm_recut_cfd.csv", "w")
-        csvout_C = open("logs/out_Cterm_recut_cfd.csv", "w")
+        mkdir(outdir)
+        recut_CFD_all = open(os.path.join(outdir,"recut_CFD_all.txt"), "w")
+        recut_CFD_fail = open(os.path.join(outdir,"recut_CFD_fail.txt"), "w")
+        csvout_N = open(os.path.join(outdir,"out_Nterm_recut_cfd.csv"), "w")
+        csvout_C = open(os.path.join(outdir,"out_Cterm_recut_cfd.csv"), "w")
         csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfdScan,cfd_max\n"
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
-        fiveUTR_log = open("logs/fiveUTR.txt", "w")
+        fiveUTR_log = open(os.path.join(outdir,"fiveUTR.txt"), "w")
 
         #open result file and write header
-        csvout_res = open("logs/result.csv", "w")
+        csvout_res = open(f"{outdir}/result.csv", "w")
         csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len\n")
 
         #dataframes to store best gRNAs
@@ -442,7 +449,7 @@ def PrintException():
     line = linecache.getline(filename, lineno, f.f_globals)
     print('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": main(outdir)
 
 
 
