@@ -100,3 +100,4 @@ run_log.bk.txt
 logs/*
 pickles/*
 tests/*
+jobs

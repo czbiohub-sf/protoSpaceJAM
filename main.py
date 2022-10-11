@@ -413,7 +413,7 @@ def ret_six_dec(myvar):
 
 def mkdir(mypath):
     if not os.path.exists(mypath):
-        os.mkdir(mypath)
+        os.makedirs(mypath)
 
 class info:
     '''
