@@ -415,20 +415,25 @@ class HDR_flank:
             #slide windows scan for new cut sites
             self.info_p5 = ""
             #print(f"{self.ODN_postMut}\n{self.ODN_phases}")
-            fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.ODN_postMut, self.ODN_phases) # this function modifies self.ODN_postMut
 
-            #scan the revcom
+            #scan for maximum chimeric cfd (no recoding yet)
+            fwd_scan_highest_cfd_no_recode = self.slide_win_cfd_coding(self.ODN_postMut, self.ODN_phases) #this is the chimeric cfd if no recoding
+            rev_scan_highest_cfd_no_recode = self.slide_win_cfd_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1])
+            self.scan_highest_cfd_no_recode = max([fwd_scan_highest_cfd_no_recode, rev_scan_highest_cfd_no_recode])
+
+            #scan and recode
+            self.phase5recoded = False
+            fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.ODN_postMut, self.ODN_phases) # this is the chimeric cfd after recoding
+            #scan and recode revcom
             #print(f"{str(Seq(self.ODN_postMut).reverse_complement())}\n{self.ODN_phases[::-1]}")
             rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1]) # this function modifies self.ODN_postMut
+
 
             #get the highest cfd among all possible cutsites
             scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
 
             self.cdf_score_highest_in_win_scan = scan_highest_cfd
 
-            self.phase5recoded = False
-            if self.ODN_prephase5.upper() != self.ODN_postMut.upper():
-                self.phase5recoded = True
             ############################
             # log recoding information #
             ############################
@@ -602,7 +607,11 @@ class HDR_flank:
 
     def revcom(self,seq):
         return str(Seq(seq).reverse_complement())
+
     def slide_win_mutation_noncoding(self,seq,phases):
+        '''
+        for noncoding strand
+        '''
         highest_cfd = 0
         #get sliding window as an iterator
         it = self.sliding_window(seq,23)
@@ -643,6 +652,7 @@ class HDR_flank:
                 if len(seq_obj_lrtrim.seq) >= 3:
                     #print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                     mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
+                    self.phase5recoded = True
                 else:
                     mutated = seq_obj_lrtrim.seq
                 untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
@@ -659,13 +669,17 @@ class HDR_flank:
                 # mutate PAM if it's in 3' UTR or intron (phase == 0)
                 if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
                     o.update(newSeq=o.recut.seq[:-1] + "c")
+                    self.phase5recoded = True
                 if n_mer_phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
                     o.update(newSeq=o.recut.seq[:-2] + "c" + o.recut.seq[-1:])
+                    self.phase5recoded = True
+
                 if o.recut.cfd>0.03:
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
                             continue #skip PAM
                         if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                            self.phase5recoded = True
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
@@ -684,15 +698,21 @@ class HDR_flank:
                 # mutate PAM if it's in 5' UTR (phase == 5)
                 if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
                     o.update(newSeq=o.recut.seq[:-1] + "c")
+                    self.phase5recoded = True
                 if n_mer_phases[-2:-1] == "5": #second position phase = 5 (the first G in NGG)
                     o.update(newSeq=o.recut.seq[:-2] + "c" + o.recut.seq[-1:])
+                    self.phase5recoded = True
 
+                self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
+                                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                                      f"                 phases:{n_mer_phases}\n")
                 if o.recut.cfd>0.03:
                     #mutate protospacer if in 5UTR
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
                             continue #skip PAM
                         if item == "5": # 5'UTR is labeled "5"
+                            self.phase5recoded = True
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
@@ -707,6 +727,7 @@ class HDR_flank:
                     #       f"                 phases:{n_mer_phases}")
 
                 self.info_phase5_5UTR[1] = o.recut.cfd
+            #print(f"DIAG mut_noncoding: {o.recut.cfd:.6f}")
             if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
                 self.info_p5 = self.info_p5 + "".join(f"phase 5 final\n"
                                                       f"  orig gRNA: {o.gRNA.seq}\n"
@@ -724,7 +745,7 @@ class HDR_flank:
             n_window+=1
         return highest_cfd
 
-    def slide_win_mutation_coding(self,seq,phases):
+    def slide_win_cfd_noncoding(self,seq,phases):
         highest_cfd = 0
         #get sliding window as an iterator
         it = self.sliding_window(seq,23)
@@ -743,6 +764,38 @@ class HDR_flank:
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
+                n_window+=1
+                continue
+            cfd = cfd_score(self.gRNA_seq, n_mer)
+            #print(f"DIAG cfd_noncoding: {cfd:.6f}")
+            if cfd>=highest_cfd:
+                highest_cfd = cfd
+            n_window+=1
+        return highest_cfd
+
+    def slide_win_mutation_coding(self,seq,phases):
+        '''
+        for coding strand
+        '''
+        highest_cfd = 0
+         #get sliding window as an iterator
+        it = self.sliding_window(seq,23)
+        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        n_window = 0
+        for n_mer in it:
+            #skip non-chimeric part of the homology arm
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                #print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                #print(f"skipping window: {n_window}")
+                continue
+            #check for "N"s in the sequence
+            n_mer = "".join(n_mer)
+            if "N" in n_mer or "n" in n_mer:
+                n_window+=1
                 continue
             cfd = cfd_score(self.gRNA_seq, n_mer)
             n_mer_phases = phases[n_window: n_window + 23]
@@ -764,6 +817,7 @@ class HDR_flank:
                 if len(seq_obj_lrtrim.seq)>=3:
                     #print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                     mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
+                    self.phase5recoded = True
                 else:
                     mutated = seq_obj_lrtrim.seq
                 o.update(newSeq=o.recut.seq.replace(seq_obj_lrtrim.seq, mutated)) #update cfd, rc seq , rc cfd according to mutated seq
@@ -779,14 +833,17 @@ class HDR_flank:
                 # mutate PAM if it's in 3' UTR (phase == 0)
                 if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
                     o.update(newSeq=o.recut.seq[:-1] + "c")
+                    self.phase5recoded = True
                 if n_mer_phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
                     o.update(newSeq=o.recut.seq[:-2] + "c" + o.recut.seq[-1:])
+                    self.phase5recoded = True
                 if o.recut.cfd>0.03:
                     #mutate protospacer if in 3UTR/intron
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
                             continue #skip PAM
                         if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                            self.phase5recoded = True
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
@@ -805,15 +862,21 @@ class HDR_flank:
                 # mutate PAM if it's in 5' UTR (phase == 5)
                 if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
                     o.update(newSeq=o.recut.seq[:-1] + "c")
+                    self.phase5recoded = True
                 if n_mer_phases[-2:-1] == "5": #second position phase = 5 (the first G in NGG)
                     o.update(newSeq=o.recut.seq[:-2] + "c" + o.recut.seq[-1:])
+                    self.phase5recoded = True
 
+                self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
+                                                      f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
+                                                      f"                 phases:{n_mer_phases}\n")
                 if o.recut.cfd>0.03:
                     #mutate protospacer if in 5UTR
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
                             continue #skip PAM
                         if item == "5": # 5'UTR is labeled "5"
+                            self.phase5recoded = True
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
@@ -828,6 +891,7 @@ class HDR_flank:
                     #       f"                 phases:{n_mer_phases}")
 
                 self.info_phase5_5UTR[1] = o.recut.cfd
+            #print(f"DIAG_mut_coding: {o.recut.cfd:.6f}")
             if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
                 n_mer_confirm = self.ODN_postMut[n_window: n_window + 23]
                 self.info_p5 = self.info_p5 + "".join(f"phase 5 final\n"
@@ -843,6 +907,34 @@ class HDR_flank:
                 highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd
             else:
                 highest_cfd = max([highest_cfd, cfd]) #update highest cfd
+            n_window+=1
+        return highest_cfd
+
+    def slide_win_cfd_coding(self,seq,phases):
+        highest_cfd = 0
+         #get sliding window as an iterator
+        it = self.sliding_window(seq,23)
+        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        n_window = 0
+        for n_mer in it:
+            #skip non-chimeric part of the homology arm
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                #print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                #print(f"skipping window: {n_window}")
+                continue
+            #check for "N"s in the sequence
+            n_mer = "".join(n_mer)
+            if "N" in n_mer or "n" in n_mer:
+                n_window+=1
+                continue
+            cfd = cfd_score(self.gRNA_seq, n_mer)
+            #print(f"DIAG cfd_coding: {cfd:.6f}")
+            if cfd>=highest_cfd:
+                highest_cfd = cfd
             n_window+=1
         return highest_cfd
 

@@ -37,13 +37,13 @@ def parse_args():
 
     #payload
     parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
-    parser.add_argument('--Npayload',  default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='payload at the N terminus', metavar='')
-    parser.add_argument('--Cpayload',  default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG", type=str, help='payload at the N terminus', metavar='')
+    parser.add_argument('--Npayload',  default="", type=str, help='payload at the N terminus', metavar='')
+    parser.add_argument('--Cpayload',  default="", type=str, help='payload at the N terminus', metavar='')
 
     #recoding
     parser.add_argument('--recoding_off',             default = False, action='store_true', help='turn off *all* recoding')
     parser.add_argument('--recoding_stop_recut_only', default = False, action='store_true', help='use recoding to prevent recut')
-    parser.add_argument('--recoding_all',             default = False, action='store_true', help='use recoding to prevent recut + recode region between insert and cut site')
+    parser.add_argument('--recoding_full',             default = False, action='store_true', help='use recoding to prevent recut + recode region between insert and cut site')
 
     #output
     parser.add_argument('--outdir',   default="logs", type=str, help='output directory')
@@ -68,24 +68,35 @@ spec_score_flavor = "guideMITScore"
 outdir = config['outdir']
 
 #check recoding args
-if (config["recoding_all"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
-    sys.exit(f"Found conflicts in recoding arguments: --recoding_all cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again")
+if (config["recoding_full"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
+    sys.exit(f"Found conflicts in recoding arguments: --recoding_full cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again")
 if config["recoding_off"] and config["recoding_stop_recut_only"]:
     sys.exit(f"Found conflicts in recoding arguments: --recoding_off cannot be used with --recoding_stop_recut_only\nplease correct the issue and try again")
 
 #process recoding args
 if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
-    config["recoding_all"] = True
+    config["recoding_full"] = True
 
 if config["recoding_off"] or config["recoding_stop_recut_only"]:
-    config["recoding_all"] = False
+    config["recoding_full"] = False
 
 
 recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_stop_recut_only":config["recoding_stop_recut_only"],
-                 "recoding_all":config["recoding_all"]}
+                 "recoding_full":config["recoding_full"]}
 
+#parse payload
+linker = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT"
+tag = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
 
+if config["payload"] == "": #no payload override
+    if config["Npayload"] == "":
+        config["Npayload"] = tag + linker
+    if config["Cpayload"] == "":
+        config["Cpayload"] = linker + tag
+else: #payload override
+    config["Npayload"] = config["payload"]
+    config["Cpayload"] = config["payload"]
 
 #check if HA_len is too short to satisfy ssODN_max_size
 if ssODN_max_size is not None:
@@ -133,7 +144,7 @@ def main(outdir):
         recut_CFD_fail = open(os.path.join(outdir,"recut_CFD_fail.txt"), "w")
         csvout_N = open(os.path.join(outdir,"out_Nterm_recut_cfd.csv"), "w")
         csvout_C = open(os.path.join(outdir,"out_Cterm_recut_cfd.csv"), "w")
-        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfdScan,cfd_max\n"
+        csvout_header = "ID,cfd1,cfd2,cfd3,cfd4,cfdScan,cfdScanNoRecode,cfd_max\n"
         csvout_N.write(csvout_header)
         csvout_C.write(csvout_header)
         fiveUTR_log = open(os.path.join(outdir,"fiveUTR.txt"), "w")
@@ -181,7 +192,7 @@ def main(outdir):
                 csvout_res.write(f"{ENST_ID},ERROR: this ID was not found in the genome {genome_ver}, most likely this ID was deprecated\n")
                 continue
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
-            if transcript_type == "protein_coding": # and ENST_ID == "ENST00000329276":
+            if transcript_type == "protein_coding": # and ENST_ID == "ENST00000398165":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
                 #     continue
                 log.info(f"processing {ENST_ID}\ttranscript type: {transcript_type}")
@@ -235,8 +246,10 @@ def main(outdir):
                             cfd4 = HDR_template.cdf_score_post_mut4
                         start_info.cfd4.append(cfd4)
                         cfd_scan = 0
+                        cfd_scan_no_recode = 0
                         if hasattr(HDR_template,"cdf_score_highest_in_win_scan"):
                             cfd_scan = HDR_template.cdf_score_highest_in_win_scan
+                            cfd_scan_no_recode = HDR_template.scan_highest_cfd_no_recode
 
                         cfdfinal = HDR_template.final_cfd
 
@@ -244,10 +257,10 @@ def main(outdir):
                         spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
-                            csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
+                            csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
-                            csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
+                            csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
                             csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
@@ -302,8 +315,10 @@ def main(outdir):
                             cfd4 = HDR_template.cdf_score_post_mut4
 
                         cfd_scan = 0
+                        cfd_scan_no_recode = 0
                         if hasattr(HDR_template,"cdf_score_highest_in_win_scan"):
                             cfd_scan = HDR_template.cdf_score_highest_in_win_scan
+                            cfd_scan_no_recode = HDR_template.scan_highest_cfd_no_recode
 
                         cfdfinal = HDR_template.final_cfd
 
@@ -311,10 +326,10 @@ def main(outdir):
                         spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
-                            csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
+                            csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
                         else:
-                            csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfdfinal}\n")
+                            csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
                             csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
