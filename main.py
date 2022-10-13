@@ -86,14 +86,14 @@ recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_full":config["recoding_full"]}
 
 #parse payload
-linker = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT"
-tag = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
+Linker = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT"
+Tag = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
 
 if config["payload"] == "": #no payload override
     if config["Npayload"] == "":
-        config["Npayload"] = tag + linker
+        config["Npayload"] = Tag + Linker
     if config["Cpayload"] == "":
-        config["Cpayload"] = linker + tag
+        config["Cpayload"] = Linker + Tag
 else: #payload override
     config["Npayload"] = config["payload"]
     config["Cpayload"] = config["payload"]
