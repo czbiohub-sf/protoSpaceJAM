@@ -36,9 +36,11 @@ def parse_args():
     parser.add_argument('--ssODN_max_size', type=int, help='length restraint of the ssODN (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
 
     #payload
-    parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload', metavar='')
-    parser.add_argument('--Npayload',  default="", type=str, help='payload at the N terminus', metavar='')
-    parser.add_argument('--Cpayload',  default="", type=str, help='payload at the N terminus', metavar='')
+    parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker', metavar='')
+    parser.add_argument('--Npayload',  default="", type=str, help='payload at the N terminus, overrides --Tag --Linker', metavar='')
+    parser.add_argument('--Cpayload',  default="", type=str, help='payload at the N terminus, overrides --Tag --Linker', metavar='')
+    parser.add_argument('--Tag',  default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG", type=str, help='default is the mNG11 tag', metavar='')
+    parser.add_argument('--Linker',  default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT", type=str, help='default is the GS linker', metavar='')
 
     #recoding
     parser.add_argument('--recoding_off',             default = False, action='store_true', help='turn off *all* recoding')
@@ -86,13 +88,13 @@ recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_full":config["recoding_full"]}
 
 #parse payload
-Linker = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT"
-Tag = "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG"
+Linker = config["Linker"]
+Tag = config["Tag"]
 
 if config["payload"] == "": #no payload override
-    if config["Npayload"] == "":
+    if config["Npayload"] == "": #no Npayload override
         config["Npayload"] = Tag + Linker
-    if config["Cpayload"] == "":
+    if config["Cpayload"] == "": #no Cpayload override
         config["Cpayload"] = Linker + Tag
 else: #payload override
     config["Npayload"] = config["payload"]
