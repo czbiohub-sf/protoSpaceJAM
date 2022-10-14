@@ -282,6 +282,36 @@ def main():
         with open(f"{out_dir}/ENST_info.pickle", 'wb') as handle:
             pickle.dump(ENST_info, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+        #split ENST_into into fileparts
+        #split the dict and write to pickle files
+        ENST_info_splitfile = {} # indexing dictionary, the values of this dict is an int (file part number)
+        ENST_info_outdir = os.path.join(out_dir,"ENST_info")
+        if os.path.exists(ENST_info_outdir):
+            shutil.rmtree(ENST_info_outdir)
+        os.makedirs(ENST_info_outdir)
+        #initialization
+        part = 0
+        temp_dict = {}
+        for ENST in ENST_info.keys(): #loop through all ENST
+            #populate tmp dict
+            temp_dict[ENST] = ENST_info[ENST]
+            #update indexing dictionary
+            ENST_info_splitfile[ENST]=part
+            if len(temp_dict) >= 200:
+                #write tmp dict to file
+                with open(f"{ENST_info_outdir}/ENST_info_part{part}.pickle", 'wb') as handle:
+                    pickle.dump(temp_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                temp_dict = {} # reset temp dict
+                part += 1
+        #write last chunk of the current chromosome
+        if len(temp_dict) > 0:
+            with open(f"{ENST_info_outdir}/ENST_info_part{part}.pickle", 'wb') as handle:
+                pickle.dump(temp_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                part += 1
+        #write indexing dictionary
+        with open(f"{ENST_info_outdir}/ENST_info_index.pickle", 'wb') as handle:
+            pickle.dump(ENST_info_splitfile, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
 
         #parse codons and assign phase to each (coding) chr position
         print("-parsing codons")
@@ -346,6 +376,45 @@ def main():
                 f"{out_dir}/ENST_codonPhase.pickle", 'wb') as handle:
             pickle.dump(ENST_codons_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+        #split the dict and write to pickle files
+        ENST_to_codoPhase_splitfile = {} # indexing dictionary, the values of this dict is a list of all the files that may contain the ENST codon phase info
+        codonPhase_outdir = os.path.join(out_dir,"ENST_codonPhases")
+        if os.path.exists(codonPhase_outdir):
+            shutil.rmtree(codonPhase_outdir)
+        os.makedirs(codonPhase_outdir)
+        #loop through all chrs
+        part = 0
+        for Chr in ENST_codons_dict.keys():
+            #initialization
+            tmp_file_ENST_list = []
+            temp_dict = {}
+            for pos in ENST_codons_dict[Chr].keys(): #loop through all pos
+                #populate tmp dict
+                update_dict(temp_dict, key=Chr, key2=pos, value= ENST_codons_dict[Chr][pos])
+                #update indexing dictionary
+                for ID in ENST_codons_dict[Chr][pos].keys():
+                    if ID in ENST_to_codoPhase_splitfile:
+                        if not part in ENST_to_codoPhase_splitfile[ID]:
+                            ENST_to_codoPhase_splitfile[ID].append(part)
+                    else:
+                        ENST_to_codoPhase_splitfile[ID]=[part]
+                    if not ID in tmp_file_ENST_list:
+                        tmp_file_ENST_list.append(ID)
+                if len(tmp_file_ENST_list) >= 200:
+                    #write tmp dict to file
+                    with open(f"{codonPhase_outdir}/ENST_codonPhase_part{part}.pickle", 'wb') as handle:
+                        pickle.dump(temp_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    temp_dict = {} # reset temp dict
+                    part += 1
+                    tmp_file_ENST_list = [] # reset temp ENST list
+            #write last chunk of the current chromosome
+            if len(tmp_file_ENST_list) > 0:
+                with open(f"{codonPhase_outdir}/ENST_codonPhase_part{part}.pickle", 'wb') as handle:
+                    pickle.dump(temp_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    part += 1
+        #write indexing dictionary
+        with open(f"{codonPhase_outdir}/ENST_codonPhase_index.pickle", 'wb') as handle:
+            pickle.dump(ENST_to_codoPhase_splitfile, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
         #populate loc2posType dict
@@ -506,7 +575,15 @@ def assign_codon_position(start, end, start_phase):
     else:
         sys.exit("ERROR in assign_codon_position(start, end, start_phase), if start_phase>0, start must < end, vice versa")
 
+def update_dict(mydict, key, key2, value):
+    """
+    make the following update:  mydict[key][key2] = value
+    """
+    if not key in mydict.keys():
+        mydict[key] = dict()
+    mydict[key][key2] = value
 
+    return mydict
 
 def update_dictOfDict(mydict, key, key2, key3, value):
     """

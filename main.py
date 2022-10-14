@@ -1,19 +1,4 @@
 import os.path
-import pandas as pd
-from subprocess import Popen
-from Bio import SeqIO
-from Bio.Seq import reverse_complement
-import csv
-import argparse
-import sys
-import linecache
-import datetime
-import gzip
-import shutil
-import gc
-import math
-import re
-import pickle
 from scripts.utils import *
 import traceback
 
@@ -118,27 +103,43 @@ def main(outdir):
         freq_dict = dict()
 
         #load gRNA info index (mapping of chromosomal location to file parts)
-        log.info("loading the mapping of chromosomal location to (gRNA) file parts")
+        log.info("loading precomputed gRNA **index to file parts**")
         loc2file_index = read_pickle_files(os.path.join("precomuted_gRNAs", "gRNA_" + config['genome_ver'],"gRNA.tab.gz.split.BwaMapped.scored","loc2file_index.pickle"))
+
+        elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
+        log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
 
         #load chr location to type (e.g. UTR, cds, exon/intron junction) mappings
         log.info("loading the mapping of chromosomal location to type (e.g. UTR, cds, exon/intron junction)")
         loc2posType = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"loc2posType.pickle"))
 
-        #load gene model info
-        log.info("loading gene model info")
-        ENST_info = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_info.pickle"))
+        elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
+        log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
 
-        #load codon phase info
-        log.info("loading codon phase info")
-        ENST_PhaseInCodon = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_codonPhase.pickle"))
+        #load gene model info
+        #log.info("loading gene model info")
+        #ENST_info = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_info.pickle"))
+
+        #load the mapping of ENST to the info file part
+        log.info("loading gene model info **index to file parts**")
+        ENST_info_index = read_pickle_files(os.path.join("genome_files", "parsed_gff3", config['genome_ver'],"ENST_info","ENST_info_index.pickle"))
+
+        elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
+        log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
+
+        #load codon phase index
+        #log.info("loading codon phase info")
+        #ENST_PhaseInCodon = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_codonPhase.pickle"))
+
+        log.info("loading codon phase info **index to file parts**")
+        ENST_PhaseInCodon_index = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_codonPhases","ENST_codonPhase_index.pickle"))
 
         #report time used
         elapsed = cal_elapsed_time(starttime,datetime.datetime.now())
         log.info(f"finished loading in {elapsed[0]:.2f} min ({elapsed[1]} sec)")
 
         #report the number of ENSTs which has ATG at the end of the exon
-        ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
+        #ExonEnd_ATG_count,ExonEnd_ATG_list = count_ATG_at_exonEnd(ENST_info)
 
         #open log files
         mkdir(outdir)
@@ -173,10 +174,10 @@ def main(outdir):
                 log.error(f"Missing columns in the input csv file\n Required columns:\"Ensemble_ID\"")
                 log.info(f"Please fix the input csv file and try again")
                 sys.exit()
-        else:
-            log.warning(f"The input file {config['path2csv']} is not found, using the whole human transcriptome")
-            input("Press Enter to continue...")
-            df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
+        # else:
+        #     log.warning(f"The input file {config['path2csv']} is not found, using the whole human transcriptome")
+        #     input("Press Enter to continue...")
+        #     df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
 
         #loop through each ENST
         transcript_count = 0
@@ -188,6 +189,11 @@ def main(outdir):
                 target_terminus = row["Target Terminus"]
                 if target_terminus!="N" and target_terminus!="C" and target_terminus!="all":
                     sys.exit(f"invalid target terminus: {target_terminus}")
+
+            #load the ENST_info for current ID
+            part = ENST_info_index[ENST_ID]
+            ENST_info = read_pickle_files(os.path.join("genome_files", "parsed_gff3", config['genome_ver'],"ENST_info",f"ENST_info_part{part}.pickle"))
+
             if not ENST_ID in ENST_info.keys():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 genome_ver = config['genome_ver']
@@ -207,6 +213,14 @@ def main(outdir):
 
                 #get gRNAs
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(ENST_ID = ENST_ID, ENST_info= ENST_info, freq_dict = freq_dict, loc2file_index= loc2file_index, loc2posType = loc2posType, dist = max_cut2ins_dist, genome_ver=config["genome_ver"], spec_score_flavor = spec_score_flavor)
+
+                #get codon_phase information for current ENST
+                file_parts_list = ENST_PhaseInCodon_index[ENST_ID]
+                ENST_PhaseInCodon = {}
+                for part in file_parts_list:
+                    Codon_phase_dict = read_pickle_files(os.path.join("genome_files","parsed_gff3", config['genome_ver'],"ENST_codonPhases",f"ENST_codonPhase_part{str(part)}.pickle"))
+                    ENST_PhaseInCodon = deepmerge(ENST_PhaseInCodon,Codon_phase_dict) #merge file parts if ENST codon info is split among fileparts
+
 
                 ##################################
                 #best start gRNA and HDR template#
@@ -431,6 +445,26 @@ def ret_six_dec(myvar):
 def mkdir(mypath):
     if not os.path.exists(mypath):
         os.makedirs(mypath)
+
+def deepmerge(dict1, dict2):
+    '''
+    merge two dictionary at the secondary key level
+    '''
+    if len(dict1) == 0:
+        return dict2
+    if len(dict2) == 0:
+        return dict1
+    #start merging
+    dictm = dict1
+    for k in dict2:
+        if k in dict1: #shared key
+            for k2 in dict2[k].keys():
+                dictm[k][k2] = dict2[k][k2]
+        else:
+            dictm[k]=dict2[k]
+    return dictm
+
+
 
 class info:
     '''
