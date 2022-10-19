@@ -10,9 +10,11 @@ import sys
 from typing import Iterator
 import copy
 from Bio.Seq import Seq
+from Bio import Restriction
 from scripts.cfdscore import *
 from itertools import islice
 import math
+
 
 try:
     from . import cfdscore, mitscore
@@ -575,9 +577,9 @@ class HDR_flank:
             self.ODN_postMut_centered = self.ODN_postMut[int(start):int(end)]
             self.effective_HA_len = _HA_len
 
-        ############
-        #final ODN #
-        ############
+        ################
+        #get final ODN #
+        ################
         self.ODN_final = self.ODN_vanillia
         if self.ODN_postMut != "recoding turned off":
             self.ODN_final = self.ODN_postMut
@@ -587,7 +589,16 @@ class HDR_flank:
         else:
             self.ODN_postMut_centered = "centering turned off"
 
+        #self.ODN_final_ss will be in the output
         self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
+
+        ################################
+        #check synthesis considerations#
+        ################################
+        #TODO  insert code here
+        #print(Restriction.BsaI.site)
+        BsaI_cutsites = Restriction.BsaI.search(Seq(self.ODN_final_ss))
+
 
     #############
     #END OF INIT#
@@ -1480,6 +1491,20 @@ def in_interval_leftrightInclusive(pos,interval):
     else:
         return False
 
+def check_RE_site(RE,seq):
+    """
+    RE: restriction site object
+    seq: plain sequence
+    return a list of restriction sites if found
+    ***does not check revcom***
+    >>>check_RE_site(Restriction.BsaI,"AAAAAAAAAAAAAA")
+    []
+    >>>check_RE_site(Restriction.BsaI,"AAAAAGGTCTCAAA")
+    [13]
+    >>>check_RE_site(Restriction.BsaI,"AAAAAGAGACCAAA")
+    []
+    """
+    return RE.search(Seq(seq))
 #taken from CRISPYcrunch
 class MutatedSeq(str):
 
