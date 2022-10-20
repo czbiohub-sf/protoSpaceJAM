@@ -11,6 +11,8 @@ from typing import Iterator
 import copy
 from Bio.Seq import Seq
 from Bio import Restriction
+from Bio.SeqUtils import GC
+import re
 from scripts.cfdscore import *
 from itertools import islice
 import math
@@ -189,11 +191,6 @@ class HDR_flank:
             f"1. left | right arms:{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
             f"2. Phases           :{self.left_flk_phases}||{self.right_flk_phases}\n"
             f"3. Coordinates      :\t{self.left_flk_coord_lst[0]}-{self.left_flk_coord_lst[1]} || {self.right_flk_coord_lst[0]}-{self.right_flk_coord_lst[1]}\n")
-
-        #TODO: no recoding: skip phases 1-5
-        #TODO: stop recut: skip phases 1
-        #TODO: stop recut + recode between cut and insert: no skip
-
 
         ####################################################################################
         #start recoding
@@ -621,7 +618,8 @@ class HDR_flank:
         ################################
         #check synthesis considerations#
         ################################
-        #TODO  insert code here
+
+        #restriction cuts
         #print(Restriction.BsaI.site)
         BsaI_cutsites = [str(pos) for pos in Restriction.BsaI.search(Seq(self.ODN_final_ss))] # will find cutsites on both strands
 
@@ -629,12 +627,51 @@ class HDR_flank:
             BsaI_cutPos = ";".join(BsaI_cutsites)
             self.synFlags.append(f"Cut by BsaI @{BsaI_cutPos}")
 
+        #GC content
+        seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.ODN_final_ss)
+        global_GC = GC(seq_noAmbiguous)
+        #print(global_GC)
+        if global_GC < 25:
+            self.synFlags.append(f"global GC content {global_GC} < 25%")
+        if global_GC > 65:
+            self.synFlags.append(f"global GC content {global_GC} > 65%")
+
+        #GC content skew (slide windown analysis
+        win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
+        #print(win_GC)
+        max_diff = max(win_GC) - min(win_GC)
+        print(max_diff)
+        if max_diff > 52:
+            self.synFlags.append(f"Max difference of slide window GC content {max_diff} > 52%")
+
+        #homopolyer
+        hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
+        if len(hp_res)>0:
+            hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
+            hp_res_display = "".join(hp_res_display)
+            self.synFlags.append(f"Homopolymer > 10bp (sequence@start): {hp_res_display}")
+
         if len(self.synFlags) == 0:
             self.synFlags = "None"
+        else:
+            self.synFlags = "; ".join(self.synFlags)
 
     #############
     #END OF INIT#
     #############
+    def slide_win_GC_content(self,seq,win_size):
+        '''
+        returns a list of GC contents of sliding windows
+        '''
+        GC_list=[]
+        it = self.sliding_window(seq,win_size)
+        for n_mer in it:
+            n_mer = "".join(n_mer)
+            #print(n_mer)
+            GC_list.append(GC(n_mer))
+        return GC_list
+
+
     def get_diff_loc(self, str1,str2):
         """
         get the locations where two strings differ

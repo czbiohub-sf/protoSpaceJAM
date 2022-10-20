@@ -191,15 +191,17 @@ def main(outdir):
                 if target_terminus!="N" and target_terminus!="C" and target_terminus!="all":
                     sys.exit(f"invalid target terminus: {target_terminus}")
 
-            #load the ENST_info for current ID
-            part = ENST_info_index[ENST_ID]
-            ENST_info = read_pickle_files(os.path.join("genome_files", "parsed_gff3", config['genome_ver'],"ENST_info",f"ENST_info_part{part}.pickle"))
-
-            if not ENST_ID in ENST_info.keys():
+            #check if ENST_ID is in the database
+            if not ENST_ID in ENST_info_index.keys():
                 log.warning(f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)")
                 genome_ver = config['genome_ver']
                 csvout_res.write(f"{ENST_ID},ERROR: this ID was not found in the genome {genome_ver}, most likely this ID was deprecated\n")
                 continue
+
+            #load the ENST_info for current ID
+            part = ENST_info_index[ENST_ID]
+            ENST_info = read_pickle_files(os.path.join("genome_files", "parsed_gff3", config['genome_ver'],"ENST_info",f"ENST_info_part{part}.pickle"))
+
             transcript_type = ENST_info[ENST_ID].description.split("|")[1]
             if transcript_type == "protein_coding": # and ENST_ID == "ENST00000398165":
                 # if not ENST_ID in ExonEnd_ATG_list: # only process edge cases in which genes with ATG are at the end of exons
