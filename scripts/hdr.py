@@ -111,6 +111,7 @@ class HDR_flank:
         self.name = name
         self.ssODN_max_size = ssODN_max_size
         self.recoding_args = recoding_args
+        self.synFlags=[]
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -243,7 +244,32 @@ class HDR_flank:
             #check if gRNA is affected by insertion
             self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
             Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
-            #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
+            print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
+
+            self.info_p1 = "".join(
+                    f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
+                    f"phase1.cut-to-insert + 2bp padding on both sides (extend to full codons)\n"
+                    f"phase1.seq                             :{self.ins2cut.seq}\n"
+                    f"phase1.Phases                          :{self.ins2cut.phases}\n"
+                    f"phase1.Coordinates                     :{self.ins2cut.start}-{self.ins2cut.end}\n"
+                    f"phase1.seq         (trimmed into frame):{self.ins2cut_LRtrimed.seq}\n"
+                    f"phase1.Phases      (trimmed into frame):{self.ins2cut_LRtrimed.phases}\n"
+                    f"phase1.Coordinates (trimmed into frame):{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}\n"
+                    f"phase1.mutated seq (trimmed into frame):{mutated_subseq}\n"
+                    f"--> display gRNA and check disruption <--\n"
+                    f"phase1.                      gRNA:{self.gRNA_seq}\n"
+                    f"phase1.                    Phases:{self.gRNA_seq_phases}\n"
+                    f"phase1.after mutation and payload:{self.post_mut_ins_gRNA_seq}\n"
+                    f"phase1.                    Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
+                    #f"phase1.                       CFD:{self.cdf_score_post_mut_ins:.4f}\n"
+                    f"--> display mutation in HDR arms <--\n"
+                    f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
+                    f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
+                    f"phase1.arms with tag   :{self.left_flk_seq_CodonMut}|{self.tag}|{self.right_flk_seq_CodonMut}\n")
+            print(self.info)
+            print(self.info_arm)
+            print(self.info_p1)
+
             self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
 
             #########
@@ -597,8 +623,14 @@ class HDR_flank:
         ################################
         #TODO  insert code here
         #print(Restriction.BsaI.site)
-        BsaI_cutsites = Restriction.BsaI.search(Seq(self.ODN_final_ss))
+        BsaI_cutsites = [str(pos) for pos in Restriction.BsaI.search(Seq(self.ODN_final_ss))] # will find cutsites on both strands
 
+        if len(BsaI_cutsites) > 0:
+            BsaI_cutPos = ";".join(BsaI_cutsites)
+            self.synFlags.append(f"Cut by BsaI @{BsaI_cutPos}")
+
+        if len(self.synFlags) == 0:
+            self.synFlags = "None"
 
     #############
     #END OF INIT#
@@ -1163,6 +1195,7 @@ class HDR_flank:
         input: leftArm, rightArm (based on which the gRNA and insert-disrupted gRNA will be extracted
         return: gRNA, chimeric_gRNA, gRNA_phases, chimeric_gRNA_phases (phases of the insert are denoted with X)
         NOTE: the returned gRNA is in strand same as the PAM for CFD calcualte (the strand is not necessarily the coding strand!)
+        #TODO bugfix: crashes when the payload is less than the gRNA length
         """
         Lstart = self.left_flk_coord_lst[0]
         Rend = self.right_flk_coord_lst[1]
@@ -1201,7 +1234,7 @@ class HDR_flank:
             chimeric_gRNA = self.tag[-trunc_len:] + chimeric_gRNA #make the chimeric gRNA
             #chimeric phases
             chimeric_gRNA_ph = whole_arm_ph[int(len(whole_arm)/2):gRNAright+1]
-            chimeric_gRNA_ph = "X"*trunc_len + chimeric_gRNA_ph  # make the chimeric gRNA
+            chimeric_gRNA_ph = "X"*trunc_len + chimeric_gRNA_ph  # make the chimeric gRNA  #TODO missing the left side of Xs
 
         elif (gRNAleft < int(len(whole_arm)/2) <= gRNAright) and (int(self.ENST_strand) * int(self.gStrand) < 0): #gRNA is truncated, and gRNA is NOT on the coding strand
             chimeric_gRNA = whole_arm[gRNAleft:int(len(whole_arm)/2)]
@@ -1209,7 +1242,7 @@ class HDR_flank:
             chimeric_gRNA = chimeric_gRNA + self.tag[:trunc_len] #make the chimeric gRNA
             #chimeric phases
             chimeric_gRNA_ph = whole_arm_ph[gRNAleft:int(len(whole_arm)/2)]
-            chimeric_gRNA_ph = chimeric_gRNA_ph + "X"*trunc_len
+            chimeric_gRNA_ph = chimeric_gRNA_ph + "X"*trunc_len  #TODO missing the right side of Xs
 
         #reverse complement gRNA, if needed
         if (int(self.ENST_strand) * int(self.gStrand) < 0):

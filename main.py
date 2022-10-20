@@ -85,6 +85,7 @@ else: #payload override
     config["Npayload"] = config["payload"]
     config["Cpayload"] = config["payload"]
 
+
 #check if HA_len is too short to satisfy ssODN_max_size
 if ssODN_max_size is not None:
     max_payload_size = max([len(config["Npayload"]),len(config["Cpayload"])])
@@ -154,7 +155,7 @@ def main(outdir):
 
         #open result file and write header
         csvout_res = open(f"{outdir}/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len,synthesis_problems\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -274,12 +275,12 @@ def main(outdir):
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
                         else:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
@@ -343,12 +344,12 @@ def main(outdir):
                         ssODN = HDR_template.ODN_final_ss
                         if config["recoding_off"]:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
                         else:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
                             #print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{ssODN},{HDR_template.effective_HA_len}\n")
 
                         #write log
