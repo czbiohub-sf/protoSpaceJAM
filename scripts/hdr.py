@@ -241,7 +241,7 @@ class HDR_flank:
             #check if gRNA is affected by insertion
             self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
             Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
-            print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
+            #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
 
             self.info_p1 = "".join(
                     f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
@@ -263,9 +263,9 @@ class HDR_flank:
                     f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
                     f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
                     f"phase1.arms with tag   :{self.left_flk_seq_CodonMut}|{self.tag}|{self.right_flk_seq_CodonMut}\n")
-            print(self.info)
-            print(self.info_arm)
-            print(self.info_p1)
+            #print(self.info)
+            #print(self.info_arm)
+            #print(self.info_p1)
 
             self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
 
@@ -632,17 +632,17 @@ class HDR_flank:
         global_GC = GC(seq_noAmbiguous)
         #print(global_GC)
         if global_GC < 25:
-            self.synFlags.append(f"global GC content {global_GC} < 25%")
+            self.synFlags.append(f"global GC content {global_GC:.2f}% < 25%")
         if global_GC > 65:
-            self.synFlags.append(f"global GC content {global_GC} > 65%")
+            self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
 
         #GC content skew (slide windown analysis
         win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
         #print(win_GC)
         max_diff = max(win_GC) - min(win_GC)
-        print(max_diff)
+        #print(max_diff)
         if max_diff > 52:
-            self.synFlags.append(f"Max difference of slide window GC content {max_diff} > 52%")
+            self.synFlags.append(f"Max difference of slide window GC content {max_diff:.2f}% > 52%")
 
         #homopolyer
         hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
