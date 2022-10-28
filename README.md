@@ -1,3 +1,5 @@
+![license-MIT-green](https://user-images.githubusercontent.com/4129442/198694171-751acee4-7dcb-4fb4-aa73-83d0d571d658.svg)
+
 # ProtospaceX  
 A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
 
