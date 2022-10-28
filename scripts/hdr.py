@@ -243,26 +243,30 @@ class HDR_flank:
             Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
             #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
 
-            self.info_p1 = "".join(
-                    f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
-                    f"phase1.cut-to-insert + 2bp padding on both sides (extend to full codons)\n"
-                    f"phase1.seq                             :{self.ins2cut.seq}\n"
-                    f"phase1.Phases                          :{self.ins2cut.phases}\n"
-                    f"phase1.Coordinates                     :{self.ins2cut.start}-{self.ins2cut.end}\n"
-                    f"phase1.seq         (trimmed into frame):{self.ins2cut_LRtrimed.seq}\n"
-                    f"phase1.Phases      (trimmed into frame):{self.ins2cut_LRtrimed.phases}\n"
-                    f"phase1.Coordinates (trimmed into frame):{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}\n"
-                    f"phase1.mutated seq (trimmed into frame):{mutated_subseq}\n"
-                    f"--> display gRNA and check disruption <--\n"
-                    f"phase1.                      gRNA:{self.gRNA_seq}\n"
-                    f"phase1.                    Phases:{self.gRNA_seq_phases}\n"
-                    f"phase1.after mutation and payload:{self.post_mut_ins_gRNA_seq}\n"
-                    f"phase1.                    Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
-                    #f"phase1.                       CFD:{self.cdf_score_post_mut_ins:.4f}\n"
-                    f"--> display mutation in HDR arms <--\n"
-                    f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
-                    f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
-                    f"phase1.arms with tag   :{self.left_flk_seq_CodonMut}|{self.tag}|{self.right_flk_seq_CodonMut}\n")
+            ###############################################################
+            #only uncomment this part to debut the short-HDR-crash problem#
+            ###############################################################
+
+            # self.info_p1 = "".join(
+            #         f"--------------------phase 1 mutate seq between cut to insert----------------------------------------------------------------------\n"
+            #         f"phase1.cut-to-insert + 2bp padding on both sides (extend to full codons)\n"
+            #         f"phase1.seq                             :{self.ins2cut.seq}\n"
+            #         f"phase1.Phases                          :{self.ins2cut.phases}\n"
+            #         f"phase1.Coordinates                     :{self.ins2cut.start}-{self.ins2cut.end}\n"
+            #         f"phase1.seq         (trimmed into frame):{self.ins2cut_LRtrimed.seq}\n"
+            #         f"phase1.Phases      (trimmed into frame):{self.ins2cut_LRtrimed.phases}\n"
+            #         f"phase1.Coordinates (trimmed into frame):{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}\n"
+            #         f"phase1.mutated seq (trimmed into frame):{mutated_subseq}\n"
+            #         f"--> display gRNA and check disruption <--\n"
+            #         f"phase1.                      gRNA:{self.gRNA_seq}\n"
+            #         f"phase1.                    Phases:{self.gRNA_seq_phases}\n"
+            #         f"phase1.after mutation and payload:{self.post_mut_ins_gRNA_seq}\n"
+            #         f"phase1.                    Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
+            #         #f"phase1.                       CFD:{self.cdf_score_post_mut_ins:.4f}\n"
+            #         f"--> display mutation in HDR arms <--\n"
+            #         f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
+            #         f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
+            #         f"phase1.arms with tag   :{self.left_flk_seq_CodonMut}|{self.tag}|{self.right_flk_seq_CodonMut}\n")
             #print(self.info)
             #print(self.info_arm)
             #print(self.info_p1)
