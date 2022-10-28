@@ -611,10 +611,10 @@ class HDR_flank:
         if self.ODN_postMut != "recoding turned off":
             self.ODN_final = self.ODN_postMut
 
-        if hasattr(self,"ODN_postMut_centered"):
-            self.ODN_final = self.ODN_postMut_centered
-        else:
-            self.ODN_postMut_centered = "centering turned off"
+            if hasattr(self,"ODN_postMut_centered"): # centering only makes sense when recode is on
+                self.ODN_final = self.ODN_postMut_centered
+            else:
+                self.ODN_postMut_centered = "centering turned off"
 
         #self.ODN_final_ss will be in the output
         self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
