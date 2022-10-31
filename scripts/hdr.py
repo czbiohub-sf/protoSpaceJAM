@@ -619,6 +619,16 @@ class HDR_flank:
         #self.ODN_final_ss will be in the output
         self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
 
+        ################
+        #get final ODN #
+        ################
+
+        #dsDNA, TODO check synthesis constraints
+
+        #ssDNA, TODO 
+
+
+
         ################################
         #check synthesis considerations#
         ################################
@@ -663,6 +673,70 @@ class HDR_flank:
     #############
     #END OF INIT#
     #############
+    #TODO scan recoded sequence for PAM-less recut
+    def slide_win_PAMLESScfd_noncoding(self,seq,phases):
+        highest_cfd = 0
+        #get sliding window as an iterator
+        it = self.sliding_window(seq,23)
+        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        n_window = 0
+        for n_mer in it:
+            #skip non-chimeric part of the homology arm
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                #print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                #print(f"skipping window: {n_window}")
+                continue
+            #check for "N"s in the sequence
+            n_mer = "".join(n_mer)
+            if "N" in n_mer or "n" in n_mer:
+                n_window+=1
+                continue
+            #replace the last 3-mer with the PAM from gRNA
+            n_mer_addPAM = n_mer[:-3] + self.gRNA_seq[-3:]
+
+            cfd = cfd_score(self.gRNA_seq, n_mer_addPAM)
+            #print(f"DIAG cfd_noncoding: {cfd:.6f}")
+            if cfd>=highest_cfd:
+                highest_cfd = cfd
+            n_window+=1
+        return highest_cfd
+
+    def slide_win_PAMLESScfd_coding(self,seq,phases):
+        highest_cfd = 0
+         #get sliding window as an iterator
+        it = self.sliding_window(seq,23)
+        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        n_window = 0
+        for n_mer in it:
+            #skip non-chimeric part of the homology arm
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                #print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                #print(f"skipping window: {n_window}")
+                continue
+            #check for "N"s in the sequence
+            n_mer = "".join(n_mer)
+            if "N" in n_mer or "n" in n_mer:
+                n_window+=1
+                continue
+            #replace the last 3-mer with the PAM from gRNA
+            n_mer_addPAM = n_mer[:-3] + self.gRNA_seq[-3:]
+
+            cfd = cfd_score(self.gRNA_seq, n_mer_addPAM)
+            #print(f"DIAG cfd_coding: {cfd:.6f}")
+            if cfd>=highest_cfd:
+                highest_cfd = cfd
+            n_window+=1
+        return highest_cfd
+
+
     def slide_win_GC_content(self,seq,win_size):
         '''
         returns a list of GC contents of sliding windows
@@ -674,7 +748,6 @@ class HDR_flank:
             #print(n_mer)
             GC_list.append(GC(n_mer))
         return GC_list
-
 
     def get_diff_loc(self, str1,str2):
         """
