@@ -131,7 +131,7 @@ def get_range(start,end): #TODO phase should be ENST specific
     else:
         return list(range(start,end-1,-1))
 
-def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType, ssODN_max_size, recoding_args):
+def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType, ssDNA_max_size, recoding_args,Donor_type,Strand_choice):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
         ENST_genename = ENST_info[ENST_ID].name
@@ -154,17 +154,6 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
         #target_seq = get_target_seq(Chr= Chr, InsPos = InsPos, gRNAstrand = gStrand, CutPos = CutPos , type = type, ENST_ID = ENST_ID, ENST_info = ENST_info)
 
         leftArm, rightArm, left_start, left_end, right_start, right_end = get_HDR_arms(loc = [Chr,InsPos,ENST_strand], half_len = HDR_arm_len, type = type,genome_ver=genome_ver) # start>end is possible
-        # left_start_phase = get_phase_in_codon(Chr=Chr, Pos=left_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        # left_end_phase = get_phase_in_codon(Chr=Chr, Pos=left_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        # right_start_phase = get_phase_in_codon(Chr=Chr, Pos=right_start, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        # right_end_phase = get_phase_in_codon(Chr=Chr, Pos=right_end, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon)
-        # print(f"{leftArm}\t"
-        #       f"{left_start}({left_start_phase})\t"
-        #       f"{left_end}({left_end_phase})\t"
-        #       f"{rightArm}\t"
-        #       f"{right_start}({right_start_phase})\t"
-        #       f"{right_end}({right_end_phase})")
-
         left_Arm_Phases = [get_phase_in_codon0(Chr=Chr, Pos=i, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon) for i in get_range(left_start,left_end)]
         right_Arm_Phases = [get_phase_in_codon0(Chr=Chr, Pos=i, ENST_ID=ENST_ID, ENST_PhaseInCodon=ENST_PhaseInCodon) for i in get_range(right_start,right_end)]
 
@@ -173,7 +162,7 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
                             left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
                             type= type, ENST_ID= ENST_ID, name = ENST_genename, ENST_strand=ENST_strand, ENST_chr = Chr, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
                             tag = tag, loc2posType = loc2posType,
-                            ssODN_max_size =ssODN_max_size,
+                            ssDNA_max_size =ssDNA_max_size,Donor_type=Donor_type,Strand_choice=Strand_choice,
                             recoding_args = recoding_args)
         return myflank
         #log IDs whose gRNA is not in the default-size HDR arms

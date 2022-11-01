@@ -17,8 +17,10 @@ def parse_args():
     parser.add_argument('--num_gRNA_per_term',  default=1, type=int, help='payload at the N terminus', metavar='')
 
     #donor
-    parser.add_argument('--HA_len',  default=500, help='length of the homology arm on one side', type=int, metavar='')
-    parser.add_argument('--ssODN_max_size', type=int, help='length restraint of the ssODN (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
+    parser.add_argument('--HA_len',  default=500, help='length of the homology arm (on each side), will be the final arm length for dsDNA donors', type=int, metavar='')
+    parser.add_argument('--Donor_type',  default="ssDNA", help='ssDNA(default) or dsDNA', type=str, metavar='')
+    parser.add_argument('--Strand_choice',  default="auto", help='only applies when --Donor_type is set to ssDNA, possible values are auto,gRNAstrand,gRNAstrandRC,codingStrand,codingStrandRC', type=str, metavar='')
+    parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
 
     #payload
     parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker', metavar='')
@@ -50,7 +52,7 @@ config = vars(parse_args())
 gRNA_num_out = config['num_gRNA_per_term']
 max_cut2ins_dist = 50 #deprecated?
 HDR_arm_len = config['HA_len']
-ssODN_max_size = config["ssODN_max_size"]
+ssDNA_max_size = config["ssDNA_max_size"]
 spec_score_flavor = "guideMITScore"
 outdir = config['outdir']
 
@@ -72,6 +74,12 @@ recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_stop_recut_only":config["recoding_stop_recut_only"],
                  "recoding_full":config["recoding_full"]}
 
+#check donor args
+if not config["Donor_type"] in ["ssDNA", "dsDNA"]:
+    sys.exit("Donor_type must be ssDNA or dsDNA, offending value:" + config["Donor_type"] + ", please correct the issue and try again")
+if not config["Strand_choice"] in ["auto","gRNAstrand","gRNAstrandRC","codingStrand","codingStrandRC"]:
+    sys.exit("Strand_choice must be auto,gRNAstrand,gRNAstrandRC,codingStrand or codingStrandRC, offending value:" + config["Strand_choice"] + ", please correct the issue and try again")
+
 #parse payload
 Linker = config["Linker"]
 Tag = config["Tag"]
@@ -86,12 +94,12 @@ else: #payload override
     config["Cpayload"] = config["payload"]
 
 
-#check if HA_len is too short to satisfy ssODN_max_size
-if ssODN_max_size is not None:
+#check if HA_len is too short to satisfy ssDNA_max_size
+if ssDNA_max_size is not None:
     max_payload_size = max([len(config["Npayload"]),len(config["Cpayload"])])
-    derived_HDR_arm_len = ssODN_max_size- max_payload_size / 2
+    derived_HDR_arm_len = ssDNA_max_size- max_payload_size / 2
     if derived_HDR_arm_len >= HDR_arm_len:
-        print(f"HA_len={HDR_arm_len} is to short to meet the requirement of ssODN_max_size={ssODN_max_size}, payload size={max_payload_size}\n ssODN_max_size={ssODN_max_size} requires HA_len = ssODN_max_size- max_payload_size / 2 = {derived_HDR_arm_len}")
+        print(f"HA_len={HDR_arm_len} is to short to meet the requirement of ssDNA_max_size={ssDNA_max_size}, payload size={max_payload_size}\n ssDNA_max_size={ssDNA_max_size} requires HA_len = ssDNA_max_size- max_payload_size / 2 = {derived_HDR_arm_len}")
         HDR_arm_len = derived_HDR_arm_len + 100
         print(f"HA_len is adjusted to {HDR_arm_len}")
 
@@ -155,7 +163,7 @@ def main(outdir):
 
         #open result file and write header
         csvout_res = open(f"{outdir}/result.csv", "w")
-        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,ssODN,effective_HA_len,synthesis_problems\n")
+        csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems\n")
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -241,7 +249,9 @@ def main(outdir):
                         current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
 
                         #get HDR template
-                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len=HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Npayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size, recoding_args = recoding_args)
+                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType, genome_ver=config["genome_ver"],
+                                                        HDR_arm_len=HDR_arm_len, tag = config["Npayload"],  ssDNA_max_size = ssDNA_max_size, Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'],
+                                                        recoding_args = recoding_args)
 
                         # append the best gRNA to the final df
                         if i==0:
@@ -274,18 +284,18 @@ def main(outdir):
 
                         #write csv
                         spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
-                        ssODN = HDR_template.ODN_final_ss
+                        donor = HDR_template.Donor_final
                         if config["recoding_off"]:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
                         else:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
-                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    ssODN before any recoding:{HDR_template.ODN_vanillia}\n     ssODN after all recoding:{HDR_template.ODN_postMut}\nssODN centered(if applicable):{HDR_template.ODN_postMut_centered}\n          ssODN (best strand):{HDR_template.ODN_final_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
@@ -311,7 +321,9 @@ def main(outdir):
                         current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
 
                         #get HDR template
-                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], loc2posType = loc2posType, ssODN_max_size = ssODN_max_size, recoding_args = recoding_args)
+                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType,
+                                                        HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'], ssDNA_max_size = ssDNA_max_size,
+                                                        recoding_args = recoding_args)
 
                         # append the best gRNA to the final df
                         best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
@@ -343,19 +355,19 @@ def main(outdir):
 
                         #write csv
                         spec_score, seq, pam, s, e, cut2ins_dist, spec_weight, dist_weight, pos_weight, final_weight = get_res(current_gRNA)
-                        ssODN = HDR_template.ODN_final_ss
+                        donor = HDR_template.Donor_final
                         if config["recoding_off"]:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
                         else:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
-                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{ssODN},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
-                            #print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{ssODN},{HDR_template.effective_HA_len}\n")
+                            csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            #print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor},{HDR_template.effective_HA_len}\n")
 
                         #write log
-                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   ssODN before any recoding:{HDR_template.ODN_vanillia}\n    ssODN after all recoding:{HDR_template.ODN_postMut}\n             ssODN centered:{HDR_template.ODN_postMut_centered}\nssODN centered (best strand):{HDR_template.ODN_final_ss}\n\n"
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)

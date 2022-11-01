@@ -94,9 +94,11 @@ class HDR_flank:
             Cut2Ins_dist:int,
             tag:str,
             name:str,
-            ssODN_max_size,
+            ssDNA_max_size,
             loc2posType,
-            recoding_args) -> None:
+            recoding_args,
+            Donor_type,
+            Strand_choice) -> None:
 
         self.left_flk_seq = left_flk_seq
         self.right_flk_seq = right_flk_seq
@@ -111,9 +113,11 @@ class HDR_flank:
         self.tag = tag
         self.loc2posType = loc2posType
         self.name = name
-        self.ssODN_max_size = ssODN_max_size
+        self.ssDNA_max_size = ssDNA_max_size
         self.recoding_args = recoding_args
         self.synFlags=[]
+        self.Donor_type=Donor_type
+        self.Strand_choice=Strand_choice
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -207,7 +211,7 @@ class HDR_flank:
         #         Arm: left_flk_seq_CodonMut2 right_flk_seq_CodonMut3
         #         gRNA: self.post_mut3_gRNA_seq
 
-        #phase 4: if cfd > 0.03, mutate protospacer if in 5UTR
+        #phase 4: if cfd > 0.03, mutate protospacer and PAM if in 5UTR
         #         Arm: left_flk_seq_CodonMut4 right_flk_seq_CodonMut4
         #         gRNA: self.post_mut4_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
@@ -276,61 +280,62 @@ class HDR_flank:
             #########
             #phase 2#
             #########
-            if self.cdf_score_post_mut_ins > 0.03: # mutate PAM if in 3' UTR or intron #
-                #get PAM position types (3UTR etc)
-                PAM_coords = self.get_pam_loc()
-                PAM_pos_types = []
-                for pos in PAM_coords:
-                    position_type = _get_position_type(chr = self.ENST_chr, ID = self.ENST_ID, pos = pos, loc2posType = self.loc2posType)
-                    PAM_pos_types = PAM_pos_types + position_type
-                left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+            if self.cdf_score_post_mut_ins > 0.03: # mutate protospacer if in 3' UTR or intron #
+                left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut2_gRNA_seq = seq
                 self.post_mut2_gRNA_seq_phases = phases
-                #mutate PAM if in 3UTR/intron
-                if (phases[-1:] == "0" or phases[-2:-1] == "0"): #   unnecessary to double-check for 3UTR/intron set(PAM_pos_types) == set(["3UTR"])
-                    # mutate PAM if it's in 3 UTR (phase == 0)
-                    if phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
-                        self.post_mut2_gRNA_seq = seq[:-1] + "c"
-                    if phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
-                        self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:-2] + "c" + self.post_mut2_gRNA_seq[-1:]
-                    self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
-
-                    #put disrupted-and-mutated seq back to arms
-                    ssODN = f"{left}{self.tag}{right}"
-                    ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
-                    ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
-                    self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
-                    self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
-
-                #mutate protospacer if in 3UTR/intron, #TODO mutate 1 in every 3 bp,  phase 2 recode needs to be small case
-                latest_cfd = self.cdf_score_post_mut_ins
-                if hasattr(self,"cdf_score_post_mut2"):
-                    latest_cfd = self.cdf_score_post_mut2 > 0.03
-                if latest_cfd > 0.03:
-                    left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
-                    self.post_mut2_gRNA_seq = seq
-                    self.post_mut2_gRNA_seq_phases = phases
-                    counter = -1
-                    for idx,item in reversed(list(enumerate(phases))):
-                        if idx == (len(phases) - 1) or idx == (len(phases) - 2):
-                            continue #skip PAM
-                        if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
-                            counter += 1
-                            if counter % 3 != 0:
-                                continue #  mutate 1 in every 3 bp
-                            base = seq[idx]
-                            mutbase = self.single_base_muation(base)
-                            self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:idx] + mutbase + self.post_mut2_gRNA_seq[idx+1:]
-                            self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
-                            #early stop if CFD goes below 0.03
-                            if self.cdf_score_post_mut2<0.03:
-                                break
+                counter = -1
+                for idx,item in reversed(list(enumerate(phases))):
+                    if idx == (len(phases) - 1) or idx == (len(phases) - 2):
+                        continue #skip PAM
+                    if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
+                        counter += 1
+                        if counter % 3 != 0:
+                            continue #  mutate 1 in every 3 bp
+                        base = seq[idx]
+                        mutbase = self.single_base_muation(base)
+                        self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:idx] + mutbase + self.post_mut2_gRNA_seq[idx+1:]
+                        self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
+                        #early stop if CFD goes below 0.03
+                        if self.cdf_score_post_mut2<0.03:
+                            break
                     #put mutated seq back to arms
                     ssODN = f"{left}{self.tag}{right}"
                     ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
                     ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
                     self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
                     self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
+
+
+                #mutate PAM if in 3UTR/intron,
+                latest_cfd = self.cdf_score_post_mut_ins
+                if hasattr(self,"cdf_score_post_mut2"):
+                    latest_cfd = self.cdf_score_post_mut2
+                if latest_cfd > 0.03:
+                    #get PAM position types (3UTR etc)
+                    PAM_coords = self.get_pam_loc()
+                    PAM_pos_types = []
+                    for pos in PAM_coords:
+                        position_type = _get_position_type(chr = self.ENST_chr, ID = self.ENST_ID, pos = pos, loc2posType = self.loc2posType)
+                        PAM_pos_types = PAM_pos_types + position_type
+                    left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+                    self.post_mut2_gRNA_seq = seq
+                    self.post_mut2_gRNA_seq_phases = phases
+                    #mutate PAM if in 3UTR/intron
+                    if (phases[-1:] == "0" or phases[-2:-1] == "0"): #   unnecessary to double-check for 3UTR/intron set(PAM_pos_types) == set(["3UTR"])
+                        # mutate PAM if it's in 3 UTR (phase == 0)
+                        if phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
+                            self.post_mut2_gRNA_seq = seq[:-1] + "c"
+                        if phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
+                            self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:-2] + "c" + self.post_mut2_gRNA_seq[-1:]
+                        self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
+
+                        #put disrupted-and-mutated seq back to arms
+                        ssODN = f"{left}{self.tag}{right}"
+                        ssODN = ssODN.replace(seq,self.post_mut2_gRNA_seq)
+                        ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut2_gRNA_seq))
+                        self.left_flk_seq_CodonMut2 = ssODN[0:len(self.left_flk_seq)]
+                        self.right_flk_seq_CodonMut2 =ssODN[-len(self.left_flk_seq):]
 
             left,right,cfd,seq,phases = self.get_uptodate_mut()
             self.postphase2ODN = left + tag + right
@@ -401,14 +406,14 @@ class HDR_flank:
             #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
             left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
             if cfd >= 0.03: #
-                #mutated protospacer if in  UTR
+                #mutate protospacer if in  UTR
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut4_gRNA_seq = seq
                 self.post_mut4_gRNA_seq_phases = phases
                 counter = -1
-                for idx,item in reversed(list(enumerate(phases))):
-                    #if idx == (len(phases) - 1) or idx == (len(phases) - 2):
-                        #continue #skip PAM
+                for idx,item in list(enumerate(phases)): # go through protospacer prior to PAM
+                    #if idx == (len(phases) - 1) or idx == (len(phases) - 2): #skip PAM
+                        #continue
                     if item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
                         counter += 1
                         if counter % 3 != 0:
@@ -437,25 +442,25 @@ class HDR_flank:
             #phase 5#
             #########
             left,right,cfd,seq,phases = self.get_uptodate_mut()
-            self.ODN_phases = self.left_flk_phases + "X"*len(self.tag) + self.right_flk_phases
-            self.ODN_postMut = left + self.tag + right
-            self.ODN_prephase5 = self.ODN_postMut
+            self.Donor_phases = self.left_flk_phases + "X"*len(self.tag) + self.right_flk_phases
+            self.Donor_postMut = left + self.tag + right
+            self.Donor_prephase5 = self.Donor_postMut
 
             #slide windows scan for new cut sites
             self.info_p5 = ""
-            #print(f"{self.ODN_postMut}\n{self.ODN_phases}")
+            #print(f"{self.Donor_postMut}\n{self.Donor_phases}")
 
             #scan for maximum chimeric cfd (no recoding yet)
-            fwd_scan_highest_cfd_no_recode = self.slide_win_cfd_coding(self.ODN_postMut, self.ODN_phases) #this is the chimeric cfd if no recoding
-            rev_scan_highest_cfd_no_recode = self.slide_win_cfd_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1])
+            fwd_scan_highest_cfd_no_recode = self.slide_win_cfd_coding(self.Donor_postMut, self.Donor_phases) #this is the chimeric cfd if no recoding
+            rev_scan_highest_cfd_no_recode = self.slide_win_cfd_noncoding(str(Seq(self.Donor_postMut).reverse_complement()), self.Donor_phases[::-1])
             self.scan_highest_cfd_no_recode = max([fwd_scan_highest_cfd_no_recode, rev_scan_highest_cfd_no_recode])
 
             #scan and recode
             self.phase5recoded = False
-            fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.ODN_postMut, self.ODN_phases) # this is the chimeric cfd after recoding
+            fwd_scan_highest_cfd = self.slide_win_mutation_coding(self.Donor_postMut, self.Donor_phases) # this is the chimeric cfd after recoding
             #scan and recode revcom
-            #print(f"{str(Seq(self.ODN_postMut).reverse_complement())}\n{self.ODN_phases[::-1]}")
-            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(self.ODN_postMut).reverse_complement()), self.ODN_phases[::-1]) # this function modifies self.ODN_postMut
+            #print(f"{str(Seq(self.Donor_postMut).reverse_complement())}\n{self.Donor_phases[::-1]}")
+            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(self.Donor_postMut).reverse_complement()), self.Donor_phases[::-1]) # this function modifies self.Donor_postMut
 
 
             #get the highest cfd among all possible cutsites
@@ -531,9 +536,9 @@ class HDR_flank:
             if self.phase5recoded == True:
                 self.info_p5 = "".join(
                     f"--------------------phase 5: sliding window check of recutting--------------------------------------------------------------------\n"
-                    f"phase 5.  ssODN pre-phase 5:{self.ODN_prephase5}\n"
-                    f"phase 5.ssODN after-phase 5:{self.ODN_postMut}\n"
-                    f"phase 5.             phases:{self.ODN_phases}\n"
+                    f"phase 5.  ssODN pre-phase 5:{self.Donor_prephase5}\n"
+                    f"phase 5.ssODN after-phase 5:{self.Donor_postMut}\n"
+                    f"phase 5.             phases:{self.Donor_phases}\n"
                     f"phase 5. maximum cfd in window scan analysis(after recoding): {self.cdf_score_highest_in_win_scan:.6f}\n") + self.info_p5
             else:
                 self.info_p5 = "".join(
@@ -546,150 +551,157 @@ class HDR_flank:
             #scan to check the highest cfd
             self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
             ODN = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
-            ODN_phases = self.gRNA_lc_Larm + "X"*len(self.tag) + self.gRNA_lc_Rarm
+            Donor_phases = self.gRNA_lc_Larm + "X"*len(self.tag) + self.gRNA_lc_Rarm
 
-            fwd_scan_highest_cfd = self.slide_win_mutation_coding(ODN, ODN_phases) # this function modifies self.ODN_postMut
+            fwd_scan_highest_cfd = self.slide_win_mutation_coding(ODN, Donor_phases) # this function modifies self.Donor_postMut
             #scan the revcom
-            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(ODN).reverse_complement()), ODN_phases[::-1]) # this function modifies self.ODN_postMut
+            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(ODN).reverse_complement()), Donor_phases[::-1]) # this function modifies self.Donor_postMut
 
             #get the highest cfd among all possible cutsites
             scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
 
             self.cdf_score_post_ins = scan_highest_cfd
-            self.ODN_postMut = "recoding turned off"
+            self.Donor_postMut = "recoding turned off"
 
         ##############################
         #finished or skipped recoding#
         ##############################
         left,right,cfd,seq,phases = self.get_uptodate_mut() # not including slide window scan and mutation
-        self.ODN_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
-        if self.ODN_postMut == "recoding turned off":
+        self.Donor_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
+        if self.Donor_postMut == "recoding turned off":
             self.final_cfd = self.cdf_score_post_ins
         else:
             self.final_cfd = max(cfd,scan_highest_cfd) #this should be the highest cfd from all phases,  cfd= phase 1-4, scan_highest_cfd = phase5
 
-        #################################
-        #center payload & recoded region#
-        #################################
-        self.effective_HA_len = len(self.gRNA_lc_Larm) #initizalize effective HA length with the maximum value
-        if self.ssODN_max_size is not None:
-            #print(f"Centering")
-            #print(f"ODN_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
-            #      f"ODN_postmut  {self.ODN_postMut}")
-            if not self.recoding_args["recoding_off"]: #recoding is on
-                diff_loc = self.get_diff_loc(str1 = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", str2 =f"{self.ODN_postMut}")
+        
+        ################
+        #dsDNA donor   #
+        ################
+        if self.Donor_type == "dsDNA":
+            self.Donor_final = self.Donor_vanillia
+            #get recoded donor
+            if self.Donor_postMut != "recoding turned off":
+                self.Donor_final = self.Donor_postMut
+            #set effective HA length
+            self.effective_HA_len="N/A for dsDNA"
+
+            ################################
+            #check synthesis considerations#
+            ################################
+            #restriction cuts
+            #print(Restriction.BsaI.site)
+            BsaI_cutsites = [str(pos) for pos in Restriction.BsaI.search(Seq(self.Donor_final))] # will find cutsites on both strands
+            if len(BsaI_cutsites) > 0:
+                BsaI_cutPos = ";".join(BsaI_cutsites)
+                self.synFlags.append(f"Cut by BsaI @{BsaI_cutPos}")
+
+            #GC content
+            seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
+            global_GC = GC(seq_noAmbiguous)
+            #print(global_GC)
+            if global_GC < 25:
+                self.synFlags.append(f"global GC content {global_GC:.2f}% < 25%")
+            if global_GC > 65:
+                self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
+
+            #GC content skew (slide windown analysis
+            win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
+            #print(win_GC)
+            max_diff = max(win_GC) - min(win_GC)
+            #print(max_diff)
+            if max_diff > 52:
+                self.synFlags.append(f"Max difference of slide window GC content {max_diff:.2f}% > 52%")
+
+            #homopolyer
+            hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
+            if len(hp_res)>0:
+                hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
+                hp_res_display = "".join(hp_res_display)
+                self.synFlags.append(f"Homopolymer > 10bp (sequence@start): {hp_res_display}")
+
+            if len(self.synFlags) == 0:
+                self.synFlags = "None"
             else:
-                diff_loc = [] # skip get_diff_loc if recoding is off
-            #print(f"{diff_loc}")
-            #print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
-
-            if len(diff_loc) == 0: #no recoding
-                _HA_len = (self.ssODN_max_size - len(self.tag))/2
-                start = len(self.gRNA_lc_Larm) - _HA_len - 1
-                end = start + _HA_len + len (self.tag) + _HA_len
-                #print(f"no recoding, start={start}\tend={end}")
-            else: #with recoding
-                recoding_left = min(diff_loc) # 0-indexed
-                recoding_right = max(diff_loc) # 0-indexed
-                tag_start = len(self.gRNA_lc_Larm) # 0-indexed
-                tag_end = len(self.gRNA_lc_Larm) + len(tag) - 1 # 0-indexed
-                centerpiece_start = min([recoding_left,recoding_right,tag_start,tag_end])
-                centerpiece_end = max([recoding_left,recoding_right,tag_start,tag_end])
-                centerpiece_len = centerpiece_end - centerpiece_start + 1
-                _HA_len = math.floor((self.ssODN_max_size - centerpiece_len)/2)
-                start = centerpiece_start - _HA_len
-                end = centerpiece_end + _HA_len + 1 # need to get the base at position:end
-                _len= end - start
-                #print(f"recoding, start={start}\tend={end}\t centerpiece:{centerpiece_start}-{centerpiece_end} len={_len} HA_len={_HA_len}")
-            self.ODN_postMut_centered = self.ODN_postMut[int(start):int(end)]
-            self.effective_HA_len = _HA_len
+                self.synFlags = "; ".join(self.synFlags)
 
         ################
-        #get final ODN #
+        #ssDNA donor   #
         ################
-        self.ODN_final = self.ODN_vanillia
-        if self.ODN_postMut != "recoding turned off":
-            self.ODN_final = self.ODN_postMut
+        if self.Donor_type == "ssDNA":
+            self.Donor_final = self.Donor_vanillia
+            #get recoded donor
+            if self.Donor_postMut != "recoding turned off":
+                self.Donor_final = self.Donor_postMut
+            self.synFlags = "N/A for ssDNA"
+            self.effective_HA_len = "N/A if not enforcing max donor length"
+            ########################################
+            #Enforce max payload size and centering#
+            #This does not require recoded donor   #
+            ########################################
+            if self.ssDNA_max_size is not None:
+                self.effective_HA_len = len(self.gRNA_lc_Larm) #initizalize effective HA length with the maximum value
+                #print(f"Centering")
+                #print(f"Donor_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
+                #      f"Donor_postmut  {self.Donor_postMut}")
+                if not self.recoding_args["recoding_off"]: #recoding is on
+                    diff_loc = self.get_diff_loc(str1 = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", str2 =f"{self.Donor_postMut}")
+                else:
+                    diff_loc = [] # skip get_diff_loc if recoding is off
+                #print(f"{diff_loc}")
+                #print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
 
-            if hasattr(self,"ODN_postMut_centered"): # centering only makes sense when recode is on
-                self.ODN_final = self.ODN_postMut_centered
-            else:
-                self.ODN_postMut_centered = "centering turned off"
+                if len(diff_loc) == 0: #no recoding
+                    _HA_len = (self.ssDNA_max_size - len(self.tag))/2
+                    start = len(self.gRNA_lc_Larm) - _HA_len - 1
+                    end = start + _HA_len + len (self.tag) + _HA_len
+                    #print(f"no recoding, start={start}\tend={end}")
+                else: #with recoding
+                    recoding_left = min(diff_loc) # 0-indexed
+                    recoding_right = max(diff_loc) # 0-indexed
+                    tag_start = len(self.gRNA_lc_Larm) # 0-indexed
+                    tag_end = len(self.gRNA_lc_Larm) + len(tag) - 1 # 0-indexed
+                    centerpiece_start = min([recoding_left,recoding_right,tag_start,tag_end])
+                    centerpiece_end = max([recoding_left,recoding_right,tag_start,tag_end])
+                    centerpiece_len = centerpiece_end - centerpiece_start + 1
+                    _HA_len = math.floor((self.ssDNA_max_size - centerpiece_len)/2)
+                    start = centerpiece_start - _HA_len
+                    end = centerpiece_end + _HA_len + 1 # need to get the base at position:end
+                    _len= end - start
+                    #print(f"recoding, start={start}\tend={end}\t centerpiece:{centerpiece_start}-{centerpiece_end} len={_len} HA_len={_HA_len}")
+                if hasattr(self,"Donor_postMut"):  # donor is recoded
+                    self.Donor_final = self.Donor_postMut[int(start):int(end)]
+                else: # donor is not recoded
+                    self.Donor_final = self.Donor_final[int(start):int(end)]
+                self.effective_HA_len = _HA_len
 
-        #self.ODN_final_ss will be in the output
-        self.ODN_final_ss = self.select_ssODN_strand(self.ODN_final)
+            ###################
+            #strand selection #
+            ###################
+            #check PAM-less cutting
+            fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(self.Donor_final) # this function modifies self.Donor_postMut
+            rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(str(Seq(self.Donor_final).reverse_complement())) # this function modifies self.Donor_postMut
+            PAMless_cfd = max([fwd_scan_highest_PAMless_cfd,rev_scan_highest_PAMless_cfd])
+            #print(f"PAMless_cfd:{PAMless_cfd}")
 
-        ################
-        #get final ODN #
-        ################
+            if PAMless_cfd > 0.03: # PAM-independent cutting can happen, choose gRNA strand
+                if not self.ENST_strand * self.gStrand:
+                    self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is not on the same strand as the ENST (coding)
 
-        #dsDNA, TODO check synthesis constraints
-
-        #ssDNA, TODO 
-
-
-
-        ################################
-        #check synthesis considerations#
-        ################################
-
-        #restriction cuts
-        #print(Restriction.BsaI.site)
-        BsaI_cutsites = [str(pos) for pos in Restriction.BsaI.search(Seq(self.ODN_final_ss))] # will find cutsites on both strands
-
-        if len(BsaI_cutsites) > 0:
-            BsaI_cutPos = ";".join(BsaI_cutsites)
-            self.synFlags.append(f"Cut by BsaI @{BsaI_cutPos}")
-
-        #GC content
-        seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.ODN_final_ss)
-        global_GC = GC(seq_noAmbiguous)
-        #print(global_GC)
-        if global_GC < 25:
-            self.synFlags.append(f"global GC content {global_GC:.2f}% < 25%")
-        if global_GC > 65:
-            self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
-
-        #GC content skew (slide windown analysis
-        win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
-        #print(win_GC)
-        max_diff = max(win_GC) - min(win_GC)
-        #print(max_diff)
-        if max_diff > 52:
-            self.synFlags.append(f"Max difference of slide window GC content {max_diff:.2f}% > 52%")
-
-        #homopolyer
-        hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
-        if len(hp_res)>0:
-            hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
-            hp_res_display = "".join(hp_res_display)
-            self.synFlags.append(f"Homopolymer > 10bp (sequence@start): {hp_res_display}")
-
-        if len(self.synFlags) == 0:
-            self.synFlags = "None"
-        else:
-            self.synFlags = "; ".join(self.synFlags)
+            else:   # PAM-independent cutting canNOT happen, choose Manu strand
+                self.Donor_final = self.select_Manu_strand(self.Donor_final)
 
     #############
     #END OF INIT#
     #############
     #TODO scan recoded sequence for PAM-less recut
-    def slide_win_PAMLESScfd_noncoding(self,seq,phases):
+    def slide_win_PAMLESScfd_noncoding(self,seq):
+        _arm_len = int((len(seq)-len(self.tag))/2)
         highest_cfd = 0
         #get sliding window as an iterator
         it = self.sliding_window(seq,23)
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm
-            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                #print(f"skipping window: {n_window}")
-                n_window+=1
-                continue
-            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-                n_window+=1
-                #print(f"skipping window: {n_window}")
-                continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -697,7 +709,7 @@ class HDR_flank:
                 continue
             #replace the last 3-mer with the PAM from gRNA
             n_mer_addPAM = n_mer[:-3] + self.gRNA_seq[-3:]
-
+            #print(f"{self.gRNA_seq}\n{n_mer_addPAM}\n")
             cfd = cfd_score(self.gRNA_seq, n_mer_addPAM)
             #print(f"DIAG cfd_noncoding: {cfd:.6f}")
             if cfd>=highest_cfd:
@@ -705,22 +717,13 @@ class HDR_flank:
             n_window+=1
         return highest_cfd
 
-    def slide_win_PAMLESScfd_coding(self,seq,phases):
+    def slide_win_PAMLESScfd_coding(self,seq):
         highest_cfd = 0
          #get sliding window as an iterator
         it = self.sliding_window(seq,23)
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm
-            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                #print(f"skipping window: {n_window}")
-                n_window+=1
-                continue
-            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-                n_window+=1
-                #print(f"skipping window: {n_window}")
-                continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -728,14 +731,13 @@ class HDR_flank:
                 continue
             #replace the last 3-mer with the PAM from gRNA
             n_mer_addPAM = n_mer[:-3] + self.gRNA_seq[-3:]
-
+            #print(f"{self.gRNA_seq}\n{n_mer_addPAM}\n")
             cfd = cfd_score(self.gRNA_seq, n_mer_addPAM)
             #print(f"DIAG cfd_coding: {cfd:.6f}")
             if cfd>=highest_cfd:
                 highest_cfd = cfd
             n_window+=1
         return highest_cfd
-
 
     def slide_win_GC_content(self,seq,win_size):
         '''
@@ -768,11 +770,12 @@ class HDR_flank:
     def slide_win_mutation_noncoding(self,seq,phases):
         '''
         for noncoding strand
+        use with untrimmed donor
         '''
         highest_cfd = 0
         #get sliding window as an iterator
         it = self.sliding_window(seq,23)
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
             #skip non-chimeric part of the homology arm
@@ -894,8 +897,8 @@ class HDR_flank:
                 #       f"  orig gRNA: {o.gRNA.seq}\n"
                 #       f"pre-mut seq: {n_mer} cfd:{cfd}\n"
                 #       f"   post-mut: {o.recut.seq} cfd:{o.recut.cfd}")
-                #put mut seq back into ssODN, need revcom here b/c the input/seq is revcomed from self.ODN_postMut
-                self.ODN_postMut = self.revcom(seq[0:n_window] + o.recut.seq + seq[n_window + 23:])
+                #put mut seq back into ssODN, need revcom here b/c the input/seq is revcomed from self.Donor_postMut
+                self.Donor_postMut = self.revcom(seq[0:n_window] + o.recut.seq + seq[n_window + 23:])
                 highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd
             else:
                 highest_cfd = max([highest_cfd, cfd]) #update highest cfd
@@ -906,7 +909,7 @@ class HDR_flank:
         highest_cfd = 0
         #get sliding window as an iterator
         it = self.sliding_window(seq,23)
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
             #skip non-chimeric part of the homology arm
@@ -937,7 +940,7 @@ class HDR_flank:
         highest_cfd = 0
          #get sliding window as an iterator
         it = self.sliding_window(seq,23)
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
             #skip non-chimeric part of the homology arm
@@ -1050,7 +1053,7 @@ class HDR_flank:
                 self.info_phase5_5UTR[1] = o.recut.cfd
             #print(f"DIAG_mut_coding: {o.recut.cfd:.6f}")
             if o.recut.seq != n_mer and o.recut.cfd <= cfd: # mutations been made and it decreases cfd
-                n_mer_confirm = self.ODN_postMut[n_window: n_window + 23]
+                n_mer_confirm = self.Donor_postMut[n_window: n_window + 23]
                 self.info_p5 = self.info_p5 + "".join(f"phase 5 final\n"
                                                       f" orig gRNA: {o.gRNA.seq}\n"
                                                       f"premut seq: {n_mer} cfd:{cfd}\n"
@@ -1060,7 +1063,7 @@ class HDR_flank:
                 #       f"premut seq: {n_mer} cfd:{cfd}\n"
                 #       f"   postmut: {o.recut.seq} cfd:{o.recut.cfd}")
                 #put mut seq back into ssODN
-                self.ODN_postMut = self.ODN_postMut[0:n_window] + o.recut.seq + self.ODN_postMut[n_window + 23:]
+                self.Donor_postMut = self.Donor_postMut[0:n_window] + o.recut.seq + self.Donor_postMut[n_window + 23:]
                 highest_cfd = max([highest_cfd, o.recut.cfd]) #update highest cfd
             else:
                 highest_cfd = max([highest_cfd, cfd]) #update highest cfd
@@ -1071,7 +1074,7 @@ class HDR_flank:
         highest_cfd = 0
          #get sliding window as an iterator
         it = self.sliding_window(seq,23)
-        #go through sliding windows #NOTE: ODN_postMut is always in the coding straind
+        #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
             #skip non-chimeric part of the homology arm
@@ -1369,7 +1372,7 @@ class HDR_flank:
 
         return gRNA, chimeric_gRNA, gRNA_ph, chimeric_gRNA_ph #cannot use the seq_with_phase object b/c not always in the coding strand
 
-    def select_ssODN_strand(self, seq):
+    def select_Manu_strand(self, seq):
         """
         select strand:
             if cut-to-insert is 0: use same strand as gRNA
