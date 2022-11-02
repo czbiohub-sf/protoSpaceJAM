@@ -681,12 +681,11 @@ class HDR_flank:
             fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(self.Donor_final) # this function modifies self.Donor_postMut
             rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(str(Seq(self.Donor_final).reverse_complement())) # this function modifies self.Donor_postMut
             PAMless_cfd = max([fwd_scan_highest_PAMless_cfd,rev_scan_highest_PAMless_cfd])
-            #print(f"PAMless_cfd:{PAMless_cfd}")
+            print(f"PAMless_cfd:{PAMless_cfd}")
 
             if PAMless_cfd > 0.03: # PAM-independent cutting can happen, choose gRNA strand
                 if not self.ENST_strand * self.gStrand:
                     self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is not on the same strand as the ENST (coding)
-
             else:   # PAM-independent cutting canNOT happen, choose Manu strand
                 self.Donor_final = self.select_Manu_strand(self.Donor_final)
 
