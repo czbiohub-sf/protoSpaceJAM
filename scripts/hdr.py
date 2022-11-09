@@ -630,7 +630,7 @@ class HDR_flank:
         if self.Donor_type == "ssDNA":
             self.Donor_final = self.Donor_vanillia
             #get recoded donor
-            if self.Donor_postMut != "recoding turned off":
+            if not self.recoding_args["recoding_off"]: #recoding is on
                 self.Donor_final = self.Donor_postMut
             self.synFlags = "N/A for ssDNA"
             self.effective_HA_len = "N/A if not enforcing max donor length"
@@ -668,9 +668,10 @@ class HDR_flank:
                     end = centerpiece_end + _HA_len + 1 # need to get the base at position:end
                     _len= end - start
                     #print(f"recoding, start={start}\tend={end}\t centerpiece:{centerpiece_start}-{centerpiece_end} len={_len} HA_len={_HA_len}")
-                if hasattr(self,"Donor_postMut"):  # donor is recoded
+                if hasattr(self,"Donor_postMut") and not self.recoding_args["recoding_off"]:  # donor is recoded
                     self.Donor_final = self.Donor_postMut[int(start):int(end)]
                 else: # donor is not recoded
+                    #print(f"{start}-{end}")
                     self.Donor_final = self.Donor_final[int(start):int(end)]
                 self.effective_HA_len = _HA_len
 
@@ -681,13 +682,14 @@ class HDR_flank:
             fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(self.Donor_final) # this function modifies self.Donor_postMut
             rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(str(Seq(self.Donor_final).reverse_complement())) # this function modifies self.Donor_postMut
             PAMless_cfd = max([fwd_scan_highest_PAMless_cfd,rev_scan_highest_PAMless_cfd])
-            print(f"PAMless_cfd:{PAMless_cfd}")
+            #print(f"PAMless_cfd:{PAMless_cfd}")
 
             if PAMless_cfd > 0.03: # PAM-independent cutting can happen, choose gRNA strand
                 if not self.ENST_strand * self.gStrand:
                     self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is not on the same strand as the ENST (coding)
             else:   # PAM-independent cutting canNOT happen, choose Manu strand
                 self.Donor_final = self.select_Manu_strand(self.Donor_final)
+
 
     #############
     #END OF INIT#
