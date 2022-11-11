@@ -48,7 +48,6 @@ bash download_genomes.sh
 ```
 Preprocess GFF3 annotation file
 ```
-#in genomefiles
 bash preprocess_GFF3.sh
 ```
 build bwa indexes Optional: for precomputing gRNA
