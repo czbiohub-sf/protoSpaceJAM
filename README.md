@@ -48,10 +48,9 @@ bash download_genomes.sh
 ```
 Preprocess GFF3 annotation file
 ```
-#in genomefiles
 bash preprocess_GFF3.sh
 ```
-build bwa indexes
+build bwa indexes Optional: for precomputing gRNA
 ```
 bash build_bwa_index.sh
 ```
@@ -60,7 +59,7 @@ Serialize fasta file for fast I/O
 #in genomefiles
 bash serialize_fa.sh
 ```
-### Precompute gRNA (optional: precomputed results available for download)
+### Optional: Precompute gRNA (precomputed results available for download)
 Get all gRNAs
 ```
 cd ../precomuted_gRNAs
