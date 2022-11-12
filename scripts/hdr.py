@@ -1,7 +1,3 @@
-"""
-Taken from https://github.com/czbiohub/crispycrunch/blob/master/utils/hdr.py
-Transformations of genome sequences for HDR.
-"""
 import functools
 import itertools
 import logging
