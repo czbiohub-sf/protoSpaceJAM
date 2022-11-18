@@ -59,7 +59,15 @@ Serialize fasta file for fast I/O
 #in genomefiles
 bash serialize_fa.sh
 ```
-### Optional: Precompute gRNA (precomputed results available for download)
+
+### Predict gRNA, DNA donor
+```
+conda deactivate
+conda activate protospaceX
+python main.py --path2csv input/test_protospaceX.csv --ssODN_max_size 200 --recoding_all
+```
+
+### ** Optional **: Precompute gRNA (precomputed results available for download)
 Get all gRNAs
 ```
 cd ../precomuted_gRNAs
@@ -99,9 +107,3 @@ bash index the precompute gRNAs for fast access
 5.index_result_files.sh
 ```
 
-### Predict gRNA, DNA donor
-```
-conda deactivate
-conda activate protospaceX
-python main.py --path2csv input/test_protospaceX.csv --ssODN_max_size 200 --recoding_all
-```
