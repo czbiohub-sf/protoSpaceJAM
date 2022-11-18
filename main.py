@@ -164,6 +164,10 @@ def main(outdir):
         #open result file and write header
         csvout_res = open(f"{outdir}/result.csv", "w")
         csvout_res.write(f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems\n")
+        #open result file2 for GenoPrimer input
+        csvout_res2 = open(f"{outdir}/input_for_GenoPrimer.csv", "w")
+        csvout_res2.write(f"ref,chr,coordinate\n")
+
 
         #dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -290,11 +294,13 @@ def main(outdir):
                         if config["recoding_off"]:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res2.write(config["genome_ver"] + f",{HDR_template.ENST_chr},{insert_pos}\n")
                         else:
                             csvout_N.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
                             csvout_res.write(f"{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res2.write(config["genome_ver"] + f",{HDR_template.ENST_chr},{insert_pos}\n")
 
                         #write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
@@ -363,11 +369,13 @@ def main(outdir):
                         if config["recoding_off"]:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res2.write(config["genome_ver"] + f",{HDR_template.ENST_chr},{insert_pos}\n")
                         else:
                             csvout_C.write(f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n")
                             if not isinstance(cfd4, float):
                                 cfd4=""
                             csvout_res.write(f"{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags}\n")
+                            csvout_res2.write(config["genome_ver"] + f",{HDR_template.ENST_chr},{insert_pos}\n")
                             #print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor},{HDR_template.effective_HA_len}\n")
 
                         #write log
