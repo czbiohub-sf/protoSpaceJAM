@@ -549,9 +549,9 @@ class HDR_flank:
             ODN = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
             Donor_phases = self.gRNA_lc_Larm + "X"*len(self.tag) + self.gRNA_lc_Rarm
 
-            fwd_scan_highest_cfd = self.slide_win_mutation_coding(ODN, Donor_phases) # this function modifies self.Donor_postMut
+            fwd_scan_highest_cfd = self.slide_win_cfd_coding(ODN, Donor_phases) # this function modifies self.Donor_postMut
             #scan the revcom
-            rev_scan_highest_cfd = self.slide_win_mutation_noncoding(str(Seq(ODN).reverse_complement()), Donor_phases[::-1]) # this function modifies self.Donor_postMut
+            rev_scan_highest_cfd = self.slide_win_cfd_noncoding(str(Seq(ODN).reverse_complement()), Donor_phases[::-1]) # this function modifies self.Donor_postMut
 
             #get the highest cfd among all possible cutsites
             scan_highest_cfd = max([fwd_scan_highest_cfd,rev_scan_highest_cfd])
@@ -775,15 +775,15 @@ class HDR_flank:
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm
-            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                #print(f"skipping window: {n_window}")
-                n_window+=1
-                continue
-            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-                n_window+=1
-                #print(f"skipping window: {n_window}")
-                continue
+            # #skip non-chimeric part of the homology arm #!!!=> we should not skip non-chimeric parts b/c the payload may contain cutsites
+            # if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+            #     #print(f"skipping window: {n_window}")
+            #     n_window+=1
+            #     continue
+            # if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+            #     n_window+=1
+            #     #print(f"skipping window: {n_window}")
+            #     continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -903,21 +903,24 @@ class HDR_flank:
         return highest_cfd
 
     def slide_win_cfd_noncoding(self,seq,phases):
+        '''
+        scan the donor and return the highest cfd
+        '''
         highest_cfd = 0
         #get sliding window as an iterator
         it = self.sliding_window(seq,23)
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm
-            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                #print(f"skipping window: {n_window}")
-                n_window+=1
-                continue
-            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-                n_window+=1
-                #print(f"skipping window: {n_window}")
-                continue
+            # #skip non-chimeric part of the homology arm #!!!=> we should not skip non-chimeric parts b/c the payload may contain cutsites
+            # if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+            #     #print(f"skipping window: {n_window}")
+            #     n_window+=1
+            #     continue
+            # if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+            #     n_window+=1
+            #     #print(f"skipping window: {n_window}")
+            #    continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -940,15 +943,15 @@ class HDR_flank:
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm
-            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                #print(f"skipping window: {n_window}")
-                n_window+=1
-                continue
-            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-                n_window+=1
-                #print(f"skipping window: {n_window}")
-                continue
+            # #skip non-chimeric part of the homology arm #!!!=> we should not skip non-chimeric parts b/c the payload may contain cutsites
+            # if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+            #     #print(f"skipping window: {n_window}")
+            #     n_window+=1
+            #     continue
+            # if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+            #     n_window+=1
+            #     #print(f"skipping window: {n_window}")
+            #     continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -1068,21 +1071,25 @@ class HDR_flank:
         return highest_cfd
 
     def slide_win_cfd_coding(self,seq,phases):
+        '''
+        scan the donor and return the highest cfd
+        for coding strand only
+        '''
         highest_cfd = 0
          #get sliding window as an iterator
         it = self.sliding_window(seq,23)
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm
-            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-                #print(f"skipping window: {n_window}")
-                n_window+=1
-                continue
-            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-                n_window+=1
-                #print(f"skipping window: {n_window}")
-                continue
+            # #skip non-chimeric part of the homology arm #!!!=> we should not skip non-chimeric parts b/c the payload may contain cutsites
+            # if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+            #     #print(f"skipping window: {n_window}")
+            #     n_window+=1
+            #     continue
+            # if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+            #     n_window+=1
+            #     #print(f"skipping window: {n_window}")
+            #     continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:

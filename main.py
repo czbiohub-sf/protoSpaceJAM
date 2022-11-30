@@ -198,8 +198,8 @@ def main(outdir):
         target_terminus = "all"
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"]
-            if "Target Terminus" in df.columns:
-                target_terminus = row["Target Terminus"]
+            if "Target_terminus" in df.columns:
+                target_terminus = row["Target_terminus"].upper()
                 if target_terminus!="N" and target_terminus!="C" and target_terminus!="all":
                     sys.exit(f"invalid target terminus: {target_terminus}")
 
@@ -245,6 +245,7 @@ def main(outdir):
                     if ranked_df_gRNAs_ATG.empty == True:
                         start_info.failed.append(ENST_ID)
                         csvout_N.write(",,,,,\n")
+                        csvout_res.write(f"{ENST_ID},ERROR: no suitable gRNAs found\n")
 
                     for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_ATG.shape[0]])):
                         # if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
@@ -321,6 +322,7 @@ def main(outdir):
                     if ranked_df_gRNAs_stop.empty == True:
                         stop_info.failed.append(ENST_ID)
                         csvout_C.write(",,,,,\n")
+                        csvout_res.write(f"{ENST_ID},ERROR: no suitable gRNAs found\n")
 
                     for i in range(0,min([gRNA_num_out, ranked_df_gRNAs_stop.shape[0]])):
                         # if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
