@@ -111,6 +111,7 @@ class HDR_flank:
         self.name = name
         self.ssDNA_max_size = ssDNA_max_size
         self.recoding_args = recoding_args
+        self.cfdThres = recoding_args["cfdThres"]
         self.synFlags=[]
         self.Donor_type=Donor_type
         self.Strand_choice=Strand_choice
@@ -199,15 +200,15 @@ class HDR_flank:
         #         Arm: left_flk_seq_CodonMut right_flk_seq_CodonMut
         #         gRNA: self.post_mut_ins_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
-        #phase 2: if cfd > 0.03, mutate PAM and protospacer if in 3UTR/intron
+        #phase 2: if cfd > self.cfdThres, mutate PAM and protospacer if in 3UTR/intron
         #         Arm: left_flk_seq_CodonMut3 right_flk_seq_CodonMut2
         #         gRNA: self.post_mut2_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
-        #phase 3: if cfd > 0.03, silently mutate gRNA seq not covered between insert and cut
+        #phase 3: if cfd > self.cfdThres, silently mutate gRNA seq not covered between insert and cut
         #         Arm: left_flk_seq_CodonMut2 right_flk_seq_CodonMut3
         #         gRNA: self.post_mut3_gRNA_seq
 
-        #phase 4: if cfd > 0.03, mutate protospacer and PAM if in 5UTR
+        #phase 4: if cfd > self.cfdThres, mutate protospacer and PAM if in 5UTR
         #         Arm: left_flk_seq_CodonMut4 right_flk_seq_CodonMut4
         #         gRNA: self.post_mut4_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
@@ -276,7 +277,7 @@ class HDR_flank:
             #########
             #phase 2#
             #########
-            if self.cdf_score_post_mut_ins > 0.03: # mutate protospacer if in 3' UTR or intron #
+            if self.cdf_score_post_mut_ins > self.cfdThres: # mutate protospacer if in 3' UTR or intron #
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut2_gRNA_seq = seq
                 self.post_mut2_gRNA_seq_phases = phases
@@ -292,8 +293,8 @@ class HDR_flank:
                         mutbase = self.single_base_muation(base)
                         self.post_mut2_gRNA_seq = self.post_mut2_gRNA_seq[:idx] + mutbase + self.post_mut2_gRNA_seq[idx+1:]
                         self.cdf_score_post_mut2 = cfd_score(self.gRNA_seq, self.post_mut2_gRNA_seq)
-                        #early stop if CFD goes below 0.03
-                        if self.cdf_score_post_mut2<0.03:
+                        #early stop if CFD goes below self.cfdThres
+                        if self.cdf_score_post_mut2<self.cfdThres:
                             break
                     #put mutated seq back to arms
                     ssODN = f"{left}{self.tag}{right}"
@@ -307,7 +308,7 @@ class HDR_flank:
                 latest_cfd = self.cdf_score_post_mut_ins
                 if hasattr(self,"cdf_score_post_mut2"):
                     latest_cfd = self.cdf_score_post_mut2
-                if latest_cfd > 0.03:
+                if latest_cfd > self.cfdThres:
                     #get PAM position types (3UTR etc)
                     PAM_coords = self.get_pam_loc()
                     PAM_pos_types = []
@@ -339,7 +340,7 @@ class HDR_flank:
             #phase 3#
             #########
             left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-            if cdf > 0.03:   # CDS>=0.03, try mutating gRNA silently(codons) in parts not covered between insert and cut
+            if cdf > self.cfdThres:   # CDS>=self.cfdThres, try mutating gRNA silently(codons) in parts not covered between insert and cut
 
                 #print(f"phase 3: gRNA in coding {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
 
@@ -399,9 +400,9 @@ class HDR_flank:
             #########
             #phase 4#
             #########
-            #If CFD>0.03, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
+            #If CFD>self.cfdThres, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
             left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-            if cfd >= 0.03: #
+            if cfd >= self.cfdThres: #
                 #mutate protospacer if in  UTR
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut4_gRNA_seq = seq
@@ -418,8 +419,8 @@ class HDR_flank:
                         mutbase = self.single_base_muation(base)
                         self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:idx] + mutbase + self.post_mut4_gRNA_seq[idx+1:]
                         self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
-                        #early stop if CFD goes below 0.03
-                        if self.cdf_score_post_mut4<0.03:
+                        #early stop if CFD goes below self.cfdThres
+                        if self.cdf_score_post_mut4<self.cfdThres:
                             break
 
                 #put mutated seq back to arms
@@ -492,7 +493,7 @@ class HDR_flank:
 
             if hasattr(self,"cdf_score_post_mut2"):
                 self.info_p2 = "".join(
-                     f"--------------------phase 2: if cfd > 0.03, mutating PAM and protospacer if in 3UTR-----------------------------------------------\n"
+                     f"--------------------phase 2: if cfd > self.cfdThres, mutating PAM and protospacer if in 3UTR-----------------------------------------------\n"
                      f"phase 2.                          gRNA:{self.gRNA_seq}\n"
                      f"phase 2.                        Phases:{self.gRNA_seq_phases}\n"
                      f"phase 2.             gRNA post phase 2:{self.post_mut2_gRNA_seq}\n"
@@ -505,7 +506,7 @@ class HDR_flank:
                      f"--------------------phase 2 skipped-----------------------------------------------------------------------------------------------\n"
             if hasattr(self,"cdf_score_post_mut3"):
                 self.info_p3 = "".join(
-                     f"--------------------phase 3: if cfd > 0.03, silently mutate gRNA seq not covered between insert and cut---------------------------\n"
+                     f"--------------------phase 3: if cfd > self.cfdThres, silently mutate gRNA seq not covered between insert and cut---------------------------\n"
                      f"phase 3.                     gRNA:{self.gRNA_seq}\n"
                      f"phase 3.                   Phases:{self.gRNA_seq_phases}\n"
                      f"phase 3.        gRNA post phase 3:{self.post_mut3_gRNA_seq}\n"
@@ -518,7 +519,7 @@ class HDR_flank:
                      f"--------------------phase 3 skipped-----------------------------------------------------------------------------------------------\n"
             if hasattr(self,"cdf_score_post_mut4"):
                 self.info_p4 = "".join(
-                     f"--------------------phase 4: if cfd > 0.03, mutating gRNA if in 5UTR--------------------------------------------------------------\n"
+                     f"--------------------phase 4: if cfd > self.cfdThres, mutating gRNA if in 5UTR--------------------------------------------------------------\n"
                      f"phase 4.                     gRNA:{self.gRNA_seq}\n"
                      f"phase 4.                   Phases:{self.gRNA_seq_phases}\n"
                      f"phase 4.        gRNA post phase 4:{self.post_mut4_gRNA_seq}\n"
@@ -630,10 +631,10 @@ class HDR_flank:
                 self.Donor_final = self.Donor_postMut
             self.synFlags = "N/A for ssDNA"
             self.effective_HA_len = "N/A if not enforcing max donor length"
-            ########################################
-            #Enforce max payload size and centering#
-            #This does not require recoded donor   #
-            ########################################
+            ###################################################
+            #Enforce max payload size and centering           #
+            #This handles both recoded and non-recoded donor  #
+            ###################################################
             if self.ssDNA_max_size is not None:
                 self.effective_HA_len = len(self.gRNA_lc_Larm) #initizalize effective HA length with the maximum value
                 #print(f"Centering")
@@ -646,7 +647,7 @@ class HDR_flank:
                 #print(f"{diff_loc}")
                 #print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
 
-                if len(diff_loc) == 0: #no recoding
+                if len(diff_loc) == 0: #no recoding (including recoding turned off and no-recoding with recoding turned on)
                     _HA_len = (self.ssDNA_max_size - len(self.tag))/2
                     start = len(self.gRNA_lc_Larm) - _HA_len - 1
                     end = start + _HA_len + len (self.tag) + _HA_len
@@ -656,7 +657,7 @@ class HDR_flank:
                     recoding_right = max(diff_loc) # 0-indexed
                     tag_start = len(self.gRNA_lc_Larm) # 0-indexed
                     tag_end = len(self.gRNA_lc_Larm) + len(tag) - 1 # 0-indexed
-                    centerpiece_start = min([recoding_left,recoding_right,tag_start,tag_end])
+                    centerpiece_start = min([recoding_left,recoding_right,tag_start,tag_end]) #center piece is the payload + recoded region
                     centerpiece_end = max([recoding_left,recoding_right,tag_start,tag_end])
                     centerpiece_len = centerpiece_end - centerpiece_start + 1
                     _HA_len = math.floor((self.ssDNA_max_size - centerpiece_len)/2)
@@ -670,7 +671,7 @@ class HDR_flank:
                     #print(f"{start}-{end}")
                     self.Donor_final = self.Donor_final[int(start):int(end)]
                 self.effective_HA_len = _HA_len
-
+                #print(f"effective_HA_len {_HA_len}")
             ###################
             #strand selection #
             ###################
@@ -680,7 +681,7 @@ class HDR_flank:
             PAMless_cfd = max([fwd_scan_highest_PAMless_cfd,rev_scan_highest_PAMless_cfd])
             #print(f"PAMless_cfd:{PAMless_cfd}")
 
-            if PAMless_cfd > 0.03: # PAM-independent cutting can happen, choose gRNA strand
+            if PAMless_cfd > self.cfdThres: # PAM-independent cutting can happen, choose gRNA strand
                 if not self.ENST_strand * self.gStrand:
                     self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is not on the same strand as the ENST (coding)
             else:   # PAM-independent cutting canNOT happen, choose Manu strand
@@ -775,15 +776,15 @@ class HDR_flank:
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            # #skip non-chimeric part of the homology arm #!!!=> we should not skip non-chimeric parts b/c the payload may contain cutsites
-            # if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-            #     #print(f"skipping window: {n_window}")
-            #     n_window+=1
-            #     continue
-            # if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-            #     n_window+=1
-            #     #print(f"skipping window: {n_window}")
-            #     continue
+            #skip non-chimeric part of the homology arm TODO #!!!=> we should not skip  payload
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                #print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                #print(f"skipping window: {n_window}")
+                continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -793,7 +794,7 @@ class HDR_flank:
             n_mer_phases = phases[n_window: n_window + 23]
             o = chimeric_gRNA(gRNA_seq=self.gRNA_seq, gRNA_phases="",
                               recut_seq=n_mer, recut_cfd = cfd, recut_phases=n_mer_phases)
-            if cfd>0.03:
+            if cfd>self.cfdThres:
                 self.info_p5 = self.info_p5 + "".join(f"win-     original gRNA:{self.gRNA_seq}\n"
                                                       f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
                                                       f"       chimeric phases:{o.recut.phases}\n")
@@ -822,7 +823,7 @@ class HDR_flank:
                 #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                 #       f"                 phases:{n_mer_phases}")
             #try mutate in 3UTR
-            if o.recut.cfd>0.03:
+            if o.recut.cfd>self.cfdThres:
                 # mutate PAM if it's in 3' UTR or intron (phase == 0)
                 if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
                     o.update(newSeq=o.recut.seq[:-1] + "c")
@@ -831,7 +832,7 @@ class HDR_flank:
                     o.update(newSeq=o.recut.seq[:-2] + "c" + o.recut.seq[-1:])
                     self.phase5recoded = True
 
-                if o.recut.cfd>0.03:
+                if o.recut.cfd>self.cfdThres:
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
                             continue #skip PAM
@@ -840,8 +841,8 @@ class HDR_flank:
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
-                            #early stop if CFD goes below 0.03
-                            if o.recut.cfd<0.03:
+                            #early stop if CFD goes below self.cfdThres
+                            if o.recut.cfd<self.cfdThres:
                                 break
                 self.info_p5 = self.info_p5 + "".join(f"3UTR/intron  before mut:{n_mer}\n"
                                                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
@@ -850,7 +851,7 @@ class HDR_flank:
                 #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                 #       f"                 phases:{n_mer_phases}")
             #try mutate in 5UTR
-            if o.recut.cfd>0.03:
+            if o.recut.cfd>self.cfdThres:
                 self.info_phase5_5UTR=[o.recut.cfd, ""]
                 # mutate PAM if it's in 5' UTR (phase == 5)
                 if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
@@ -863,7 +864,7 @@ class HDR_flank:
                 self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
                                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                                       f"                 phases:{n_mer_phases}\n")
-                if o.recut.cfd>0.03:
+                if o.recut.cfd>self.cfdThres:
                     #mutate protospacer if in 5UTR
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
@@ -873,8 +874,8 @@ class HDR_flank:
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
-                            #early stop if CFD goes below 0.03
-                            if o.recut.cfd<0.03:
+                            #early stop if CFD goes below self.cfdThres
+                            if o.recut.cfd<self.cfdThres:
                                 break
                     self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
                                                           f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
@@ -943,15 +944,15 @@ class HDR_flank:
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            # #skip non-chimeric part of the homology arm #!!!=> we should not skip non-chimeric parts b/c the payload may contain cutsites
-            # if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
-            #     #print(f"skipping window: {n_window}")
-            #     n_window+=1
-            #     continue
-            # if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
-            #     n_window+=1
-            #     #print(f"skipping window: {n_window}")
-            #     continue
+            #skip non-chimeric part of the homology arm TODO #!!!=> we should not skip  the payload as it may contain cutsites
+            if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
+                #print(f"skipping window: {n_window}")
+                n_window+=1
+                continue
+            if n_window >= len(self.left_flk_seq) + len(self.tag) - 1:
+                n_window+=1
+                #print(f"skipping window: {n_window}")
+                continue
             #check for "N"s in the sequence
             n_mer = "".join(n_mer)
             if "N" in n_mer or "n" in n_mer:
@@ -961,7 +962,7 @@ class HDR_flank:
             n_mer_phases = phases[n_window: n_window + 23]
             o = chimeric_gRNA(gRNA_seq=self.gRNA_seq, gRNA_phases="",
                               recut_seq=n_mer, recut_cfd = cfd, recut_phases=n_mer_phases)
-            if cfd>0.03:
+            if cfd>self.cfdThres:
                 self.info_p5 = self.info_p5 + "".join(f"win+     original gRNA:{self.gRNA_seq}\n"
                                       f"         chimeric site:{o.recut.seq}\tcfd: {o.recut.cfd}\n"
                                       f"       chimeric phases:{o.recut.phases}\n")
@@ -989,7 +990,7 @@ class HDR_flank:
                 #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                 #       f"                 phases:{n_mer_phases}")
             #try mutate in 3UTR/intron
-            if o.recut.cfd>0.03:
+            if o.recut.cfd>self.cfdThres:
                 # mutate PAM if it's in 3' UTR (phase == 0)
                 if n_mer_phases[-1:] == "0": #last position phase = 0 (the second G in NGG)
                     o.update(newSeq=o.recut.seq[:-1] + "c")
@@ -997,7 +998,7 @@ class HDR_flank:
                 if n_mer_phases[-2:-1] == "0": #second position phase = 0 (the first G in NGG)
                     o.update(newSeq=o.recut.seq[:-2] + "c" + o.recut.seq[-1:])
                     self.phase5recoded = True
-                if o.recut.cfd>0.03:
+                if o.recut.cfd>self.cfdThres:
                     #mutate protospacer if in 3UTR/intron
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
@@ -1007,8 +1008,8 @@ class HDR_flank:
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
-                            #early stop if CFD goes below 0.03
-                            if o.recut.cfd<0.03:
+                            #early stop if CFD goes below self.cfdThres
+                            if o.recut.cfd<self.cfdThres:
                                 break
                 self.info_p5 = self.info_p5 + "".join(f"3UTR/intron  before mut:{n_mer}\n"
                                                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
@@ -1017,7 +1018,7 @@ class HDR_flank:
                 #       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                 #       f"                 phases:{n_mer_phases}")
             #try mutate in 5UTR
-            if o.recut.cfd>0.03:
+            if o.recut.cfd>self.cfdThres:
                 self.info_phase5_5UTR=[o.recut.cfd, ""]
                 # mutate PAM if it's in 5' UTR (phase == 5)
                 if n_mer_phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
@@ -1030,7 +1031,7 @@ class HDR_flank:
                 self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
                                                       f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
                                                       f"                 phases:{n_mer_phases}\n")
-                if o.recut.cfd>0.03:
+                if o.recut.cfd>self.cfdThres:
                     #mutate protospacer if in 5UTR
                     for idx,item in reversed(list(enumerate(n_mer_phases))):
                         if idx == (len(n_mer_phases) - 1) or idx == (len(n_mer_phases) - 2):
@@ -1040,8 +1041,8 @@ class HDR_flank:
                             base = o.recut.seq[idx]
                             mutbase = self.single_base_muation(base)
                             o.update(newSeq=o.recut.seq[:idx] + mutbase + o.recut.seq[idx+1:])
-                            #early stop if CFD goes below 0.03
-                            if o.recut.cfd<0.03:
+                            #early stop if CFD goes below self.cfdThres
+                            if o.recut.cfd<self.cfdThres:
                                 break
                     self.info_p5 = self.info_p5 + "".join(f"5UTR         before mut:{n_mer}\n"
                                                           f"              after mut:{o.recut.seq}\t cfd:{o.recut.cfd}\n"
@@ -1962,7 +1963,7 @@ class HDR:
         >>> hdr = HDR('CTCAGAAGATGATGACTGAAAGGGACTCGGGACT', 'atg', 'stop_codon', 9, True, 15)
         >>> hdr.guide_seq
         'GATGATGACTGAAAGGGACTCGG'
-        >>> hdr.target_mutation_score = 0.03
+        >>> hdr.target_mutation_score = self.cfdThres
         >>> hdr.should_mutate
         True
         >>> hdr.pam_outside_cds
