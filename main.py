@@ -73,7 +73,7 @@ if config["recoding_off"] or config["recoding_stop_recut_only"]:
 recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_stop_recut_only":config["recoding_stop_recut_only"],
                  "recoding_full":config["recoding_full"],
-                 "cfdThres":config['cfdThres']}
+                 "cfdThres":float(config['cfdThres'])}
 
 #check donor args
 if not config["Donor_type"] in ["ssDNA", "dsDNA"]:
