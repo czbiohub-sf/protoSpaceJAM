@@ -94,7 +94,8 @@ class HDR_flank:
             loc2posType,
             recoding_args,
             Donor_type,
-            Strand_choice) -> None:
+            Strand_choice,
+            syn_check_args) -> None:
 
         self.left_flk_seq = left_flk_seq
         self.right_flk_seq = right_flk_seq
@@ -115,6 +116,7 @@ class HDR_flank:
         self.synFlags=[]
         self.Donor_type=Donor_type
         self.Strand_choice=Strand_choice
+        self.enzymes2check = syn_check_args["check_enzymes"]
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -570,7 +572,6 @@ class HDR_flank:
         else:
             self.final_cfd = max(cfd,scan_highest_cfd) #this should be the highest cfd from all phases,  cfd= phase 1-4, scan_highest_cfd = phase5
 
-        
         ################
         #dsDNA donor   #
         ################
@@ -586,11 +587,18 @@ class HDR_flank:
             #check synthesis considerations#
             ################################
             #restriction cuts
-            #print(Restriction.BsaI.site)
-            BsaI_cutsites = [str(pos) for pos in Restriction.BsaI.search(Seq(self.Donor_final))] # will find cutsites on both strands
-            if len(BsaI_cutsites) > 0:
-                BsaI_cutPos = ";".join(BsaI_cutsites)
-                self.synFlags.append(f"Cut by BsaI @{BsaI_cutPos}")
+            #print(Restriction.BsaI.site) TODO: add other cut sites
+            enzyme_list = self.enzymes2check.split("|")
+            if len(enzyme_list)>=1:
+                for enzyme in enzyme_list:
+                    if hasattr(Restriction, enzyme):
+                        RE_object = getattr(Restriction, enzyme)
+                        enzyme_cutsites = [str(pos) for pos in RE_object.search(Seq(self.Donor_final))] # will find cutsites on both strands
+                        if len(enzyme_cutsites) > 0:
+                            enzyme_cutPos = ";".join(enzyme_cutsites)
+                            self.synFlags.append(f"Cut by {enzyme} @{enzyme_cutPos}")
+
+            print(self.synFlags)
 
             #GC content
             seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
@@ -776,7 +784,7 @@ class HDR_flank:
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm TODO #!!!=> we should not skip  payload
+            #skip the homology arms (while not skipping the payload)
             if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
                 #print(f"skipping window: {n_window}")
                 n_window+=1
@@ -944,7 +952,7 @@ class HDR_flank:
         #go through sliding windows #NOTE: Donor_postMut is always in the coding straind
         n_window = 0
         for n_mer in it:
-            #skip non-chimeric part of the homology arm TODO #!!!=> we should not skip  the payload as it may contain cutsites
+            #skip the homology arms (while not skipping the payload)
             if 0 <= n_window <= (len(self.left_flk_seq) - 23 - 1):
                 #print(f"skipping window: {n_window}")
                 n_window+=1

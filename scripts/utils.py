@@ -131,7 +131,7 @@ def get_range(start,end): #TODO phase should be ENST specific
     else:
         return list(range(start,end-1,-1))
 
-def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType, ssDNA_max_size, recoding_args,Donor_type,Strand_choice):
+def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType, ssDNA_max_size, recoding_args,Donor_type,Strand_choice, syn_check_args):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
         ENST_genename = ENST_info[ENST_ID].name
@@ -163,7 +163,7 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
                             type= type, ENST_ID= ENST_ID, name = ENST_genename, ENST_strand=ENST_strand, ENST_chr = Chr, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
                             tag = tag, loc2posType = loc2posType,
                             ssDNA_max_size =ssDNA_max_size,Donor_type=Donor_type,Strand_choice=Strand_choice,
-                            recoding_args = recoding_args)
+                            recoding_args = recoding_args, syn_check_args = syn_check_args)
         return myflank
         #log IDs whose gRNA is not in the default-size HDR arms
         #if myflank.entire_gRNA_in_HDR_arms == False:

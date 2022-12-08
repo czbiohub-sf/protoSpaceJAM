@@ -21,6 +21,7 @@ def parse_args():
     parser.add_argument('--Donor_type',  default="ssDNA", help='ssDNA(default) or dsDNA', type=str, metavar='')
     parser.add_argument('--Strand_choice',  default="auto", help='only applies when --Donor_type is set to ssDNA, possible values are auto,gRNAstrand,gRNAstrandRC,codingStrand,codingStrandRC', type=str, metavar='')
     parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
+    parser.add_argument('--CheckEnzymes',  default="", help='Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI', type=str, metavar='')
 
     #payload
     parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker', metavar='')
@@ -56,6 +57,9 @@ HDR_arm_len = config['HA_len']
 ssDNA_max_size = config["ssDNA_max_size"]
 spec_score_flavor = "guideMITScore"
 outdir = config['outdir']
+syn_check_args = {
+                    "check_enzymes": config["CheckEnzymes"]
+} # dictionary for multiple synthesis check arguments
 
 #check recoding args
 if (config["recoding_full"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
@@ -263,7 +267,7 @@ def main(outdir):
                     #get HDR template
                     HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType, genome_ver=config["genome_ver"],
                                                     HDR_arm_len=HDR_arm_len, tag = config["Npayload"],  ssDNA_max_size = ssDNA_max_size, Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'],
-                                                    recoding_args = recoding_args)
+                                                    recoding_args = recoding_args, syn_check_args = syn_check_args)
 
                     # append the best gRNA to the final df
                     if i==0:
@@ -340,7 +344,7 @@ def main(outdir):
                     #get HDR template
                     HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType,
                                                     HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'], ssDNA_max_size = ssDNA_max_size,
-                                                    recoding_args = recoding_args)
+                                                    recoding_args = recoding_args, syn_check_args = syn_check_args)
 
                     # append the best gRNA to the final df
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
