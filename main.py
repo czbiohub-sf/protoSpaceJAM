@@ -22,6 +22,7 @@ def parse_args():
     parser.add_argument('--Strand_choice',  default="auto", help='only applies when --Donor_type is set to ssDNA, possible values are auto,gRNAstrand,gRNAstrandRC,codingStrand,codingStrandRC', type=str, metavar='')
     parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
     parser.add_argument('--CheckEnzymes',  default="", help='Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI', type=str, metavar='')
+    parser.add_argument('--CustomSeq2Avoid',  default="", help='custom sequences to avoid, separated by |', type=str, metavar='')
 
     #payload
     parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker', metavar='')
@@ -58,7 +59,8 @@ ssDNA_max_size = config["ssDNA_max_size"]
 spec_score_flavor = "guideMITScore"
 outdir = config['outdir']
 syn_check_args = {
-                    "check_enzymes": config["CheckEnzymes"]
+                    "check_enzymes": config["CheckEnzymes"],
+                    "CustomSeq2Avoid": config["CustomSeq2Avoid"]
 } # dictionary for multiple synthesis check arguments
 
 #check recoding args
