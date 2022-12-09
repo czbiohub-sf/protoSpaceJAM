@@ -117,6 +117,7 @@ class HDR_flank:
         self.Donor_type=Donor_type
         self.Strand_choice=Strand_choice
         self.enzymes2check = syn_check_args["check_enzymes"]
+        self.CustomSeq2Avoid = syn_check_args["CustomSeq2Avoid"]
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -587,7 +588,7 @@ class HDR_flank:
             #check synthesis considerations#
             ################################
             #restriction cuts
-            #print(Restriction.BsaI.site) TODO: add other cut sites
+            #print(Restriction.BsaI.site) 
             enzyme_list = self.enzymes2check.split("|")
             if len(enzyme_list)>=1:
                 for enzyme in enzyme_list:
@@ -598,7 +599,20 @@ class HDR_flank:
                             enzyme_cutPos = ";".join(enzyme_cutsites)
                             self.synFlags.append(f"Cut by {enzyme} @{enzyme_cutPos}")
 
-            print(self.synFlags)
+            #custom sequences to avoid
+            if self.CustomSeq2Avoid!="":
+                seqs2avoid = self.CustomSeq2Avoid.split("|")
+                if len(seqs2avoid)>=1:
+                    for seq in seqs2avoid:
+                        locations = []
+                        for m in re.finditer(seq, self.Donor_final,flags=re.IGNORECASE):
+                            locations.append(str(m.start()+1))
+                        for m in re.finditer(seq, self.revcom(self.Donor_final),flags=re.IGNORECASE):
+                            start = m.start() + 1
+                            locations.append(str(len(self.Donor_final) - start + 1))
+                        if len(locations) > 0: # current seq found
+                            locs = "@".join(locations)
+                            self.synFlags.append(f"{seq}@{locs}")
 
             #GC content
             seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
