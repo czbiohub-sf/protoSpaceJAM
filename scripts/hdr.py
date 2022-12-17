@@ -588,7 +588,7 @@ class HDR_flank:
             #check synthesis considerations#
             ################################
             #restriction cuts
-            #print(Restriction.BsaI.site) 
+            #print(Restriction.BsaI.site)
             enzyme_list = self.enzymes2check.split("|")
             if len(enzyme_list)>=1:
                 for enzyme in enzyme_list:
