@@ -118,6 +118,7 @@ class HDR_flank:
         self.Strand_choice=Strand_choice
         self.enzymes2check = syn_check_args["check_enzymes"]
         self.CustomSeq2Avoid = syn_check_args["CustomSeq2Avoid"]
+        self.recode_order = recoding_args["recode_order"]
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -203,7 +204,7 @@ class HDR_flank:
         #         Arm: left_flk_seq_CodonMut right_flk_seq_CodonMut
         #         gRNA: self.post_mut_ins_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
-        #phase 2: if cfd > self.cfdThres, mutate PAM and protospacer if in 3UTR/intron
+        #phase 2: if cfd > self.cfdThres, mutate PAM and protospacer if in 3UTR/intron  (tunable order PAM <=> protospacer)
         #         Arm: left_flk_seq_CodonMut3 right_flk_seq_CodonMut2
         #         gRNA: self.post_mut2_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
@@ -211,7 +212,7 @@ class HDR_flank:
         #         Arm: left_flk_seq_CodonMut2 right_flk_seq_CodonMut3
         #         gRNA: self.post_mut3_gRNA_seq
 
-        #phase 4: if cfd > self.cfdThres, mutate protospacer and PAM if in 5UTR
+        #phase 4: if cfd > self.cfdThres, mutate protospacer and PAM if in 5UTR  (tunable order PAM <=> protospacer)
         #         Arm: left_flk_seq_CodonMut4 right_flk_seq_CodonMut4
         #         gRNA: self.post_mut4_gRNA_seq (the returned gRNA is in strand same as the PAM)
 
@@ -280,13 +281,14 @@ class HDR_flank:
             #########
             #phase 2#
             #########
+            #TODO test(implement adjustable order of mutating PAM <=> protospacer)
             if self.cdf_score_post_mut_ins > self.cfdThres: # mutate protospacer if in 3' UTR or intron #
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut2_gRNA_seq = seq
                 self.post_mut2_gRNA_seq_phases = phases
                 counter = -1
                 for idx,item in reversed(list(enumerate(phases))):
-                    if idx == (len(phases) - 1) or idx == (len(phases) - 2):
+                    if self.recode_order == "protospacer_first" and (idx == (len(phases) - 1) or idx == (len(phases) - 2)): #skip PAM if recode_order is protospacer_first
                         continue #skip PAM
                     if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
                         counter += 1
@@ -311,7 +313,7 @@ class HDR_flank:
                 latest_cfd = self.cdf_score_post_mut_ins
                 if hasattr(self,"cdf_score_post_mut2"):
                     latest_cfd = self.cdf_score_post_mut2
-                if latest_cfd > self.cfdThres:
+                if latest_cfd > self.cfdThres and self.recode_order == "protospacer_first": # mutate PAM if it was skipped earlier
                     #get PAM position types (3UTR etc)
                     PAM_coords = self.get_pam_loc()
                     PAM_pos_types = []
@@ -403,17 +405,18 @@ class HDR_flank:
             #########
             #phase 4#
             #########
-            #If CFD>self.cfdThres, mutate PAM & protospacer in 5’ UTR #TODO mutate 1 in every 3 bp ,test
+            #TODO test(implement adjustable order of mutating PAM <=> protospacer)
+            #If CFD>self.cfdThres, mutate PAM & protospacer in 5’ UTR
             left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
             if cfd >= self.cfdThres: #
-                #mutate protospacer if in  UTR
+                #mutate protospacer if in 5' UTR
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
                 self.post_mut4_gRNA_seq = seq
                 self.post_mut4_gRNA_seq_phases = phases
                 counter = -1
                 for idx,item in list(enumerate(phases)): # go through protospacer prior to PAM
-                    #if idx == (len(phases) - 1) or idx == (len(phases) - 2): #skip PAM
-                        #continue
+                    if self.recode_order == "protospacer_first" and (idx == (len(phases) - 1) or idx == (len(phases) - 2)): #skip PAM if recode_order is protospacer_first
+                        continue
                     if item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
                         counter += 1
                         if counter % 3 != 0:
@@ -425,7 +428,6 @@ class HDR_flank:
                         #early stop if CFD goes below self.cfdThres
                         if self.cdf_score_post_mut4<self.cfdThres:
                             break
-
                 #put mutated seq back to arms
                 ssODN = f"{left}{self.tag}{right}"
                 ssODN = ssODN.replace(seq,self.post_mut4_gRNA_seq)
@@ -435,6 +437,40 @@ class HDR_flank:
 
                 if hasattr(self,"cdf_score_post_mut4"):
                     self.info_phase4_5UTR=[cfd, self.cdf_score_post_mut4]
+
+                #TODO test (add mutate PAM)
+                #===================================================================
+                #mutate PAM if in 3UTR/intron,
+                latest_cfd = cfd
+                if hasattr(self,"self.cdf_score_post_mut4"):
+                    latest_cfd = self.self.cdf_score_post_mut4
+                if latest_cfd > self.cfdThres and self.recode_order == "protospacer_first": # mutate PAM only if skipped earlier
+                    #get PAM position types (3UTR etc)
+                    PAM_coords = self.get_pam_loc()
+                    PAM_pos_types = []
+                    for pos in PAM_coords:
+                        position_type = _get_position_type(chr = self.ENST_chr, ID = self.ENST_ID, pos = pos, loc2posType = self.loc2posType)
+                        PAM_pos_types = PAM_pos_types + position_type
+                    left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+                    self.post_mut4_gRNA_seq = seq
+                    self.post_mut4_gRNA_seq_phases = phases
+                    #mutate PAM if in 5 UTR/intron
+                    if (phases[-1:] == "5" or phases[-2:-1] == "5"):
+                        # mutate PAM if it's in 5 UTR (phase == 5)
+                        if phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
+                            self.post_mut4_gRNA_seq = seq[:-1] + "c"
+                        if phases[-2:-1] == "5": #second position phase = 5 (the first G in NGG)
+                            self.post_mut4_gRNA_seq = self.post_mut4_gRNA_seq[:-2] + "c" + self.post_mut4_gRNA_seq[-1:]
+                        self.cdf_score_post_mut4 = cfd_score(self.gRNA_seq, self.post_mut4_gRNA_seq)
+
+                        #put disrupted-and-mutated seq back to arms
+                        ssODN = f"{left}{self.tag}{right}"
+                        ssODN = ssODN.replace(seq,self.post_mut4_gRNA_seq)
+                        ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut4_gRNA_seq))
+                        self.left_flk_seq_CodonMut4 = ssODN[0:len(self.left_flk_seq)]
+                        self.right_flk_seq_CodonMut4 =ssODN[-len(self.left_flk_seq):]
+                #=================================================================
+
             left,right,cfd,seq,phases = self.get_uptodate_mut()
             self.postphase4ODN = left + tag + right
 

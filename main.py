@@ -36,6 +36,7 @@ def parse_args():
     parser.add_argument('--recoding_stop_recut_only', default = False, action='store_true', help='use recoding to prevent recut')
     parser.add_argument('--recoding_full',             default = False, action='store_true', help='use recoding to prevent recut + recode region between insert and cut site')
     parser.add_argument('--cfdThres',                default = 0.03, help='ProtospaceX will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.')
+    parser.add_argument('--recode_order',            default = "protospacer_first", help='possible values: protospacer_first, PAM_first')
 
     #output
     parser.add_argument('--outdir',   default="logs", type=str, help='output directory')
@@ -64,6 +65,7 @@ syn_check_args = {
 } # dictionary for multiple synthesis check arguments
 
 #check recoding args
+assert config["recode_order"] == "protospacer_first" or config["recode_order"] == "PAM_first"
 if (config["recoding_full"] and any([config["recoding_off"],config["recoding_stop_recut_only"]])):
     sys.exit(f"Found conflicts in recoding arguments: --recoding_full cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again")
 if config["recoding_off"] and config["recoding_stop_recut_only"]:
@@ -79,7 +81,8 @@ if config["recoding_off"] or config["recoding_stop_recut_only"]:
 recoding_args = {"recoding_off":config["recoding_off"],
                  "recoding_stop_recut_only":config["recoding_stop_recut_only"],
                  "recoding_full":config["recoding_full"],
-                 "cfdThres":float(config['cfdThres'])}
+                 "cfdThres":float(config['cfdThres']),
+                 "recode_order":config['recode_order']}
 
 #check donor args
 if not config["Donor_type"] in ["ssDNA", "dsDNA"]:
