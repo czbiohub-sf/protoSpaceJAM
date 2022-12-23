@@ -440,7 +440,6 @@ class HDR_flank:
             #########
             #phase 4#
             #########
-            #TODO test(implement adjustable order of mutating PAM <=> protospacer)
             #If CFD>self.cfdThres, mutate PAM & protospacer in 5’ UTR
             left, right, cfd, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
             if cfd >= self.cfdThres: #
@@ -468,7 +467,6 @@ class HDR_flank:
                         ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut4_gRNA_seq))
                         self.left_flk_seq_CodonMut4 = ssODN[0:len(self.left_flk_seq)]
                         self.right_flk_seq_CodonMut4 =ssODN[-len(self.left_flk_seq):]
-                        print(self.post_mut4_gRNA_seq)
 
                 #mutate protospacer
                 left, right, null, seq, phases = self.get_uptodate_mut() #get up-to-date gRNA seq and phases
@@ -499,7 +497,6 @@ class HDR_flank:
                     ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut4_gRNA_seq))
                     self.left_flk_seq_CodonMut4 = ssODN[0:len(self.left_flk_seq)]
                     self.right_flk_seq_CodonMut4 =ssODN[-len(self.left_flk_seq):]
-                    print(self.post_mut4_gRNA_seq)
 
                 # mutate PAM afterwards (if skipped earlier)
                 latest_cfd = cfd
@@ -524,7 +521,6 @@ class HDR_flank:
                         ssODN = ssODN.replace(self.revcom(seq),self.revcom(self.post_mut4_gRNA_seq))
                         self.left_flk_seq_CodonMut4 = ssODN[0:len(self.left_flk_seq)]
                         self.right_flk_seq_CodonMut4 =ssODN[-len(self.left_flk_seq):]
-                        print(self.post_mut4_gRNA_seq)
 
                 if hasattr(self,"cdf_score_post_mut4"):
                     self.info_phase4_5UTR=[cfd, self.cdf_score_post_mut4]
