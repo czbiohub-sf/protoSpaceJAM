@@ -1,6 +1,7 @@
 import os.path
 from scripts.utils import *
 import traceback
+import time
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -10,7 +11,7 @@ class MyParser(argparse.ArgumentParser):
 
 def parse_args():
     parser= MyParser(description='ProtospaceX')
-    parser.add_argument('--genome_ver', default="GRCh38", type=str, help='pickle file containing the ENST_info dict', metavar='')
+    parser.add_argument('--genome_ver', default="GRCh38", type=str, help='currently supports three genomes: GRCh38, GRCm39, GRCz11, ', metavar='')
     parser.add_argument('--path2csv',   default="input/mart_export_canonical_proteincoding.csv", type=str,help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
 
     #gRNA
@@ -23,6 +24,7 @@ def parse_args():
     parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
     parser.add_argument('--CheckEnzymes',  default="", help='Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI', type=str, metavar='')
     parser.add_argument('--CustomSeq2Avoid',  default="", help='custom sequences to avoid, separated by |', type=str, metavar='')
+    parser.add_argument('--MinLenPostTrim',  default=0, help='Minimum length of dsDNA donor to trim down to,  default is 0 (turning off trimming)', type=str, metavar='')
 
     #payload
     parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker', metavar='')
@@ -61,7 +63,8 @@ spec_score_flavor = "guideMITScore"
 outdir = config['outdir']
 syn_check_args = {
                     "check_enzymes": config["CheckEnzymes"],
-                    "CustomSeq2Avoid": config["CustomSeq2Avoid"]
+                    "CustomSeq2Avoid": config["CustomSeq2Avoid"],
+                    "MinLenPostTrim": config["MinLenPostTrim"]
 } # dictionary for multiple synthesis check arguments
 
 #check recoding args
@@ -118,6 +121,14 @@ if ssDNA_max_size is not None:
 #####################
 def main(outdir):
     try:
+        ##########################
+        #check memory requirement#
+        ##########################
+        enough_mem = test_memory(4200)
+        while not enough_mem: # test if at least 4.2 GB memory is available
+            time.sleep(5) #retry in 5 seconds
+            enough_mem = test_memory(4200)
+
         starttime = datetime.datetime.now()
         freq_dict = dict()
 
@@ -535,6 +546,18 @@ def get_res(best_start_gRNA):
     pos_weight = best_start_gRNA["pos_weight"].values[0]
     final_weight = best_start_gRNA["final_weight"].values[0]
     return([spec_score,seq,pam,s,e,cut2ins_dist,spec_weight,dist_weight,pos_weight,final_weight])
+
+def test_memory(n):
+    '''
+    try allocate n MB of memory
+    return true if can, and false otherwise
+    '''
+    try:
+        x = bytearray(1024*1000*n)
+        del(x)
+        return True
+    except:
+        return False
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()

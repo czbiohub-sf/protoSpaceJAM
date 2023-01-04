@@ -118,6 +118,7 @@ class HDR_flank:
         self.Strand_choice=Strand_choice
         self.enzymes2check = syn_check_args["check_enzymes"]
         self.CustomSeq2Avoid = syn_check_args["CustomSeq2Avoid"]
+        self.MinLenPostTrim = syn_check_args["MinLenPostTrim"]
         self.recode_order = recoding_args["recode_order"]
 
         assert len(left_flk_coord_lst) > 1
@@ -134,6 +135,8 @@ class HDR_flank:
 
         assert len(right_flk_phases) > 1
         self.right_flk_phases = self.join_int_list(right_flk_phases)
+
+        #TODO: check enzyme is in list
 
         if gStrand * ENST_strand >= 0:
             self.gRNA_in_coding_strand = True
@@ -677,7 +680,8 @@ class HDR_flank:
             ################################
             #check synthesis considerations#
             ################################
-            #restriction cuts
+
+            #Flag restriction cuts
             #print(Restriction.BsaI.site)
             enzyme_list = self.enzymes2check.split("|")
             if len(enzyme_list)>=1:
@@ -689,7 +693,7 @@ class HDR_flank:
                             enzyme_cutPos = ";".join(enzyme_cutsites)
                             self.synFlags.append(f"Cut by {enzyme} @{enzyme_cutPos}")
 
-            #custom sequences to avoid
+            #Flag custom sequences to avoid
             if self.CustomSeq2Avoid!="":
                 seqs2avoid = self.CustomSeq2Avoid.split("|")
                 if len(seqs2avoid)>=1:
@@ -697,14 +701,16 @@ class HDR_flank:
                         locations = []
                         for m in re.finditer(seq, self.Donor_final,flags=re.IGNORECASE):
                             locations.append(str(m.start()+1))
+                            trim_locs.append([seq,m.start()+1, m.start()+1+len(seq)])
                         for m in re.finditer(seq, self.revcom(self.Donor_final),flags=re.IGNORECASE):
                             start = m.start() + 1
                             locations.append(str(len(self.Donor_final) - start + 1))
+                            trim_locs.append([seq, len(self.Donor_final) - start + 1, len(self.Donor_final) - start + 1 - len(seq)])
                         if len(locations) > 0: # current seq found
                             locs = "@".join(locations)
                             self.synFlags.append(f"{seq}@{locs}")
 
-            #GC content
+            #Flag GC content
             seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
             global_GC = GC(seq_noAmbiguous)
             #print(global_GC)
@@ -713,7 +719,7 @@ class HDR_flank:
             if global_GC > 65:
                 self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
 
-            #GC content skew (slide windown analysis
+            #Flag GC content skew (slide windown analysis)
             win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
             #print(win_GC)
             max_diff = max(win_GC) - min(win_GC)
@@ -721,7 +727,7 @@ class HDR_flank:
             if max_diff > 52:
                 self.synFlags.append(f"Max difference of slide window GC content {max_diff:.2f}% > 52%")
 
-            #homopolyer
+            #Flag Homopolyer
             hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
             if len(hp_res)>0:
                 hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
@@ -732,6 +738,28 @@ class HDR_flank:
                 self.synFlags = "None"
             else:
                 self.synFlags = "; ".join(self.synFlags)
+
+            #Trim sequences (based on the list of seqs to avoid)
+            if self.MinLenPostTrim > 0:
+                #Add restriction site seqs to the list of seqs to avoid
+                for enzyme in enzyme_list:
+                    if hasattr(Restriction, enzyme):
+                        RE_object = getattr(Restriction, enzyme)
+                        enzyme_cut_seq = RE_object.site
+                        seqs2avoid.append(enzyme_cut_seq)
+                #TODO add homopolyers to the list of seqs to avoid
+                #get the start-end of seqs to avoid
+                locs2trim = [] # List of lists [seq, start, end]
+                for seq in seqs2avoid:
+                    for m in re.finditer(seq, self.Donor_final,flags=re.IGNORECASE):
+                        locs2trim.append([seq,m.start()+1, m.start() + 1 + len(seq) - 1])
+                    for m in re.finditer(seq, self.revcom(self.Donor_final),flags=re.IGNORECASE):
+                        start = m.start() + 1
+                        locs2trim.append([seq, len(self.Donor_final) - start + 1, len(self.Donor_final) - start + 1 - len(seq) + 1])
+                #trim the donor according to the seqs to avoid
+                self.Donor_final = self.trim(self.Donor_final, [[i[1],i[2]] for i in locs2trim], self.MinLenPostTrim)
+
+
 
         ################
         #ssDNA donor   #
@@ -803,6 +831,33 @@ class HDR_flank:
     #############
     #END OF INIT#
     #############
+    def trim(self, seq, locs, minLen):
+        '''
+        trims a sequences
+        input:
+            seq: sequence to trim
+            locs: a list of [start,end], designating coordinates that shouldn't be in the trimmed product
+            minLen: minimum length, trim will stop if seq becomes shorter than this length
+        '''
+        #inialize
+        Start=1
+        End=len(seq)
+        #compute the final start end
+        for loc in locs:
+            s = min([loc[0],loc[1]])
+            e = max([loc[0],loc[1]])
+            if s <= (len(seq)/2) and e <= (len(seq)/2): # on the left side
+                newStart = e + 1 #start after the last base in the seq to avoid
+                newLen = End - newStart + 1
+                if newLen >= minLen and newStart >= Start: #minmum length check and prevent untrimming
+                    Start = newStart #update start
+            if s >= (len(seq)/2) and e >= (len(seq)/2): # on the right side
+                newEnd = s - 1 #end before the first base in the seq to avoid
+                newLen = newEnd - Start + 1
+                if newLen >= minLen and newEnd <= Start: #minmum length check and prevent untrimming
+                    End = newEnd #update end
+        return(seq[Start-1: End])
+
     #TODO scan recoded sequence for PAM-less recut
     def slide_win_PAMLESScfd_noncoding(self,seq):
         _arm_len = int((len(seq)-len(self.tag))/2)
