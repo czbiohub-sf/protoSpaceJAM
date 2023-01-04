@@ -739,16 +739,16 @@ class HDR_flank:
             else:
                 self.synFlags = "; ".join(self.synFlags)
 
-            #Trim sequences (based on the list of seqs to avoid)
+            #Trim sequences
             if self.MinLenPostTrim > 0:
-                #Add restriction site seqs to the list of seqs to avoid
+                #Add restriction site seqs to the list of seqs-to-avoid (which already contains user-entered sequences to avoid)
                 for enzyme in enzyme_list:
                     if hasattr(Restriction, enzyme):
                         RE_object = getattr(Restriction, enzyme)
                         enzyme_cut_seq = RE_object.site
                         seqs2avoid.append(enzyme_cut_seq)
-                #TODO add homopolyers to the list of seqs to avoid
-                #get the start-end of seqs to avoid
+
+                #Search for seqs-to-avoid in the donor, and document the coordinates (1-indexing)
                 locs2trim = [] # List of lists [seq, start, end]
                 for seq in seqs2avoid:
                     for m in re.finditer(seq, self.Donor_final,flags=re.IGNORECASE):
@@ -756,7 +756,17 @@ class HDR_flank:
                     for m in re.finditer(seq, self.revcom(self.Donor_final),flags=re.IGNORECASE):
                         start = m.start() + 1
                         locs2trim.append([seq, len(self.Donor_final) - start + 1, len(self.Donor_final) - start + 1 - len(seq) + 1])
-                #trim the donor according to the seqs to avoid
+
+                #Search for homopolyers in the donor, and document the coordinates (1-indexing)
+                hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', self.Donor_final.upper())]
+                if len(hp_res)>0:
+                    for t in hp_res:
+                        Seq = t[0]
+                        Start = t[1]
+                        End = t[1] + len(t[0]) - 1
+                        locs2trim.append([Seq, Start, End])
+
+                #trim the donor according to the coordinates
                 self.Donor_final = self.trim(self.Donor_final, [[i[1],i[2]] for i in locs2trim], self.MinLenPostTrim)
 
 
@@ -836,7 +846,7 @@ class HDR_flank:
         trims a sequences
         input:
             seq: sequence to trim
-            locs: a list of [start,end], designating coordinates that shouldn't be in the trimmed product
+            locs: a list of [start,end], designating (1-indexed) coordinates that shouldn't be in the trimmed product
             minLen: minimum length, trim will stop if seq becomes shorter than this length
         '''
         #inialize

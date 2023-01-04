@@ -121,9 +121,7 @@ if ssDNA_max_size is not None:
 #####################
 def main(outdir):
     try:
-        ##########################
-        #check memory requirement#
-        ##########################
+        #check memory requirement
         enough_mem = test_memory(4200)
         while not enough_mem: # test if at least 4.2 GB memory is available
             time.sleep(5) #retry in 5 seconds
