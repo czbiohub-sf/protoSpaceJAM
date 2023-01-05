@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
     parser.add_argument('--CheckEnzymes',  default="", help='Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI', type=str, metavar='')
     parser.add_argument('--CustomSeq2Avoid',  default="", help='custom sequences to avoid, separated by |', type=str, metavar='')
-    parser.add_argument('--MinLenPostTrim',  default=0, help='Minimum length of dsDNA donor to trim down to,  default is 0 (turning off trimming)', type=str, metavar='')
+    parser.add_argument('--MinArmLenPostTrim',  default=0, help='Minimum length the homology arm after trimming,  default is 0 (turning off trimming)', type=str, metavar='')
 
     #payload
     parser.add_argument('--payload',   default="", type=str, help='payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker', metavar='')
@@ -64,7 +64,7 @@ outdir = config['outdir']
 syn_check_args = {
                     "check_enzymes": config["CheckEnzymes"],
                     "CustomSeq2Avoid": config["CustomSeq2Avoid"],
-                    "MinLenPostTrim": config["MinLenPostTrim"]
+                    "MinArmLenPostTrim": config["MinArmLenPostTrim"]
 } # dictionary for multiple synthesis check arguments
 
 #check recoding args

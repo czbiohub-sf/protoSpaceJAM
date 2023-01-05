@@ -118,7 +118,7 @@ class HDR_flank:
         self.Strand_choice=Strand_choice
         self.enzymes2check = syn_check_args["check_enzymes"]
         self.CustomSeq2Avoid = syn_check_args["CustomSeq2Avoid"]
-        self.MinLenPostTrim = syn_check_args["MinLenPostTrim"]
+        self.MinArmLenPostTrim = int(syn_check_args["MinArmLenPostTrim"])
         self.recode_order = recoding_args["recode_order"]
 
         assert len(left_flk_coord_lst) > 1
@@ -709,6 +709,8 @@ class HDR_flank:
                         if len(locations) > 0: # current seq found
                             locs = "@".join(locations)
                             self.synFlags.append(f"{seq}@{locs}")
+            else:
+                seqs2avoid=[] #initialize seq2avoid for later use (trimming)
 
             #Flag GC content
             seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
@@ -740,7 +742,7 @@ class HDR_flank:
                 self.synFlags = "; ".join(self.synFlags)
 
             #Trim sequences
-            if self.MinLenPostTrim > 0:
+            if self.MinArmLenPostTrim > 0:
                 #Add restriction site seqs to the list of seqs-to-avoid (which already contains user-entered sequences to avoid)
                 for enzyme in enzyme_list:
                     if hasattr(Restriction, enzyme):
@@ -759,15 +761,15 @@ class HDR_flank:
 
                 #Search for homopolyers in the donor, and document the coordinates (1-indexing)
                 hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', self.Donor_final.upper())]
-                if len(hp_res)>0:
+                if len(hp_res) > 0:
                     for t in hp_res:
-                        Seq = t[0]
+                        hpSeq = t[0]
                         Start = t[1]
                         End = t[1] + len(t[0]) - 1
-                        locs2trim.append([Seq, Start, End])
+                        locs2trim.append([hpSeq, Start, End])
 
                 #trim the donor according to the coordinates
-                self.Donor_final = self.trim(self.Donor_final, [[i[1],i[2]] for i in locs2trim], self.MinLenPostTrim)
+                self.Donor_final = self.trim(self.Donor_final, [[i[1],i[2]] for i in locs2trim], self.MinArmLenPostTrim)
 
 
 
@@ -841,9 +843,18 @@ class HDR_flank:
     #############
     #END OF INIT#
     #############
-    def trim(self, seq, locs, minLen):
+    def calc_HA_len(self, start, end):
         '''
-        trims a sequences
+        calculates the HA length on both sides
+        '''
+        tagstart = len(self.left_flk_seq) + 1
+        tagend= len(self.left_flk_seq) + len(self.tag) + 1
+        leftHAlen = tagstart - start
+        rightHAlen = end - tagend + 1
+        return [leftHAlen, rightHAlen]
+    def trim(self, seq, locs, minHAlen):
+        '''
+        trims a sequences and stops trimming if homology arm becomes shorter than minHAlen
         input:
             seq: sequence to trim
             locs: a list of [start,end], designating (1-indexed) coordinates that shouldn't be in the trimmed product
@@ -858,13 +869,15 @@ class HDR_flank:
             e = max([loc[0],loc[1]])
             if s <= (len(seq)/2) and e <= (len(seq)/2): # on the left side
                 newStart = e + 1 #start after the last base in the seq to avoid
-                newLen = End - newStart + 1
-                if newLen >= minLen and newStart >= Start: #minmum length check and prevent untrimming
+                leftHAlen, rightHAlen = self.calc_HA_len(newStart, End)
+                print(f"leftHAlen {leftHAlen} rightHAlen {rightHAlen}")
+                if leftHAlen >= minHAlen and rightHAlen >= minHAlen and newStart >= Start: #minmum HA length check and prevent untrimming
                     Start = newStart #update start
             if s >= (len(seq)/2) and e >= (len(seq)/2): # on the right side
                 newEnd = s - 1 #end before the first base in the seq to avoid
-                newLen = newEnd - Start + 1
-                if newLen >= minLen and newEnd <= Start: #minmum length check and prevent untrimming
+                leftHAlen, rightHAlen = self.calc_HA_len(Start, newEnd)
+                print(f"leftHAlen {leftHAlen} rightHAlen {rightHAlen}")
+                if leftHAlen >= minHAlen and rightHAlen >= minHAlen and newEnd <= Start: #minmum length check and prevent untrimming
                     End = newEnd #update end
         return(seq[Start-1: End])
 
