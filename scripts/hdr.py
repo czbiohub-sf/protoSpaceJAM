@@ -120,6 +120,7 @@ class HDR_flank:
         self.CustomSeq2Avoid = syn_check_args["CustomSeq2Avoid"]
         self.MinArmLenPostTrim = int(syn_check_args["MinArmLenPostTrim"])
         self.recode_order = recoding_args["recode_order"]
+        self.minCut2Ins_dist_ForUTRRecoding = 0
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -192,6 +193,9 @@ class HDR_flank:
         if len(self.ins2cut.seq)>0 and (len(self.ins2cut.seq)-4 != abs(self.Cut2Ins_dist)):
             sys.exit(f"ins2cut_seq:{self.ins2cut.seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
 
+        #get cfd score prior to recoding
+        self.pre_recoding_cfd_score, self.post_payload_gRNA_seq = self.get_pre_recoding_cfd_score()
+
         # log information #
         self.info = f"\n#################\n#{self.ENST_ID}#\n#################\n {self.ENST_ID}\t{self.name}\tstrand:{self.ENST_strand}\tgRNA_strand:{self.gStrand}\t{type}-tagging\tCut2Ins-dist:{self.Cut2Ins_dist}\ngRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord})\tCutPos:{self.CutPos}\tInsPos:{self.InsPos}\n"
         self.info_arm = "".join(
@@ -239,20 +243,52 @@ class HDR_flank:
                 self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
                 self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
 
-                # mutate insert-to-cut sequence
+                # mutate insert-to-cut sequence (codons only)
                 mutated_subseq = self.get_silent_mutations(self.ins2cut_LRtrimed.seq.upper()) # mutated_subseq is always in coding strand
 
-                #put_silent_mutation_subseq_back into HDR flank
+                #put mutated insert2cut region into HDR flank
                 self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
                                                                                                                mutated_subseq = mutated_subseq,                                      # mutated_subseq is in the coding strand
                                                                                                                start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|#
-            #check if gRNA is affected by insertion
+
+
+                # TODO: mutate insert-to-cut sequence (UTRs)
+                self.ins2cut_postCodontmut = self.get_ins2cut_seq(leftseq = self.left_flk_seq_CodonMut, rightseq = self.right_flk_seq_CodonMut )
+                seq = self.ins2cut_postCodontmut.seq
+                phases = self.ins2cut_postCodontmut.phases
+                start = self.ins2cut_postCodontmut.start
+                end = self.ins2cut_postCodontmut.end
+                self.postPhase1Seq = seq
+                if abs(self.Cut2Ins_dist) >= self.minCut2Ins_dist_ForUTRRecoding:
+                    #print(phases)
+                    #print([item for idx,item in (list(enumerate(phases))) if idx not in [0,1,len(phases) - 1,len(phases) - 2]])
+                    #print(f"len:{len(phases)-4} Cut2Ins_dist:{self.Cut2Ins_dist}")
+                    counter = -1
+                    for idx,item in (list(enumerate(phases))):
+                        if not idx in [0,1,len(phases) - 1,len(phases) - 2]: #skip the first 2 and last 2 positions, b/c those were extra paddings see self.get_ins2cut_seq()
+                            if item in ["0", "5"]:
+                                counter += 1
+                                if counter % 3 != 0:
+                                    continue #  mutate 1 in every 3 bp
+                                base = seq[idx]
+                                mutbase = self.single_base_muation(base)
+                                seq = seq[:idx] + mutbase + seq[idx+1:]
+                                #no need to check CFD score b/c for the cut2insert mutation
+                #TODO: update self.left_flk_seq_CodonMut and self.right_flk_seq_CodonMut
+                #put mutated insert2cut region into HDR flank
+                self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
+                                                                                                               mutated_subseq = seq,                                      # mutated_subseq is in the coding strand
+                                                                                                               start = start, end = end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|#
+
+            #get post mutation cfd score
             self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
             Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
             #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
+            self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
+
 
             ###############################################################
-            #only uncomment this part to debut the short-HDR-crash problem#
+            #only uncomment this part to debug the short-HDR-crash problem#
             ###############################################################
 
             # self.info_p1 = "".join(
@@ -279,7 +315,7 @@ class HDR_flank:
             #print(self.info_arm)
             #print(self.info_p1)
 
-            self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
+
 
             #########
             #phase 2#
@@ -579,9 +615,10 @@ class HDR_flank:
                     f"--> display gRNA and check disruption <--\n"
                     f"phase1.                      gRNA:{self.gRNA_seq}\n"
                     f"phase1.                    Phases:{self.gRNA_seq_phases}\n"
-                    f"phase1.after mutation and payload:{self.post_mut_ins_gRNA_seq}\n"
+                    f"phase1.         after payload(PL):{self.post_payload_gRNA_seq}\n"
+                    f"phase1.     after PL and mutation:{self.post_mut_ins_gRNA_seq}\n"
                     f"phase1.                    Phases:{self.post_mut_ins_gRNA_seq_phases}\n"
-                    f"phase1.                       CFD:{self.cdf_score_post_mut_ins:.4f}\n"
+                    f"phase1.      CFD(PL, PL+mutation):{self.pre_recoding_cfd_score:.4f} {self.cdf_score_post_mut_ins:.4f}\n"
                     f"--> display mutation in HDR arms <--\n"
                     f"phase1.original arms   :{self.gRNA_lc_Larm}||{self.gRNA_lc_Rarm}\n"
                     f"phase1.cut2insert mut  :{self.left_flk_seq_CodonMut}||{self.right_flk_seq_CodonMut}\n"
@@ -843,6 +880,30 @@ class HDR_flank:
     #############
     #END OF INIT#
     #############
+
+    def get_pre_recoding_cfd_score(self):
+        '''
+        payload included
+        This part uses code from codon-mutation part of phase 1, but skipping the mutation part
+        '''
+        #trim insert-to-cut into frame
+        ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
+        ins2cut_LRtrimed = self.trim_right_into_frame(ins2cut_Ltrimed)
+
+        # skip mutation
+        mutated_subseq = ins2cut_LRtrimed.seq.upper()
+
+        #put mutated insert2cut region into HDR flank
+        left_flk_seq_CodonMut, right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
+                                                                                                       mutated_subseq = mutated_subseq,                                      # mutated_subseq is in the coding strand
+                                                                                                       start = ins2cut_LRtrimed.start, end = ins2cut_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|#
+        #get post mutation cfd score
+        gRNA_seq, Null, gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
+        Null, post_payload_gRNA_seq, Null, ppost_payload_gRNA_seq_phases = self.get_post_integration_gRNA(left_flk_seq_CodonMut, right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
+
+        pre_recoding_cfd_score  = cfd_score(gRNA_seq, post_payload_gRNA_seq)
+        return pre_recoding_cfd_score, post_payload_gRNA_seq
+
     def calc_HA_len(self, start, end):
         '''
         calculates the HA length on both sides
@@ -1644,17 +1705,19 @@ class HDR_flank:
             newEnd=start - end
             return(seq,newStart,newEnd)
 
-    def get_ins2cut_seq(self):
+    def get_ins2cut_seq(self, leftseq="", rightseq=""):
         '''
         get the sequence between insertion and cut sites
         return [seq, phases, start, end] (the returned seq is always in the coding strand)
-        Note, the sequence is padded with 2bp on each side (to avoid truncating codons)
-        Note 2: returns two sets of coordinates, both with respective to the whole arm, one is adjusted that the start is always the gRNA start
+        Note: the sequence is padded with 2bp on each side (to avoid truncating codons)
         '''
         if self.InsPos == self.CutPos: #cut and insertion are at the same site
             ins2cut = seq_w_phase(seq = "", phases = "", start = self.InsPos, end = self.CutPos)
             return ins2cut
-
+        if leftseq == "":
+            leftseq = self.left_flk_seq
+        if rightseq == "":
+            rightseq = self.right_flk_seq
         #convert into 0-index
         Lstart = self.left_flk_coord_lst[0]
         Rend = self.right_flk_coord_lst[1]
@@ -1666,8 +1729,8 @@ class HDR_flank:
             newRend = Rend -Lstart
             ins2cutStart = min([self.InsPos - Lstart + 1, self.CutPos  - Lstart + 1]) # exclude the base after which the cut/insertion is made
             ins2cutEnd = max([self.InsPos - Lstart , self.CutPos - Lstart])
-            newLarm = self.left_flk_seq
-            newRarm = self.right_flk_seq
+            newLarm = leftseq
+            newRarm = rightseq
             newLarm_phases = self.left_flk_phases
             newRarm_phases = self.right_flk_phases
             whole_arm = newLarm + newRarm
@@ -1678,8 +1741,8 @@ class HDR_flank:
             ins2cutStart = min(self.InsPos - Rend, self.CutPos - Rend)
             ins2cutEnd = max(self.InsPos - Rend -1, self.CutPos - Rend -1) # exclude the base after which the cut/insertion is made
 
-            newLarm = self.left_flk_seq[::-1]
-            newRarm = self.right_flk_seq[::-1]
+            newLarm = leftseq[::-1]
+            newRarm = rightseq[::-1]
             newLarm_phases = self.left_flk_phases[::-1]
             newRarm_phases = self.right_flk_phases[::-1]
             whole_arm = newRarm + newLarm
