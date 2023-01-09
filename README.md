@@ -8,16 +8,16 @@ A standalone program to design guide RNA and repair donors for CRISPR knock-in e
 ## Key features:  
 - Fully standalone, no calling to other bioinformatics servers
 - Sophisticated guide RNA ranking system
-  - specificity weight
+  - Specificity weight
   - Penalize cuts near exon-intron junctions etc.
   - Penalize cuts far away from the payload insertion site
 - Sophisticated DNA donor design
-  - recode to prevent recut
-  - recode to facilitate payload insertion and prevent recut
-  - center the DNA donor around the region containing the payload and recoded bases. 
-  - enforce maximum length of DNA donor
-  - automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
-  - scan and trim hard-to-synthesis motifs (coming soon)
+  - Recode to prevent recut
+  - Recode to facilitate payload insertion and prevent recut
+  - Center the DNA donor around the region containing the payload and recoded bases. 
+  - Enforce maximum length of DNA donor
+  - Automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
+  - Scan and trim hard-to-synthesis motifs (coming soon)
 - Use/generate pre-computed genome-wide guide RNAs and their properties for fast runtime
 
 
