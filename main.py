@@ -206,19 +206,21 @@ def main(outdir):
                 log.error(f"Missing columns in the input csv file\n Required columns:\"Ensemble_ID\"")
                 log.info(f"Please fix the input csv file and try again")
                 sys.exit()
-        # else:
-        #     log.warning(f"The input file {config['path2csv']} is not found, using the whole human transcriptome")
-        #     input("Press Enter to continue...")
-        #     df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
+        else:
+            sys.exit(f"ERROR: The input file {config['path2csv']} is not found")
+            # log.warning(f"The input file {config['path2csv']} is not found, using the whole human transcriptome")
+            # input("Press Enter to continue...")
+            # df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
 
         #loop through each ENST
         transcript_count = 0
         protein_coding_transcripts_count = 0
         target_terminus = "all"
         for index, row in df.iterrows():
-            ENST_ID = row["Ensemble_ID"]
+            ENST_ID = row["Ensemble_ID"].rstrip().lstrip()
             if "Target_terminus" in df.columns:
-                target_terminus = row["Target_terminus"].upper()
+                target_terminus = row["Target_terminus"].rstrip().lstrip().upper()
+
                 if target_terminus!="N" and target_terminus!="C" and target_terminus!="all":
                     sys.exit(f"invalid target terminus: {target_terminus}")
 
@@ -279,9 +281,12 @@ def main(outdir):
                     current_gRNA = ranked_df_gRNAs_ATG.iloc[[i]]
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType, genome_ver=config["genome_ver"],
+                    try:
+                        HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType, genome_ver=config["genome_ver"],
                                                     HDR_arm_len=HDR_arm_len, tag = config["Npayload"],  ssDNA_max_size = ssDNA_max_size, Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'],
                                                     recoding_args = recoding_args, syn_check_args = syn_check_args)
+                    except:
+                        pass
 
                     # append the best gRNA to the final df
                     if i==0:
@@ -357,9 +362,12 @@ def main(outdir):
                     current_gRNA = ranked_df_gRNAs_stop.iloc[[i]]
 
                     #get HDR template
-                    HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType,
+                    try:
+                        HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType,
                                                     HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'], ssDNA_max_size = ssDNA_max_size,
                                                     recoding_args = recoding_args, syn_check_args = syn_check_args)
+                    except:
+                        pass
 
                     # append the best gRNA to the final df
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])

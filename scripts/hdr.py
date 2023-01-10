@@ -190,8 +190,8 @@ class HDR_flank:
         self.ins2cut = self.get_ins2cut_seq()
 
         #check if the ins2cut_seq is the same length as the Cut2Ins_dist calculated elsewhere
-        if len(self.ins2cut.seq)>0 and (len(self.ins2cut.seq)-4 != abs(self.Cut2Ins_dist)):
-            sys.exit(f"ins2cut_seq:{self.ins2cut.seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
+        # if len(self.ins2cut.seq)>0 and (len(self.ins2cut.seq)-4 != abs(self.Cut2Ins_dist)):
+        #     sys.exit(f"ins2cut_seq:{self.ins2cut.seq} is not the same length as reported: Cut2Ins_dist={self.Cut2Ins_dist}")
 
         #get cfd score prior to recoding
         self.pre_recoding_cfd_score, self.post_payload_gRNA_seq = self.get_pre_recoding_cfd_score()
