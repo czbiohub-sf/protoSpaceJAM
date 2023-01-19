@@ -861,20 +861,36 @@ class HDR_flank:
                     self.Donor_final = self.Donor_final[int(start):int(end)]
                 self.effective_HA_len = _HA_len
                 #print(f"effective_HA_len {_HA_len}")
-            ###################
-            #strand selection #
-            ###################
-            #check PAM-less cutting
-            fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(self.Donor_final) # this function modifies self.Donor_postMut
-            rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(str(Seq(self.Donor_final).reverse_complement())) # this function modifies self.Donor_postMut
-            PAMless_cfd = max([fwd_scan_highest_PAMless_cfd,rev_scan_highest_PAMless_cfd])
-            #print(f"PAMless_cfd:{PAMless_cfd}")
+            #############################################################################
+            #strand selection                                                           #
+            #Modes: "auto","gRNAstrand","gRNAstrandRC","codingStrand","codingStrandRC"  #
+            #Notes: Donor is always in the coding strand before the strand selection    #
+            #############################################################################
+            if self.Strand_choice == "auto":
+                #In auto mode, check PAM-less cutting
+                fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(self.Donor_final) # get PAMless cfd cut
+                rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(str(Seq(self.Donor_final).reverse_complement()))
+                PAMless_cfd = max([fwd_scan_highest_PAMless_cfd,rev_scan_highest_PAMless_cfd])
+                #print(f"PAMless_cfd:{PAMless_cfd}")
+                if PAMless_cfd > self.cfdThres: # PAM-independent cutting can happen, choose gRNA strand
+                    if self.ENST_strand * self.gStrand == -1:
+                        self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is not on the same strand as the ENST (coding)
+                else:   # PAM-independent cutting canNOT happen, choose Manu strand
+                    self.Donor_final = self.select_Manu_strand(self.Donor_final)
+            else:
+                if self.Strand_choice == "gRNAstrand":
+                    if self.ENST_strand * self.gStrand == -1:
+                        self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is NOT on the same strand as the ENST (coding)
+                elif self.Strand_choice == "gRNAstrandRC":
+                    if self.ENST_strand * self.gStrand == 1:
+                        self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA IS on the same strand as the ENST (coding)
+                elif self.Strand_choice == "codingStrand":
+                    pass # No change needed, the donor is already in the coding strand,
+                elif self.Strand_choice == "codingStrandRC":
+                    self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom
+                else:
+                    logging.ERROR(f"unrecognized strand choice: {self.Strand_choice}")
 
-            if PAMless_cfd > self.cfdThres: # PAM-independent cutting can happen, choose gRNA strand
-                if not self.ENST_strand * self.gStrand:
-                    self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is not on the same strand as the ENST (coding)
-            else:   # PAM-independent cutting canNOT happen, choose Manu strand
-                self.Donor_final = self.select_Manu_strand(self.Donor_final)
 
 
     #############
