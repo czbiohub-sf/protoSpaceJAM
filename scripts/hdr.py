@@ -878,15 +878,15 @@ class HDR_flank:
                 else:   # PAM-independent cutting canNOT happen, choose Manu strand
                     self.Donor_final = self.select_Manu_strand(self.Donor_final)
             else:
-                if self.Strand_choice == "gRNAstrand":
+                if self.Strand_choice == "NonTargetStrand": #gRNAstrand
                     if self.ENST_strand * self.gStrand == -1:
                         self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA is NOT on the same strand as the ENST (coding)
-                elif self.Strand_choice == "gRNAstrandRC":
+                elif self.Strand_choice == "TargetStrand": #gRNAstrandRC
                     if self.ENST_strand * self.gStrand == 1:
                         self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom if gRNA IS on the same strand as the ENST (coding)
-                elif self.Strand_choice == "codingStrand":
+                elif self.Strand_choice == "CodingStrand": #codingStrand
                     pass # No change needed, the donor is already in the coding strand,
-                elif self.Strand_choice == "codingStrandRC":
+                elif self.Strand_choice == "NonCodingStrand": #codingStrandRC
                     self.Donor_final = str(Seq(self.Donor_final).reverse_complement()) # take revcom
                 else:
                     logging.ERROR(f"unrecognized strand choice: {self.Strand_choice}")
