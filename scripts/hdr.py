@@ -430,7 +430,7 @@ class HDR_flank:
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
                     #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                     if len(seq_obj_lrtrim.seq) >= 3:
-                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
@@ -441,7 +441,7 @@ class HDR_flank:
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
                     #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
                     if len(seq_obj_lrtrim.seq) >= 3:
-                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
@@ -491,7 +491,7 @@ class HDR_flank:
                     left, right, cdf, seq, phases = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
                     self.post_mut4_gRNA_seq = seq
                     self.post_mut4_gRNA_seq_phases = phases
-                    #mutate PAM if in 5 UTR/intron
+                    #mutate PAM if in 5 UTR/intron (mutated both Gs)
                     if (phases[-1:] == "5" or phases[-2:-1] == "5"):
                         # mutate PAM if it's in 5 UTR (phase == 5)
                         if phases[-1:] == "5": #last position phase = 5 (the second G in NGG)
