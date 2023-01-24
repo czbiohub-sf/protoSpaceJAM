@@ -17,7 +17,7 @@ def parse_args():
     parser= MyParser(description='ProtospaceX')
     parser.add_argument('--genome_ver', default="GRCh38", type=str, help='currently supports three genomes: GRCh38, GRCm39, GRCz11, ', metavar='')
     parser.add_argument('--path2csv',   default="../../input/mart_export_canonical_proteincoding.csv", type=str,help='path to a csv file containing ENST information\n *required columns*: Ensemble_ID',metavar='')
-    parser.add_argument('--outdir',   default="logs", type=str, help='output directory')
+
 
     config = parser.parse_args()
     return config

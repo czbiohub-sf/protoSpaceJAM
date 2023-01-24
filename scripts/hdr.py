@@ -97,8 +97,8 @@ class HDR_flank:
             Strand_choice,
             syn_check_args) -> None:
 
-        self.left_flk_seq = left_flk_seq
-        self.right_flk_seq = right_flk_seq
+        self.left_flk_seq = left_flk_seq.upper() #turn into upper case, to keep track of newly mutated bases (small case)
+        self.right_flk_seq = right_flk_seq.upper() #turn into upper case, to keep track of newly mutated bases (small case)
         self.ENST_ID = ENST_ID
         self.ENST_strand = ENST_strand
         self.ENST_chr = ENST_chr
@@ -251,8 +251,7 @@ class HDR_flank:
                                                                                                                mutated_subseq = mutated_subseq,                                      # mutated_subseq is in the coding strand
                                                                                                                start = self.ins2cut_LRtrimed.start, end = self.ins2cut_LRtrimed.end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|#
 
-
-                # TODO: mutate insert-to-cut sequence (UTRs)
+                #mutate insert-to-cut sequence (UTRs)
                 self.ins2cut_postCodontmut = self.get_ins2cut_seq(leftseq = self.left_flk_seq_CodonMut, rightseq = self.right_flk_seq_CodonMut )
                 seq = self.ins2cut_postCodontmut.seq
                 phases = self.ins2cut_postCodontmut.phases
@@ -274,17 +273,39 @@ class HDR_flank:
                                 mutbase = self.single_base_muation(base)
                                 seq = seq[:idx] + mutbase + seq[idx+1:]
                                 #no need to check CFD score b/c for the cut2insert mutation
-                #TODO: update self.left_flk_seq_CodonMut and self.right_flk_seq_CodonMut
+                #update self.left_flk_seq_CodonMut and self.right_flk_seq_CodonMut
                 #put mutated insert2cut region into HDR flank
                 self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
                                                                                                                mutated_subseq = seq,                                      # mutated_subseq is in the coding strand
                                                                                                                start = start, end = end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|#
+                #mark mutated region in the gRNA ( to prevent re-mutating the gRNA in all following phases)
+                cut2insert_start = min([self.ins2cut_LRtrimed.start,self.ins2cut_LRtrimed.end])
+                cut2insert_end = max([self.ins2cut_LRtrimed.start,self.ins2cut_LRtrimed.end])
+                #print(f"gRNA left coord on the arm: {self.g_leftcoord}, right coord: {self.g_rightcoord }")
+                #print(f"cut2insert_start: {cut2insert_start}, cut2insert_end: {cut2insert_end }")
+                self.mutatedPosIngRNA=[] # format 0-22, protospacer: 0-19, PAM: 20-22
+                if cut2insert_start <= self.g_leftcoord and cut2insert_end >= self.g_rightcoord: # whole gRNA is mutated
+                    self.mutatedPosIngRNA = [i for i in range(0,23)]
+                elif (not self.g_leftcoord <= cut2insert_start <= self.g_rightcoord) and (not self.g_leftcoord <= cut2insert_end <= self.g_rightcoord): # whole gRNA is not mutated
+                    self.mutatedPosIngRNA = []
+                elif self.g_leftcoord <= cut2insert_start <= self.g_rightcoord and (not self.g_leftcoord <= cut2insert_end <= self.g_rightcoord):
+                    self.mutatedPosIngRNA = [cut2insert_start-self.g_leftcoord, self.g_rightcoord-self.g_leftcoord]
+                elif (not self.g_leftcoord <= cut2insert_start <= self.g_rightcoord) and (self.g_leftcoord <= cut2insert_end <= self.g_rightcoord):
+                    self.mutatedPosIngRNA = [cut2insert_end-self.g_leftcoord, self.g_rightcoord-self.g_leftcoord]
+                elif (self.g_leftcoord <= cut2insert_start <= self.g_rightcoord) and (self.g_leftcoord <= cut2insert_end <= self.g_rightcoord): # all mutated regions is in gRNA
+                    self.mutatedPosIngRNA = [cut2insert_start-self.g_leftcoord, cut2insert_end-self.g_leftcoord]
+                #print(f"mutated positions in gRNA: {self.mutatedPosIngRNA} (before strand adjustment)")
+                if self.gStrand * self.ENST_strand == -1: # adjust according to strand
+                    self.mutatedPosIngRNA = [22 - self.mutatedPosIngRNA[1], 22 - self.mutatedPosIngRNA[0]]
+                #print(f"mutated positions in gRNA: {self.mutatedPosIngRNA}")
 
             #get post mutation cfd score
             self.gRNA_seq, Null, self.gRNA_seq_phases, Null = self.get_post_integration_gRNA(self.left_flk_seq,self.right_flk_seq) #get the original gRNA
             Null, self.post_mut_ins_gRNA_seq, Null, self.post_mut_ins_gRNA_seq_phases = self.get_post_integration_gRNA(self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut) #get the post mutation and insertion gRNA
             #print(f"caculating CFD scores using: {self.gRNA_seq} {self.post_mut_ins_gRNA_seq}")
             self.cdf_score_post_mut_ins  = cfd_score(self.gRNA_seq, self.post_mut_ins_gRNA_seq)
+
+
 
 
             ###############################################################
@@ -320,7 +341,6 @@ class HDR_flank:
             #########
             #phase 2#
             #########
-            #TODO test(implement adjustable order of mutating PAM <=> protospacer)
             if self.cdf_score_post_mut_ins > self.cfdThres: # mutate protospacer if in 3' UTR or intron #
 
                 # mutate PAM if PAM first
@@ -362,9 +382,11 @@ class HDR_flank:
                 if hasattr(self,"cdf_score_post_mut2"):
                     latest_cfd = self.cdf_score_post_mut2
                 if latest_cfd > self.cfdThres:
-                    for idx,item in reversed(list(enumerate(phases))):
+                    for idx,item in reversed(list(enumerate(phases))): # enumerate from the PAM side
                         if (idx == (len(phases) - 1) or idx == (len(phases) - 2)):
                             continue #skip PAM
+                        if idx in self.mutatedPosIngRNA:
+                            continue # skip position if it is already mutated
                         if item == "0": # "0" means 3'UTR (5'UTR is labeled "5")
                             counter += 1
                             if counter % 3 != 0:
@@ -428,25 +450,36 @@ class HDR_flank:
                     seq_obj = seq_w_phase(seq = seq, phases =phases, start = 1, end = 23)
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}\n{seq_obj_lrtrim.end}")
                     if len(seq_obj_lrtrim.seq) >= 3:
-                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
-                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+                    print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
                 else:
                     seq_obj = seq_w_phase(seq = self.revcom(seq), phases = phases[::-1], start = 1, end = 23)
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
+                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}\n{seq_obj_lrtrim.end}")
                     if len(seq_obj_lrtrim.seq) >= 3:
-                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq.upper())
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
                     untrimmed = self.revcom(untrimmed)
-                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}")
+                    print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
+
+                #check for useless PAM mutations (only N in NGG is mutated without surrounding mutations)
+                last5=untrimmed[-5:]
+                last5vanilla=self.gRNA_seq[-5:]
+                last5phases = seq_obj.phases[-5:]
+                #print(f"{last5vanilla}\n{last5}\n{last5phases}\n")
+                #print([last5[i].upper() == last5vanilla[i].upper() for i in range(0,5)])
+                if [last5[i].upper() == last5vanilla[i].upper() for i in range(0,5)] == [True, True, False, True, True]:
+                    #print("FOUND useless PAM mutations")
+                    untrimmed = untrimmed[:-5] + last5vanilla # replace last 5 bp with vanilla
+                    #print(untrimmed)
 
                 # # get the sequence between PAM and cut site
                 # self.trunc_gRNA, null, null = self.get_trunc_gRNA(left, right)
@@ -516,9 +549,11 @@ class HDR_flank:
                     latest_cfd = self.cdf_score_post_mut4
                 counter = -1
                 if latest_cfd>self.cfdThres:
-                    for idx,item in list(enumerate(phases)): # go through protospacer prior to PAM
+                    for idx,item in reversed(list(enumerate(phases))): # go through protospacer prior to PAM
                         if (idx == (len(phases) - 1) or idx == (len(phases) - 2)): #skip PAM (in this protospacer block of code)
                             continue
+                        if idx in self.mutatedPosIngRNA:
+                            continue # skip position if it is already mutated
                         if item == "5": # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
                             counter += 1
                             if counter % 3 != 0:
@@ -1765,7 +1800,7 @@ class HDR_flank:
             whole_arm_phases = newRarm_phases + newLarm_phases
 
         #get the ins2cut_seq
-        ins2cut_seq = whole_arm[ins2cutStart-2:ins2cutStart].lower() + whole_arm[ins2cutStart:ins2cutEnd+1] + whole_arm[ins2cutEnd+1:ins2cutEnd+3].lower() #pad 2bp on each side
+        ins2cut_seq = whole_arm[ins2cutStart-2:ins2cutStart] + whole_arm[ins2cutStart:ins2cutEnd+1] + whole_arm[ins2cutEnd+1:ins2cutEnd+3] #pad 2bp on each side
         ins2cut_phases = whole_arm_phases[ins2cutStart-2:ins2cutStart] + whole_arm_phases[ins2cutStart:ins2cutEnd+1] + whole_arm_phases[ins2cutEnd+1:ins2cutEnd+3] #pad 2bp on each side
 
         if Lstart>Rend:
