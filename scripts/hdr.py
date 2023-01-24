@@ -196,6 +196,22 @@ class HDR_flank:
         #get cfd score prior to recoding
         self.pre_recoding_cfd_score, self.post_payload_gRNA_seq = self.get_pre_recoding_cfd_score()
 
+        #get distance between cutsite and nearest junction offlimit bases
+        self.cutPos2nearestOffLimitJunc = ">100"
+        for i in range(-100,0):
+            flag = check_within_3bp_exon_intron_junction(self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType)
+            if flag: #update cutPos2nearestOffLimitJunc
+                if self.cutPos2nearestOffLimitJunc == ">100":
+                    self.cutPos2nearestOffLimitJunc = -i
+                elif abs(self.cutPos2nearestOffLimitJunc) >= abs(i):
+                    self.cutPos2nearestOffLimitJunc = -i
+        for i in range(0,101):
+            flag = check_within_3bp_exon_intron_junction(self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType)
+            if flag: #update cutPos2nearestOffLimitJunc
+                if self.cutPos2nearestOffLimitJunc == ">100":
+                    self.cutPos2nearestOffLimitJunc = -i
+                elif abs(self.cutPos2nearestOffLimitJunc) >= abs(i):
+                    self.cutPos2nearestOffLimitJunc = -i
         # log information #
         self.info = f"\n#################\n#{self.ENST_ID}#\n#################\n {self.ENST_ID}\t{self.name}\tstrand:{self.ENST_strand}\tgRNA_strand:{self.gStrand}\t{type}-tagging\tCut2Ins-dist:{self.Cut2Ins_dist}\ngRNA:{self.gStart}-{self.gPAM_end} ({self.g_leftcoord}-{self.g_rightcoord})\tCutPos:{self.CutPos}\tInsPos:{self.InsPos}\n"
         self.info_arm = "".join(
@@ -235,6 +251,7 @@ class HDR_flank:
         if not self.recoding_args["recoding_off"]:
             self.left_flk_seq_CodonMut = self.left_flk_seq #initialize for later use ( the definition may be skipped in phase 1)
             self.right_flk_seq_CodonMut = self.right_flk_seq #initialize for later use ( the definition may be skipped in phase 1)
+            self.mutatedPosIngRNA=[] # format 0-22, protospacer: 0-19, PAM: 20-22
             if not self.recoding_args["recoding_stop_recut_only"]:
                 #########
                 #Phase 1#
@@ -278,12 +295,13 @@ class HDR_flank:
                 self.left_flk_seq_CodonMut, self.right_flk_seq_CodonMut = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq, R_arm=self.right_flk_seq,
                                                                                                                mutated_subseq = seq,                                      # mutated_subseq is in the coding strand
                                                                                                                start = start, end = end) #|-> start, end are local to the whole arm = L_arm + R_arm <-|#
+
                 #mark mutated region in the gRNA ( to prevent re-mutating the gRNA in all following phases)
                 cut2insert_start = min([self.ins2cut_LRtrimed.start,self.ins2cut_LRtrimed.end])
                 cut2insert_end = max([self.ins2cut_LRtrimed.start,self.ins2cut_LRtrimed.end])
                 #print(f"gRNA left coord on the arm: {self.g_leftcoord}, right coord: {self.g_rightcoord }")
                 #print(f"cut2insert_start: {cut2insert_start}, cut2insert_end: {cut2insert_end }")
-                self.mutatedPosIngRNA=[] # format 0-22, protospacer: 0-19, PAM: 20-22
+
                 if cut2insert_start <= self.g_leftcoord and cut2insert_end >= self.g_rightcoord: # whole gRNA is mutated
                     self.mutatedPosIngRNA = [i for i in range(0,23)]
                 elif (not self.g_leftcoord <= cut2insert_start <= self.g_rightcoord) and (not self.g_leftcoord <= cut2insert_end <= self.g_rightcoord): # whole gRNA is not mutated
@@ -295,7 +313,7 @@ class HDR_flank:
                 elif (self.g_leftcoord <= cut2insert_start <= self.g_rightcoord) and (self.g_leftcoord <= cut2insert_end <= self.g_rightcoord): # all mutated regions is in gRNA
                     self.mutatedPosIngRNA = [cut2insert_start-self.g_leftcoord, cut2insert_end-self.g_leftcoord]
                 #print(f"mutated positions in gRNA: {self.mutatedPosIngRNA} (before strand adjustment)")
-                if self.gStrand * self.ENST_strand == -1: # adjust according to strand
+                if self.gStrand * self.ENST_strand == -1 and len(self.mutatedPosIngRNA)==2: # adjust according to strand
                     self.mutatedPosIngRNA = [22 - self.mutatedPosIngRNA[1], 22 - self.mutatedPosIngRNA[0]]
                 #print(f"mutated positions in gRNA: {self.mutatedPosIngRNA}")
 
@@ -335,8 +353,6 @@ class HDR_flank:
             #print(self.info)
             #print(self.info_arm)
             #print(self.info_p1)
-
-
 
             #########
             #phase 2#
@@ -456,7 +472,7 @@ class HDR_flank:
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
-                    print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
+                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
                 else:
                     seq_obj = seq_w_phase(seq = self.revcom(seq), phases = phases[::-1], start = 1, end = 23)
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
@@ -468,7 +484,7 @@ class HDR_flank:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(seq_obj_lrtrim.seq, mutated) # untrim: replace trimmed part with the mutated part
                     untrimmed = self.revcom(untrimmed)
-                    print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
+                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
 
                 #check for useless PAM mutations (only N in NGG is mutated without surrounding mutations)
                 last5=untrimmed[-5:]
