@@ -151,11 +151,13 @@ class HDR_flank:
         #for positions within 3bp to exon/intron junctions, change phase from "0" to "9", for cds, change from "1/2/3" to "8"
         #for position in 5UTR, change phase from "0" to "5"
         coord1, coord2 = self.left_flk_coord_lst[0], self.left_flk_coord_lst[1]
-        self.left_flk_phases_masked = self.mask_phase_within_3bp_exon_intron_junction(coord1, coord2, self.left_flk_phases)
-        self.left_flk_phases_masked = self.mask_phase_in_5UTR(coord1, coord2, self.left_flk_phases_masked)
+        self.left_flk_phases_masked = self.mask_phase_in_5UTR(coord1, coord2, self.left_flk_phases)
+        self.left_flk_phases_masked = self.mask_phase_near_EI_IE_junction(coord1, coord2, self.left_flk_phases_masked) # this will overwrite 5UTR masks
+
         coord1, coord2 = self.right_flk_coord_lst[0], self.right_flk_coord_lst[1]
-        self.right_flk_phases_masked = self.mask_phase_within_3bp_exon_intron_junction(coord1, coord2, self.right_flk_phases)
-        self.right_flk_phases_masked = self.mask_phase_in_5UTR(coord1, coord2, self.right_flk_phases_masked)
+        self.right_flk_phases_masked = self.mask_phase_in_5UTR(coord1, coord2, self.right_flk_phases)
+        self.right_flk_phases_masked = self.mask_phase_near_EI_IE_junction(coord1, coord2, self.right_flk_phases_masked) # this will overwrite 5UTR masks
+
 
 
         # adjust insPos, for stop-tagging ,the insertion site is now before the first base of the stop codon
@@ -199,14 +201,14 @@ class HDR_flank:
         #get distance between cutsite and nearest junction offlimit bases
         self.cutPos2nearestOffLimitJunc = ">100"
         for i in range(-100,0):
-            flag = check_within_3bp_exon_intron_junction(self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType)
+            flag = check_near_EI_IE_junction(self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType)
             if flag: #update cutPos2nearestOffLimitJunc
                 if self.cutPos2nearestOffLimitJunc == ">100":
                     self.cutPos2nearestOffLimitJunc = -i
                 elif abs(self.cutPos2nearestOffLimitJunc) >= abs(i):
                     self.cutPos2nearestOffLimitJunc = -i
         for i in range(0,101):
-            flag = check_within_3bp_exon_intron_junction(self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType)
+            flag = check_near_EI_IE_junction(self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType)
             if flag: #update cutPos2nearestOffLimitJunc
                 if self.cutPos2nearestOffLimitJunc == ">100":
                     self.cutPos2nearestOffLimitJunc = -i
@@ -1453,7 +1455,7 @@ class HDR_flank:
                 idx+=1
         return "".join(tmp_lst)
 
-    def mask_phase_within_3bp_exon_intron_junction(self, coord1, coord2, phases):
+    def mask_phase_near_EI_IE_junction(self, coord1, coord2, phases):
         """
         example input:
         phases = 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000123
@@ -1466,7 +1468,7 @@ class HDR_flank:
         tmp_lst = list(phases)
         if coord1<coord2:
             for c in range(coord1,coord2+1):
-                flag1 = check_within_3bp_exon_intron_junction(chr = self.ENST_chr, ID = self.ENST_ID, pos = c, loc2posType = self.loc2posType)
+                flag1 = check_near_EI_IE_junction(chr = self.ENST_chr, ID = self.ENST_ID, pos = c, loc2posType = self.loc2posType)
                 flag2 = check_cds(chr = self.ENST_chr, ID = self.ENST_ID, pos = c, loc2posType = self.loc2posType)
                 if flag2 and flag1:
                     tmp_lst[idx] = "8"
@@ -1475,7 +1477,7 @@ class HDR_flank:
                 idx+=1
         else:
             for c in reversed(range(coord2,coord1+1)):
-                flag1 = check_within_3bp_exon_intron_junction(chr = self.ENST_chr, ID = self.ENST_ID, pos = c, loc2posType = self.loc2posType)
+                flag1 = check_near_EI_IE_junction(chr = self.ENST_chr, ID = self.ENST_ID, pos = c, loc2posType = self.loc2posType)
                 flag2 = check_cds(chr = self.ENST_chr, ID = self.ENST_ID, pos = c, loc2posType = self.loc2posType)
                 if flag2 and flag1:
                     tmp_lst[idx] = "8" # idx+1 is caused by reversing (range(coord2,coord1))
@@ -1902,19 +1904,19 @@ class HDR_flank:
         return([cutPos,gPAM_end])
 
 
-def check_within_3bp_exon_intron_junction(chr, ID, pos, loc2posType):
+def check_near_EI_IE_junction(chr, ID, pos, loc2posType):
     """
     return True if the position is within_3bp_of_intron_exon_junction or within_3bp_of_exon_intron_junction
     """
     pos_types = _get_position_type(chr, ID, pos, loc2posType)
-    if 'within_3bp_of_intron_exon_junction' in set(pos_types) or 'within_3bp_of_exon_intron_junction' in set(pos_types):
+    if '-3_to_+2bp_of_intron_exon_junction' in set(pos_types) or '-3_to_+6bp_of_exon_intron_junction' in set(pos_types):
         return True
     else:
         return False
 
 def check_5UTR(chr, ID, pos, loc2posType):
     """
-    return True if the position is within_3bp_of_intron_exon_junction or within_3bp_of_exon_intron_junction
+    return True if the position is UTR
     """
     pos_types = _get_position_type(chr, ID, pos, loc2posType)
     if '5UTR' in set(pos_types):

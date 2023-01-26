@@ -366,8 +366,11 @@ def main(outdir):
                         HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType,
                                                     HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'], ssDNA_max_size = ssDNA_max_size,
                                                     recoding_args = recoding_args, syn_check_args = syn_check_args)
-                    except:
-                        pass
+                    except Exception as e:
+                        print("Unexpected error:", str(sys.exc_info()))
+                        traceback.print_exc()
+                        print("additional information:", e)
+                        PrintException()
 
                     # append the best gRNA to the final df
                     best_stop_gRNAs = pd.concat([best_stop_gRNAs, current_gRNA])
