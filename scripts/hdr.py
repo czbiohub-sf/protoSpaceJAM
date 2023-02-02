@@ -771,65 +771,15 @@ class HDR_flank:
             #check synthesis considerations#
             ################################
 
-            #Flag restriction cuts
+            #Process restriction cuts
             #print(Restriction.BsaI.site)
             enzyme_list = self.enzymes2check.split("|")
-            if len(enzyme_list)>=1:
-                for enzyme in enzyme_list:
-                    if hasattr(Restriction, enzyme):
-                        RE_object = getattr(Restriction, enzyme)
-                        enzyme_cutsites = [str(pos) for pos in RE_object.search(Seq(self.Donor_final))] # will find cutsites on both strands
-                        if len(enzyme_cutsites) > 0:
-                            enzyme_cutPos = ";".join(enzyme_cutsites)
-                            self.synFlags.append(f"Cut by {enzyme} @{enzyme_cutPos}")
 
-            #Flag custom sequences to avoid
+            #Process custom sequences to avoid
             if self.CustomSeq2Avoid!="":
                 seqs2avoid = self.CustomSeq2Avoid.split("|")
-                if len(seqs2avoid)>=1:
-                    for seq in seqs2avoid:
-                        locations = []
-                        for m in re.finditer(seq, self.Donor_final,flags=re.IGNORECASE):
-                            locations.append(str(m.start()+1))
-                            trim_locs.append([seq,m.start()+1, m.start()+1+len(seq)])
-                        for m in re.finditer(seq, self.revcom(self.Donor_final),flags=re.IGNORECASE):
-                            start = m.start() + 1
-                            locations.append(str(len(self.Donor_final) - start + 1))
-                            trim_locs.append([seq, len(self.Donor_final) - start + 1, len(self.Donor_final) - start + 1 - len(seq)])
-                        if len(locations) > 0: # current seq found
-                            locs = "@".join(locations)
-                            self.synFlags.append(f"{seq}@{locs}")
             else:
                 seqs2avoid=[] #initialize seq2avoid for later use (trimming)
-
-            #Flag GC content
-            seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
-            global_GC = GC(seq_noAmbiguous)
-            #print(global_GC)
-            if global_GC < 25:
-                self.synFlags.append(f"global GC content {global_GC:.2f}% < 25%")
-            if global_GC > 65:
-                self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
-
-            #Flag GC content skew (slide windown analysis)
-            win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
-            #print(win_GC)
-            max_diff = max(win_GC) - min(win_GC)
-            #print(max_diff)
-            if max_diff > 52:
-                self.synFlags.append(f"Max difference of slide window GC content {max_diff:.2f}% > 52%")
-
-            #Flag Homopolyer
-            hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
-            if len(hp_res)>0:
-                hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
-                hp_res_display = "".join(hp_res_display)
-                self.synFlags.append(f"Homopolymer > 10bp (sequence@start): {hp_res_display}")
-
-            if len(self.synFlags) == 0:
-                self.synFlags = "None"
-            else:
-                self.synFlags = "; ".join(self.synFlags)
 
             #Trim sequences
             if self.MinArmLenPostTrim > 0:
@@ -861,8 +811,67 @@ class HDR_flank:
                 #trim the donor according to the coordinates
                 self.Donor_final = self.trim(self.Donor_final, [[i[1],i[2]] for i in locs2trim], self.MinArmLenPostTrim)
 
+            #collect remaining flags
 
+            #Flag restriction cuts
+            #print(Restriction.BsaI.site)
+            if len(enzyme_list)>=1:
+                for enzyme in enzyme_list:
+                    if hasattr(Restriction, enzyme):
+                        RE_object = getattr(Restriction, enzyme)
+                        enzyme_cutsites = [str(pos) for pos in RE_object.search(Seq(self.Donor_final))] # will find cutsites on both strands
+                        if len(enzyme_cutsites) > 0:
+                            enzyme_cutPos = ";".join(enzyme_cutsites)
+                            self.synFlags.append(f"Cut by {enzyme} @{enzyme_cutPos}")
 
+            #Flag custom sequences to avoid
+            if self.CustomSeq2Avoid!="": #reset seqs to avoid
+                seqs2avoid = self.CustomSeq2Avoid.split("|")
+            else:
+                seqs2avoid=[] #initialize seq2avoid for later use (trimming)
+            if len(seqs2avoid)>=1:
+                for seq in seqs2avoid:
+                    locations = []
+                    for m in re.finditer(seq, self.Donor_final,flags=re.IGNORECASE):
+                        locations.append(str(m.start()+1))
+                    for m in re.finditer(seq, self.revcom(self.Donor_final),flags=re.IGNORECASE):
+                        start = m.start() + 1
+                        locations.append(str(len(self.Donor_final) - start + 1))
+                    if len(locations) > 0: # current seq found
+                        locs = "@".join(locations)
+                        self.synFlags.append(f"{seq}@{locs}")
+
+            #Flag remaining problems
+            seq_noAmbiguous = re.sub(r'[^ATCGatcg]', '', self.Donor_final)
+            #Flag Homopolyer
+            hp_res = [(m.group(), m.start()+1) for m in re.finditer(r'([ACGT])\1{9,}', seq_noAmbiguous.upper())]
+            if len(hp_res)>0:
+                hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
+                hp_res_display = "".join(hp_res_display)
+                self.synFlags.append(f"Homopolymer > 10bp (sequence@start): {hp_res_display}")
+
+            #Flag GC content
+            global_GC = GC(seq_noAmbiguous)
+            #print(global_GC)
+            if global_GC < 25:
+                self.synFlags.append(f"global GC content {global_GC:.2f}% < 25%")
+            if global_GC > 65:
+                self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
+
+            #Flag GC content skew (slide windown analysis)
+            win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
+            #print(win_GC)
+            max_diff = max(win_GC) - min(win_GC)
+            #print(max_diff)
+            if max_diff > 52:
+                self.synFlags.append(f"Max difference of slide window GC content {max_diff:.2f}% > 52%")
+
+            if len(self.synFlags) == 0:
+                self.synFlags = "None"
+            else:
+                self.synFlags = "; ".join(self.synFlags)
+
+        print(f"length of Donor: {len(self.Donor_final)}")
         ################
         #ssDNA donor   #
         ################
@@ -1000,14 +1009,14 @@ class HDR_flank:
             if s <= (len(seq)/2) and e <= (len(seq)/2): # on the left side
                 newStart = e + 1 #start after the last base in the seq to avoid
                 leftHAlen, rightHAlen = self.calc_HA_len(newStart, End)
-                print(f"leftHAlen {leftHAlen} rightHAlen {rightHAlen}")
+                print(f"leftHAlen {leftHAlen} rightHAlen {rightHAlen} newStart {newStart} Start {Start} End {End}")
                 if leftHAlen >= minHAlen and rightHAlen >= minHAlen and newStart >= Start: #minmum HA length check and prevent untrimming
                     Start = newStart #update start
             if s >= (len(seq)/2) and e >= (len(seq)/2): # on the right side
                 newEnd = s - 1 #end before the first base in the seq to avoid
                 leftHAlen, rightHAlen = self.calc_HA_len(Start, newEnd)
-                print(f"leftHAlen {leftHAlen} rightHAlen {rightHAlen}")
-                if leftHAlen >= minHAlen and rightHAlen >= minHAlen and newEnd <= Start: #minmum length check and prevent untrimming
+                print(f"leftHAlen {leftHAlen} rightHAlen {rightHAlen} newEnd {newEnd} Start {Start} End {End}")
+                if leftHAlen >= minHAlen and rightHAlen >= minHAlen and newEnd <= End: #minmum length check and prevent untrimming
                     End = newEnd #update end
         return(seq[Start-1: End])
 
