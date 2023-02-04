@@ -38,7 +38,7 @@ def parse_args():
     parser.add_argument('--recoding_stop_recut_only', default = False, action='store_true', help='use recoding to prevent recut')
     parser.add_argument('--recoding_full',            default = False, action='store_true', help='use recoding to prevent recut + recode region between insert and cut site')
     parser.add_argument('--cfdThres',                 default = 0.03, help='ProtospaceX will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.')
-    parser.add_argument('--recode_order',             default = "protospacer_first", help='possible values: protospacer_first, PAM_first')
+    parser.add_argument('--recode_order',             default = "PAM_first", help='possible values: protospacer_first, PAM_first')
 
     #output
     parser.add_argument('--outdir',   default="logs", type=str, help='output directory')
@@ -285,8 +285,11 @@ def main(outdir):
                         HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType, genome_ver=config["genome_ver"],
                                                     HDR_arm_len=HDR_arm_len, tag = config["Npayload"],  ssDNA_max_size = ssDNA_max_size, Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'],
                                                     recoding_args = recoding_args, syn_check_args = syn_check_args)
-                    except:
-                        pass
+                    except Exception as e:
+                        print("Unexpected error:", str(sys.exc_info()))
+                        traceback.print_exc()
+                        print("additional information:", e)
+                        PrintException()
 
                     # append the best gRNA to the final df
                     if i==0:
