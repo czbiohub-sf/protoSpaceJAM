@@ -298,25 +298,25 @@ def main(outdir):
                     #append cfd score to list for plotting
                     pre_recoding_cfd_score = HDR_template.pre_recoding_cfd_score
                     cfd1 = ""
-                    if hasattr(HDR_template,"cdf_score_post_mut_ins"):
-                        cfd1 = HDR_template.cdf_score_post_mut_ins
-                    if not hasattr(HDR_template,"cdf_score_post_mut2"):
+                    if hasattr(HDR_template,"cfd_score_post_mut_ins"):
+                        cfd1 = HDR_template.cfd_score_post_mut_ins
+                    if not hasattr(HDR_template,"cfd_score_post_mut2"):
                         cfd2 = cfd1
                     else:
-                        cfd2 = HDR_template.cdf_score_post_mut2
-                    if not hasattr(HDR_template,"cdf_score_post_mut3"):
+                        cfd2 = HDR_template.cfd_score_post_mut2
+                    if not hasattr(HDR_template,"cfd_score_post_mut3"):
                         cfd3 = cfd2
                     else:
-                        cfd3 = HDR_template.cdf_score_post_mut3
-                    if not hasattr(HDR_template,"cdf_score_post_mut4"):
+                        cfd3 = HDR_template.cfd_score_post_mut3
+                    if not hasattr(HDR_template,"cfd_score_post_mut4"):
                         cfd4 = cfd3
                     else:
-                        cfd4 = HDR_template.cdf_score_post_mut4
+                        cfd4 = HDR_template.cfd_score_post_mut4
                     start_info.cfd4.append(cfd4)
                     cfd_scan = 0
                     cfd_scan_no_recode = 0
-                    if hasattr(HDR_template,"cdf_score_highest_in_win_scan"):
-                        cfd_scan = HDR_template.cdf_score_highest_in_win_scan
+                    if hasattr(HDR_template,"cfd_score_highest_in_win_scan"):
+                        cfd_scan = HDR_template.cfd_score_highest_in_win_scan
                         cfd_scan_no_recode = HDR_template.scan_highest_cfd_no_recode
 
                     cfdfinal = HDR_template.final_cfd
@@ -338,7 +338,7 @@ def main(outdir):
                         csvout_res2.write(config["genome_ver"] + f",{HDR_template.ENST_chr},{insert_pos}\n")
 
                     #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
                     recut_CFD_all.write(this_log)
                     if HDR_template.final_cfd > 0.03:
                         recut_CFD_fail.write(this_log)
@@ -381,25 +381,25 @@ def main(outdir):
                     #append cfd score to list for plotting
                     pre_recoding_cfd_score = HDR_template.pre_recoding_cfd_score
                     cfd1 = ""
-                    if hasattr(HDR_template,"cdf_score_post_mut_ins"):
-                        cfd1 = HDR_template.cdf_score_post_mut_ins
-                    if not hasattr(HDR_template,"cdf_score_post_mut2"):
+                    if hasattr(HDR_template,"cfd_score_post_mut_ins"):
+                        cfd1 = HDR_template.cfd_score_post_mut_ins
+                    if not hasattr(HDR_template,"cfd_score_post_mut2"):
                         cfd2 = cfd1
                     else:
-                        cfd2 = HDR_template.cdf_score_post_mut2
-                    if not hasattr(HDR_template,"cdf_score_post_mut3"):
+                        cfd2 = HDR_template.cfd_score_post_mut2
+                    if not hasattr(HDR_template,"cfd_score_post_mut3"):
                         cfd3 = cfd2
                     else:
-                        cfd3 = HDR_template.cdf_score_post_mut3
-                    if not hasattr(HDR_template,"cdf_score_post_mut4"):
+                        cfd3 = HDR_template.cfd_score_post_mut3
+                    if not hasattr(HDR_template,"cfd_score_post_mut4"):
                         cfd4 = cfd3
                     else:
-                        cfd4 = HDR_template.cdf_score_post_mut4
+                        cfd4 = HDR_template.cfd_score_post_mut4
 
                     cfd_scan = 0
                     cfd_scan_no_recode = 0
-                    if hasattr(HDR_template,"cdf_score_highest_in_win_scan"):
-                        cfd_scan = HDR_template.cdf_score_highest_in_win_scan
+                    if hasattr(HDR_template,"cfd_score_highest_in_win_scan"):
+                        cfd_scan = HDR_template.cfd_score_highest_in_win_scan
                         cfd_scan_no_recode = HDR_template.scan_highest_cfd_no_recode
 
                     cfdfinal = HDR_template.final_cfd
@@ -422,7 +422,7 @@ def main(outdir):
                         #print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor},{HDR_template.effective_HA_len}\n")
 
                     #write log
-                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
+                    this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
                     recut_CFD_all.write(this_log)
                     if HDR_template.final_cfd > 0.03:
                         recut_CFD_fail.write(this_log)
