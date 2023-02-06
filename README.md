@@ -1,4 +1,3 @@
-![license-MIT-green](https://user-images.githubusercontent.com/4129442/198694171-751acee4-7dcb-4fb4-aa73-83d0d571d658.svg)
 ![Webserver dependencies-0-brightgreen](https://user-images.githubusercontent.com/4129442/198696112-92ecc372-f3b5-4498-8cd9-4a01de0f851b.svg)
 ![status-active development-blueviolet](https://user-images.githubusercontent.com/4129442/198695999-a70bcd5f-c52e-4895-a1e7-d6b0da132812.svg)
 
