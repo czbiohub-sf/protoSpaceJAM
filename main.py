@@ -20,7 +20,7 @@ def parse_args():
     #donor
     parser.add_argument('--HA_len',  default=500, help='length of the homology arm (on each side), will be the final arm length for dsDNA donors', type=int, metavar='')
     parser.add_argument('--Donor_type',  default="ssDNA", help='ssDNA(default) or dsDNA', type=str, metavar='')
-    parser.add_argument('--Strand_choice',  default="auto", help='only applies when --Donor_type is set to ssDNA, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand', type=str, metavar='')
+    parser.add_argument('--Strand_choice',  default="NonTargetStrand", help='only applies when --Donor_type is set to ssDNA, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand', type=str, metavar='')
     parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
     parser.add_argument('--CheckEnzymes',  default="", help='Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI', type=str, metavar='')
     parser.add_argument('--CustomSeq2Avoid',  default="", help='custom sequences to avoid, separated by |', type=str, metavar='')
