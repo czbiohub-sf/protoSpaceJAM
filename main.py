@@ -19,9 +19,9 @@ def parse_args():
 
     #donor
     parser.add_argument('--HA_len',  default=500, help='length of the homology arm (on each side), will be the final arm length for dsDNA donors', type=int, metavar='')
-    parser.add_argument('--Donor_type',  default="ssDNA", help='ssDNA(default) or dsDNA', type=str, metavar='')
-    parser.add_argument('--Strand_choice',  default="NonTargetStrand", help='only applies when --Donor_type is set to ssDNA, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand', type=str, metavar='')
-    parser.add_argument('--ssDNA_max_size', type=int, help='only applies when --Donor_type is set to ssDNA. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
+    parser.add_argument('--Donor_type',  default="ssODN", help='ssODN(default) or dsDNA', type=str, metavar='')
+    parser.add_argument('--Strand_choice',  default="NonTargetStrand", help='only applies when --Donor_type is set to ssODN, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand', type=str, metavar='')
+    parser.add_argument('--ssODN_max_size', type=int, help='only applies when --Donor_type is set to ssODN. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region', metavar='')
     parser.add_argument('--CheckEnzymes',  default="", help='Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI', type=str, metavar='')
     parser.add_argument('--CustomSeq2Avoid',  default="", help='custom sequences to avoid, separated by |', type=str, metavar='')
     parser.add_argument('--MinArmLenPostTrim',  default=0, help='Minimum length the homology arm after trimming,  default is 0 (turning off trimming)', type=str, metavar='')
@@ -58,7 +58,7 @@ config = vars(parse_args())
 gRNA_num_out = config['num_gRNA_per_term']
 max_cut2ins_dist = 50 #deprecated?
 HDR_arm_len = config['HA_len']
-ssDNA_max_size = config["ssDNA_max_size"]
+ssODN_max_size = config["ssODN_max_size"]
 spec_score_flavor = "guideMITScore"
 outdir = config['outdir']
 syn_check_args = {
@@ -88,8 +88,8 @@ recoding_args = {"recoding_off":config["recoding_off"],
                  "recode_order":config['recode_order']}
 
 #check donor args
-if not config["Donor_type"] in ["ssDNA", "dsDNA"]:
-    sys.exit("Donor_type must be ssDNA or dsDNA, offending value:" + config["Donor_type"] + ", please correct the issue and try again")
+if not config["Donor_type"] in ["ssODN", "dsDNA"]:
+    sys.exit("Donor_type must be ssODN or dsDNA, offending value:" + config["Donor_type"] + ", please correct the issue and try again")
 if not config["Strand_choice"] in ["auto","TargetStrand","NonTargetStrand","CodingStrand","NonCodingStrand"]:
     sys.exit("Strand_choice must be auto,TargetStrand,NonTargetStrand,CodingStrand or NonCodingStrand, offending value:" + config["Strand_choice"] + ", please correct the issue and try again")
 
@@ -107,12 +107,12 @@ else: #payload override
     config["Cpayload"] = config["payload"]
 
 
-#check if HA_len is too short to satisfy ssDNA_max_size
-if ssDNA_max_size is not None:
+#check if HA_len is too short to satisfy ssODN_max_size
+if ssODN_max_size is not None:
     max_payload_size = max([len(config["Npayload"]),len(config["Cpayload"])])
-    derived_HDR_arm_len = ssDNA_max_size- max_payload_size / 2
+    derived_HDR_arm_len = ssODN_max_size- max_payload_size / 2
     if derived_HDR_arm_len >= HDR_arm_len:
-        print(f"HA_len={HDR_arm_len} is to short to meet the requirement of ssDNA_max_size={ssDNA_max_size}, payload size={max_payload_size}\n ssDNA_max_size={ssDNA_max_size} requires HA_len = ssDNA_max_size- max_payload_size / 2 = {derived_HDR_arm_len}")
+        print(f"HA_len={HDR_arm_len} is to short to meet the requirement of ssODN_max_size={ssODN_max_size}, payload size={max_payload_size}\n ssODN_max_size={ssODN_max_size} requires HA_len = ssODN_max_size- max_payload_size / 2 = {derived_HDR_arm_len}")
         HDR_arm_len = derived_HDR_arm_len + 100
         print(f"HA_len is adjusted to {HDR_arm_len}")
 
@@ -283,7 +283,7 @@ def main(outdir):
                     #get HDR template
                     try:
                         HDR_template = get_HDR_template(df = current_gRNA, ENST_info = ENST_info, type = "start", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType, genome_ver=config["genome_ver"],
-                                                    HDR_arm_len=HDR_arm_len, tag = config["Npayload"],  ssDNA_max_size = ssDNA_max_size, Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'],
+                                                    HDR_arm_len=HDR_arm_len, tag = config["Npayload"],  ssODN_max_size = ssODN_max_size, Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'],
                                                     recoding_args = recoding_args, syn_check_args = syn_check_args)
                     except Exception as e:
                         print("Unexpected error:", str(sys.exc_info()))
@@ -367,7 +367,7 @@ def main(outdir):
                     #get HDR template
                     try:
                         HDR_template = get_HDR_template(df=current_gRNA, ENST_info=ENST_info, type="stop", ENST_PhaseInCodon = ENST_PhaseInCodon, loc2posType = loc2posType,
-                                                    HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'], ssDNA_max_size = ssDNA_max_size,
+                                                    HDR_arm_len = HDR_arm_len, genome_ver=config["genome_ver"], tag = config["Cpayload"], Donor_type = config["Donor_type"] ,Strand_choice= config['Strand_choice'], ssODN_max_size = ssODN_max_size,
                                                     recoding_args = recoding_args, syn_check_args = syn_check_args)
                     except Exception as e:
                         print("Unexpected error:", str(sys.exc_info()))

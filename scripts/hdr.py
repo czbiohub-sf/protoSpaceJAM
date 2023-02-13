@@ -90,7 +90,7 @@ class HDR_flank:
             Cut2Ins_dist:int,
             tag:str,
             name:str,
-            ssDNA_max_size,
+            ssODN_max_size,
             loc2posType,
             recoding_args,
             Donor_type,
@@ -110,7 +110,7 @@ class HDR_flank:
         self.tag = tag
         self.loc2posType = loc2posType
         self.name = name
-        self.ssDNA_max_size = ssDNA_max_size
+        self.ssODN_max_size = ssODN_max_size
         self.recoding_args = recoding_args
         self.cfdThres = recoding_args["cfdThres"]
         self.synFlags=[]
@@ -432,7 +432,7 @@ class HDR_flank:
                         Donor = Donor.replace(self.revcom(seq),self.revcom(self.post_Phase2_gRNA_seq))
                         self.left_flk_seq_Phase2 = Donor[0:len(self.left_flk_seq)]
                         self.right_flk_seq_Phase2 =Donor[-len(self.left_flk_seq):]
-                        
+
                 left,right,cfd,seq,phases = self.get_uptodate_mut()
                 self.postPhase2ODN = left + tag + right
 
@@ -979,20 +979,20 @@ class HDR_flank:
 
             print(f"length of Donor: {len(self.Donor_final)}")
         ################
-        #ssDNA donor   #
+        #ssODN donor   #
         ################
-        if self.Donor_type == "ssDNA":
+        if self.Donor_type == "ssODN":
             self.Donor_final = self.Donor_vanillia
             #get recoded donor
             if not self.recoding_args["recoding_off"]: #recoding is on
                 self.Donor_final = self.Donor_postMut
-            self.synFlags = "N/A for ssDNA"
+            self.synFlags = "N/A for ssODN"
             self.effective_HA_len = "N/A if not enforcing max donor length"
             ###################################################
             #Enforce max payload size and centering           #
             #This handles both recoded and non-recoded donor  #
             ###################################################
-            if self.ssDNA_max_size is not None:
+            if self.ssODN_max_size is not None:
                 self.effective_HA_len = len(self.gRNA_lc_Larm) #initizalize effective HA length with the maximum value
                 #print(f"Centering")
                 #print(f"Donor_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
@@ -1005,7 +1005,7 @@ class HDR_flank:
                 #print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
 
                 if len(diff_loc) == 0: #no recoding (including recoding turned off and no-recoding with recoding turned on)
-                    _HA_len = (self.ssDNA_max_size - len(self.tag))/2
+                    _HA_len = (self.ssODN_max_size - len(self.tag))/2
                     start = len(self.gRNA_lc_Larm) - _HA_len - 1
                     end = start + _HA_len + len (self.tag) + _HA_len
                     #print(f"no recoding, start={start}\tend={end}")
@@ -1017,7 +1017,7 @@ class HDR_flank:
                     centerpiece_start = min([recoding_left,recoding_right,tag_start,tag_end]) #center piece is the payload + recoded region
                     centerpiece_end = max([recoding_left,recoding_right,tag_start,tag_end])
                     centerpiece_len = centerpiece_end - centerpiece_start + 1
-                    _HA_len = math.floor((self.ssDNA_max_size - centerpiece_len)/2)
+                    _HA_len = math.floor((self.ssODN_max_size - centerpiece_len)/2)
                     start = centerpiece_start - _HA_len
                     end = centerpiece_end + _HA_len + 1 # need to get the base at position:end
                     _len= end - start
@@ -1097,6 +1097,7 @@ class HDR_flank:
         leftHAlen = tagstart - start
         rightHAlen = end - tagend + 1
         return [leftHAlen, rightHAlen]
+
     def trim(self, seq, locs, minHAlen):
         '''
         trims a sequences and stops trimming if homology arm becomes shorter than minHAlen
@@ -1126,7 +1127,6 @@ class HDR_flank:
                     End = newEnd #update end
         return(seq[Start-1: End])
 
-    #TODO scan recoded sequence for PAM-less recut
     def slide_win_PAMLESScfd_noncoding(self,seq):
         _arm_len = int((len(seq)-len(self.tag))/2)
         highest_cfd = 0
@@ -1694,7 +1694,6 @@ class HDR_flank:
         else:
             return ([self.gStart-21, self.gStart-22])
 
-
     def to_coding_strand(self, gRNA_seq):
         """
         input:  gRNA sequence in the PAM strand
@@ -1747,6 +1746,7 @@ class HDR_flank:
             seq = self.gRNA_seq
             phases = self.gRNA_seq_phases
         return([left,right,cfd,seq,phases])
+
     def single_base_muation(self,base):
         mapping = {"A":"t","a":"t",
                    "C":"g","c":"g",
@@ -2074,8 +2074,6 @@ class HDR_flank:
 
         return([newLarm, newRarm])
 
-    #TODO: check the gRNA CFD scores
-
     def join_int_list(self, mylist):
         return ''.join([str(abs(int(i))) for i in mylist])
 
@@ -2197,6 +2195,7 @@ def check_RE_site(RE,seq):
     []
     """
     return RE.search(Seq(seq))
+
 #taken from CRISPYcrunch
 class MutatedSeq(str):
 

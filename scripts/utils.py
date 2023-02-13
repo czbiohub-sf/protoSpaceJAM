@@ -131,7 +131,7 @@ def get_range(start,end): #TODO phase should be ENST specific
     else:
         return list(range(start,end-1,-1))
 
-def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType, ssDNA_max_size, recoding_args,Donor_type,Strand_choice, syn_check_args):
+def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ver, tag, loc2posType, ssODN_max_size, recoding_args,Donor_type,Strand_choice, syn_check_args):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
         ENST_genename = ENST_info[ENST_ID].name
@@ -162,7 +162,7 @@ def get_HDR_template(df, ENST_info,type,ENST_PhaseInCodon,HDR_arm_len, genome_ve
                             left_flk_phases = left_Arm_Phases, right_flk_phases = right_Arm_Phases,
                             type= type, ENST_ID= ENST_ID, name = ENST_genename, ENST_strand=ENST_strand, ENST_chr = Chr, gStart= gStart, gStrand= gStrand, InsPos = InsPos, CutPos = CutPos, Cut2Ins_dist = Cut2Ins_dist,
                             tag = tag, loc2posType = loc2posType,
-                            ssDNA_max_size =ssDNA_max_size,Donor_type=Donor_type,Strand_choice=Strand_choice,
+                            ssODN_max_size =ssODN_max_size,Donor_type=Donor_type,Strand_choice=Strand_choice,
                             recoding_args = recoding_args, syn_check_args = syn_check_args)
         return myflank
         #log IDs whose gRNA is not in the default-size HDR arms
@@ -747,9 +747,6 @@ def check_ATG_at_exonEnd(my_transcript):
     else:
         return False
 
-
-#TODO: check if all the function below are still needed
-
 def get_cds_seq_in_transcript(mytranscript):
     '''
     input: Bio.SeqRecord  (such as that from function fetch_ensembl_transcript)
@@ -773,7 +770,6 @@ def get_cds_seq_in_transcript(mytranscript):
     else:
         return(''.join(cds_seqs))
 
-# get cds seq and flank
 def get_cds_seqNflank(transcriptObj, which_cds, cds_flank_len):
     '''
     returns the n-th cds and its flanking sequences
@@ -1047,7 +1043,6 @@ def nudge_cutsite_inframe(transcriptObj, listOfgRNAObj, HDR_flank_len, which_cds
         listOfgRNAObj[idx].cds_leading_nonTriplet = leading_nonTriplet
     return listOfgRNAObj
 
-# calcualte frame
 def get_cds_frame(mytranscript, which_cds):
     """
     for the n-th cds, calculate the frame (using coding sequence from 1 to n-1 th cds)
@@ -1082,7 +1077,6 @@ def get_cds_frame(mytranscript, which_cds):
     elif frame == 2:
         frame = 2
     return (frame)
-
 
 if __name__ == '__main__':
     import doctest
