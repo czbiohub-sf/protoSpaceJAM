@@ -1,3 +1,4 @@
+![Python version](https://img.shields.io/badge/python-3.9%20%7C%203.10-blue)
 ![Webserver dependencies-0-brightgreen](https://user-images.githubusercontent.com/4129442/198696112-92ecc372-f3b5-4498-8cd9-4a01de0f851b.svg)
 ![status-active development-blueviolet](https://user-images.githubusercontent.com/4129442/198695999-a70bcd5f-c52e-4895-a1e7-d6b0da132812.svg)
 
@@ -33,10 +34,14 @@ git checkout <branch you'd like to run>
 ```
 ### Create conda environment and activate it
 ```
-conda env create -f environment1.yml
-conda env create -f environment2.yml
-conda activate protospaceX
+conda create -y -n protospacejam python=3.9 && conda activate protospacejam
+conda activate protospacejam
 ```
+
+PS: Default dependencies will only allow users to run protoSpaceJam 
+with existing pre-computed data. If you like to execute pre-computation
+steps please follow [here](). TODO: fill  this link
+
 make sure all script/binary files in folder utils are excutable
 ### Genome download and preprocessing
 Download default genomes:   
