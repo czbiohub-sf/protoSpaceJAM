@@ -8,7 +8,9 @@ from azimuth.model_comparison import predict
 
 
 def predict_moreno(seq):
-    return predict(seq, aa_cut=None, percent_peptide=None, model_file="moreno_model.pkl")
+    return predict(
+        seq, aa_cut=None, percent_peptide=None, model_file="moreno_model.pkl"
+    )
 
 
 def test_moreno_predict(dataset_file):
@@ -21,7 +23,7 @@ def test_moreno_predict(dataset_file):
     data["30mer"] = [np.nan] * data.shape[0]
     for i in range(data.shape[0]):
         row = data.iloc[i]
-        seq = row['seq']
+        seq = row["seq"]
 
         if len(seq) == 20:
             twentymer = seq
@@ -31,17 +33,21 @@ def test_moreno_predict(dataset_file):
         else:
             raise Exception("%s: %s" % (i, twentymer))
 
-        hundredmer = row['longSeq100Bp']
+        hundredmer = row["longSeq100Bp"]
         pos = hundredmer.find(twentymer)
 
         if pos == -1:
             raise Exception("%s not found in 100mer" % twentymer)
 
-        assert twentymer == hundredmer[pos:pos + 20], "%s: %s != %s" % (i, twentymer, hundredmer[pos:pos + 20])
-        thirtymer = hundredmer[pos - 4:pos + 26]
+        assert twentymer == hundredmer[pos : pos + 20], "%s: %s != %s" % (
+            i,
+            twentymer,
+            hundredmer[pos : pos + 20],
+        )
+        thirtymer = hundredmer[pos - 4 : pos + 26]
         data.loc[data.iloc[i].name, "30mer"] = thirtymer
 
-    sequences = data['30mer'].values
+    sequences = data["30mer"].values
 
     y_pred = predict_moreno(sequences)
     y_true = data["modFreq"].values
@@ -53,4 +59,6 @@ def test_moreno_predict(dataset_file):
 
 if __name__ == "__main__":
     assert np.allclose(0.312935544002, test_moreno_predict("alenaAll.scores.tab.txt"))
-    assert np.allclose(0.583916446247, test_moreno_predict("teboulVivo_mm9.scores.tab.txt"))
+    assert np.allclose(
+        0.583916446247, test_moreno_predict("teboulVivo_mm9.scores.tab.txt")
+    )

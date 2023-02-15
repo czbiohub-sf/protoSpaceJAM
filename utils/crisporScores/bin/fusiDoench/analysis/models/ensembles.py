@@ -17,39 +17,66 @@ def spearman_scoring(clf, X, y):
     return sp.stats.spearmanr(y_pred, y.flatten())[0]
 
 
-def adaboost_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options):
-    '''
+def adaboost_on_fold(
+    feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options
+):
+    """
     AdaBoostRegressor from scikitlearn.
-    '''
+    """
 
-    if learn_options['adaboost_version'] == 'python':
-        if not learn_options['adaboost_CV']:
-            clf = en.GradientBoostingRegressor(loss=learn_options['adaboost_loss'], learning_rate=learn_options['adaboost_learning_rate'],
-                                               n_estimators=learn_options['adaboost_n_estimators'],
-                                               alpha=learn_options['adaboost_alpha'],
-                                               subsample=1.0, min_samples_split=2, min_samples_leaf=1, max_depth=learn_options['adaboost_max_depth'],
-                                               init=None, random_state=None, max_features=None,
-                                               verbose=0, max_leaf_nodes=None, warm_start=False)
+    if learn_options["adaboost_version"] == "python":
+        if not learn_options["adaboost_CV"]:
+            clf = en.GradientBoostingRegressor(
+                loss=learn_options["adaboost_loss"],
+                learning_rate=learn_options["adaboost_learning_rate"],
+                n_estimators=learn_options["adaboost_n_estimators"],
+                alpha=learn_options["adaboost_alpha"],
+                subsample=1.0,
+                min_samples_split=2,
+                min_samples_leaf=1,
+                max_depth=learn_options["adaboost_max_depth"],
+                init=None,
+                random_state=None,
+                max_features=None,
+                verbose=0,
+                max_leaf_nodes=None,
+                warm_start=False,
+            )
 
             clf.fit(X[train], y[train].flatten())
             y_pred = clf.predict(X[test])[:, None]
         else:
             print("Adaboost with GridSearch")
             from sklearn.grid_search import GridSearchCV
-            param_grid = {'learning_rate': [0.1, 0.05, 0.01],
-                          'max_depth': [4, 5, 6, 7],
-                          'min_samples_leaf': [5, 7, 10, 12, 15],
-                          'max_features': [1.0, 0.5, 0.3, 0.1]}
 
+            param_grid = {
+                "learning_rate": [0.1, 0.05, 0.01],
+                "max_depth": [4, 5, 6, 7],
+                "min_samples_leaf": [5, 7, 10, 12, 15],
+                "max_features": [1.0, 0.5, 0.3, 0.1],
+            }
 
             label_encoder = sklearn.preprocessing.LabelEncoder()
-            label_encoder.fit(y_all['Target gene'].values[train])
-            gene_classes = label_encoder.transform(y_all['Target gene'].values[train])
+            label_encoder.fit(y_all["Target gene"].values[train])
+            gene_classes = label_encoder.transform(y_all["Target gene"].values[train])
             n_folds = len(np.unique(gene_classes))
-            cv = sklearn.cross_validation.StratifiedKFold(gene_classes, n_folds=n_folds, shuffle=True)
+            cv = sklearn.cross_validation.StratifiedKFold(
+                gene_classes, n_folds=n_folds, shuffle=True
+            )
 
-            est = en.GradientBoostingRegressor(loss=learn_options['adaboost_loss'], n_estimators=learn_options['adaboost_n_estimators'])
-            clf = GridSearchCV(est, param_grid, n_jobs=20, verbose=1, cv=cv, scoring=spearman_scoring, iid=False).fit(X[train], y[train].flatten())
+            est = en.GradientBoostingRegressor(
+                loss=learn_options["adaboost_loss"],
+                n_estimators=learn_options["adaboost_n_estimators"],
+            )
+            clf = GridSearchCV(
+                est,
+                param_grid,
+                n_jobs=20,
+                verbose=1,
+                cv=cv,
+                scoring=spearman_scoring,
+                iid=False,
+            ).fit(X[train], y[train].flatten())
             print(clf.best_params_)
             y_pred = clf.predict(X[test])[:, None]
     else:
@@ -58,9 +85,11 @@ def adaboost_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum, learn_
     return y_pred, clf
 
 
-def LASSOs_ensemble_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options):
+def LASSOs_ensemble_on_fold(
+    feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options
+):
     train_indices = np.where(train)[0]
-    sel = len(train_indices)*0.10
+    sel = len(train_indices) * 0.10
     permuted_ind = np.random.permutation(train_indices)
     valid_indices = permuted_ind[:sel]
     train_indices = permuted_ind[sel:]
@@ -74,7 +103,17 @@ def LASSOs_ensemble_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum,
 
     for i, feature_name in enumerate(feature_sets.keys()):
         X_feature = feature_sets[feature_name].values
-        y_pred, m = linreg_on_fold(feature_sets, train_sub, valid_sub, y, y_all, X_feature, dim, dimsum, learn_options)
+        y_pred, m = linreg_on_fold(
+            feature_sets,
+            train_sub,
+            valid_sub,
+            y,
+            y_all,
+            X_feature,
+            dim,
+            dimsum,
+            learn_options,
+        )
         predictions[:, i] = m.predict(X_feature[test]).flatten()
         validations[:, i] = y_pred.flatten()
 
@@ -85,20 +124,24 @@ def LASSOs_ensemble_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum,
     return y_pred, None
 
 
-def randomforest_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options):
-    '''
+def randomforest_on_fold(
+    feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options
+):
+    """
     RandomForestRegressor from scikitlearn.
-    '''
+    """
     clf = en.RandomForestRegressor(oob_score=True)
     clf.fit(X[train], y[train][:, 0])
     y_pred = clf.predict(X[test])[:, None]
     return y_pred, clf
 
 
-def decisiontree_on_fold(feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options):
-    '''
+def decisiontree_on_fold(
+    feature_sets, train, test, y, y_all, X, dim, dimsum, learn_options
+):
+    """
     DecisionTreeRegressor from scikitlearn.
-    '''
+    """
     clf = tree.DecisionTreeRegressor()
     clf.fit(X[train], y[train][:, 0])
     y_pred = clf.predict(X[test])[:, None]
@@ -120,9 +163,9 @@ def pairwise_majority_voting(y):
             if i == j:
                 continue
 
-            y_pred[i, j] = (y[i] > y[j]).sum() > y.shape[1]/2
+            y_pred[i, j] = (y[i] > y[j]).sum() > y.shape[1] / 2
 
-    return y_pred.sum(1)/y_pred.sum(1).max()
+    return y_pred.sum(1) / y_pred.sum(1).max()
 
 
 def median(y):
@@ -130,28 +173,41 @@ def median(y):
 
 
 def GBR_stacking(y_train, X_train, X_test):
-    param_grid = {'learning_rate': [0.1, 0.05, 0.01],
-                  'max_depth': [2, 3, 4, 5],  # [2, 3, 4, 6],
-                  'min_samples_leaf': [1, 2, 3],  # ,5, 7],
-                  'max_features': [1.0, 0.5, 0.3, 0.1]}
+    param_grid = {
+        "learning_rate": [0.1, 0.05, 0.01],
+        "max_depth": [2, 3, 4, 5],  # [2, 3, 4, 6],
+        "min_samples_leaf": [1, 2, 3],  # ,5, 7],
+        "max_features": [1.0, 0.5, 0.3, 0.1],
+    }
 
-    est = en.GradientBoostingRegressor(loss='ls', n_estimators=100)
-    clf = GridSearchCV(est, param_grid, n_jobs=3, verbose=1, cv=20, scoring=spearman_scoring).fit(X_train, y_train.flatten())
+    est = en.GradientBoostingRegressor(loss="ls", n_estimators=100)
+    clf = GridSearchCV(
+        est, param_grid, n_jobs=3, verbose=1, cv=20, scoring=spearman_scoring
+    ).fit(X_train, y_train.flatten())
     # clf.fit(X_train, y_train.flatten())
     return clf.predict(X_test)
 
 
 def GP_stacking(y_train, X_train, X_test):
     import GPy
-    m = GPy.models.SparseGPRegression(X_train, y_train, num_inducing=20, kernel=GPy.kern.RBF(X_train.shape[1]))
-    m.optimize('bfgs', messages=0)
+
+    m = GPy.models.SparseGPRegression(
+        X_train, y_train, num_inducing=20, kernel=GPy.kern.RBF(X_train.shape[1])
+    )
+    m.optimize("bfgs", messages=0)
     y_pred = m.predict(X_test)[0]
     return y_pred.flatten()
 
 
 def SVM_stacking(y_train, X_train, X_test):
-    parameters = {'kernel': ('linear', 'rbf'), 'C': np.linspace(1, 10, 10), 'gamma': np.linspace(1e-3, 1., 10)}
+    parameters = {
+        "kernel": ("linear", "rbf"),
+        "C": np.linspace(1, 10, 10),
+        "gamma": np.linspace(1e-3, 1.0, 10),
+    }
     svr = svm.SVR()
-    clf = GridSearchCV(svr, parameters, n_jobs=3, verbose=1, cv=10, scoring=spearman_scoring)
+    clf = GridSearchCV(
+        svr, parameters, n_jobs=3, verbose=1, cv=10, scoring=spearman_scoring
+    )
     clf.fit(X_train, y_train.flatten())
     return clf.predict(X_test)

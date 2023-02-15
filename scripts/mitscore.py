@@ -1,13 +1,10 @@
-#taken from https://github.com/czbiohub/crispycrunch/blob/master/utils/mitscore.py
+# taken from https://github.com/czbiohub/crispycrunch/blob/master/utils/mitscore.py
 from functools import lru_cache
 
 
 @lru_cache(maxsize=1024 * 1024)
 def mit_hit_score(
-    seq1: str,
-    seq2: str,
-    guide_strand_same=True,
-    include_pam=False
+    seq1: str, seq2: str, guide_strand_same=True, include_pam=False
 ) -> float:
     """Compute MIT mismatch score between two 20-mers or 23-mers.
     See 'Scores of single hits' on http://crispr.mit.edu/about
@@ -54,8 +51,28 @@ def mit_hit_score(
     0.20754716981132063
     """
     # aka Matrix "M"
-    hit_score_m = [0, 0, 0.014, 0, 0, 0.395, 0.317, 0, 0.389, 0.079, 0.445, 0.508,
-                   0.613, 0.851, 0.732, 0.828, 0.615, 0.804, 0.685, 0.583]
+    hit_score_m = [
+        0,
+        0,
+        0.014,
+        0,
+        0,
+        0.395,
+        0.317,
+        0,
+        0.389,
+        0.079,
+        0.445,
+        0.508,
+        0.613,
+        0.851,
+        0.732,
+        0.828,
+        0.615,
+        0.804,
+        0.685,
+        0.583,
+    ]
     if include_pam:
         # Add some high values, determined intuitively.
         hit_score_m += [0, 0.8, 0.8]
@@ -72,7 +89,7 @@ def mit_hit_score(
         # Use most important 20bp only
         seq1 = seq1[-20:]
         seq2 = seq2[-20:]
-        assert(len(seq1) == 20)
+        assert len(seq1) == 20
         max_dist = 19
 
     dists = []  # distances between mismatches, for part 2
@@ -97,11 +114,12 @@ def mit_hit_score(
     if mm_count == 0:  # special case, not shown in the paper
         score3 = 1.0
     else:
-        score3 = 1.0 / (mm_count**2)
+        score3 = 1.0 / (mm_count ** 2)
 
     return score1 * score2 * score3 * 100
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
