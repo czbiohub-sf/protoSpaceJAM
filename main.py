@@ -357,7 +357,7 @@ def main(outdir):
         # open result file and write header
         csvout_res = open(f"{outdir}/result.csv", "w")
         csvout_res.write(
-            f"ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc\n"
+            f"Entry,ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc\n"
         )
         # open result file2 for GenoPrimer input
         csvout_res2 = open(f"{outdir}/input_for_GenoPrimer.csv", "w")
@@ -395,6 +395,8 @@ def main(outdir):
         transcript_count = 0
         protein_coding_transcripts_count = 0
         target_terminus = "all"
+        Entry_defined = False
+        Entry = 0
         for index, row in df.iterrows():
             ENST_ID = row["Ensemble_ID"].rstrip().lstrip()
             if "Target_terminus" in df.columns:
@@ -406,25 +408,35 @@ def main(outdir):
                     and target_terminus != "all"
                 ):
                     sys.exit(f"invalid target terminus: {target_terminus}")
+            if "Entry" in df.columns:
+                try:
+                    Entry = str(row["Entry"]).rstrip().lstrip()
+                    Entry_defined = True
+                except:
+                    Entry_defined = False
 
             # check if ENST_ID is in the database
             if not ENST_ID in ENST_info_index.keys():
+                if not Entry_defined:
+                    Entry += 1
                 log.warning(
                     f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)"
                 )
                 genome_ver = config["genome_ver"]
                 csvout_res.write(
-                    f"{ENST_ID},ERROR: this ID was not found in the genome {genome_ver}, most likely this ID was deprecated\n"
+                    f"{Entry},{ENST_ID},ERROR: this ID was not found in the genome {genome_ver}, most likely this ID was deprecated\n"
                 )
                 continue
 
             # check if codon phase info exists
             if not ENST_ID in ENST_PhaseInCodon_index.keys():
+                if not Entry_defined:
+                    Entry += 1
                 log.warning(
                     f"skipping {ENST_ID} b/c transcript has no codon phase information"
                 )
                 csvout_res.write(
-                    f"{ENST_ID},ERROR: this ID is either not protein-coding and/or has no codon phase information\n"
+                    f"{Entry},{ENST_ID},ERROR: this ID is either not protein-coding and/or has no codon phase information\n"
                 )
                 continue
 
@@ -485,11 +497,13 @@ def main(outdir):
             # best start gRNA and HDR template#
             ##################################
             if target_terminus == "all" or target_terminus == "N":
+                if not Entry_defined:
+                    Entry += 1
                 csvout_N.write(ENST_ID)
                 if ranked_df_gRNAs_ATG.empty == True:
                     start_info.failed.append(ENST_ID)
                     csvout_N.write(",,,,,\n")
-                    csvout_res.write(f"{ENST_ID},ERROR: no suitable gRNAs found\n")
+                    csvout_res.write(f"{Entry},{ENST_ID},ERROR: no suitable gRNAs found\n")
 
                 for i in range(0, min([gRNA_num_out, ranked_df_gRNAs_ATG.shape[0]])):
                     # if best_start_gRNA.shape[0] > 1: # multiple best scoring gRNA
@@ -573,7 +587,7 @@ def main(outdir):
                             f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
                         )
                         csvout_res.write(
-                            f"{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                            f"{Entry},{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
                         )
                         csvout_res2.write(
                             config["genome_ver"]
@@ -586,7 +600,7 @@ def main(outdir):
                         if not isinstance(cfd4, float):
                             cfd4 = ""
                         csvout_res.write(
-                            f"{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                            f"{Entry},{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
                         )
                         csvout_res2.write(
                             config["genome_ver"]
@@ -612,11 +626,13 @@ def main(outdir):
             # best stop gRNA and HDR template#
             #################################
             if target_terminus == "all" or target_terminus == "C":
+                if not Entry_defined:
+                    Entry += 1
                 csvout_C.write(ENST_ID)
                 if ranked_df_gRNAs_stop.empty == True:
                     stop_info.failed.append(ENST_ID)
                     csvout_C.write(",,,,,\n")
-                    csvout_res.write(f"{ENST_ID},ERROR: no suitable gRNAs found\n")
+                    csvout_res.write(f"{Entry},{ENST_ID},ERROR: no suitable gRNAs found\n")
 
                 for i in range(0, min([gRNA_num_out, ranked_df_gRNAs_stop.shape[0]])):
                     # if best_stop_gRNA.shape[0] > 1: # multiple best scoring gRNA
@@ -699,7 +715,7 @@ def main(outdir):
                             f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
                         )
                         csvout_res.write(
-                            f"{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                            f"{Entry},{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
                         )
                         csvout_res2.write(
                             config["genome_ver"]
@@ -712,7 +728,7 @@ def main(outdir):
                         if not isinstance(cfd4, float):
                             cfd4 = ""
                         csvout_res.write(
-                            f"{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                            f"{Entry},{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
                         )
                         csvout_res2.write(
                             config["genome_ver"]
