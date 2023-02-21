@@ -35,7 +35,6 @@ git checkout <branch you'd like to run>
 ### Create conda environment and activate it
 ```
 conda create -y -n protospacejam python=3.9 && conda activate protospacejam
-conda activate protospacejam
 ```
 
 PS: Default dependencies will only allow users to run protoSpaceJam 
