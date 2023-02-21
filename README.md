@@ -36,6 +36,10 @@ git checkout <branch you'd like to run>
 ```
 conda create -y -n protospacejam python=3.9 && conda activate protospacejam
 ```
+### Install required packages
+```
+pip install -r requirements.txt
+```
 
 PS: Default dependencies will only allow users to run protoSpaceJam 
 with existing pre-computed data. If you like to execute pre-computation
