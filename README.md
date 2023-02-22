@@ -30,7 +30,7 @@ git clone https://github.com/czbiohub/protoSpaceJAM
 ### Go the repository directory, switch the branch if running branch other than master
 ```
 cd protoSpaceJAM
-git checkout <branch you'd like to run>
+git checkout main
 ```
 ### Create conda environment and activate it
 ```
