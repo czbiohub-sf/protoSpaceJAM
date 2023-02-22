@@ -1,6 +1,9 @@
-### ** Optional **: Precompute gRNA (precomputed results available for download)
+### ** Optional **: Precompute gRNA  
+If you prefer downloading the precomputed gRNA, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM)
 
-make sure all script/binary files in folder utils are excutable
+### Prerequisite
+All scripts and binary files in protoSpaceJAM/utils should be excutable
+
 ### Genome download and preprocessing
 Download default genomes:   
 GRCh38, GRCm39, GRCz11 (fasta + gff3)
