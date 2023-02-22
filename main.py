@@ -12,7 +12,7 @@ class MyParser(argparse.ArgumentParser):
 
 
 def parse_args():
-    parser = MyParser(description="ProtospaceX")
+    parser = MyParser(description="protoSpaceJAM")
     parser.add_argument(
         "--genome_ver",
         default="GRCh38",
@@ -146,7 +146,7 @@ def parse_args():
     parser.add_argument(
         "--cfdThres",
         default=0.03,
-        help="ProtospaceX will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.",
+        help="protoSpaceJAM will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.",
     )
     parser.add_argument(
         "--recode_order",
@@ -163,7 +163,7 @@ def parse_args():
 
 logging.setLoggerClass(ColoredLogger)
 # logging.basicConfig()
-log = logging.getLogger("ProtospaceX")
+log = logging.getLogger("protoSpaceJAM")
 log.propagate = False
 log.setLevel(logging.INFO)  # set the level of warning displayed
 # log.setLevel(logging.DEBUG) #set the level of warning displayed
