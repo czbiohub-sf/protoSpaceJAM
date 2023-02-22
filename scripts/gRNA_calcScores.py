@@ -12,7 +12,7 @@ import gzip
 import shutil
 import re
 import math
-sys.path.insert(1, '../utils')
+sys.path.insert(1, '../precomuted_gRNAs/utils')
 #from gRNA_search import *
 #from utils import *
 #add to sys path, so the scoring modules can load

@@ -263,6 +263,7 @@ if ssODN_max_size is not None:
 #####################
 def main(outdir):
     try:
+        # TODO: fix  the potential infinite loop
         # check memory requirement
         enough_mem = test_memory(4200)
         while not enough_mem:  # test if at least 4.2 GB memory is available
