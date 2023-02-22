@@ -1,5 +1,5 @@
 ### ** Optional **: Precompute gRNA  
-If you prefer downloading the precomputed gRNA, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM)
+If you prefer downloading the precomputed gRNA, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM#download-and-unzip-pre-computed-data)
 
 ### Prerequisite
 All scripts and binary files in protoSpaceJAM/utils should be excutable
