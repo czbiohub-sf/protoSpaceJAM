@@ -51,6 +51,6 @@ steps please follow [here](https://github.com/czbiohub/protoSpaceJAM/tree/main/p
 ### Run protoSpaceJAM
 ```
 conda activate protospacejam
-python main.py --path2csv input/test_protoSpaceJAM.csv --path2csv input/test_protoSpaceJAM.csv --outdir logs/test
+python main.py --path2csv input/test_protoSpaceJAM.csv --outdir logs/test
 ```
 
