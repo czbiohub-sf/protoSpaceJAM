@@ -99,7 +99,6 @@ run_log.txt
 run_log.bk.txt
 logs/*
 pickles/*
-tests/*
 jobs
 jobs/*
 OpenCell_protospaceX_design/
