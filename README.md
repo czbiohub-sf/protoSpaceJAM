@@ -54,3 +54,5 @@ conda activate protospacejam
 python main.py --path2csv input/test_protoSpaceJAM.csv --outdir logs/test
 ```
 
+## License
+Distributed under the terms of the BSD-3 license, "protoSpaceJAM" is free and open source software
