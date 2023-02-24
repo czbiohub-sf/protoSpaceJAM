@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; protoSpaceJAM 0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Source code" href="sourcecode.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> protoSpaceJAM
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sourcecode.html">Source code</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm">Algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#portal">Portal</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">protoSpaceJAM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Changelog</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline"></a></h1>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="algorithm">
+<h2>Algorithm<a class="headerlink" href="#algorithm" title="Permalink to this headline"></a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 7, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/d3b5610d73fd75fa89a9948eb80733bf5286e2e5"><img alt="bug fix 6e2e5" src="https://img.shields.io/badge/6e2e5-bug%20fix-red" /></a> Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions.</p></li>
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/f94f320dbb9fba33fc6927d39bc2db950ce82c61"><img alt="bug fix 82c61" src="https://img.shields.io/badge/82c61-bug%20fix-red" /></a> Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 6, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/b70c9762a756355697a7643e0c07af70f4f78fd0"><img alt="enhancement 78fd0" src="https://img.shields.io/badge/78fd0-enhancement-green" /></a> Changed the order of recoding in gRNAs and emerging cutsites (in window scan) to: 3’UTR -&gt; codons -&gt; intron -&gt; 5’UTR</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 4, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/1b37873b25f1c0f912f2a3c78445933f1887da6a"><img alt="enhancement 7da6a" src="https://img.shields.io/badge/7da6a-enhancement-green" /></a> Changed the order of recoding in gRNAs to: codons -&gt; 3’UTR -&gt; intron -&gt; 5’UTR</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 1, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/67a4e0df5a33b023e2de834039b4fddd416e20ed"><img alt="bug fix e20ed" src="https://img.shields.io/badge/e20ed-bug%20fix-red" /></a> Fixed two bugs in the dsDNA trimming logic: 1) the right arm was not trimming correctly, 2) report synthesis problems remaining after the trimming step.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>January 25, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/820ed9004c8d33136417ff22733d6812571bf85b"><img alt="enhancement bf85b" src="https://img.shields.io/badge/bf85b-enhancement-green" /></a> Fine-tuned the off-limit range for recoding near junctions. Now avoiding 3bp/6bp from exon/intron side of the exon/intron junction, and 3bp/2bp from intron/exon side of the intron/exon junction.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>January 24, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/98ab6e0dc698effa2441542771d7d82abbdf87f4"><img alt="bug fix f87f4" src="https://img.shields.io/badge/f87f4-bug%20fix-red" /></a> Avoid re-mutating by keeping track of mutated bases.</p></li>
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/98ab6e0dc698effa2441542771d7d82abbdf87f4"><img alt="bug fix f87f4" src="https://img.shields.io/badge/f87f4-bug%20fix-red" /></a> Fixed an interference with mutation caused by marking codon-padding sequence with lower-case.</p></li>
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/98ab6e0dc698effa2441542771d7d82abbdf87f4"><img alt="enhancement f87f4" src="https://img.shields.io/badge/f87f4-enhancement-green" /></a> Scan and undo isolated mutation of “N” in “NGG”.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>January 20, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/3662c9a9b02e958fd3d6f8a94625470b07b94ea9"><img alt="bug fix 94ea9" src="https://img.shields.io/badge/94ea9-bug%20fix-red" /></a> Codon mutation won’t happen in some gRNAs in recut mode.</p></li>
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX/commit/1b7c70cf2eb6ca6ae8f4783b9337d86a5c7c2e92"><img alt="enhancement c2e92" src="https://img.shields.io/badge/c2e92-enhancement-green" /></a> Changed strand names to match the naming convention.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="portal">
+<h2>Portal<a class="headerlink" href="#portal" title="Permalink to this headline"></a></h2>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 16, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protoSpaceJAM-portal/tree/68d37db4642fea22d3738ef5c37da3b9331004c6"><img alt="bug fix 004c6" src="https://img.shields.io/badge/004c6-bug%20fix-red" /></a> Entry number are now correct when there are 2+ gRNAs for each design. <a class="reference external" href="https://github.com/czbiohub/protoSpaceJAM-portal/commit/68d37db4642fea22d3738ef5c37da3b9331004c6">Associated change:</a> ProtospaceJAM will read “Entry” from input, and if fails, uses an auto increment</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 14, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/b006e6c3280f0ff09a279e35ec93fb7eb3849990"><img alt="enhancement 49990" src="https://img.shields.io/badge/49990-enhancement-green" /></a> Added a link in the landing page to a Google form to get an invitation code.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 14, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/b006e6c3280f0ff09a279e35ec93fb7eb3849990"><img alt="enhancement 49990" src="https://img.shields.io/badge/49990-enhancement-green" /></a> Complete the name change to “protoSpaceJAM”. And several small changes, e.g. ‘Launch’ -&gt; ‘Jam it’. Fixed typos.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 9, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/3818cc5f92e26f170251d950cbadad11c04dced1"><img alt="enhancement dced1" src="https://img.shields.io/badge/dced1-enhancement-green" /></a> Consolidated donor length parameters into one box, and donor recoding parameters into one box.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>Feburary 1, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/1fd046d24253d0fdc8d13d5f1ef9c5f6644b6b91"><img alt="enhancement b6b91" src="https://img.shields.io/badge/b6b91-enhancement-green" /></a> Change the default minumn homology arm length (dsDNA) to 200.</p></li>
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/1fd046d24253d0fdc8d13d5f1ef9c5f6644b6b91"><img alt="bug fix b6b91" src="https://img.shields.io/badge/b6b91-bug%20fix-red" /></a> Made “clear example” and “reset button” buttons work correctly, both will reset to the following defaults: Genome: Human, Genes: None, number of gRNA:1, DNA donor type: ssDNA, HA arm length to consider: 500, target strand: non-target strand, recode intensity:full, prioritize recoding in: PAM, minimum homology arm length: 200, enforce maximum donor length: 200, recut cfd threshold: 0.03.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>January 27, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/687f8faab0839d65da990c9bcbc6487100ff0ad7"><img alt="enhancement f0ad7" src="https://img.shields.io/badge/f0ad7-enhancement-green" /></a> Add a maximum limit of 384 entries per submission list.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Date</dt>
+<dd class="field-odd"><p>January 26, 2023</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/823eaff78a281fdfd2627dff329974ccee20c23a"><img alt="enhancement 0c23a" src="https://img.shields.io/badge/0c23a-enhancement-green" /></a> Default changed to “non-target strand” (including the example).</p></li>
+<li><p><a class="reference external" href="https://github.com/czbiohub/protospaceX-portal/commit/e80b823bbe1f2a95a9afa6655305402203554621"><img alt="enhancement 54621" src="https://img.shields.io/badge/54621-enhancement-green" /></a> Default changed to “Prioritize recoding in PAM” (including the example).</p></li>
+</ul>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sourcecode.html" class="btn btn-neutral float-left" title="Source code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
