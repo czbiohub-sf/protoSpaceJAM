@@ -1,8 +1,7 @@
 import unittest
-import filecmp
 import os
-import subprocess
 import shutil
+import main as pJAM
 
 class test_with_OpenCell_design(unittest.TestCase):
 
@@ -19,14 +18,15 @@ class test_with_OpenCell_design(unittest.TestCase):
             shutil.rmtree("tests/quick_test")
 
         #run protoSpaceJAM
-        subprocess.run(["python", "main.py",
-                       "--path2csv", "input/test_protoSpaceJAM.csv",
-                       "--outdir", "tests/quick_test",
-                       "--ssODN_max_size", "200",  "--recoding_full",
-                        "--Npayload", "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
-                        "--Cpayload", "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
-                        "--Strand_choice", "NonTargetStrand",
-                        "--recode_order", "PAM_first"])
+        test_args = {
+                    "path2csv": "input/test_protoSpaceJAM.csv",
+                    "outdir": "tests/quick_test",
+                    "ssODN_max_size": 200,
+                    "Npayload": "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
+                    "Cpayload": "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
+                    "Strand_choice": "NonTargetStrand",
+                    "recode_order": "PAM_first"}
+        pJAM.main(test_args)
 
     @classmethod
     def tearDownClass(cls):
