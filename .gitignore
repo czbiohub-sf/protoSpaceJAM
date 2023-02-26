@@ -118,12 +118,12 @@ genome_files/*
 !genome_files/build_bwa_index.sh
 
 input/*
-!input_files/test.csv
-!input_files/mart_export_canonical_proteincoding.csv
-!input_files/mart_export_canonical_proteincoding.GRCm39.csv
-!input_files/mart_export_canonical_proteincoding.GRCz11.csv
-!input_files/test_protoSpaceJAM.csv
-!input_files/OpenCell_protospaceX_design.csv
+!input/test.csv
+!input/mart_export_canonical_proteincoding.csv
+!input/mart_export_canonical_proteincoding.GRCm39.csv
+!input/mart_export_canonical_proteincoding.GRCz11.csv
+!input/test_protoSpaceJAM.csv
+!input/OpenCell_protospaceX_design.csv
 
 OpenCell_protospaceX_design/
 OpenCell_protospaceX_design/*
