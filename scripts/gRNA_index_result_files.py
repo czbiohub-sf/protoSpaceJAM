@@ -135,30 +135,32 @@ def main():
         for filename in os.listdir(config["gzdir"]):
             file_path = os.path.join(config["gzdir"], filename)
 
-            Chr = filename.split(".tab")[0].split(".part")[0]
-            print(f"file: {filename}\tchr: {Chr}")
+            if file_path.endswith(".gz"):
 
-            if Chr not in file_index.keys():
-                file_index[Chr] = dict()
+                Chr = filename.split(".tab")[0].split(".part")[0]
+                print(f"file: {filename}\tchr: {Chr}")
 
-            min_pos = 999999999
-            max_pos = 0
-            with gzip.open(file_path, "rt") as infh:
-                for line in infh:
-                    # print(line)
-                    # read gRNA from gzip file
-                    # seq = line.split("\t")[0]
-                    # pam = line.split("\t")[1]
-                    st = int(line.split("\t")[2])
-                    en = int(line.split("\t")[3])
+                if Chr not in file_index.keys():
+                    file_index[Chr] = dict()
 
-                    min_pos = update_min(min_pos, st)
-                    min_pos = update_min(min_pos, en)
-                    max_pos = update_max(max_pos, st)
-                    max_pos = update_max(max_pos, en)
+                min_pos = 999999999
+                max_pos = 0
+                with gzip.open(file_path, "rt") as infh:
+                    for line in infh:
+                        # print(line)
+                        # read gRNA from gzip file
+                        # seq = line.split("\t")[0]
+                        # pam = line.split("\t")[1]
+                        st = int(line.split("\t")[2])
+                        en = int(line.split("\t")[3])
 
-            file_index[Chr][f"{min_pos}-{max_pos}"] = filename
-            file_count += 1
+                        min_pos = update_min(min_pos, st)
+                        min_pos = update_min(min_pos, en)
+                        max_pos = update_max(max_pos, st)
+                        max_pos = update_max(max_pos, en)
+
+                file_index[Chr][f"{min_pos}-{max_pos}"] = filename
+                file_count += 1
 
         # write dict to file
         with open(
