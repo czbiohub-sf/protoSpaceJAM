@@ -137,3 +137,6 @@ precomuted_gRNAs/*
 !precomuted_gRNAs/5.get_gRNAs_stats.py
 !precomuted_gRNAs/cmd.sh
 !precomuted_gRNAs/README.md
+
+docs/build
+
