@@ -48,6 +48,12 @@ PS: Default dependencies will only allow users to run protoSpaceJam
 with existing pre-computed data. If you like to execute pre-computation
 steps please follow [here](https://github.com/czbiohub/protoSpaceJAM/tree/main/precomuted_gRNAs)
 
+### Run a quick test to verify installation
+```
+python tests/run_quick_test_pJAM.py
+```
+A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` at the end.
+
 ### Run protoSpaceJAM
 ```
 conda activate protospacejam

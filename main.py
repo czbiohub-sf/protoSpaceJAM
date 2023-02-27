@@ -3,13 +3,11 @@ from scripts.utils import *
 import traceback
 import time
 
-
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write("error: %s\n" % message)
         self.print_help()
         sys.exit(2)
-
 
 def parse_args():
     parser = MyParser(description="protoSpaceJAM")
@@ -27,7 +25,6 @@ def parse_args():
         help="path to a csv file containing ENST information\n *required columns*: Ensemble_ID",
         metavar="",
     )
-
     # gRNA
     parser.add_argument(
         "--num_gRNA_per_term",
@@ -36,7 +33,6 @@ def parse_args():
         help="payload at the N terminus",
         metavar="",
     )
-
     # donor
     parser.add_argument(
         "--HA_len",
@@ -161,108 +157,116 @@ def parse_args():
     return config
 
 
-logging.setLoggerClass(ColoredLogger)
-# logging.basicConfig()
-log = logging.getLogger("protoSpaceJAM")
-log.propagate = False
-log.setLevel(logging.INFO)  # set the level of warning displayed
-# log.setLevel(logging.DEBUG) #set the level of warning displayed
-
-# configs
-config = vars(parse_args())
-gRNA_num_out = config["num_gRNA_per_term"]
-max_cut2ins_dist = 50  # deprecated?
-HDR_arm_len = config["HA_len"]
-ssODN_max_size = config["ssODN_max_size"]
-spec_score_flavor = "guideMITScore"
-outdir = config["outdir"]
-syn_check_args = {
-    "check_enzymes": config["CheckEnzymes"],
-    "CustomSeq2Avoid": config["CustomSeq2Avoid"],
-    "MinArmLenPostTrim": config["MinArmLenPostTrim"],
-}  # dictionary for multiple synthesis check arguments
-
-# check recoding args
-assert (
-    config["recode_order"] == "protospacer_first"
-    or config["recode_order"] == "PAM_first"
-)
-if config["recoding_full"] and any(
-    [config["recoding_off"], config["recoding_stop_recut_only"]]
-):
-    sys.exit(
-        f"Found conflicts in recoding arguments: --recoding_full cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again"
-    )
-if config["recoding_off"] and config["recoding_stop_recut_only"]:
-    sys.exit(
-        f"Found conflicts in recoding arguments: --recoding_off cannot be used with --recoding_stop_recut_only\nplease correct the issue and try again"
-    )
-
-# process recoding args
-if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
-    config["recoding_full"] = True
-
-if config["recoding_off"] or config["recoding_stop_recut_only"]:
-    config["recoding_full"] = False
-
-recoding_args = {
-    "recoding_off": config["recoding_off"],
-    "recoding_stop_recut_only": config["recoding_stop_recut_only"],
-    "recoding_full": config["recoding_full"],
-    "cfdThres": float(config["cfdThres"]),
-    "recode_order": config["recode_order"],
-}
-
-# check donor args
-if not config["Donor_type"] in ["ssODN", "dsDNA"]:
-    sys.exit(
-        "Donor_type must be ssODN or dsDNA, offending value:"
-        + config["Donor_type"]
-        + ", please correct the issue and try again"
-    )
-if not config["Strand_choice"] in [
-    "auto",
-    "TargetStrand",
-    "NonTargetStrand",
-    "CodingStrand",
-    "NonCodingStrand",
-]:
-    sys.exit(
-        "Strand_choice must be auto,TargetStrand,NonTargetStrand,CodingStrand or NonCodingStrand, offending value:"
-        + config["Strand_choice"]
-        + ", please correct the issue and try again"
-    )
-
-# parse payload
-Linker = config["Linker"]
-Tag = config["Tag"]
-
-if config["payload"] == "":  # no payload override
-    if config["Npayload"] == "":  # no Npayload override
-        config["Npayload"] = Tag + Linker
-    if config["Cpayload"] == "":  # no Cpayload override
-        config["Cpayload"] = Linker + Tag
-else:  # payload override
-    config["Npayload"] = config["payload"]
-    config["Cpayload"] = config["payload"]
-
-
-# check if HA_len is too short to satisfy ssODN_max_size
-if ssODN_max_size is not None:
-    max_payload_size = max([len(config["Npayload"]), len(config["Cpayload"])])
-    derived_HDR_arm_len = ssODN_max_size - max_payload_size / 2
-    if derived_HDR_arm_len >= HDR_arm_len:
-        print(
-            f"HA_len={HDR_arm_len} is to short to meet the requirement of ssODN_max_size={ssODN_max_size}, payload size={max_payload_size}\n ssODN_max_size={ssODN_max_size} requires HA_len = ssODN_max_size- max_payload_size / 2 = {derived_HDR_arm_len}"
-        )
-        HDR_arm_len = derived_HDR_arm_len + 100
-        print(f"HA_len is adjusted to {HDR_arm_len}")
-
 #####################
 ##      main       ##
 #####################
-def main(outdir):
+def main(custom_args=None):
+    """
+    main function
+    custom_args: a dict of arguments to override the default arguments
+    """
     try:
+        logging.setLoggerClass(ColoredLogger)
+        # logging.basicConfig()
+        log = logging.getLogger("protoSpaceJAM")
+        log.propagate = False
+        log.setLevel(logging.INFO)  # set the level of warning displayed
+        # log.setLevel(logging.DEBUG) #set the level of warning displayed
+
+        # configs
+        config = vars(parse_args())
+        #apply custom args
+        for c_arg in custom_args:
+            config[c_arg] = custom_args[c_arg]
+
+        gRNA_num_out = config["num_gRNA_per_term"]
+        max_cut2ins_dist = 50  # deprecated?
+        HDR_arm_len = config["HA_len"]
+        ssODN_max_size = config["ssODN_max_size"]
+        spec_score_flavor = "guideMITScore"
+        outdir = config["outdir"]
+        syn_check_args = {
+            "check_enzymes": config["CheckEnzymes"],
+            "CustomSeq2Avoid": config["CustomSeq2Avoid"],
+            "MinArmLenPostTrim": config["MinArmLenPostTrim"],
+        }  # dictionary for multiple synthesis check arguments
+
+        # check recoding args
+        assert (
+            config["recode_order"] == "protospacer_first"
+            or config["recode_order"] == "PAM_first"
+        )
+        if config["recoding_full"] and any(
+            [config["recoding_off"], config["recoding_stop_recut_only"]]
+        ):
+            sys.exit(
+                f"Found conflicts in recoding arguments: --recoding_full cannot be used with --recoding_off or --recoding_stop_recut_only\nplease correct the issue and try again"
+            )
+        if config["recoding_off"] and config["recoding_stop_recut_only"]:
+            sys.exit(
+                f"Found conflicts in recoding arguments: --recoding_off cannot be used with --recoding_stop_recut_only\nplease correct the issue and try again"
+            )
+
+        # process recoding args
+        if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
+            config["recoding_full"] = True
+
+        if config["recoding_off"] or config["recoding_stop_recut_only"]:
+            config["recoding_full"] = False
+
+        recoding_args = {
+            "recoding_off": config["recoding_off"],
+            "recoding_stop_recut_only": config["recoding_stop_recut_only"],
+            "recoding_full": config["recoding_full"],
+            "cfdThres": float(config["cfdThres"]),
+            "recode_order": config["recode_order"],
+        }
+
+        # check donor args
+        if not config["Donor_type"] in ["ssODN", "dsDNA"]:
+            sys.exit(
+                "Donor_type must be ssODN or dsDNA, offending value:"
+                + config["Donor_type"]
+                + ", please correct the issue and try again"
+            )
+        if not config["Strand_choice"] in [
+            "auto",
+            "TargetStrand",
+            "NonTargetStrand",
+            "CodingStrand",
+            "NonCodingStrand",
+        ]:
+            sys.exit(
+                "Strand_choice must be auto,TargetStrand,NonTargetStrand,CodingStrand or NonCodingStrand, offending value:"
+                + config["Strand_choice"]
+                + ", please correct the issue and try again"
+            )
+
+        # parse payload
+        Linker = config["Linker"]
+        Tag = config["Tag"]
+
+        if config["payload"] == "":  # no payload override
+            if config["Npayload"] == "":  # no Npayload override
+                config["Npayload"] = Tag + Linker
+            if config["Cpayload"] == "":  # no Cpayload override
+                config["Cpayload"] = Linker + Tag
+        else:  # payload override
+            config["Npayload"] = config["payload"]
+            config["Cpayload"] = config["payload"]
+
+
+        # check if HA_len is too short to satisfy ssODN_max_size
+        if ssODN_max_size is not None:
+            max_payload_size = max([len(config["Npayload"]), len(config["Cpayload"])])
+            derived_HDR_arm_len = ssODN_max_size - max_payload_size / 2
+            if derived_HDR_arm_len >= HDR_arm_len:
+                print(
+                    f"HA_len={HDR_arm_len} is to short to meet the requirement of ssODN_max_size={ssODN_max_size}, payload size={max_payload_size}\n ssODN_max_size={ssODN_max_size} requires HA_len = ssODN_max_size- max_payload_size / 2 = {derived_HDR_arm_len}"
+                )
+                HDR_arm_len = derived_HDR_arm_len + 100
+                print(f"HA_len is adjusted to {HDR_arm_len}")
+
         # TODO: fix  the potential infinite loop
         # check memory requirement
         enough_mem = test_memory(4200)
@@ -577,7 +581,7 @@ def main(outdir):
                         dist_weight,
                         pos_weight,
                         final_weight,
-                    ) = get_res(current_gRNA)
+                    ) = get_res(current_gRNA, spec_score_flavor)
                     donor = HDR_template.Donor_final
                     gRNA_cut_pos = (
                         HDR_template.CutPos
@@ -705,7 +709,7 @@ def main(outdir):
                         dist_weight,
                         pos_weight,
                         final_weight,
-                    ) = get_res(current_gRNA)
+                    ) = get_res(current_gRNA, spec_score_flavor)
                     donor = HDR_template.Donor_final
                     gRNA_cut_pos = (
                         HDR_template.CutPos
@@ -823,6 +827,10 @@ def main(outdir):
         recut_CFD_fail.close()
         csvout_N.close()
         csvout_C.close()
+        fiveUTR_log.close()
+        csvout_res.close()
+        csvout_res2.close()
+
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
@@ -886,7 +894,7 @@ class info:
         self.failed = []
 
 
-def get_res(best_start_gRNA):
+def get_res(best_start_gRNA, spec_score_flavor):
     spec_score = best_start_gRNA[spec_score_flavor].values[0]
     seq = best_start_gRNA["seq"].values[0]
     pam = best_start_gRNA["pam"].values[0]
@@ -939,4 +947,4 @@ def PrintException():
 
 
 if __name__ == "__main__":
-    main(outdir)
+    main()
