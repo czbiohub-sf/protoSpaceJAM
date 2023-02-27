@@ -90,20 +90,53 @@ fabric.properties
 # that are supposed to be shared within teams.
 
 .idea/*
-
 !.idea/codeStyles
 !.idea/runConfigurations
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all
+# Begin custom ignore rules
 run_log.txt
 run_log.bk.txt
+logs
 logs/*
+pickles
 pickles/*
+plots
+plots/*
 jobs
 jobs/*
-OpenCell_protospaceX_design/
+
 enzymes.txt
 bk
 bk/*
 
+genome_files/*
+!genome_files/serialize_fa.sh
+!genome_files/preprocess_GFF3.sh
+!genome_files/get_fagz_sizes.py
+!genome_files/download_genomes.sh
+!genome_files/build_bwa_index.sh
+
+input/*
+!input/test.csv
+!input/mart_export_canonical_proteincoding.csv
+!input/mart_export_canonical_proteincoding.GRCm39.csv
+!input/mart_export_canonical_proteincoding.GRCz11.csv
+!input/test_protoSpaceJAM.csv
+!input/OpenCell_protospaceX_design.csv
+
+OpenCell_protospaceX_design/
+OpenCell_protospaceX_design/*
+
+precomuted_gRNAs/*
+!precomuted_gRNAs/utils/*
+!precomuted_gRNAs/1.get_gRNAs.sh
+!precomuted_gRNAs/2.split4mapping.sh
+!precomuted_gRNAs/3.map_gRNAs.sh
+!precomuted_gRNAs/4.get_gRNAs_stats.sh
+!precomuted_gRNAs/5.get_gRNAs_stats.py
+!precomuted_gRNAs/cmd.sh
+!precomuted_gRNAs/README.md
+
 docs/build
+
