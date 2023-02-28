@@ -176,8 +176,9 @@ def main(custom_args=None):
         # configs
         config = vars(parse_args())
         #apply custom args
-        for c_arg in custom_args:
-            config[c_arg] = custom_args[c_arg]
+        if not custom_args is None and len(custom_args) > 0:
+            for c_arg in custom_args:
+                config[c_arg] = custom_args[c_arg]
 
         gRNA_num_out = config["num_gRNA_per_term"]
         max_cut2ins_dist = 50  # deprecated?
@@ -560,7 +561,6 @@ def main(custom_args=None):
                         cfd4 = cfd3
                     else:
                         cfd4 = HDR_template.cfd_score_post_mut4
-                    start_info.cfd4.append(cfd4)
                     cfd_scan = 0
                     cfd_scan_no_recode = 0
                     if hasattr(HDR_template, "cfd_score_highest_in_win_scan"):
@@ -762,7 +762,7 @@ def main(custom_args=None):
             transcript_count += 1
             # report progress
             if (
-                protein_coding_transcripts_count % 10 == 0
+                protein_coding_transcripts_count % 100 == 0
                 and protein_coding_transcripts_count != 0
             ):
                 endtime = datetime.datetime.now()
