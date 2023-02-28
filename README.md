@@ -4,14 +4,15 @@
 
 # protoSpaceJAM 
 A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
+A web-portal is available at http://protospacejam.czbiohub.org/
 
 ## Key features:  
 - Fully standalone, no calling to other bioinformatics servers
-- Sophisticated guide RNA ranking system
+- Sophisticated guide RNA ranking system ([details](https://czbiohub.github.io/protoSpaceJAM/algorithm.html#grna-scoring))
   - Specificity weight
   - Penalize cuts near exon-intron junctions etc.
   - Penalize cuts far away from the payload insertion site
-- Sophisticated DNA donor design
+- Sophisticated DNA donor design ([details](https://czbiohub.github.io/protoSpaceJAM/algorithm.html#recoding-strategy))
   - Recode to prevent recut
   - Recode to facilitate payload insertion and prevent recut
   - Center the DNA donor around the region containing the payload and recoded bases. 
@@ -60,3 +61,5 @@ conda activate protospacejam
 python main.py --path2csv input/test_protoSpaceJAM.csv --outdir logs/test
 ```
 
+## License
+Distributed under the terms of the BSD-3 license, "protoSpaceJAM" is free and open source software
