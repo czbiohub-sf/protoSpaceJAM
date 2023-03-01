@@ -5,15 +5,8 @@ import sys
 
 sys.path.insert(1, "../")
 import os.path
-from scripts.utils import *
+from protoSpaceJAM.util.utils import *
 import traceback
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():

@@ -12,11 +12,14 @@ import gzip
 import shutil
 import re
 import math
-sys.path.insert(1, '../precomuted_gRNAs/utils')
+
+from protoSpaceJAM.util.utils import MyParser
+
+sys.path.insert(1, '../../precomuted_gRNAs/utils')
 #from gRNA_search import *
 #from utils import *
 #add to sys path, so the scoring modules can load
-scoring_script_dir = os.path.join(sys.path[0],"..","utils","crisporScores")
+scoring_script_dir = os.path.join(sys.path[0], "../..", "utils", "crisporScores")
 sys.path.insert(1, scoring_script_dir)
 from cfd import *
 from crisporEffScores import *
@@ -76,14 +79,9 @@ class ColoredLogger(logging.Logger):
         self.addHandler(console)
         return
 
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('error: %s\n' % message)
-        self.print_help()
-        sys.exit(2)
 
 def parse_args():
-    parser= MyParser(description='')
+    parser = MyParser(description='')
     parser.add_argument('--gzfile', default="", type=str, help='path to the gzfile', metavar='')
     parser.add_argument('--gzdir', default="", type=str, help='path to the dir containing gzfile', metavar='')
     parser.add_argument('--genome_fa', default="", type=str, help='name of genome fasta file', metavar='')

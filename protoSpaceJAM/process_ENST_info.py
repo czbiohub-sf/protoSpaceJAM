@@ -28,6 +28,8 @@ import zlib
 #################
 import logging
 
+from protoSpaceJAM.util.utils import MyParser
+
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 # The background is set with 40 plus the number of the color, and the foreground with 30
 
@@ -84,13 +86,6 @@ class ColoredLogger(logging.Logger):
 
         self.addHandler(console)
         return
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():

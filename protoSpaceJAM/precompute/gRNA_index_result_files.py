@@ -11,11 +11,13 @@ import gzip
 import shutil
 import gc
 import math
+import pickle
 
-sys.path.insert(1, "..")
+from protoSpaceJAM.util.utils import MyParser
+
+sys.path.insert(1, "../..")
 # from gRNA_search import *
 # from utils import *
-from crisporEffScores.crisporEffScores import *
 
 #################
 # custom logging #
@@ -81,42 +83,22 @@ class ColoredLogger(logging.Logger):
 
 
 # add to sys path, so the scoring modules can load
-scoring_script_dir = os.path.join(sys.path[0], "..", "crisporEffScores")
-sys.path.insert(1, scoring_script_dir)
-from cfd import *
-from crisporEffScores import *
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
+# scoring_script_dir = os.path.join(sys.path[0],"..","crisporEffScores")
+# sys.path.insert(1, scoring_script_dir)
+# from cfd import *
+# from crisporEffScores import *
 
 
 def parse_args():
     parser = MyParser(description="")
     parser.add_argument(
-        "--gzfile", default="", type=str, help="path to the gzfile", metavar=""
-    )
-    parser.add_argument(
         "--gzdir",
         default="",
         type=str,
-        help="path to the dir containing gzfile",
-        metavar="",
-    )
-    parser.add_argument(
-        "--genome_fa",
-        default="",
-        type=str,
-        help="name of genome fasta file",
+        help="path to the dir containing gzfiles",
         metavar="",
     )
     config = parser.parse_args()
-    if len(sys.argv) == 1:  # print help message if arguments are not valid
-        parser.print_help()
-        sys.exit(1)
     return config
 
 
@@ -136,76 +118,55 @@ n_gRNA_per_chunk = 200
 def main():
     try:
         # check input
-        if config["gzfile"] is None or config["gzfile"] == "":
-            log.error(f"please specify --gzfile")
+        if config["gzdir"] is None or config["gzdir"] == "":
+            log.error(f"please specify --gzdir")
             sys.exit("Please fix the error(s) above and rerun the script")
 
         starttime = datetime.datetime.now()
-        gRNA_count = 0
-        scored_gRNA_count = 0
-        # keep a dictionary of multi-mapping guides for current file
-        gRNA = dict()
-        scored_gRNA = dict()
+        file_count = 0
+        # make a dict for the index information will be collected
+        file_index = dict()
 
-        # make output dir
-        outdir_path = config["gzdir"] + ".scored_failedCheck"
-        if os.path.isdir(outdir_path):
-            # shutil.rmtree(outdir_path)  # remove existing dir
-            pass
-        else:
-            os.makedirs(outdir_path)
+        for filename in os.listdir(config["gzdir"]):
+            file_path = os.path.join(config["gzdir"], filename)
 
-        file = os.path.join(config["gzdir"], config["gzfile"])
-        Chr = file.rstrip(".tab.gz").split("/")[1].split(r".")[0]
-        # print(Chr)
+            Chr = filename.split(".tab")[0].split(".part")[0]
+            print(f"file: {filename}\tchr: {Chr}")
 
-        with gzip.open(file, "rt") as infh:
-            for line in infh:
-                # print(line)
-                # read gRNA from gzip file
-                seq = line.split("\t")[0]
-                pam = line.split("\t")[1]
-                st = line.split("\t")[2]
-                en = line.split("\t")[3]
-                strand = line.split("\t")[4].rstrip()
-                gRNA_name = f"{Chr}_{st}_{en}_{strand}_{pam}"
-                gRNA_name2 = f"{Chr}:{st}-{en}_{strand}"
-                gRNA[gRNA_name] = 1
-                gRNA_count += 1
+            if Chr not in file_index.keys():
+                file_index[Chr] = dict()
 
-        result_file = os.path.join(
-            config["gzdir"] + ".scored", f"{config['gzfile'].rstrip('.gz')}.scored.gz"
-        )
-        if os.path.isfile(result_file):  # score result file exists
-            with gzip.open(result_file, "rt") as outfh:
-                for line in outfh:
+            min_pos = 999999999
+            max_pos = 0
+            with gzip.open(file_path, "rt") as infh:
+                for line in infh:
                     # print(line)
                     # read gRNA from gzip file
-                    seq = line.split("\t")[0]
-                    pam = line.split("\t")[1]
-                    st = line.split("\t")[2]
-                    en = line.split("\t")[3]
-                    strand = line.split("\t")[4].rstrip()
-                    gRNA_name = f"{Chr}_{st}_{en}_{strand}_{pam}"
-                    gRNA_name2 = f"{Chr}:{st}-{en}_{strand}"
-                    scored_gRNA[gRNA_name] = 1
-            if len(scored_gRNA) < len(gRNA):  # check the number of scored gRNAs
-                with gzip.open(
-                    os.path.join(outdir_path, config["gzfile"]), "wt"
-                ) as gzfh:
-                    gzfh.write(f"scored_gRNA_count < gRNA_count")
-        else:  # score result file doesn't exist
-            with gzip.open(os.path.join(outdir_path, config["gzfile"]), "wt") as gzfh:
-                gzfh.write(f"scored gRNA file doesn't exist")
+                    # seq = line.split("\t")[0]
+                    # pam = line.split("\t")[1]
+                    st = int(line.split("\t")[2])
+                    en = int(line.split("\t")[3])
+
+                    min_pos = update_min(min_pos, st)
+                    min_pos = update_min(min_pos, en)
+                    max_pos = update_max(max_pos, st)
+                    max_pos = update_max(max_pos, en)
+
+            file_index[Chr][f"{min_pos}-{max_pos}"] = filename
+            file_count += 1
+
+        # write dict to file
+        with open(
+            os.path.join(config["gzdir"], "loc2file_index.pickle"), "wb"
+        ) as handle:
+            pickle.dump(file_index, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         endtime = datetime.datetime.now()
         elapsed_sec = endtime - starttime
         elapsed_min = elapsed_sec.seconds / 60
-        log.info(
-            f"finished in {elapsed_min:.2f} min, checked {gRNA_count} gRNAs in file {file}"
-        )
+        log.info(f"finished in {elapsed_min:.2f} min, processed {file_count} files")
         print(
-            f"finished in {elapsed_min:.2f} min, checked {gRNA_count} gRNAs in file {file}",
+            f"finished in {elapsed_min:.2f} min, processed {file_count} files",
             flush=True,
         )
 
@@ -218,6 +179,20 @@ def main():
 ##########################
 ## function definitions ##
 ##########################
+def update_min(min, number):
+    if number <= min:
+        return number
+    else:
+        return min
+
+
+def update_max(max, number):
+    if number >= max:
+        return number
+    else:
+        return max
+
+
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame

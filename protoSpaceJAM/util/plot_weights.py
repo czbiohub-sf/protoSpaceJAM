@@ -1,22 +1,9 @@
 import os.path
-import pandas as pd
-import argparse
-import sys
-import linecache
-import datetime
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
-import pickle
-from scripts.utils import *
+from protoSpaceJAM.util.utils import *
 from scipy.stats import gaussian_kde
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():

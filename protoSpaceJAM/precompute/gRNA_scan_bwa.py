@@ -13,17 +13,11 @@ import gc
 import math
 
 # from BLAST_utils import check_blastDB_human
+from protoSpaceJAM.util.utils import MyParser
 
-sys.path.insert(1, "..")
+sys.path.insert(1, "../..")
 from gRNA_search import *
 from utils import *
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():

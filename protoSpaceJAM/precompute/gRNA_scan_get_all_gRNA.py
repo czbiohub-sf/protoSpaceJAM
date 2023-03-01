@@ -11,16 +11,11 @@ import shutil
 import gc
 import re
 
-sys.path.insert(1, "..")
+from protoSpaceJAM.util.utils import MyParser
+
+sys.path.insert(1, "../..")
 from gRNA_search import *
 from utils import *
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():
