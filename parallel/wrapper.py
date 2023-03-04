@@ -298,22 +298,15 @@ def worker(num, event, conn, workerConfig):
     #constrcut the command line arguments
     cmd = ["python", "main.py"]
     for key, val in workerConfig.items():
-
         if key in ["recoding_full", "recoding_stop_recut_only", "recoding_off"]:
-            if val == "True" or val == True:
-                cmd.append("--recoding_full")
-            elif val == "True" or val == True:
-                cmd.append("--recoding_stop_recut_only")
-            elif val == "True" or val == True:
-                cmd.append("--recoding_off")
+            if val:
+                cmd.append(f"--{key}")
             continue
 
         if val != "" and val is not None and val != 'None':
             cmd.append(f"--{key}")
             cmd.append(str(val))
 
-
-    #print(cmd)
     with open(os.path.join(workerConfig["outdir"], "stdout.txt"), "w") as stdout, open(os.path.join(workerConfig["outdir"], "stderr.txt"), "w") as stderr:
         subprocess.call(cmd, stdout=stdout, stderr=stderr)
 
