@@ -1,7 +1,7 @@
 import os
 import tarfile
 import gdown
-
+import sys
 
 def download_from_gdrive(
     id, name, dest_folder=".", overwrite=False, unzip=False
@@ -31,15 +31,15 @@ def download_from_gdrive(
         return output_path
     else:
         print(f"Not downloading file {output_path} as it already exists.")
-
-
         return None
 
 
 if __name__ == '__main__':
+    if not os.path.exists("protoSpaceJAM"):
+        sys.exit("Please run this script from the repo's root directory.")
     download_from_gdrive(
         id="1kFl22tFgCyr9Ipnm7h6Y-fu0Usn-4wsa",
-        dest_folder=".",
+        dest_folder=os.path.join("."),
         name="precomputed_results.tar.gz",
         unzip=True,
         overwrite=True

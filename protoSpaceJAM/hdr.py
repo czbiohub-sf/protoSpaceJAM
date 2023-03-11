@@ -9,7 +9,7 @@ from Bio.Seq import Seq
 from Bio import Restriction
 from Bio.SeqUtils import GC
 import re
-from protoSpaceJAM.cfdscore import *
+from cfdscore import *
 from itertools import islice
 import math
 

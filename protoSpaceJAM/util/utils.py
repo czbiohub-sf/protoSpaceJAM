@@ -15,7 +15,8 @@ import gc
 import math
 import re
 import pickle
-from protoSpaceJAM.hdr import *
+sys.path.append('..')
+from hdr import *
 
 #################
 # custom logging #
@@ -848,7 +849,7 @@ def get_gRNAs_near_loc(loc, dist, loc2file_index, genome_ver):
     dfs = []
     for file in target_files:
         file_path = os.path.join(
-            "precomuted_gRNAs",
+            "precomputed_gRNAs",
             f"gRNA_{genome_ver}",
             "gRNA.tab.gz.split.BwaMapped.scored",
             file,

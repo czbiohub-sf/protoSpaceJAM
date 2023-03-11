@@ -15,7 +15,7 @@ import math
 
 from protoSpaceJAM.util.utils import MyParser
 
-sys.path.insert(1, '../../precomuted_gRNAs/utils')
+sys.path.insert(1, '../../precomputed_gRNAs/utils')
 #from gRNA_search import *
 #from utils import *
 #add to sys path, so the scoring modules can load
