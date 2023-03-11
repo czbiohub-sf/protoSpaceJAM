@@ -2,6 +2,7 @@ import os
 import tarfile
 import gdown
 
+
 def download_from_gdrive(
     id, name, dest_folder=".", overwrite=False, unzip=False
 ):
@@ -34,4 +35,12 @@ def download_from_gdrive(
 
         return None
 
-download_from_gdrive(id="1kFl22tFgCyr9Ipnm7h6Y-fu0Usn-4wsa", dest_folder=".",name="precomputed_results.tar.gz", unzip=True, overwrite=True)
+
+if __name__ == '__main__':
+    download_from_gdrive(
+        id="1kFl22tFgCyr9Ipnm7h6Y-fu0Usn-4wsa",
+        dest_folder=".",
+        name="precomputed_results.tar.gz",
+        unzip=True,
+        overwrite=True
+    )

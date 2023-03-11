@@ -1,28 +1,10 @@
 import os.path
-import pandas as pd
-from subprocess import Popen
-from Bio import SeqIO
-import csv
-import argparse
 import sys
-import linecache
-import datetime
-import gzip
-import gc
-import math
 import numpy as np
-import errno, os, stat, shutil
+import errno, os, stat
 
-sys.path.insert(1, "..")
-from gRNA_search import *
+sys.path.insert(1, "../..")
 from utils import *
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():

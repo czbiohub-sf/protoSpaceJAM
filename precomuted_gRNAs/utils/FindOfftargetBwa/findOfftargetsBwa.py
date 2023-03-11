@@ -14,17 +14,12 @@ import logging
 import argparse
 import sys
 
+from protoSpaceJAM.util.utils import MyParser
+
 logging.basicConfig()  # setup the default configuration set
 log = logging.getLogger("FinOfftargetBwa")  # Logger name
 log.propagate = False
 log.setLevel(logging.INFO)  # set the level of warning displayed
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
 
 
 def parse_args():

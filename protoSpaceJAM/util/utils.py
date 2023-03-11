@@ -15,12 +15,20 @@ import gc
 import math
 import re
 import pickle
-from scripts.hdr import *
+from protoSpaceJAM.hdr import *
 
 #################
 # custom logging #
 #################
 import logging
+
+
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write("error: %s\n" % message)
+        self.print_help()
+        sys.exit(2)
+
 
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 # The background is set with 40 plus the number of the color, and the foreground with 30

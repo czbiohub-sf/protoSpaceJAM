@@ -1,29 +1,10 @@
 import os.path
-import pandas as pd
-from subprocess import Popen
-from Bio import SeqIO
-import csv
-import argparse
 import sys
-import linecache
-import datetime
-import gzip
-import shutil
-import gc
-import math
 
 # from BLAST_utils import check_blastDB_human
 
 sys.path.insert(1, "..")
-from gRNA_search import *
-from utils import *
-
-
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write("error: %s\n" % message)
-        self.print_help()
-        sys.exit(2)
+from protoSpaceJAM.util.utils import *
 
 
 def parse_args():
