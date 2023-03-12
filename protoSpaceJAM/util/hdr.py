@@ -9,16 +9,16 @@ from Bio.Seq import Seq
 from Bio import Restriction
 from Bio.SeqUtils import GC
 import re
-from cfdscore import *
+from util.cfdscore import *
 from itertools import islice
 import math
 
-
 try:
-    from . import cfdscore, mitscore
+    from util.cfdscore import *
+    from util.mitscore import *
 except ImportError:
-    import cfdscore  # type: ignore
-    import mitscore  # type: ignore
+    from cfdscore import *
+    from mitscore import *
 
 logger = logging.getLogger(__name__)
 

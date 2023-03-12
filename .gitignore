@@ -140,5 +140,8 @@ protoSpaceJAM/precomputed_gRNAs/*
 !protoSpaceJAM/precomputed_gRNAs/cmd.sh
 !protoSpaceJAM/precomputed_gRNAs/README.md
 
+protoSpaceJAM/precomputed_results.tar.gz
+
 docs/build
+
 

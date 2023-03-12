@@ -38,8 +38,8 @@ if __name__ == '__main__':
     if not os.path.exists("protoSpaceJAM"):
         sys.exit("Please run this script from the repo's root directory.")
     download_from_gdrive(
-        id="1kFl22tFgCyr9Ipnm7h6Y-fu0Usn-4wsa",
-        dest_folder=os.path.join("."),
+        id="1cxqnKGPVg1elEcs_kIob5SKETEZ0egfg",
+        dest_folder=os.path.join("protoSpaceJAM"),
         name="precomputed_results.tar.gz",
         unzip=True,
         overwrite=True

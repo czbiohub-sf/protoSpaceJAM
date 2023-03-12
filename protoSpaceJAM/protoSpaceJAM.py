@@ -161,6 +161,13 @@ def main(custom_args=None):
     custom_args: a dict of arguments to override the default arguments
     """
     try:
+        #set up working directory
+        if not os.path.exists(os.path.join("precomputed_gRNAs")):
+            if not os.path.exists(os.path.join("protoSpaceJAM", "precomputed_gRNAs")):
+                sys.exit("precomputed_gRNAs folder not found, please run the script from the repo's root directory")
+            else:
+                os.chdir("protoSpaceJAM")
+
         logging.setLoggerClass(ColoredLogger)
         # logging.basicConfig()
         log = logging.getLogger("protoSpaceJAM")
