@@ -110,12 +110,12 @@ enzymes.txt
 bk
 bk/*
 
-genome_files/*
-!genome_files/serialize_fa.sh
-!genome_files/preprocess_GFF3.sh
-!genome_files/get_fagz_sizes.py
-!genome_files/download_genomes.sh
-!genome_files/build_bwa_index.sh
+protoSpaceJAM/genome_files/*
+!protoSpaceJAM/genome_files/serialize_fa.sh
+!protoSpaceJAM/genome_files/preprocess_GFF3.sh
+!protoSpaceJAM/genome_files/get_fagz_sizes.py
+!protoSpaceJAM/genome_files/download_genomes.sh
+!protoSpaceJAM/genome_files/build_bwa_index.sh
 
 input/*
 !input/test.csv
@@ -125,18 +125,23 @@ input/*
 !input/test_protoSpaceJAM.csv
 !input/OpenCell_protospaceX_design.csv
 
+output/*
+
 OpenCell_protospaceX_design/
 OpenCell_protospaceX_design/*
 
-precomuted_gRNAs/*
-!precomuted_gRNAs/utils/*
-!precomuted_gRNAs/1.get_gRNAs.sh
-!precomuted_gRNAs/2.split4mapping.sh
-!precomuted_gRNAs/3.map_gRNAs.sh
-!precomuted_gRNAs/4.get_gRNAs_stats.sh
-!precomuted_gRNAs/5.get_gRNAs_stats.py
-!precomuted_gRNAs/cmd.sh
-!precomuted_gRNAs/README.md
+protoSpaceJAM/precomputed_gRNAs/*
+!protoSpaceJAM/precomputed_gRNAs/utils/*
+!protoSpaceJAM/precomputed_gRNAs/1.get_gRNAs.sh
+!protoSpaceJAM/precomputed_gRNAs/2.split4mapping.sh
+!protoSpaceJAM/precomputed_gRNAs/3.map_gRNAs.sh
+!protoSpaceJAM/precomputed_gRNAs/4.get_gRNAs_stats.sh
+!protoSpaceJAM/precomputed_gRNAs/5.get_gRNAs_stats.py
+!protoSpaceJAM/precomputed_gRNAs/cmd.sh
+!protoSpaceJAM/precomputed_gRNAs/README.md
+
+protoSpaceJAM/precomputed_results.tar.gz
 
 docs/build
+
 

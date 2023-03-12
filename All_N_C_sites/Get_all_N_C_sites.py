@@ -42,7 +42,7 @@ def main():
         print("loading gene model info")
         ENST_info = read_pickle_files(
             os.path.join(
-                "../precomuted_gRNAs/utils",
+                "../precomputed_gRNAs/utils",
                 "..",
                 "genome_files",
                 "parsed_gff3",
