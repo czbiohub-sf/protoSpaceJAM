@@ -1,30 +1,21 @@
 from Bio.Seq import Seq
 import os.path
 import pandas as pd
-from subprocess import Popen
-from Bio import SeqIO
 from Bio.Seq import reverse_complement
-import csv
 import argparse
 import sys
-import linecache
-import datetime
-import gzip
-import shutil
-import gc
 import math
-import re
 import pickle
 
-try:
-    from hdr import *
-except ImportError:
-    from util.hdr import *
+
 
 import logging
 #################
 # custom logging #
 #################
+from protoSpaceJAM.util.hdr import HDR_flank
+
+
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
         sys.stderr.write("error: %s\n" % message)
@@ -279,6 +270,7 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
     """
     Chr, Pos, Strand = loc
     # get arms
+    vanilla_left_arm, vanilla_right_arm = None, None
     if type == "start":
         if Strand == 1:
             vanilla_left_arm = get_seq(

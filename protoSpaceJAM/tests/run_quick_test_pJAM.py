@@ -1,9 +1,8 @@
 import unittest
 import os
 import shutil
-import sys
-sys.path.append(os.path.join(sys.path[0], '..'))
-from protoSpaceJAM import main as pJAM
+
+from protoSpaceJAM.protoSpaceJAM import main as pJAM
 
 class test_with_OpenCell_design(unittest.TestCase):
 
