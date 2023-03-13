@@ -125,6 +125,7 @@ protoSpaceJAM/input/*
 !protoSpaceJAM/input/test_protoSpaceJAM.csv
 !protoSpaceJAM/input/OpenCell_protospaceX_design.csv
 
+output
 output/*
 
 OpenCell_protospaceX_design/
@@ -143,5 +144,6 @@ protoSpaceJAM/precomputed_gRNAs/*
 protoSpaceJAM/precomputed_results.tar.gz
 
 docs/build
-
+build
+protoSpaceJAM.egg-info
 

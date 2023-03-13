@@ -25,7 +25,7 @@ def parse_args():
     )
     parser.add_argument(
         "--path2csv",
-        default="../input/test.csv",
+        default="input/test.csv",
         type=str,
         help="path to a csv file containing ENST information\n *required columns*: Ensemble_ID",
         metavar="",
@@ -156,7 +156,7 @@ def parse_args():
     )
 
     # output
-    parser.add_argument("--outdir", default="../output/test_run", type=str, help="output directory")
+    parser.add_argument("--outdir", default="output/test_run", type=str, help="output directory")
 
     config = parser.parse_args()
     return config
