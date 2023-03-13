@@ -117,13 +117,13 @@ protoSpaceJAM/genome_files/*
 !protoSpaceJAM/genome_files/download_genomes.sh
 !protoSpaceJAM/genome_files/build_bwa_index.sh
 
-input/*
-!input/test.csv
-!input/mart_export_canonical_proteincoding.csv
-!input/mart_export_canonical_proteincoding.GRCm39.csv
-!input/mart_export_canonical_proteincoding.GRCz11.csv
-!input/test_protoSpaceJAM.csv
-!input/OpenCell_protospaceX_design.csv
+protoSpaceJAM/input/*
+!protoSpaceJAM/input/test.csv
+!protoSpaceJAM/input/mart_export_canonical_proteincoding.csv
+!protoSpaceJAM/input/mart_export_canonical_proteincoding.GRCm39.csv
+!protoSpaceJAM/input/mart_export_canonical_proteincoding.GRCz11.csv
+!protoSpaceJAM/input/test_protoSpaceJAM.csv
+!protoSpaceJAM/input/OpenCell_protospaceX_design.csv
 
 output/*
 

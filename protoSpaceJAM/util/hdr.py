@@ -1,6 +1,7 @@
 import functools
 import itertools
 import logging
+import re
 from typing import List
 import sys
 from typing import Iterator
@@ -8,17 +9,11 @@ import copy
 from Bio.Seq import Seq
 from Bio import Restriction
 from Bio.SeqUtils import GC
-import re
-from util.cfdscore import *
 from itertools import islice
 import math
 
-try:
-    from util.cfdscore import *
-    from util.mitscore import *
-except ImportError:
-    from cfdscore import *
-    from mitscore import *
+from protoSpaceJAM.util.cfdscore import cfd_score
+from protoSpaceJAM.util.mitscore import mit_hit_score
 
 logger = logging.getLogger(__name__)
 
@@ -3309,13 +3304,13 @@ class HDR:
         # TODO (gdingle): remove MIT score?
         if self.use_cfd_score:
             hit_score_func = functools.partial(
-                cfdscore.cfd_score,
+                cfd_score,
                 wt=self.guide_seq.upper(),
                 guide_strand_same=self.guide_strand_same,
             )
         else:
             hit_score_func = functools.partial(
-                mitscore.mit_hit_score,
+                mit_hit_score,
                 self.guide_seq.upper(),
                 guide_strand_same=self.guide_strand_same,
                 include_pam=test_length == 23,

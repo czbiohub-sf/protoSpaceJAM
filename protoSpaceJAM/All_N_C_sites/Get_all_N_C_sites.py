@@ -3,7 +3,7 @@
 
 import sys
 
-sys.path.insert(1, "../")
+sys.path.insert(1, "../../")
 import os.path
 from protoSpaceJAM.util.utils import *
 import traceback
@@ -43,7 +43,7 @@ def main():
         ENST_info = read_pickle_files(
             os.path.join(
                 "../precomputed_gRNAs/utils",
-                "..",
+                "../..",
                 "genome_files",
                 "parsed_gff3",
                 config["genome_ver"],

@@ -1,5 +1,0 @@
-biopython==1.78
-numpy
-pandas
-primer3-py
-gdown==4.6.4
