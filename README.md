@@ -37,9 +37,9 @@ git checkout main
 ```
 conda create -y -n protospacejam python=3.9 && conda activate protospacejam
 ```
-### Install required packages
+### Install protoSpaceJAM
 ```
-pip install -r requirements.txt
+pip install .
 ```
 ### Download and unzip pre-computed data
 ```
