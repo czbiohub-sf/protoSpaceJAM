@@ -1,6 +1,6 @@
 ![Python version](https://img.shields.io/badge/python-3.9%20%7C%203.10-blue)
 ![Webserver dependencies-0-brightgreen](https://user-images.githubusercontent.com/4129442/198696112-92ecc372-f3b5-4498-8cd9-4a01de0f851b.svg)
-![status-active development-blueviolet](https://user-images.githubusercontent.com/4129442/198695999-a70bcd5f-c52e-4895-a1e7-d6b0da132812.svg)
+![status](https://img.shields.io/badge/status-beta--testing-blueviolet)
 
 # protoSpaceJAM 
 A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
