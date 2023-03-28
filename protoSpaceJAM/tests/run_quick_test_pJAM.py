@@ -9,7 +9,6 @@ class test_with_OpenCell_design(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print("running protoSpaceJAM tests using only four designs (quick test)...")
-
         #change directory to protoSpaceJAM
         try:
             os.chdir(os.path.join('protoSpaceJAM'))
@@ -21,13 +20,13 @@ class test_with_OpenCell_design(unittest.TestCase):
             raise FileNotFoundError("protoSpaceJAM.py not found in current directory, are you in the protoSpaceJAM directory?")
 
         #Remove previous results
-        if os.path.exists("tests/quick_test"):
-            shutil.rmtree("tests/quick_test")
+        if os.path.exists(os.path.join("tests", "quick_test_result")):
+            shutil.rmtree(os.path.join("tests", "quick_test_result"))
 
         #run protoSpaceJAM
         test_args = {
-                    "path2csv": "../input/test_protoSpaceJAM.csv",
-                    "outdir": "tests/quick_test",
+                    "path2csv": os.path.join("input", "test_protoSpaceJAM.csv"),
+                    "outdir": os.path.join("tests","quick_test_result"),
                     "ssODN_max_size": 200,
                     "Npayload": "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
                     "Cpayload": "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
@@ -38,19 +37,19 @@ class test_with_OpenCell_design(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         #Remove results
-        if os.path.exists("tests/quick_test"):
-            shutil.rmtree("tests/quick_test")
+        if os.path.exists(os.path.join("tests", "quick_test_result")):
+            shutil.rmtree(os.path.join("tests", "quick_test_result"))
 
     def test_if_generated_results(self):
         #check if results were generated
-        self.assertTrue(os.path.isfile("tests/quick_test/result.csv"))
+        self.assertTrue(os.path.isfile(os.path.join("tests", "quick_test_result", "result.csv")))
 
     def test_compare_results(self):
         print("comparing results...")
 
         #define path to results
         ExpectedResPath = os.path.join("tests","GroundTruths", "quick_result.csv")
-        NewResPath = os.path.join("tests","quick_test","result.csv")
+        NewResPath = os.path.join("tests","quick_test_result","result.csv")
 
         #compare results
         with open(ExpectedResPath, 'r') as file1, open(NewResPath, 'r') as file2:

@@ -27,8 +27,8 @@ class test_with_OpenCell_design(unittest.TestCase):
 
         #run protoSpaceJAM
         test_args = {
-                    "path2csv": "../input/OpenCell_protospaceX_design.csv",
-                    "outdir": "tests/OpenCell_design",
+                    "path2csv": os.path.join("input", "OpenCell_protospaceX_design.csv"),
+                    "outdir": os.path.join("tests", "OpenCell_design"),
                     "ssODN_max_size": 200,
                     "Npayload": "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
                     "Cpayload": "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
@@ -39,12 +39,12 @@ class test_with_OpenCell_design(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         #Remove results
-        if os.path.exists("tests/OpenCell_design"):
-            shutil.rmtree("tests/OpenCell_design")
+        if os.path.exists(os.path.join("tests", "OpenCell_design")):
+            shutil.rmtree(os.path.join("tests", "OpenCell_design"))
 
     def test_if_generated_results(self):
         #check if results were generated
-        self.assertTrue(os.path.isfile("tests/OpenCell_design/result.csv"))
+        self.assertTrue(os.path.isfile(os.path.join("tests", "OpenCell_design", "result.csv")))
 
     def test_compare_results(self):
         print("comparing results...")
