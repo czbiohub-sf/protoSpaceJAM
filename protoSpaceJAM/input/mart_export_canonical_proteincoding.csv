@@ -1,4 +1,4 @@
-Gene stable ID,Gene stable ID version,Transcript stable ID,Ensemble_ID,Transcript stable ID version,Ensembl Canonical,Gene type
+Gene stable ID,Gene stable ID version,Transcript stable ID,Ensembl_ID,Transcript stable ID version,Ensembl Canonical,Gene type
 ENSG00000198888,ENSG00000198888.2,ENST00000361390,ENST00000361390,ENST00000361390.2,1,protein_coding
 ENSG00000198763,ENSG00000198763.3,ENST00000361453,ENST00000361453,ENST00000361453.3,1,protein_coding
 ENSG00000198804,ENSG00000198804.2,ENST00000361624,ENST00000361624,ENST00000361624.2,1,protein_coding

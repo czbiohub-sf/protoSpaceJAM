@@ -10,119 +10,139 @@ import time
 
 import pandas as pd
 
-from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, \
-    get_HDR_template
+from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
+    get_HDR_template #uncomment this for pip installation
+
+# from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
+#     get_HDR_template
 
 
 def parse_args():
-    parser = MyParser(description="protoSpaceJAM")
+    parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n")
+
+    parser.add_argument(
+        "--path2csv",
+        default=os.path.join("input","test_input.csv"),
+        type=str,
+        help="path to a csv file containing ENST information, see input/test_input.csv for an example\n *required columns*: 'Ensembl_ID' (specifying the transcript ID), and either 'Target_terminus' or 'Chromosome','Coordinate' (specifying the terminus of the transcript or a genomic coordinate in the transcript)",
+        metavar="<PATH_TO_CSV>",
+    )
+
+    parser.add_argument(
+        "--outdir",
+        default=os.path.join("ouput","test"),
+        type=str,
+        metavar = "<PATH_TO_OUTPUT_DIRECTORY>",
+        help="output directory"
+    )
+
     parser.add_argument(
         "--genome_ver",
         default="GRCh38",
         type=str,
         help="currently supports three genomes: GRCh38, GRCm39, GRCz11, ",
-        metavar="",
-    )
-    parser.add_argument(
-        "--path2csv",
-        default="input/test.csv",
-        type=str,
-        help="path to a csv file containing ENST information\n *required columns*: Ensemble_ID",
-        metavar="",
-    )
-    # gRNA
-    parser.add_argument(
-        "--num_gRNA_per_term",
-        default=1,
-        type=int,
-        help="payload at the N terminus",
-        metavar="",
-    )
-    # donor
-    parser.add_argument(
-        "--HA_len",
-        default=500,
-        help="length of the homology arm (on each side), will be the final arm length for dsDNA donors",
-        type=int,
-        metavar="",
-    )
-    parser.add_argument(
-        "--Donor_type",
-        default="ssODN",
-        help="ssODN(default) or dsDNA",
-        type=str,
-        metavar="",
-    )
-    parser.add_argument(
-        "--Strand_choice",
-        default="NonTargetStrand",
-        help="only applies when --Donor_type is set to ssODN, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand",
-        type=str,
-        metavar="",
-    )
-    parser.add_argument(
-        "--ssODN_max_size",
-        type=int,
-        help="only applies when --Donor_type is set to ssODN. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region",
-        metavar="",
-    )
-    parser.add_argument(
-        "--CheckEnzymes",
-        default="",
-        help="Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI",
-        type=str,
-        metavar="",
-    )
-    parser.add_argument(
-        "--CustomSeq2Avoid",
-        default="",
-        help="custom sequences to avoid, separated by |",
-        type=str,
-        metavar="",
-    )
-    parser.add_argument(
-        "--MinArmLenPostTrim",
-        default=0,
-        help="Minimum length the homology arm after trimming,  default is 0 (turning off trimming)",
-        type=str,
-        metavar="",
+        metavar="<string>",
     )
 
+    # gRNA
+    parser.add_argument(
+        "--num_gRNA_per_design",
+        default=1,
+        type=int,
+        help="Number of gRNAs per design, default is 1",
+        metavar="<integer>",
+    )
     # payload
     parser.add_argument(
         "--payload",
         default="",
         type=str,
-        help="payload, overrides --Npayloadf and --Cpayload, --Tag, --Linker",
-        metavar="",
+        help="payload for every site, regardless of termius or coordinates, overrides --Npayload, --Cpayload, POSpayload, --Tag, --Linker",
+        metavar="<string>",
     )
     parser.add_argument(
         "--Npayload",
-        default="",
+        default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
         type=str,
-        help="payload at the N terminus, overrides --Tag --Linker",
-        metavar="",
+        help="payload at the N terminus, default is mNG11 + XTEN80: ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT , overrides --Tag --Linker",
+        metavar="<string>",
     )
     parser.add_argument(
         "--Cpayload",
-        default="",
+        default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the N terminus, overrides --Tag --Linker",
-        metavar="",
+        help="payload at the C terminus, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG () overrides --Tag --Linker",
+        metavar="<string>",
+    )
+    parser.add_argument(
+        "--POSpayload",
+        default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
+        type=str,
+        help="payload at the target coordinate, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG () overrides --Tag --Linker",
+        metavar="<string>",
     )
     parser.add_argument(
         "--Tag",
         default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
         help="default is the mNG11 tag",
-        metavar="",
+        metavar="<string>",
     )
     parser.add_argument(
         "--Linker",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
         type=str,
-        help="default is the GS linker",
-        metavar="",
+        help="default is the XTEN80 linker",
+        metavar="<string>",
+    )
+    # donor
+    parser.add_argument(
+        "--Donor_type",
+        default="ssODN",
+        help="ssODN(default) or dsDNA",
+        type=str,
+        metavar="<string>",
+    )
+    parser.add_argument(
+        "--HA_len",
+        default=500,
+        help="length of the homology arm (on each side), will be the final arm length for dsDNA donors",
+        type=int,
+        metavar="<integer>",
+    )
+    parser.add_argument(
+        "--Strand_choice",
+        default="NonTargetStrand",
+        help="only applies when --Donor_type is set to ssODN, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand",
+        type=str,
+        metavar="<string>",
+    )
+    parser.add_argument(
+        "--ssODN_max_size",
+        type=int,
+        help="only applies when --Donor_type is set to ssODN. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region",
+        metavar="<int>",
+    )
+    parser.add_argument(
+        "--CheckEnzymes",
+        default="",
+        help="Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI",
+        type=str,
+        metavar="<string>",
+    )
+    parser.add_argument(
+        "--CustomSeq2Avoid",
+        default="",
+        help="custom sequences to avoid, separated by |",
+        type=str,
+        metavar="<string>",
+    )
+    parser.add_argument(
+        "--MinArmLenPostTrim",
+        default=0,
+        help="Minimum length the homology arm after trimming,  default is 0 (turning off trimming)",
+        type=int,
+        metavar="<integer>",
     )
 
     # recoding
@@ -136,31 +156,34 @@ def parse_args():
         "--recoding_stop_recut_only",
         default=False,
         action="store_true",
-        help="use recoding to prevent recut",
+        help="Recode in the gRNA to prevent recut",
     )
     parser.add_argument(
         "--recoding_full",
         default=False,
         action="store_true",
-        help="use recoding to prevent recut + recode region between insert and cut site",
+        help="Use full recoding: recode both the gRNA and region between insert and cut site",
     )
     parser.add_argument(
         "--cfdThres",
         default=0.03,
         help="protoSpaceJAM will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.",
+        metavar="<float>",
     )
     parser.add_argument(
         "--recode_order",
         default="PAM_first",
-        help="possible values: protospacer_first, PAM_first",
+        help="Prioritize recoding in the PAM or in protospacer, possible values: protospacer_first, PAM_first",
+        metavar="<string>",
     )
+    if len(sys.argv)==1:
+        print("[Message] Pleases provide the following arguments: --path2csv --outdir")
+        print("[Message]To run a quick example: protoSpaceJAM --path2csv input/test_input.csv --outdir output/test\n")
 
-    # output
-    parser.add_argument("--outdir", default="output/test_run", type=str, help="output directory")
-
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     config = parser.parse_args()
     return config
-
 
 #####################
 ##      main       ##
@@ -192,7 +215,7 @@ def main(custom_args=None):
             for c_arg in custom_args:
                 config[c_arg] = custom_args[c_arg]
 
-        gRNA_num_out = config["num_gRNA_per_term"]
+        gRNA_num_out = config["num_gRNA_per_design"]
         max_cut2ins_dist = 50  # deprecated?
         HDR_arm_len = config["HA_len"]
         ssODN_max_size = config["ssODN_max_size"]
@@ -267,6 +290,7 @@ def main(custom_args=None):
         else:  # payload override
             config["Npayload"] = config["payload"]
             config["Cpayload"] = config["payload"]
+            config["POSpayload"] = config["payload"]
 
 
         # check if HA_len is too short to satisfy ssODN_max_size
@@ -394,12 +418,12 @@ def main(custom_args=None):
             log.info(
                 f"begin processing user-supplied list of gene IDs in file {config['path2csv']}"
             )
-            df = pd.read_csv(os.path.join(config["path2csv"]))
+            df = pd.read_csv(os.path.join(config["path2csv"]), dtype = str)
             # check csv columns
-            keys2check = set(["Ensemble_ID"])
+            keys2check = set(["Ensembl_ID"])
             if not keys2check.issubset(df.columns):
                 log.error(
-                    f'Missing columns in the input csv file\n Required columns:"Ensemble_ID"'
+                    f'Missing columns in the input csv file\n Required columns:"Ensembl_ID"'
                 )
                 log.info(f"Please fix the input csv file and try again")
                 sys.exit()
@@ -407,35 +431,55 @@ def main(custom_args=None):
             sys.exit(f"ERROR: The input file {config['path2csv']} is not found")
             # log.warning(f"The input file {config['path2csv']} is not found, using the whole human transcriptome")
             # input("Press Enter to continue...")
-            # df = pd.DataFrame(ENST_info.keys(), columns = ["Ensemble_ID"]) # create data frame from ENST_info
+            # df = pd.DataFrame(ENST_info.keys(), columns = ["Ensembl_ID"]) # create data frame from ENST_info
 
-        # loop through each ENST
+        # loop through each entry in the input csv file
         transcript_count = 0
         protein_coding_transcripts_count = 0
-        target_terminus = "all"
-        Entry_defined = False
-        Entry = 0
+        target_terminus = "None"
+        target_coordinate = "None"
+        ENST_in_db = False
+        Entry = 0 # Entry is defined by the portal, and if not using the portal, it is just the index of the row
         for index, row in df.iterrows():
-            ENST_ID = row["Ensemble_ID"].rstrip().lstrip()
-            if "Target_terminus" in df.columns:
+            ENST_ID = row["Ensembl_ID"].rstrip().lstrip()
+            if "Target_terminus" in df.columns and row.isnull()["Target_terminus"] == False:
                 target_terminus = row["Target_terminus"].rstrip().lstrip().upper()
 
                 if (
                     target_terminus != "N"
                     and target_terminus != "C"
-                    and target_terminus != "all"
+                    and target_terminus != "ALL"
+                    and target_terminus != ""
                 ):
                     sys.exit(f"invalid target terminus: {target_terminus}")
+
+            # determine if the input is ENST-based or coordinate-based
+            ENST_based, coordinate_based = False, False
+            if "Chromosome" in df.columns and "Coordinate" in df.columns and row.isnull()["Chromosome"] == False and row.isnull()["Coordinate"] == False:
+                chrom = str(row["Chromosome"]).rstrip().lstrip()
+                coordinate = str(row["Coordinate"]).rstrip().lstrip()
+                if (
+                    chrom != ""
+                    and coordinate != ""
+                    and coordinate.isdigit()
+                ):
+                    coordinate_based = True
+            # if coordinate_based didn't check out, revert to ENST-based
+            if coordinate_based == False:
+                ENST_based = True
+                if not target_terminus in ["N","C","ALL"]:
+                    target_terminus = "ALL"
+
             if "Entry" in df.columns:
                 try:
                     Entry = str(row["Entry"]).rstrip().lstrip()
-                    Entry_defined = True
+                    ENST_in_db = True
                 except:
-                    Entry_defined = False
+                    ENST_in_db = False
 
             # check if ENST_ID is in the database
             if not ENST_ID in ENST_info_index.keys():
-                if not Entry_defined:
+                if not ENST_in_db:
                     Entry += 1
                 log.warning(
                     f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)"
@@ -448,7 +492,7 @@ def main(custom_args=None):
 
             # check if codon phase info exists
             if not ENST_ID in ENST_PhaseInCodon_index.keys():
-                if not Entry_defined:
+                if not ENST_in_db:
                     Entry += 1
                 log.warning(
                     f"skipping {ENST_ID} b/c transcript has no codon phase information"
@@ -482,18 +526,6 @@ def main(custom_args=None):
                 name = ""
             row_prefix = f"{ENST_ID},{ENST_info[ENST_ID].chr},{transcript_type},{name}"
 
-            # get gRNAs
-            ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(
-                ENST_ID=ENST_ID,
-                ENST_info=ENST_info,
-                freq_dict=freq_dict,
-                loc2file_index=loc2file_index,
-                loc2posType=loc2posType,
-                dist=max_cut2ins_dist,
-                genome_ver=config["genome_ver"],
-                spec_score_flavor=spec_score_flavor,
-            )
-
             # get codon_phase information for current ENST
             file_parts_list = ENST_PhaseInCodon_index[ENST_ID]
             ENST_PhaseInCodon = {}
@@ -511,13 +543,168 @@ def main(custom_args=None):
                     ENST_PhaseInCodon, Codon_phase_dict
                 )  # merge file parts if ENST codon info is split among fileparts
 
-            ##################################
-            # best start gRNA and HDR template#
-            ##################################
-            if target_terminus == "all" or target_terminus == "N":
-                if not Entry_defined:
+            ######################################
+            # best gRNA for a specific coordinate#
+            ######################################
+            if coordinate_based == True:
+                if not ENST_in_db:
                     Entry += 1
                 csvout_N.write(ENST_ID)
+                #check if the coordinate is in the ENST
+                if ENST_info[ENST_ID].chr == chrom and min(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end) <= int(coordinate) <=  max(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end):
+
+                    # get gRNAs
+                    ranked_df_gRNAs_target_pos = get_gRNAs_target_coordinate(
+                        ENST_ID=ENST_ID,
+                        chrom = chrom,
+                        pos = int(coordinate),
+                        ENST_info=ENST_info,
+                        freq_dict=freq_dict,
+                        loc2file_index=loc2file_index,
+                        loc2posType=loc2posType,
+                        dist=max_cut2ins_dist,
+                        genome_ver=config["genome_ver"],
+                        spec_score_flavor=spec_score_flavor,
+                    )
+
+                    if ranked_df_gRNAs_target_pos.empty == True:
+                        csvout_res.write(f"{Entry},{ENST_ID},ERROR: no suitable gRNAs found\n")
+
+                    for i in range(0, min([gRNA_num_out, ranked_df_gRNAs_target_pos.shape[0]])):
+                        current_gRNA = ranked_df_gRNAs_target_pos.iloc[[i]]
+
+                        # get HDR template
+                        try:
+                            HDR_template = get_HDR_template(
+                                df=current_gRNA,
+                                ENST_info=ENST_info,
+                                type="start", # this borrowed option specifies that the edit is immediately after the coordinate
+                                ENST_PhaseInCodon=ENST_PhaseInCodon,
+                                loc2posType=loc2posType,
+                                genome_ver=config["genome_ver"],
+                                HDR_arm_len=HDR_arm_len,
+                                tag=config["POSpayload"],
+                                ssODN_max_size=ssODN_max_size,
+                                Donor_type=config["Donor_type"],
+                                Strand_choice=config["Strand_choice"],
+                                recoding_args=recoding_args,
+                                syn_check_args=syn_check_args,
+                            )
+                        except Exception as e:
+                            print("Unexpected error:", str(sys.exc_info()))
+                            traceback.print_exc()
+                            print("additional information:", e)
+                            PrintException()
+
+                        # append the best gRNA to the final df
+                        if i == 0:
+                            best_start_gRNAs = pd.concat([best_start_gRNAs, current_gRNA])
+
+                        # append cfd score to list for plotting
+                        pre_recoding_cfd_score = HDR_template.pre_recoding_cfd_score
+                        cfd1 = ""
+                        if hasattr(HDR_template, "cfd_score_post_mut_ins"):
+                            cfd1 = HDR_template.cfd_score_post_mut_ins
+                        if not hasattr(HDR_template, "cfd_score_post_mut2"):
+                            cfd2 = cfd1
+                        else:
+                            cfd2 = HDR_template.cfd_score_post_mut2
+                        if not hasattr(HDR_template, "cfd_score_post_mut3"):
+                            cfd3 = cfd2
+                        else:
+                            cfd3 = HDR_template.cfd_score_post_mut3
+                        if not hasattr(HDR_template, "cfd_score_post_mut4"):
+                            cfd4 = cfd3
+                        else:
+                            cfd4 = HDR_template.cfd_score_post_mut4
+                        cfd_scan = 0
+                        cfd_scan_no_recode = 0
+                        if hasattr(HDR_template, "cfd_score_highest_in_win_scan"):
+                            cfd_scan = HDR_template.cfd_score_highest_in_win_scan
+                            cfd_scan_no_recode = HDR_template.scan_highest_cfd_no_recode
+
+                        cfdfinal = HDR_template.final_cfd
+
+                        # write csv
+                        (
+                            spec_score,
+                            seq,
+                            pam,
+                            s,
+                            e,
+                            cut2ins_dist,
+                            spec_weight,
+                            dist_weight,
+                            pos_weight,
+                            final_weight,
+                        ) = get_res(current_gRNA, spec_score_flavor)
+                        donor = HDR_template.Donor_final
+                        gRNA_cut_pos = (
+                            HDR_template.CutPos
+                        )  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
+                        insert_pos = HDR_template.InsPos
+                        if config["recoding_off"]:
+                            csvout_N.write(
+                                f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
+                            )
+                            csvout_res.write(
+                                f"{Entry},{row_prefix},NA,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                            )
+                            csvout_res2.write(
+                                config["genome_ver"]
+                                + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                            )
+                        else:
+                            csvout_N.write(
+                                f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
+                            )
+                            if not isinstance(cfd4, float):
+                                cfd4 = ""
+                            csvout_res.write(
+                                f"{Entry},{row_prefix},NA,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                            )
+                            csvout_res2.write(
+                                config["genome_ver"]
+                                + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                            )
+
+                        # write log
+                        this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
+                        recut_CFD_all.write(this_log)
+                        if HDR_template.final_cfd > 0.03:
+                            recut_CFD_fail.write(this_log)
+
+                        if hasattr(HDR_template, "info_phase4_5UTR"):
+                            fiveUTR_log.write(
+                                f"phase4_UTR\t{HDR_template.info_phase4_5UTR[0]}\t{HDR_template.info_phase4_5UTR[1]}\n"
+                            )
+                        if hasattr(HDR_template, "info_phase5_5UTR"):
+                            fiveUTR_log.write(
+                                f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0]}\t{HDR_template.info_phase5_5UTR[1]}\n"
+                            )
+                else:
+                    csvout_res.write(f"{Entry},{ENST_ID},ERROR: provided genomic coordinates are not in the {ENST_ID}\n")
+
+            ###################################
+            # best start gRNA and HDR template#
+            ###################################
+            if ENST_based == True and (target_terminus == "ALL" or target_terminus == "N"):
+                if not ENST_in_db:
+                    Entry += 1
+                csvout_N.write(ENST_ID)
+
+                # get gRNAs
+                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(
+                    ENST_ID=ENST_ID,
+                    ENST_info=ENST_info,
+                    freq_dict=freq_dict,
+                    loc2file_index=loc2file_index,
+                    loc2posType=loc2posType,
+                    dist=max_cut2ins_dist,
+                    genome_ver=config["genome_ver"],
+                    spec_score_flavor=spec_score_flavor,
+                )
+
                 if ranked_df_gRNAs_ATG.empty == True:
                     start_info.failed.append(ENST_ID)
                     csvout_N.write(",,,,,\n")
@@ -639,13 +826,26 @@ def main(custom_args=None):
                             f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0]}\t{HDR_template.info_phase5_5UTR[1]}\n"
                         )
 
-            #################################
+            ##################################
             # best stop gRNA and HDR template#
-            #################################
-            if target_terminus == "all" or target_terminus == "C":
-                if not Entry_defined:
+            ##################################
+            if ENST_based == True and (target_terminus == "ALL" or target_terminus == "C"):
+                if not ENST_in_db:
                     Entry += 1
                 csvout_C.write(ENST_ID)
+
+                # get gRNAs
+                ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(
+                    ENST_ID=ENST_ID,
+                    ENST_info=ENST_info,
+                    freq_dict=freq_dict,
+                    loc2file_index=loc2file_index,
+                    loc2posType=loc2posType,
+                    dist=max_cut2ins_dist,
+                    genome_ver=config["genome_ver"],
+                    spec_score_flavor=spec_score_flavor,
+                )
+
                 if ranked_df_gRNAs_stop.empty == True:
                     stop_info.failed.append(ENST_ID)
                     csvout_C.write(",,,,,\n")
@@ -806,26 +1006,26 @@ def main(custom_args=None):
             num_to_process = "all"
 
         # write best gRNA dfs to file
-        outdir = "pickles"
-        mkdir(outdir)
-        with open(
-            f"{outdir}/best_start_gRNAs_of_{num_to_process}_genes.pickle", "wb"
-        ) as handle:
-            pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(
-            f"{outdir}/best_stop_gRNAs_of_{num_to_process}_genes.pickle", "wb"
-        ) as handle:
-            pickle.dump(best_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # outdir = "pickles"
+        # mkdir(outdir)
+        # with open(
+        #     f"{outdir}/best_start_gRNAs_of_{num_to_process}_genes.pickle", "wb"
+        # ) as handle:
+        #     pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # with open(
+        #     f"{outdir}/best_stop_gRNAs_of_{num_to_process}_genes.pickle", "wb"
+        # ) as handle:
+        #     pickle.dump(best_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write failed ENSTs to file
-        with open(
-            f"{outdir}/start_failed_IDs_of_{num_to_process}_genes.pickle", "wb"
-        ) as handle:
-            pickle.dump(start_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        with open(
-            f"{outdir}/stop_failed_IDs_of_{num_to_process}_genes.pickle", "wb"
-        ) as handle:
-            pickle.dump(stop_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # with open(
+        #     f"{outdir}/start_failed_IDs_of_{num_to_process}_genes.pickle", "wb"
+        # ) as handle:
+        #     pickle.dump(start_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # with open(
+        #     f"{outdir}/stop_failed_IDs_of_{num_to_process}_genes.pickle", "wb"
+        # ) as handle:
+        #     pickle.dump(stop_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         # write ENSTs (whose gRNA is outside of the default HDR arm) to file
         # with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:

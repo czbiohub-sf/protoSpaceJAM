@@ -6,15 +6,10 @@ import argparse
 import sys
 import math
 import pickle
-
-
-
 import logging
-#################
-# custom logging #
-#################
-from protoSpaceJAM.util.hdr import HDR_flank
 
+from protoSpaceJAM.util.hdr import HDR_flank #uncomment this for pip installation
+# from util.hdr import HDR_flank
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -22,6 +17,9 @@ class MyParser(argparse.ArgumentParser):
         self.print_help()
         sys.exit(2)
 
+#################
+# custom logging #
+#################
 
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 # The background is set with 40 plus the number of the color, and the foreground with 30
@@ -364,6 +362,63 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
         ]
     else:
         sys.exit(f"unknown strand: {Strand}, acceptable values are -1 and 1")
+
+def get_gRNAs_target_coordinate(
+    ENST_ID,
+    chrom,
+    pos,
+    ENST_info,
+    freq_dict,
+    loc2file_index,
+    loc2posType,
+    genome_ver,
+    spec_score_flavor,
+    dist=50,
+):
+    """
+    Rank gRNA that cuts near the target site (associated with the ENST_ID)
+    input
+        ENST_ID: ENST ID
+        chr: chromosome (as part of the target location)
+        pos: position (as part of the target location)
+        ENST_info: gene model info loaded from pickle file
+        loc2file_index: mapping of location to the file part that stores gRNAs in that region
+        loc2posType: mapping of location to location type (e.g. 5UTR etc)
+        dist: max cut to insert distance (default 50)
+    return:
+        a dictionary of guide RNAs which cuts <[dist] to the target location
+
+    """
+    # get ENST strand
+    ENST_strand = ENST_info[ENST_ID].features[0].strand
+    ##################################
+    # get gRNAs around the coordinate#
+    ##################################
+    # get the start codon chromosomal location
+    target_pos = [chrom, pos, ENST_strand]
+
+    # get gRNAs around the target location/coordinate
+    df_gRNAs_target_pos = get_gRNAs_near_loc(
+        loc=target_pos,
+        dist=dist,
+        loc2file_index=loc2file_index,
+        genome_ver=genome_ver,
+    )
+    # rank gRNAs
+    ranked_df_gRNAs_target_pos = rank_gRNAs_for_tagging(
+        loc=target_pos,
+        gRNA_df=df_gRNAs_target_pos,
+        loc2posType=loc2posType,
+        ENST_ID=ENST_ID,
+        ENST_strand=ENST_strand,
+        type="start",
+        spec_score_flavor=spec_score_flavor,
+    )
+    ranked_df_gRNAs_ATG = ranked_df_gRNAs_target_pos.sort_values(
+        "final_weight", ascending=False
+    )  # sort descending on final weight
+
+    return ranked_df_gRNAs_ATG
 
 
 def get_gRNAs(

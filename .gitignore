@@ -95,6 +95,7 @@ fabric.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all
 # Begin custom ignore rules
+.vscode/
 run_log.txt
 run_log.bk.txt
 logs
@@ -122,11 +123,12 @@ protoSpaceJAM/input/*
 !protoSpaceJAM/input/mart_export_canonical_proteincoding.csv
 !protoSpaceJAM/input/mart_export_canonical_proteincoding.GRCm39.csv
 !protoSpaceJAM/input/mart_export_canonical_proteincoding.GRCz11.csv
-!protoSpaceJAM/input/test_protoSpaceJAM.csv
+!protoSpaceJAM/input/test_input.csv
 !protoSpaceJAM/input/OpenCell_protospaceX_design.csv
 
 output
 output/*
+protoSpaceJAM/output/*
 
 OpenCell_protospaceX_design/
 OpenCell_protospaceX_design/*
