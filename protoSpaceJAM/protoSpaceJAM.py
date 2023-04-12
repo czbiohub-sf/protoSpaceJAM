@@ -17,7 +17,7 @@ from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files,
 #     get_HDR_template
 
 
-def parse_args():
+def parse_args(test_mode=False):
     parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n")
 
     parser.add_argument(
@@ -30,7 +30,7 @@ def parse_args():
 
     parser.add_argument(
         "--outdir",
-        default=os.path.join("ouput","test"),
+        default=os.path.join("output","test"),
         type=str,
         metavar = "<PATH_TO_OUTPUT_DIRECTORY>",
         help="output directory"
@@ -176,14 +176,14 @@ def parse_args():
         help="Prioritize recoding in the PAM or in protospacer, possible values: protospacer_first, PAM_first",
         metavar="<string>",
     )
-    if len(sys.argv)==1:
-        print("[Message] Pleases provide the following arguments: --path2csv --outdir")
-        print("[Message]To run a quick example: protoSpaceJAM --path2csv input/test_input.csv --outdir output/test\n")
-
-        parser.print_help(sys.stderr)
-        sys.exit(1)
+    parser.add_argument(
+        "--test_mode",
+        default=False,
+        help="used by the unit tests, not user-oriented",
+        metavar="<boolean>",
+    )
     config = parser.parse_args()
-    return config
+    return config, parser
 
 #####################
 ##      main       ##
@@ -209,11 +209,21 @@ def main(custom_args=None):
         # log.setLevel(logging.DEBUG) #set the level of warning displayed
 
         # configs
-        config = vars(parse_args())
-        #apply custom args
+        config = vars(parse_args()[0])
+        parser = parse_args()[1]
+
+        # apply custom args
         if not custom_args is None and len(custom_args) > 0:
             for c_arg in custom_args:
                 config[c_arg] = custom_args[c_arg]
+
+        # Exit if no arguments provided and not in test mode
+        if len(sys.argv)==1 and config["test_mode"] == False:
+            print("[Message] Pleases provide the following arguments: --path2csv --outdir")
+            print("[Message] To run a quick example: protoSpaceJAM --path2csv input/test_input.csv --outdir output/test\n")
+
+            parser.print_help(sys.stderr)
+            sys.exit(1)
 
         gRNA_num_out = config["num_gRNA_per_design"]
         max_cut2ins_dist = 50  # deprecated?

@@ -33,7 +33,8 @@ class test_with_OpenCell_design(unittest.TestCase):
                     "Npayload": "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
                     "Cpayload": "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
                     "Strand_choice": "NonTargetStrand",
-                    "recode_order": "PAM_first"}
+                    "recode_order": "PAM_first",
+                    "test_mode": True}
         pJAM(test_args)
 
     @classmethod
