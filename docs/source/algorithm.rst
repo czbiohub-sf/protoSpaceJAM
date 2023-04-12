@@ -1,14 +1,23 @@
 Algorithm 
 =========
 
+Key concepts
+------------
+.. figure:: keyConcepts.png
+   :width: 100%
+   :align: center
+   :alt: Key_concepts
+
 Overview
 --------
 .. figure:: /_static/images/Algorithm.png
    :width: 55%
    :align: center
    :alt: Algorithm_overview
+
 |
 |
+
 gRNA scoring
 ------------
 The gRNAs score is computed from three weights that aim to (1) maximize specificity, (2) minimize cut-to-insert distance and (3) avoid cutting near splice junctions and in 5’ UTRs.
@@ -17,6 +26,7 @@ The gRNAs score is computed from three weights that aim to (1) maximize specific
    :width: 100%
    :align: center
    :alt: gRNA_scoring
+
 | Notes:
 | The gRNA specificity score is calculated in three steps:
 | (1) Identify all possible off-target hits of a gRNA in the genome with `BWA <https://bio-bwa.sourceforge.net/>`_. 
@@ -24,6 +34,7 @@ The gRNAs score is computed from three weights that aim to (1) maximize specific
 | (3) Take the sum of all MIT scores and use formula 100/(100+sum(mitScores)) to calculate the gRNA specificity score.
 | 
 |
+
 Recoding strategy
 -----------------
 | Silent mutations are included in the DNA donor to:
@@ -49,8 +60,10 @@ Recoding strategy
    :width: 100%
    :align: center
    :alt: region_definition
+
 |
 |
+
 DNA donor processing strategy
 -----------------------------
 | After recoding, the DNA donors are further processed, in a type-specific way.

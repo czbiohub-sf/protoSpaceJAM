@@ -25,7 +25,7 @@ class test_with_OpenCell_design(unittest.TestCase):
 
         #run protoSpaceJAM
         test_args = {
-                    "path2csv": os.path.join("input", "test_protoSpaceJAM.csv"),
+                    "path2csv": os.path.join("input", "test_input.csv"),
                     "outdir": os.path.join("tests","quick_test_result"),
                     "ssODN_max_size": 200,
                     "Npayload": "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
