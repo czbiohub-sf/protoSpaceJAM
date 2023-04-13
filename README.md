@@ -58,7 +58,7 @@ A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` 
 ### Run protoSpaceJAM
 ```
 conda activate protospacejam
-protoSpaceJAM --path2csv input/test_input.csv --outdir output/tes
+protoSpaceJAM --path2csv input/test_input.csv --outdir output/test
 ```
 
 ## License

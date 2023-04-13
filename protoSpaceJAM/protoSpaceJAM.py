@@ -64,21 +64,21 @@ def parse_args(test_mode=False):
         "--Npayload",
         default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
         type=str,
-        help="payload at the N terminus, default is mNG11 + XTEN80: ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT , overrides --Tag --Linker",
+        help="payload at the N terminus, default is mNG11 + XTEN80: ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT, overrides --Tag --Linker",
         metavar="<string>",
     )
     parser.add_argument(
         "--Cpayload",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the C terminus, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG () overrides --Tag --Linker",
+        help="payload at the C terminus, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag --Linker",
         metavar="<string>",
     )
     parser.add_argument(
         "--POSpayload",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the target coordinate, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG () overrides --Tag --Linker",
+        help="payload at the target coordinate, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag --Linker",
         metavar="<string>",
     )
     parser.add_argument(
@@ -654,24 +654,18 @@ def main(custom_args=None):
                         )  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
                         insert_pos = HDR_template.InsPos
                         if config["recoding_off"]:
-                            csvout_N.write(
-                                f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
-                            )
                             csvout_res.write(
-                                f"{Entry},{row_prefix},NA,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                                f"{Entry},{row_prefix},-,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
                             )
                             csvout_res2.write(
                                 config["genome_ver"]
                                 + f",{HDR_template.ENST_chr},{insert_pos}\n"
                             )
                         else:
-                            csvout_N.write(
-                                f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
-                            )
                             if not isinstance(cfd4, float):
                                 cfd4 = ""
                             csvout_res.write(
-                                f"{Entry},{row_prefix},NA,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
+                                f"{Entry},{row_prefix},-,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc}\n"
                             )
                             csvout_res2.write(
                                 config["genome_ver"]
