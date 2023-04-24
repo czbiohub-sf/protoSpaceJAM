@@ -6,6 +6,9 @@ Changelog
 Algorithm
 ---------
 
+:Date: April 11, 2023
+* |enhancement 6b9db| Users can now specify any genomic coordinates in a transript as the edit site. 
+
 :Date: Feburary 7, 2023
 * |bug fix 6e2e5| Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions. 
 * |bug fix 82c61| Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor
@@ -36,6 +39,10 @@ Algorithm
 
 Portal
 ------
+
+:Date: April 15, 2023
+* |enhancement 6b9db| Changed the interface to accomodate the input of custom genomic coordinates as edit sites. 
+
 :Date: Feburary 16, 2023
 * |bug fix 004c6| Entry number are now correct when there are 2+ gRNAs for each design. `Associated change: <https://github.com/czbiohub/protoSpaceJAM-portal/commit/68d37db4642fea22d3738ef5c37da3b9331004c6>`_ ProtospaceJAM will read "Entry" from input, and if fails, uses an auto increment
 
@@ -60,7 +67,10 @@ Portal
 * |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 * |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
-
+.. |enhancement 6b9db| image:: https://img.shields.io/badge/ec722-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/188f96a2a136678df5a08ee4668a9af3ffaec722
+.. |enhancement 6b9db| image:: https://img.shields.io/badge/6b9db-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM/commit/8778e69416078ed2f29499d916724aaac126b9db
 .. |bug fix 94ea9| image:: https://img.shields.io/badge/94ea9-bug%20fix-red
     :target: https://github.com/czbiohub/protospaceX/commit/3662c9a9b02e958fd3d6f8a94625470b07b94ea9
 .. |bug fix f87f4| image:: https://img.shields.io/badge/f87f4-bug%20fix-red
