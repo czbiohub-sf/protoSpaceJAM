@@ -15,10 +15,10 @@ A web-portal is available at http://protospacejam.czbiohub.org/
 - Sophisticated DNA donor design ([details](https://czbiohub.github.io/protoSpaceJAM/algorithm.html#recoding-strategy))
   - Recode to prevent recut
   - Recode to facilitate payload insertion and prevent recut
+  - Automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
+  - Scan and trim hard-to-synthesis motifs
   - Center the DNA donor around the region containing the payload and recoded bases. 
   - Enforce maximum length of DNA donor
-  - Automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
-  - Scan and trim hard-to-synthesis motifs (coming soon)
 - Use/generate pre-computed genome-wide guide RNAs and their properties for fast runtime
 
 
