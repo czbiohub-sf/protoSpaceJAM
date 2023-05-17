@@ -6,8 +6,11 @@ Changelog
 Algorithm
 ---------
 
+:Date: May 15, 2023
+* |enhancement 9aac65| Results now includes the strands of gene, gRNA and donor ( + denotes the forward strand and - denotes the reverse strands). 
+
 :Date: April 11, 2023
-* |enhancement 6b9db| Users can now specify any genomic coordinates in a transript as the edit site. 
+* |enhancement 6b9db| Users can now specify any genomic coordinates in a transcript as the edit site. 
 
 :Date: Feburary 7, 2023
 * |bug fix 6e2e5| Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions. 
@@ -70,9 +73,11 @@ Portal
 * |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 * |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
-.. |enhancement c7d70| image:: https://img.shields.io/badge/ec722-enhancement-green
+.. |enhancement 9aac65| image:: https://img.shields.io/badge/9aac65-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM/commit/0566a4d2c79d50190e4df1908d374d4bbb9aac65
+.. |enhancement c7d70| image:: https://img.shields.io/badge/c7d70-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/5631fc0dfb6af3d21a48086c3185ebfdd70c7d70
-.. |enhancement 6b9db| image:: https://img.shields.io/badge/ec722-enhancement-green
+.. |enhancement ec722| image:: https://img.shields.io/badge/ec722-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/188f96a2a136678df5a08ee4668a9af3ffaec722
 .. |enhancement 6b9db| image:: https://img.shields.io/badge/6b9db-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM/commit/8778e69416078ed2f29499d916724aaac126b9db
