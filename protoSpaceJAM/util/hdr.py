@@ -1277,6 +1277,8 @@ class HDR_flank:
         ################
         if self.Donor_type == "dsDNA":
             self.Donor_final = self.Donor_vanillia
+            self.Donor_strand = self.ENST_strand # dsDNA donor strand is the same as the transcript strand
+
             # get recoded donor
             if self.Donor_postMut != "recoding turned off":
                 self.Donor_final = self.Donor_postMut
@@ -1421,6 +1423,7 @@ class HDR_flank:
         ################
         if self.Donor_type == "ssODN":
             self.Donor_final = self.Donor_vanillia
+            self.Donor_strand = self.ENST_strand # ssODN donor strand, before strand selection, is the same as the transcript strand
             # get recoded donor
             if not self.recoding_args["recoding_off"]:  # recoding is on
                 self.Donor_final = self.Donor_postMut
@@ -1496,6 +1499,7 @@ class HDR_flank:
                 rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(
                     str(Seq(self.Donor_final).reverse_complement())
                 )
+                self.Donor_strand = self.flip_strand(self.Donor_strand)
                 PAMless_cfd = max(
                     [fwd_scan_highest_PAMless_cfd, rev_scan_highest_PAMless_cfd]
                 )
@@ -1506,7 +1510,9 @@ class HDR_flank:
                     if self.ENST_strand * self.gStrand == -1:
                         self.Donor_final = str(
                             Seq(self.Donor_final).reverse_complement()
-                        )  # take revcom if gRNA is not on the same strand as the ENST (coding)
+                        )
+                        self.Donor_strand = self.flip_strand(self.Donor_strand)
+                        # take revcom if gRNA is not on the same strand as the ENST (coding)
                 else:  # PAM-independent cutting can NOT happen, choose Manu strand
                     self.Donor_final = self.select_Manu_strand(self.Donor_final)
             else:
@@ -1514,24 +1520,69 @@ class HDR_flank:
                     if self.ENST_strand * self.gStrand == -1:
                         self.Donor_final = str(
                             Seq(self.Donor_final).reverse_complement()
-                        )  # take revcom if gRNA is NOT on the same strand as the ENST (coding)
+                        )  
+                        self.Donor_strand = self.flip_strand(self.Donor_strand)
+                        # take revcom if gRNA is NOT on the same strand as the ENST (coding), also flip the strand
                 elif self.Strand_choice == "TargetStrand":  # gRNAstrandRC
                     if self.ENST_strand * self.gStrand == 1:
                         self.Donor_final = str(
                             Seq(self.Donor_final).reverse_complement()
-                        )  # take revcom if gRNA IS on the same strand as the ENST (coding)
+                        )  
+                        self.Donor_strand = self.flip_strand(self.Donor_strand)
+                        # take revcom if gRNA IS on the same strand as the ENST (coding), also flip the strand
                 elif self.Strand_choice == "CodingStrand":  # codingStrand
                     pass  # No change needed, the donor is already in the coding strand,
                 elif self.Strand_choice == "NonCodingStrand":  # codingStrandRC
                     self.Donor_final = str(
                         Seq(self.Donor_final).reverse_complement()
-                    )  # take revcom
+                    )
+                    self.Donor_strand = self.flip_strand(self.Donor_strand)
+                    # take revcom, also flip the strand
                 else:
                     logging.ERROR(f"unrecognized strand choice: {self.Strand_choice}")
+        
+        self.ENST_strand = self.convert_strand_to_plus_minus(self.ENST_strand)
+        self.Donor_strand = self.convert_strand_to_plus_minus(self.Donor_strand)
+        self.gStrand = self.convert_strand_to_plus_minus(self.gStrand)
 
     #############
     # END OF INIT#
     #############
+    def flip_strand(self, strand):
+        """
+        flips the strand
+        input can be +,-,1,-1,"+","-","1","-1"
+        """
+        if strand == "+":
+            return "-"
+        if strand == "-":
+            return "+"
+        if strand == 1:
+            return -1
+        if strand == -1:
+            return 1
+        if strand == "1":
+            return "-1"
+        if strand == "-1":
+            return "1"
+    
+    def convert_strand_to_plus_minus(self, strand):
+        """
+        converts strand to + or -
+        input can be +,-,1,-1,"+","-","1","-1"
+        """
+        if strand == "+":
+            return "+"
+        if strand == "-":
+            return "-"
+        if strand == 1:
+            return "+"
+        if strand == -1:
+            return "-"
+        if strand == "1":
+            return "+"
+        if strand == "-1":
+            return "-"
 
     def get_pre_recoding_cfd_score(self):
         """

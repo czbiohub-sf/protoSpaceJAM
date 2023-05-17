@@ -40,6 +40,9 @@ Algorithm
 Portal
 ------
 
+:Date: May 15, 2023
+* |enhancement c7d70| Genotyping primers are fetched from precomputed results, and if not found, are designed on the fly.
+
 :Date: April 15, 2023
 * |enhancement 6b9db| Changed the interface to accomodate the input of custom genomic coordinates as edit sites. 
 
@@ -67,6 +70,8 @@ Portal
 * |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 * |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+.. |enhancement c7d70| image:: https://img.shields.io/badge/ec722-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/5631fc0dfb6af3d21a48086c3185ebfdd70c7d70
 .. |enhancement 6b9db| image:: https://img.shields.io/badge/ec722-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/188f96a2a136678df5a08ee4668a9af3ffaec722
 .. |enhancement 6b9db| image:: https://img.shields.io/badge/6b9db-enhancement-green
