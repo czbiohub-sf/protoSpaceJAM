@@ -10,10 +10,9 @@ Algorithm
 
 :Date: April 11, 2023 |enhancement 6b9db| Users can now specify any genomic coordinates in a transcript as the edit site. 
 
-:Date: Feburary 7, 2023
-|bug fix 6e2e5| Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions.  
+:Date: Feburary 7, 2023 |bug fix 6e2e5| Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions.  
 
-|bug fix 82c61| Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor
+:Date: Feburary 7, 2023 |bug fix 82c61| Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor
 
 :Date: Feburary 6, 2023 |enhancement 78fd0| Changed the order of recoding in gRNAs and emerging cutsites (in window scan) to: 3'UTR -> codons -> intron -> 5'UTR
 
@@ -23,24 +22,21 @@ Algorithm
 
 :Date: January 25, 2023 |enhancement bf85b| Fine-tuned the off-limit range for recoding near junctions. Now avoiding 3bp/6bp from exon/intron side of the exon/intron junction, and 3bp/2bp from intron/exon side of the intron/exon junction.
 
-:Date: January 24, 2023
-|bug fix f87f4| Avoid re-mutating by keeping track of mutated bases. Fixed an interference with mutation caused by marking codon-padding sequence with lower-case.
+:Date: January 24, 2023 |bug fix f87f4| Avoid re-mutating by keeping track of mutated bases. Fixed an interference with mutation caused by marking codon-padding sequence with lower-case.
 
-|enhancement f87f4| Scan and undo isolated mutation of "N" in "NGG".
+:Date: January 24, 2023 |enhancement f87f4| Scan and undo isolated mutation of "N" in "NGG".
 
-:Date: January 20, 2023
-|bug fix 94ea9| Codon mutation won't happen in some gRNAs in recut mode.
+:Date: January 20, 2023 |bug fix 94ea9| Codon mutation won't happen in some gRNAs in recut mode.
 
-|enhancement c2e92| Changed strand names to match the naming convention.
+:Date: January 20, 2023 |enhancement c2e92| Changed strand names to match the naming convention.
 
 |
 
 Portal
 ------
-:Date: May 19, 2023
-|enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
+:Date: May 19, 2023 |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
 
-|bug fix 04401| CSV upload is updated to work with the new columns in the submission list.
+:Date: May 19, 2023 |bug fix 04401| CSV upload is updated to work with the new columns in the submission list.
 
 :Date: May 15, 2023 |enhancement c7d70| Genotyping primers are fetched from precomputed results, and if not found, are designed on the fly.
 
@@ -52,17 +48,15 @@ Portal
 
 :Date: Feburary 9, 2023 |enhancement dced1| Consolidated donor length parameters into one box, and donor recoding parameters into one box.
 
-:Date: Feburary 1, 2023
-|enhancement b6b91| Change the default minumn homology arm length (dsDNA) to 200.
+:Date: Feburary 1, 2023 |enhancement b6b91| Change the default minumn homology arm length (dsDNA) to 200.
 
-|bug fix b6b91| Made "clear example" and "reset button" buttons work correctly, both will reset to the following defaults: Genome: Human, Genes: None, number of gRNA:1, DNA donor type: ssDNA, HA arm length to consider: 500, target strand: non-target strand, recode intensity:full, prioritize recoding in: PAM, minimum homology arm length: 200, enforce maximum donor length: 200, recut cfd threshold: 0.03.
+:Date: Feburary 1, 2023 |bug fix b6b91| Made "clear example" and "reset button" buttons work correctly, both will reset to the following defaults: Genome: Human, Genes: None, number of gRNA:1, DNA donor type: ssDNA, HA arm length to consider: 500, target strand: non-target strand, recode intensity:full, prioritize recoding in: PAM, minimum homology arm length: 200, enforce maximum donor length: 200, recut cfd threshold: 0.03.
 
 :Date: January 27, 2023 |enhancement f0ad7| Add a maximum limit of 384 entries per submission list.
 
-:Date: January 26, 2023
-|enhancement 0c23a| Default changed to "non-target strand" (including the example).
+:Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
-|enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+:Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
 .. |enhancement 04401| image:: https://img.shields.io/badge/04401-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d388b8d19d7d1468d4463e0b7061dce1af004401
