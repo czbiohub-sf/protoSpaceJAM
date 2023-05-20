@@ -6,32 +6,24 @@ Changelog
 Algorithm
 ---------
 
-:Date: May 15, 2023
-* |enhancement 9aac65| Results now include the strands of gene, gRNA and donor ( + denotes the forward strand and - denotes the reverse strands). 
+:Date: May 15, 2023 |enhancement 9aac65| Results now include the strands of gene, gRNA and donor ( + denotes the forward strand and - denotes the reverse strands). 
 
-:Date: April 11, 2023
-* |enhancement 6b9db| Users can now specify any genomic coordinates in a transcript as the edit site. 
+:Date: April 11, 2023 |enhancement 6b9db| Users can now specify any genomic coordinates in a transcript as the edit site. 
 
 :Date: Feburary 7, 2023
 * |bug fix 6e2e5| Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions. 
 * |bug fix 82c61| Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor
 
-:Date: Feburary 6, 2023
-* |enhancement 78fd0| Changed the order of recoding in gRNAs and emerging cutsites (in window scan) to: 3'UTR -> codons -> intron -> 5'UTR
+:Date: Feburary 6, 2023 |enhancement 78fd0| Changed the order of recoding in gRNAs and emerging cutsites (in window scan) to: 3'UTR -> codons -> intron -> 5'UTR
 
-:Date: Feburary 4, 2023
-* |enhancement 7da6a| Changed the order of recoding in gRNAs to: codons -> 3'UTR -> intron -> 5'UTR
+:Date: Feburary 4, 2023 |enhancement 7da6a| Changed the order of recoding in gRNAs to: codons -> 3'UTR -> intron -> 5'UTR
 
-:Date: Feburary 1, 2023
-* |bug fix e20ed| Fixed two bugs in the dsDNA trimming logic: 1) the right arm was not trimming correctly, 2) report synthesis problems remaining after the trimming step.
+:Date: Feburary 1, 2023 |bug fix e20ed| Fixed two bugs in the dsDNA trimming logic: 1) the right arm was not trimming correctly, 2) report synthesis problems remaining after the trimming step.
 
-:Date: January 25, 2023
-
-* |enhancement bf85b| Fine-tuned the off-limit range for recoding near junctions. Now avoiding 3bp/6bp from exon/intron side of the exon/intron junction, and 3bp/2bp from intron/exon side of the intron/exon junction.
+:Date: January 25, 2023 |enhancement bf85b| Fine-tuned the off-limit range for recoding near junctions. Now avoiding 3bp/6bp from exon/intron side of the exon/intron junction, and 3bp/2bp from intron/exon side of the intron/exon junction.
 
 :Date: January 24, 2023
-* |bug fix f87f4| Avoid re-mutating by keeping track of mutated bases.
-* |bug fix f87f4| Fixed an interference with mutation caused by marking codon-padding sequence with lower-case.
+* |bug fix f87f4| Avoid re-mutating by keeping track of mutated bases. Fixed an interference with mutation caused by marking codon-padding sequence with lower-case.
 * |enhancement f87f4| Scan and undo isolated mutation of "N" in "NGG".
 
 :Date: January 20, 2023
@@ -42,36 +34,25 @@ Algorithm
 
 Portal
 ------
-:Date: May 15, 2023
-* |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
-
 :Date: May 19, 2023
+* |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
 * |bug fix 04401| CSV upload is updated to work with the new columns in the submission list.
 
-:Date: May 15, 2023
-* |enhancement c7d70| Genotyping primers are fetched from precomputed results, and if not found, are designed on the fly.
+:Date: May 15, 2023 |enhancement c7d70| Genotyping primers are fetched from precomputed results, and if not found, are designed on the fly.
 
-:Date: April 15, 2023
-* |enhancement 6b9db| Changed the interface to accomodate the input of custom genomic coordinates as edit sites. 
+:Date: April 15, 2023 |enhancement 6b9db| Changed the interface to accomodate the input of custom genomic coordinates as edit sites. 
 
-:Date: Feburary 16, 2023
-* |bug fix 004c6| Entry number are now correct when there are 2+ gRNAs for each design. `Associated change: <https://github.com/czbiohub/protoSpaceJAM-portal/commit/68d37db4642fea22d3738ef5c37da3b9331004c6>`_ ProtospaceJAM will read "Entry" from input, and if fails, uses an auto increment
+:Date: Feburary 16, 2023 |bug fix 004c6| Entry number are now correct when there are 2+ gRNAs for each design. `Associated change: <https://github.com/czbiohub/protoSpaceJAM-portal/commit/68d37db4642fea22d3738ef5c37da3b9331004c6>`_ ProtospaceJAM will read "Entry" from input, and if fails, uses an auto increment
 
-:Date: Feburary 14, 2023
-* |enhancement 49990| Added a link in the landing page to a Google form to get an invitation code.
+:Date: Feburary 14, 2023 |enhancement 49990| Added a link in the landing page to a Google form to get an invitation code. Complete the name change to "protoSpaceJAM". And several small changes, e.g. 'Launch' -> 'Jam it'. Fixed typos.
 
-:Date: Feburary 14, 2023
-* |enhancement 49990| Complete the name change to "protoSpaceJAM". And several small changes, e.g. 'Launch' -> 'Jam it'. Fixed typos.
-
-:Date: Feburary 9, 2023
-* |enhancement dced1| Consolidated donor length parameters into one box, and donor recoding parameters into one box.
+:Date: Feburary 9, 2023 |enhancement dced1| Consolidated donor length parameters into one box, and donor recoding parameters into one box.
 
 :Date: Feburary 1, 2023
 * |enhancement b6b91| Change the default minumn homology arm length (dsDNA) to 200.
 * |bug fix b6b91| Made "clear example" and "reset button" buttons work correctly, both will reset to the following defaults: Genome: Human, Genes: None, number of gRNA:1, DNA donor type: ssDNA, HA arm length to consider: 500, target strand: non-target strand, recode intensity:full, prioritize recoding in: PAM, minimum homology arm length: 200, enforce maximum donor length: 200, recut cfd threshold: 0.03.
 
-:Date: January 27, 2023
-* |enhancement f0ad7| Add a maximum limit of 384 entries per submission list.
+:Date: January 27, 2023 |enhancement f0ad7| Add a maximum limit of 384 entries per submission list.
 
 :Date: January 26, 2023
 
