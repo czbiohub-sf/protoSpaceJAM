@@ -7,7 +7,7 @@ Algorithm
 ---------
 
 :Date: May 15, 2023
-* |enhancement 9aac65| Results now includes the strands of gene, gRNA and donor ( + denotes the forward strand and - denotes the reverse strands). 
+* |enhancement 9aac65| Results now include the strands of gene, gRNA and donor ( + denotes the forward strand and - denotes the reverse strands). 
 
 :Date: April 11, 2023
 * |enhancement 6b9db| Users can now specify any genomic coordinates in a transcript as the edit site. 
@@ -42,6 +42,11 @@ Algorithm
 
 Portal
 ------
+:Date: May 15, 2023
+* |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
+
+:Date: May 19, 2023
+* |bug fix 04401| CSV upload is updated to work with the new columns in the submission list.
 
 :Date: May 15, 2023
 * |enhancement c7d70| Genotyping primers are fetched from precomputed results, and if not found, are designed on the fly.
@@ -73,6 +78,10 @@ Portal
 * |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 * |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+.. |enhancement 04401| image:: https://img.shields.io/badge/04401-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d388b8d19d7d1468d4463e0b7061dce1af004401
+.. |bug fix 04401| image:: https://img.shields.io/badge/04401-bug%20fix-red
+    :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d388b8d19d7d1468d4463e0b7061dce1af004401
 .. |enhancement 9aac65| image:: https://img.shields.io/badge/9aac65-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM/commit/0566a4d2c79d50190e4df1908d374d4bbb9aac65
 .. |enhancement c7d70| image:: https://img.shields.io/badge/c7d70-enhancement-green
