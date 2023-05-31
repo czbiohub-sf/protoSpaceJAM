@@ -2,7 +2,6 @@ import os.path
 import pandas as pd
 from Bio import SeqIO
 import csv
-import argparse
 import sys
 import linecache
 import datetime
@@ -11,12 +10,8 @@ import shutil
 import gc
 import re
 
-from protoSpaceJAM.util.utils import MyParser
-
-sys.path.insert(1, "../..")
-from gRNA_search import *
 from utils import *
-
+from gRNA_search import *
 
 def parse_args():
     parser = MyParser(
@@ -55,7 +50,7 @@ PAM = "NGG"
 
 logging.setLoggerClass(ColoredLogger)
 # logging.basicConfig()
-log = logging.getLogger("Get all gRNA")
+log = logging.getLogger("Scan gRNA")
 log.propagate = False
 log.setLevel(logging.INFO)  # set the level of warning displayed
 

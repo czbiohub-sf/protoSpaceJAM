@@ -14,7 +14,11 @@ import logging
 import argparse
 import sys
 
-from protoSpaceJAM.util.utils import MyParser
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write("error: %s\n" % message)
+        self.print_help()
+        sys.exit(2)
 
 logging.basicConfig()  # setup the default configuration set
 log = logging.getLogger("FinOfftargetBwa")  # Logger name
@@ -70,7 +74,7 @@ GRNA_FA = config["fa"]
 GRNA_FA_PATH = os.path.join(config["fa_dir"], config["fa"])
 BIN = config["bin_dir"]
 SCRIPT = config["script_dir"]
-# GENOME = config["genome_fa"]
+GENOME_FA = config["genome_fa"]
 GENOME_IDX_BWA = config["bwa_idx"]
 GUIDELEN = config["guideLen"]
 thread2use = config["thread"]
@@ -394,7 +398,7 @@ mystderr = open(path_to_stderr_file, "w+")
 # use genome fa in /dev/shm
 # command = f"time {BIN}/bedtools getfasta -s -name -fi {shmFaFname} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}"
 # don't use genome fa in /dev/shm
-command = f"time {BIN}/bedtools getfasta -s -name -fi {GENOME_IDX_BWA} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}"
+command = f"time {BIN}/bedtools getfasta -s -name -fi {GENOME_FA} -bed {matchesBedFname} -fo /dev/stdout | python {SCRIPT}/filterFaToBed {GRNA_FA_PATH} {pam} {altPats} {altPamMinScore} > {filtMatchesBedFname}"
 
 # else:
 #    logging.info("Using twoBitfofa, %s" % shmFaFname)

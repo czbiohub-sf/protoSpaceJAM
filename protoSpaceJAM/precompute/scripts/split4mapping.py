@@ -11,11 +11,6 @@ import gzip
 import gc
 import math
 import errno, os, stat, shutil
-
-from protoSpaceJAM.util.utils import MyParser
-
-sys.path.insert(1, "../..")
-from gRNA_search import *
 from utils import *
 
 
@@ -53,7 +48,7 @@ def parse_args():
 
 logging.setLoggerClass(ColoredLogger)
 # logging.basicConfig()
-log = logging.getLogger("map_gRNA")
+log = logging.getLogger("split files")
 log.propagate = False
 log.setLevel(logging.INFO)  # set the level of warning displayed
 

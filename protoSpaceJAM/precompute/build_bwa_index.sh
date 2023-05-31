@@ -1,55 +1,21 @@
 #!/bin/bash
-
-#SBATCH --job-name=Bwa_idx
-#SBATCH --time=14-00:00:00
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=128G
-#SBATCH -e bwa_idx-%j.err
-#SBATCH -o bwa_idx-%j.out
-
-release=release-107
-release_num=107
-
-module load anaconda
-conda activate protospaceX
-
-########
-#GRCh38#
-########
-genome_file="Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz"
-cp ${genome_file} indexes_bwa/${genome_file_fagz}
-cd indexes_bwa
+genome_file_dir="genome_files"
+outdir="${genome_file_dir}/indexes_bwa"
+# Check if the output directory exists
+if [ ! -d ${outdir} ]; then
+    mkdir ${outdir}
+fi
+#make a copy of the genome file
+genome_file="${2}.${1}.dna_sm.primary_assembly.fa.gz"
+genome_file_path="${genome_file_dir}/${genome_file}"
+cp ${genome_file_path} ${outdir}/${genome_file}
+cd ${outdir}
+# get chromosome sizes
+python ../../scripts/get_fagz_sizes.py --fastagz ${genome_file}
+mv ${genome_file}.sizes ${genome_file%.gz}.sizes
+#bwa
+bwa_bin="../../utils/FindOfftargetBwa/bin/Linux/bwa"
+chmod a+xX ${bwa_bin}
 gunzip ${genome_file}
-chmod a+xX ../../utils/FindOfftargetBwa/bin/Linux/bwa
-../../utils/FindOfftargetBwa/bin/Linux/bwa index ${genome_file%.gz}
-cd ..
-python get_fagz_sizes.py --fastagz ${genome_file}
-mv ${genome_file}.sizes indexes_bwa/${genome_file%.gz}.sizes
-
-########
-#GRCm39#
-########
-genome_file="Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz"
-cp ${genome_file} indexes_bwa/${genome_file_fagz}
-cd indexes_bwa
-gunzip ${genome_file}
-chmod a+xX ../../utils/FindOfftargetBwa/bin/Linux/bwa
-../../utils/FindOfftargetBwa/bin/Linux/bwa index ${genome_file%.gz}
-cd ..
-python get_fagz_sizes.py --fastagz ${genome_file}
-mv ${genome_file}.sizes indexes_bwa/${genome_file%.gz}.sizes
-
-########
-#GRCz11#
-########
-genome_file="Danio_rerio.GRCz11.dna_sm.primary_assembly.fa.gz"
-cp ${genome_file} indexes_bwa/${genome_file_fagz}
-cd indexes_bwa
-gunzip ${genome_file}
-chmod a+xX ../../utils/FindOfftargetBwa/bin/Linux/bwa
-../../utils/FindOfftargetBwa/bin/Linux/bwa index ${genome_file%.gz}
-cd ..
-python get_fagz_sizes.py --fastagz ${genome_file}
-mv ${genome_file}.sizes indexes_bwa/${genome_file%.gz}.sizes
+${bwa_bin} index ${genome_file%.gz}
+mv ${genome_file%.gz} ../${genome_file%.gz} # move the genome fasta file to genome_files/, this is needed for the post-bwa processing in the bwa scripts

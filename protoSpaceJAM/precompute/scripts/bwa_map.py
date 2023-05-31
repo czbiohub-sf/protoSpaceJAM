@@ -12,11 +12,6 @@ import shutil
 import gc
 import math
 
-# from BLAST_utils import check_blastDB_human
-from protoSpaceJAM.util.utils import MyParser
-
-sys.path.insert(1, "../..")
-from gRNA_search import *
 from utils import *
 
 
@@ -39,7 +34,14 @@ def parse_args():
         "--genome_fa",
         default="",
         type=str,
-        help="name of genome fasta file",
+        help="path to the genome fasta file",
+        metavar="",
+    )
+    parser.add_argument(
+        "--bwa_idx",
+        default="",
+        type=str,
+        help="path to the basename of the index",
         metavar="",
     )
     parser.add_argument(
@@ -64,6 +66,7 @@ log.setLevel(logging.INFO)  # set the level of warning displayed
 
 config = vars(parse_args())
 genome_fa = config["genome_fa"]
+bwa_idx = config["bwa_idx"]
 thread2use = config["thread"]
 pam_len = 3
 protospacer_len = 20
@@ -138,18 +141,19 @@ def main():
                     fastafile_name = os.path.split(fastafile)[1]
                     command = [
                         "python",
-                        "../utils/FindOfftargetBwa/findOfftargetsBwa.py",
+                        "./utils/FindOfftargetBwa/findOfftargetsBwa.py",
                         f"--fa",
                         f"{fastafile_name}",
                         f"--fa_dir",
                         f"{fastafile_dir}",
                         f"--bin_dir",
-                        f"../utils/FindOfftargetBwa/bin/Linux",
+                        f"./utils/FindOfftargetBwa/bin/Linux",
                         f"--script_dir",
-                        f"../utils/FindOfftargetBwa/bin/",
+                        f"./utils/FindOfftargetBwa/bin/",
                         f"--bwa_idx",
-                        f"../genome_files/indexes_bwa/{genome_fa}",
-                        # f"--genome_fa", f"{genome_fa}",
+                        f"{bwa_idx}",
+                        f"--genome_fa",
+                        f"{genome_fa}",
                         f"--guideLen",
                         f"20",
                         f"--thread",
@@ -244,18 +248,19 @@ def main():
                 fastafile_name = os.path.split(fastafile)[1]
                 command = [
                     "python",
-                    "../utils/FindOfftargetBwa/findOfftargetsBwa.py",
+                    "./utils/FindOfftargetBwa/findOfftargetsBwa.py",
                     f"--fa",
                     f"{fastafile_name}",
                     f"--fa_dir",
                     f"{fastafile_dir}",
                     f"--bin_dir",
-                    f"../utils/FindOfftargetBwa/bin/Linux",
+                    f"./utils/FindOfftargetBwa/bin/Linux",
                     f"--script_dir",
-                    f"../utils/FindOfftargetBwa/bin/",
+                    f"./utils/FindOfftargetBwa/bin/",
                     f"--bwa_idx",
-                    f"../genome_files/indexes_bwa/{genome_fa}",
-                    # f"--genome_fa", f"{genome_fa}",
+                    f"{bwa_idx}",
+                    f"--genome_fa",
+                    f"{genome_fa}",
                     f"--guideLen",
                     f"20",
                     f"--thread",
@@ -319,10 +324,10 @@ def main():
                 os.remove(f"{fastafile}")
                 # remove tmp gz file
                 os.remove(
-                    os.path.join(
-                        outdir_path, f"{config['gzfile'].rstrip('.gz')}.tmp.gz"
-                    )
-                )
+                     os.path.join(
+                         outdir_path, f"{config['gzfile'].rstrip('.gz')}.tmp.gz"
+                     )
+                 )
 
             gRNA_count += file_gRNA_count
 

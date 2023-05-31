@@ -1,9 +1,37 @@
 import re
 from Bio.Seq import Seq
-from classes import gRNA
 from utils import *
 import gc
 
+class gRNA:
+    """
+    Stores one gRNA
+    """
+
+    def __init__(
+            self,
+            name: str = '',
+            protospacer: str = '',
+            pam: str = 'NGG',
+            pos_strand: bool = True,
+            g_st: int = "",
+            g_en: int = "",
+            g_strand: str = "",
+            prsp_len: int = '',
+            protospacer5p_flank: str = '',
+            pam3p_flank: str = '') -> None:
+        
+        self.prsp_len = prsp_len
+        self.name = name
+        self.protospacer = protospacer
+        self.pam = pam
+        self.pos_strand = pos_strand
+        self.g_st = g_st
+        self.g_en = g_en
+        self.g_strand = g_strand
+        self.protospacer5p_flank = protospacer5p_flank
+        self.pam3p_flank = pam3p_flank
+        self.offTargets = []
 
 def search_gRNA(protosp_len, PAM, search_in, flanksize=100):
     """
