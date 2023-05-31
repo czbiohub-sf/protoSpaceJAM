@@ -46,7 +46,7 @@ bash split4mapping.sh GRCm39 Mus_musculus
 bash split4mapping.sh GRCz11 Danio_rerio
 ```
 ### Run bwa on the hpc
-submit three batch jobs to the hpc, takes ~20 hours to finish with 1700 cores
+submit three batch jobs to the hpc, takes ~20 hours to finish with 1000 cores
 ```
 rm -rf bwa.slurm.out && mkdir bwa.slurm.out
 chmod -R a+xX /hpc/projects/data_lg/duo.peng/pJAM_precompute/utils/FindOfftargetBwa/bin
@@ -55,7 +55,7 @@ sbatch map_gRNA.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa .
 sbatch map_gRNA.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa .
 ```
 ## Compute off-target score
-submit three batch jobs to the hpc, takes ~20 hours to finish with 1700 cores
+submit three batch jobs to the hpc, takes ~10 hours to finish with 1000 cores
 ```
 sbatch score_gRNA.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa .
 sbatch score_gRNA.sh GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa .
