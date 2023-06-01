@@ -10,11 +10,11 @@ import time
 
 import pandas as pd
 
-from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
-    get_HDR_template #uncomment this for pip installation
+# from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
+#     get_HDR_template #uncomment this for pip installation
 
-# from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
-#     get_HDR_template
+from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
+    get_HDR_template
 
 
 def parse_args(test_mode=False):
@@ -409,8 +409,9 @@ def main(custom_args=None):
         # open result file and write header
         csvout_res = open(f"{outdir}/result.csv", "w")
         csvout_res.write(
-            f"Entry,ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc,strand(gene/gRNA/donor)\n"
-        )
+            f"Entry,ID,chr,transcript_type,name,terminus,gRNA_name,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut_pos-insert_pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,name_of_DNA_donor,DNA donor,name_of_trimmed_DNA_Donor,trimmed_DNA_donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc,strand(gene/gRNA/donor)\n"
+        )   #"Entry,ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc,strand(gene/gRNA/donor)\n"
+
         # open result file2 for GenoPrimer input
         csvout_res2 = open(f"{outdir}/input_for_GenoPrimer.csv", "w")
         csvout_res2.write(f"Entry,ref,chr,coordinate\n")
@@ -449,6 +450,7 @@ def main(custom_args=None):
         target_terminus = "None"
         target_coordinate = "None"
         ENST_in_db = False
+        ENST_design_counts = {} #used in the names of gRNA and donors
         Entry = 0 # Entry is defined by the portal, and if not using the portal, it is just the index of the row
         for index, row in df.iterrows():
             ENST_ID = row["Ensembl_ID"].rstrip().lstrip()
@@ -651,13 +653,27 @@ def main(custom_args=None):
                             final_weight,
                         ) = get_res(current_gRNA, spec_score_flavor)
                         donor = HDR_template.Donor_final
+                        donor_trimmed = "N/A for ssODN"
+                        if config["Donor_type"] == "dsDNA":
+                            donor_trimmed = HDR_template.Donor_final
+                            donor = HDR_template.Donor_pretrim
+                            
+                        # gRNA and donor names
+                        ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
+                        gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
+                        donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
+                        if config["Donor_type"] == "dsDNA":
+                            donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
+                        else:
+                            donor_trimmed_name = "N/A for ssODN"
+
                         gRNA_cut_pos = (
                             HDR_template.CutPos
                         )  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
                         insert_pos = HDR_template.InsPos
                         if config["recoding_off"]:
                             csvout_res.write(
-                                f"{Entry},{row_prefix},-,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                                f"{Entry},{row_prefix},-,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
                             )
                             csvout_res2.write( f"{Entry},"+
                                 config["genome_ver"]
@@ -667,7 +683,7 @@ def main(custom_args=None):
                             if not isinstance(cfd4, float):
                                 cfd4 = ""
                             csvout_res.write(
-                                f"{Entry},{row_prefix},-,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                                f"{Entry},{row_prefix},-,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
                             )
                             csvout_res2.write( f"{Entry},"+
                                 config["genome_ver"]
@@ -789,7 +805,22 @@ def main(custom_args=None):
                         pos_weight,
                         final_weight,
                     ) = get_res(current_gRNA, spec_score_flavor)
+
                     donor = HDR_template.Donor_final
+                    donor_trimmed = "N/A for ssODN"
+                    if config["Donor_type"] == "dsDNA":
+                        donor_trimmed = HDR_template.Donor_final
+                        donor = HDR_template.Donor_pretrim
+                        
+                    # gRNA and donor names
+                    ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
+                    gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
+                    donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
+                    if config["Donor_type"] == "dsDNA":
+                        donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
+                    else:
+                        donor_trimmed_name = "N/A for ssODN"
+
                     gRNA_cut_pos = (
                         HDR_template.CutPos
                     )  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
@@ -799,7 +830,7 @@ def main(custom_args=None):
                             f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
                         )
                         csvout_res.write(
-                            f"{Entry},{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},N,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
@@ -812,7 +843,7 @@ def main(custom_args=None):
                         if not isinstance(cfd4, float):
                             cfd4 = ""
                         csvout_res.write(
-                            f"{Entry},{row_prefix},N,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},N,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
@@ -932,7 +963,22 @@ def main(custom_args=None):
                         pos_weight,
                         final_weight,
                     ) = get_res(current_gRNA, spec_score_flavor)
+
                     donor = HDR_template.Donor_final
+                    donor_trimmed = "N/A for ssODN"
+                    if config["Donor_type"] == "dsDNA":
+                        donor_trimmed = HDR_template.Donor_final
+                        donor = HDR_template.Donor_pretrim
+                        
+                    # gRNA and donor names
+                    ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
+                    gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
+                    donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
+                    if config["Donor_type"] == "dsDNA":
+                        donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
+                    else:
+                        donor_trimmed_name = "N/A for ssODN"
+
                     gRNA_cut_pos = (
                         HDR_template.CutPos
                     )  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
@@ -942,7 +988,7 @@ def main(custom_args=None):
                             f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
                         )
                         csvout_res.write(
-                            f"{Entry},{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
                         )
                         csvout_res2.write( f"{Entry},"+
                             config["genome_ver"]
@@ -955,13 +1001,13 @@ def main(custom_args=None):
                         if not isinstance(cfd4, float):
                             cfd4 = ""
                         csvout_res.write(
-                            f"{Entry},{row_prefix},C,{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
                             + f",{HDR_template.ENST_chr},{insert_pos}\n"
                         )
-                        # print(f"{row_prefix},C,{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor},{HDR_template.effective_HA_len}\n")
+                        # print(f"{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len}\n")
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"

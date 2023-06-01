@@ -12,10 +12,11 @@ from Bio.SeqUtils import GC
 from itertools import islice
 import math
 
-from protoSpaceJAM.util.cfdscore import cfd_score #uncomment this for pip installation
-from protoSpaceJAM.util.mitscore import mit_hit_score #uncomment this for pip installation
-# from util.cfdscore import cfd_score
-# from util.mitscore import mit_hit_score
+# from protoSpaceJAM.util.cfdscore import cfd_score #uncomment this for pip installation
+# from protoSpaceJAM.util.mitscore import mit_hit_score #uncomment this for pip installation
+
+from util.cfdscore import cfd_score
+from util.mitscore import mit_hit_score
 
 
 logger = logging.getLogger(__name__)
@@ -1288,6 +1289,7 @@ class HDR_flank:
             ################################
             # check synthesis considerations#
             ################################
+            self.Donor_pretrim = self.Donor_final
 
             # Process restriction cuts
             # print(Restriction.BsaI.site)
@@ -1417,7 +1419,7 @@ class HDR_flank:
             else:
                 self.synFlags = "; ".join(self.synFlags)
 
-            print(f"length of Donor: {len(self.Donor_final)}")
+            #print(f"length of Donor: {len(self.Donor_final)}")
         ################
         # ssODN donor   #
         ################

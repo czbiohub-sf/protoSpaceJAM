@@ -8,8 +8,8 @@ import math
 import pickle
 import logging
 
-from protoSpaceJAM.util.hdr import HDR_flank #uncomment this for pip installation
-# from util.hdr import HDR_flank
+# from protoSpaceJAM.util.hdr import HDR_flank #uncomment this for pip installation
+from util.hdr import HDR_flank
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -1457,7 +1457,6 @@ def get_cds_frame(mytranscript, which_cds):
     elif frame == 2:
         frame = 2
     return frame
-
 
 if __name__ == "__main__":
     import doctest
