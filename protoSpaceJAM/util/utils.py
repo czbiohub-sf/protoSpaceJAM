@@ -373,10 +373,10 @@ def get_gRNAs_target_coordinate(
     loc2posType,
     genome_ver,
     spec_score_flavor,
+    reg_penalty,
     dist=50,
 ):
     """
-    Rank gRNA that cuts near the target site (associated with the ENST_ID)
     input
         ENST_ID: ENST ID
         chr: chromosome (as part of the target location)
@@ -385,6 +385,7 @@ def get_gRNAs_target_coordinate(
         loc2file_index: mapping of location to the file part that stores gRNAs in that region
         loc2posType: mapping of location to location type (e.g. 5UTR etc)
         dist: max cut to insert distance (default 50)
+        reg_penalty: whether to penalize gRNAs that cut in the region of interest (default True)
     return:
         a dictionary of guide RNAs which cuts <[dist] to the target location
 
@@ -413,6 +414,7 @@ def get_gRNAs_target_coordinate(
         ENST_strand=ENST_strand,
         type="start",
         spec_score_flavor=spec_score_flavor,
+        reg_penalty=reg_penalty,
     )
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_target_pos.sort_values(
         "final_weight", ascending=False
@@ -429,9 +431,11 @@ def get_gRNAs(
     loc2posType,
     genome_ver,
     spec_score_flavor,
+    reg_penalty,
     dist=50,
 ):
     """
+    Rank gRNAs that cut near the start and stop codon of an ENST_ID
     input
         ENST_ID: ENST ID
         ENST_info: gene model info loaded from pickle file
@@ -469,6 +473,7 @@ def get_gRNAs(
         ENST_strand=ENST_strand,
         type="start",
         spec_score_flavor=spec_score_flavor,
+        reg_penalty=reg_penalty,
     )
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_ATG.sort_values(
         "final_weight", ascending=False
@@ -497,6 +502,7 @@ def get_gRNAs(
         ENST_strand=ENST_strand,
         type="stop",
         spec_score_flavor=spec_score_flavor,
+        reg_penalty=reg_penalty,
     )
     ranked_df_gRNAs_stop = ranked_df_gRNAs_stop.sort_values(
         "final_weight", ascending=False
@@ -506,7 +512,7 @@ def get_gRNAs(
 
 
 def rank_gRNAs_for_tagging(
-    loc, gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, alpha=1
+    loc, gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, reg_penalty, alpha=1
 ):
     """
     input:  loc         [chr,pos,strand]  #start < end
@@ -554,16 +560,19 @@ def rank_gRNAs_for_tagging(
 
         # get position_weight
         position_type = _get_position_type(
-            chr=Chr, ID=ENST_ID, pos=cutPos, loc2posType=loc2posType
-        )
-        position_weight = _position_weight(position_type)
+                chr=Chr, ID=ENST_ID, pos=cutPos, loc2posType=loc2posType
+            )
+        if reg_penalty is True:
+            position_weight = _position_weight(position_type)
 
-        position_type_nextbp = _get_position_type(
-            chr=Chr, ID=ENST_ID, pos=cutPos + 1, loc2posType=loc2posType
-        )
-        position_weight_nextbp = _position_weight(position_type_nextbp)
+            position_type_nextbp = _get_position_type(
+                chr=Chr, ID=ENST_ID, pos=cutPos + 1, loc2posType=loc2posType
+            )
+            position_weight_nextbp = _position_weight(position_type_nextbp)
 
-        position_weight = min([position_weight, position_weight_nextbp])
+            position_weight = min([position_weight, position_weight_nextbp])
+        else:
+            position_weight = 1
 
         col_pos_weight.append(position_weight)
 

@@ -1653,9 +1653,9 @@ class HDR_flank:
             if s <= (len(seq) / 2) and e <= (len(seq) / 2):  # on the left side
                 newStart = e + 1  # start after the last base in the seq to avoid
                 leftHAlen, rightHAlen = self.calc_HA_len(newStart, End)
-                print(
-                    f"leftHAlen {leftHAlen} rightHAlen {rightHAlen} newStart {newStart} Start {Start} End {End}"
-                )
+                # print(
+                #     f"leftHAlen {leftHAlen} rightHAlen {rightHAlen} newStart {newStart} Start {Start} End {End}"
+                # )
                 if (
                     leftHAlen >= minHAlen
                     and rightHAlen >= minHAlen
@@ -1665,9 +1665,9 @@ class HDR_flank:
             if s >= (len(seq) / 2) and e >= (len(seq) / 2):  # on the right side
                 newEnd = s - 1  # end before the first base in the seq to avoid
                 leftHAlen, rightHAlen = self.calc_HA_len(Start, newEnd)
-                print(
-                    f"leftHAlen {leftHAlen} rightHAlen {rightHAlen} newEnd {newEnd} Start {Start} End {End}"
-                )
+                # print(
+                #     f"leftHAlen {leftHAlen} rightHAlen {rightHAlen} newEnd {newEnd} Start {Start} End {End}"
+                # )
                 if (
                     leftHAlen >= minHAlen and rightHAlen >= minHAlen and newEnd <= End
                 ):  # minmum length check and prevent untrimming

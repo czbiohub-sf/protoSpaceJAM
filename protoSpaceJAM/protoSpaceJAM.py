@@ -20,7 +20,9 @@ from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_t
 def parse_args(test_mode=False):
     parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n")
 
-    parser.add_argument(
+    IO = parser.add_argument_group('input/output')
+    
+    IO.add_argument(
         "--path2csv",
         default=os.path.join("input","test_input.csv"),
         type=str,
@@ -28,15 +30,15 @@ def parse_args(test_mode=False):
         metavar="<PATH_TO_CSV>",
     )
 
-    parser.add_argument(
+    IO.add_argument(
         "--outdir",
         default=os.path.join("output","test"),
         type=str,
         metavar = "<PATH_TO_OUTPUT_DIRECTORY>",
         help="output directory"
     )
-
-    parser.add_argument(
+    genome = parser.add_argument_group('genome')
+    genome.add_argument(
         "--genome_ver",
         default="GRCh38",
         type=str,
@@ -44,100 +46,108 @@ def parse_args(test_mode=False):
         metavar="<string>",
     )
 
-    # gRNA
-    parser.add_argument(
+    gRNA = parser.add_argument_group('gRNA')
+    gRNA.add_argument(
         "--num_gRNA_per_design",
         default=1,
         type=int,
         help="Number of gRNAs per design, default is 1",
         metavar="<integer>",
     )
-    # payload
-    parser.add_argument(
+    gRNA.add_argument(
+        "--no_regulatory_penalty",
+        default=False,
+        action="store_true",
+        help="turn off penalty for gRNAs cutting in UTRs or near splice junctions, default is applying penalty",
+    )
+
+    payload = parser.add_argument_group('payload')
+    payload.add_argument(
         "--payload",
         default="",
         type=str,
         help="payload for every site, regardless of termius or coordinates, overrides --Npayload, --Cpayload, POSpayload, --Tag, --Linker",
         metavar="<string>",
     )
-    parser.add_argument(
+    payload.add_argument(
         "--Npayload",
         default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
         type=str,
-        help="payload at the N terminus, default is mNG11 + XTEN80: ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT, overrides --Tag --Linker",
+        help="payload at the N terminus, default is mNG11 + XTEN80: ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT, overrides --Tag and --Linker",
         metavar="<string>",
     )
-    parser.add_argument(
+    payload.add_argument(
         "--Cpayload",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the C terminus, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag --Linker",
+        help="payload at the C terminus, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag and --Linker",
         metavar="<string>",
     )
-    parser.add_argument(
+    payload.add_argument(
         "--POSpayload",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the target coordinate, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag --Linker",
+        help="payload at the target coordinate, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag and --Linker",
         metavar="<string>",
     )
-    parser.add_argument(
+    payload.add_argument(
         "--Tag",
         default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
         help="default is the mNG11 tag",
         metavar="<string>",
     )
-    parser.add_argument(
+    payload.add_argument(
         "--Linker",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
         type=str,
         help="default is the XTEN80 linker",
         metavar="<string>",
     )
-    # donor
-    parser.add_argument(
+
+    donor = parser.add_argument_group('donor')
+    donor.add_argument(
         "--Donor_type",
         default="ssODN",
         help="ssODN(default) or dsDNA",
         type=str,
         metavar="<string>",
     )
-    parser.add_argument(
+    donor.add_argument(
         "--HA_len",
         default=500,
         help="length of the homology arm (on each side), will be the final arm length for dsDNA donors",
         type=int,
         metavar="<integer>",
     )
-    parser.add_argument(
+    donor.add_argument(
         "--Strand_choice",
         default="NonTargetStrand",
         help="only applies when --Donor_type is set to ssODN, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand",
         type=str,
         metavar="<string>",
     )
-    parser.add_argument(
+    donor.add_argument(
         "--ssODN_max_size",
         type=int,
         help="only applies when --Donor_type is set to ssODN. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region",
         metavar="<int>",
     )
-    parser.add_argument(
+    donor.add_argument(
         "--CheckEnzymes",
         default="",
         help="Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI",
         type=str,
         metavar="<string>",
     )
-    parser.add_argument(
+    donor.add_argument(
         "--CustomSeq2Avoid",
         default="",
         help="custom sequences to avoid, separated by |",
         type=str,
         metavar="<string>",
     )
-    parser.add_argument(
+    donor.add_argument(
         "--MinArmLenPostTrim",
         default=0,
         help="Minimum length the homology arm after trimming,  default is 0 (turning off trimming)",
@@ -145,38 +155,39 @@ def parse_args(test_mode=False):
         metavar="<integer>",
     )
 
-    # recoding
-    parser.add_argument(
+    recoding = parser.add_argument_group('recoding')
+    recoding.add_argument(
         "--recoding_off",
         default=False,
         action="store_true",
         help="turn off *all* recoding",
     )
-    parser.add_argument(
+    recoding.add_argument(
         "--recoding_stop_recut_only",
         default=False,
         action="store_true",
         help="Recode in the gRNA to prevent recut",
     )
-    parser.add_argument(
+    recoding.add_argument(
         "--recoding_full",
         default=False,
         action="store_true",
         help="Use full recoding: recode both the gRNA and region between insert and cut site",
     )
-    parser.add_argument(
+    recoding.add_argument(
         "--cfdThres",
         default=0.03,
         help="protoSpaceJAM will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.",
         metavar="<float>",
     )
-    parser.add_argument(
+    recoding.add_argument(
         "--recode_order",
         default="PAM_first",
         help="Prioritize recoding in the PAM or in protospacer, possible values: protospacer_first, PAM_first",
         metavar="<string>",
     )
-    parser.add_argument(
+    misc = parser.add_argument_group('misc.')
+    misc.add_argument(
         "--test_mode",
         default=False,
         help="used by the unit tests, not user-oriented",
@@ -231,6 +242,7 @@ def main(custom_args=None):
         ssODN_max_size = config["ssODN_max_size"]
         spec_score_flavor = "guideMITScore"
         outdir = config["outdir"]
+        reg_penalty = not config["no_regulatory_penalty"]
         syn_check_args = {
             "check_enzymes": config["CheckEnzymes"],
             "CustomSeq2Avoid": config["CustomSeq2Avoid"],
@@ -564,7 +576,7 @@ def main(custom_args=None):
                 csvout_N.write(ENST_ID)
                 #check if the coordinate is in the ENST
                 if ENST_info[ENST_ID].chr == chrom and min(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end) <= int(coordinate) <=  max(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end):
-
+                    
                     # get gRNAs
                     ranked_df_gRNAs_target_pos = get_gRNAs_target_coordinate(
                         ENST_ID=ENST_ID,
@@ -577,6 +589,7 @@ def main(custom_args=None):
                         dist=max_cut2ins_dist,
                         genome_ver=config["genome_ver"],
                         spec_score_flavor=spec_score_flavor,
+                        reg_penalty=reg_penalty,
                     )
 
                     if ranked_df_gRNAs_target_pos.empty == True:
@@ -714,7 +727,6 @@ def main(custom_args=None):
                 if not ENST_in_db:
                     Entry += 1
                 csvout_N.write(ENST_ID)
-
                 # get gRNAs
                 ranked_df_gRNAs_ATG, ranked_df_gRNAs_stop = get_gRNAs(
                     ENST_ID=ENST_ID,
@@ -725,6 +737,7 @@ def main(custom_args=None):
                     dist=max_cut2ins_dist,
                     genome_ver=config["genome_ver"],
                     spec_score_flavor=spec_score_flavor,
+                    reg_penalty=reg_penalty,
                 )
 
                 if ranked_df_gRNAs_ATG.empty == True:
@@ -883,6 +896,7 @@ def main(custom_args=None):
                     dist=max_cut2ins_dist,
                     genome_ver=config["genome_ver"],
                     spec_score_flavor=spec_score_flavor,
+                    reg_penalty=reg_penalty,
                 )
 
                 if ranked_df_gRNAs_stop.empty == True:
