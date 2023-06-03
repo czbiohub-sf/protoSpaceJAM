@@ -5,6 +5,11 @@ Changelog
 
 Algorithm
 ---------
+:Date: June 2, 2023 |enhancement 756ad| Add an option to disable penalizing gRNAs that cut in UTRs or near splice junctions.
+
+:Date: June 2, 2023 |enhancement c3828| |enhancement c2717| Output both trimmed and untrimmed dsDNA donors in the results.
+
+:Date: June 2, 2023 |enhancement c2717| |enhancement c3828| Generate a unique name for each gRNA, donor, and trimmed donor.
 
 :Date: May 15, 2023 |enhancement 9aac65| Results now include the strands of gene, gRNA and donor ( + denotes the forward strand and - denotes the reverse strands). 
 
@@ -34,6 +39,7 @@ Algorithm
 
 Portal
 ------
+
 :Date: May 19, 2023 |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
 
 :Date: May 19, 2023 |bug fix 04401| CSV upload is updated to work with the new columns in the submission list.
@@ -58,6 +64,13 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+
+.. |enhancement c2717| image:: https://img.shields.io/badge/c2717-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d3d055816ea35b9936e7937b91889a139e9c2717
+.. |enhancement 756ad| image:: https://img.shields.io/badge/756ad-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM/commit/4bb71f3479236704df299a19ed3da731f97756ad
+.. |enhancement c3828| image:: https://img.shields.io/badge/c3828-enhancement-green
+    :target: https://github.com/czbiohub/protoSpaceJAM/commit/1a24e1ea0251d4a732d5813240742e6420dc3828
 .. |enhancement 04401| image:: https://img.shields.io/badge/04401-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d388b8d19d7d1468d4463e0b7061dce1af004401
 .. |bug fix 04401| image:: https://img.shields.io/badge/04401-bug%20fix-red
