@@ -12,11 +12,11 @@ from Bio.SeqUtils import GC
 from itertools import islice
 import math
 
-# from protoSpaceJAM.util.cfdscore import cfd_score #uncomment this for pip installation
-# from protoSpaceJAM.util.mitscore import mit_hit_score #uncomment this for pip installation
+from protoSpaceJAM.util.cfdscore import cfd_score #uncomment this for pip installation
+from protoSpaceJAM.util.mitscore import mit_hit_score #uncomment this for pip installation
 
-from util.cfdscore import cfd_score
-from util.mitscore import mit_hit_score
+# from util.cfdscore import cfd_score
+# from util.mitscore import mit_hit_score
 
 
 logger = logging.getLogger(__name__)
@@ -1332,7 +1332,7 @@ class HDR_flank:
                 # Search for homopolyers in the donor, and document the coordinates (1-indexing)
                 hp_res = [
                     (m.group(), m.start() + 1)
-                    for m in re.finditer(r"([ACGT])\1{9,}", self.Donor_final.upper())
+                    for m in re.finditer(r"([ATat])\1{9,}|([CGcg])\2{5,}", self.Donor_final.upper())
                 ]
                 if len(hp_res) > 0:
                     for t in hp_res:
