@@ -47,7 +47,7 @@ python ./protoSpaceJAM/util/download_precomputed_results.py
 ```
 PS: Default dependencies will only allow users to run protoSpaceJam 
 with existing pre-computed data. If you like to execute pre-computation
-steps please follow [here](https://github.com/czbiohub/protoSpaceJAM/tree/main/precomputed_gRNAs)
+steps please follow [here](https://github.com/czbiohub-sf/protoSpaceJAM/tree/main/protoSpaceJAM/precompute)
 
 ### Run a quick test to verify installation
 ```
