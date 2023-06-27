@@ -1387,13 +1387,13 @@ class HDR_flank:
             # Flag Homopolyer
             hp_res = [
                 (m.group(), m.start() + 1)
-                for m in re.finditer(r"([ACGT])\1{9,}", seq_noAmbiguous.upper())
+                for m in re.finditer(r"([ATat])\1{9,}|([CGcg])\2{5,}", seq_noAmbiguous.upper())
             ]
             if len(hp_res) > 0:
                 hp_res_display = [f"({t[0]}@{t[1]})" for t in hp_res]
                 hp_res_display = "".join(hp_res_display)
                 self.synFlags.append(
-                    f"Homopolymer > 10bp (sequence@start): {hp_res_display}"
+                    f"Homopolymer(sequence@start): {hp_res_display}"
                 )
 
             # Flag GC content

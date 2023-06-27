@@ -5,6 +5,8 @@ Changelog
 
 Algorithm
 ---------
+:Date: June 26, 2023 |enhancement c5c26| Use Bowtie as the default aligner to check unintended PCR products in primer design.
+
 :Date: June 2, 2023 |enhancement 756ad| Add an option to disable penalizing gRNAs that cut in UTRs or near splice junctions.
 
 :Date: June 2, 2023 |enhancement c3828| |enhancement c2717| Output both trimmed and untrimmed dsDNA donors in the results.
@@ -39,6 +41,11 @@ Algorithm
 
 Portal
 ------
+:Date: June 26, 2023 |enhancement 74c6d| Add progress indicator for pJAM.
+
+:Date: June 26, 2023 |enhancement 392f8| Add gene ID and gene symbol for primer output
+
+:Date: June 12, 2023 |enhancement 940a1| Add privacy and cookie policy
 
 :Date: May 19, 2023 |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
 
@@ -64,7 +71,14 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
-
+.. |enhancement c5c26| image:: https://img.shields.io/badge/c5c26-enhancement-green
+    :target: https://github.com/czbiohub-sf/GenoPrimer/commit/f63b44bfa67fd7fbd27d11da1a02c794dfdc5c26
+.. |enhancement 74c6d| image:: https://img.shields.io/badge/74c6d-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/ef3101aec0e314123ba2cf8ee7bc1c9571574c6d
+.. |enhancement 392f8| image:: https://img.shields.io/badge/392f8-enhancement-green
+:target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/327481b312b420fccc2c9c5dc0b5982fbd0392f8
+.. |enhancement 940a1| image:: https://img.shields.io/badge/940a1-enhancement-green
+:target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/e405e9c998c23af5bce489d46b76f9ee2c9940a1
 .. |enhancement c2717| image:: https://img.shields.io/badge/c2717-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d3d055816ea35b9936e7937b91889a139e9c2717
 .. |enhancement 756ad| image:: https://img.shields.io/badge/756ad-enhancement-green

@@ -10,11 +10,11 @@ import time
 
 import pandas as pd
 
-# from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
-#     get_HDR_template #uncomment this for pip installation
+from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
+    get_HDR_template #uncomment this for pip installation
 
-from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
-    get_HDR_template
+# from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
+#     get_HDR_template
 
 
 def parse_args(test_mode=False):
@@ -426,7 +426,7 @@ def main(custom_args=None):
 
         # open result file2 for GenoPrimer input
         csvout_res2 = open(f"{outdir}/input_for_GenoPrimer.csv", "w")
-        csvout_res2.write(f"Entry,ref,chr,coordinate\n")
+        csvout_res2.write(f"Entry,ref,chr,coordinate,ID,geneSymbol\n")
 
         # dataframes to store best gRNAs
         best_start_gRNAs = pd.DataFrame()
@@ -690,7 +690,7 @@ def main(custom_args=None):
                             )
                             csvout_res2.write( f"{Entry},"+
                                 config["genome_ver"]
-                                + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                                + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                             )
                         else:
                             if not isinstance(cfd4, float):
@@ -700,7 +700,7 @@ def main(custom_args=None):
                             )
                             csvout_res2.write( f"{Entry},"+
                                 config["genome_ver"]
-                                + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                                + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                             )
 
                         # write log
@@ -847,7 +847,7 @@ def main(custom_args=None):
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
-                            + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                            + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
                     else:
                         csvout_N.write(
@@ -860,7 +860,7 @@ def main(custom_args=None):
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
-                            + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                            + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
 
                     # write log
@@ -1006,7 +1006,7 @@ def main(custom_args=None):
                         )
                         csvout_res2.write( f"{Entry},"+
                             config["genome_ver"]
-                            + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                            + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
                     else:
                         csvout_C.write(
@@ -1019,7 +1019,7 @@ def main(custom_args=None):
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
-                            + f",{HDR_template.ENST_chr},{insert_pos}\n"
+                            + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
                         # print(f"{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len}\n")
 

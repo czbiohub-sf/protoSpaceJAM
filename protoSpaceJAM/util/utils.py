@@ -8,8 +8,8 @@ import math
 import pickle
 import logging
 
-# from protoSpaceJAM.util.hdr import HDR_flank #uncomment this for pip installation
-from util.hdr import HDR_flank
+from protoSpaceJAM.util.hdr import HDR_flank #uncomment this for pip installation
+# from util.hdr import HDR_flank
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
