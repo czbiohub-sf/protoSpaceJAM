@@ -76,9 +76,9 @@ Portal
 .. |enhancement 74c6d| image:: https://img.shields.io/badge/74c6d-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/ef3101aec0e314123ba2cf8ee7bc1c9571574c6d
 .. |enhancement 392f8| image:: https://img.shields.io/badge/392f8-enhancement-green
-:target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/327481b312b420fccc2c9c5dc0b5982fbd0392f8
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/327481b312b420fccc2c9c5dc0b5982fbd0392f8
 .. |enhancement 940a1| image:: https://img.shields.io/badge/940a1-enhancement-green
-:target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/e405e9c998c23af5bce489d46b76f9ee2c9940a1
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/e405e9c998c23af5bce489d46b76f9ee2c9940a1
 .. |enhancement c2717| image:: https://img.shields.io/badge/c2717-enhancement-green
     :target: https://github.com/czbiohub/protoSpaceJAM-portal/commit/d3d055816ea35b9936e7937b91889a139e9c2717
 .. |enhancement 756ad| image:: https://img.shields.io/badge/756ad-enhancement-green
