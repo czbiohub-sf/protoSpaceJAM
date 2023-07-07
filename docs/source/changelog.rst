@@ -41,6 +41,8 @@ Algorithm
 
 Portal
 ------
+:Date: June 26, 2023 |enhancement b95b4| Implement a maximum wait time of 5min for each *ad hoc* GenoPrimer design.
+
 :Date: June 26, 2023 |enhancement 74c6d| Add progress indicator for pJAM.
 
 :Date: June 26, 2023 |enhancement 392f8| Add gene ID and gene symbol for primer output
@@ -71,6 +73,10 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+
+
+.. |enhancement b95b4| image:: https://img.shields.io/badge/b95b4-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/2b6f8b1a004049129037773ff1758acaa60b95b4
 .. |enhancement c5c26| image:: https://img.shields.io/badge/c5c26-enhancement-green
     :target: https://github.com/czbiohub-sf/GenoPrimer/commit/f63b44bfa67fd7fbd27d11da1a02c794dfdc5c26
 .. |enhancement 74c6d| image:: https://img.shields.io/badge/74c6d-enhancement-green
