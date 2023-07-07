@@ -41,7 +41,7 @@ Algorithm
 
 Portal
 ------
-:Date: June 26, 2023 |enhancement b95b4| Implement a maximum wait time of 5min for each *ad hoc* GenoPrimer design.
+:Date: July 06, 2023 |enhancement b95b4| Implement a maximum wait time of 5min for each *ad hoc* GenoPrimer design.
 
 :Date: June 26, 2023 |enhancement 74c6d| Add progress indicator for pJAM.
 
