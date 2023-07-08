@@ -1494,29 +1494,38 @@ class HDR_flank:
             # Notes: Donor is always in the coding strand before the strand selection    #
             #############################################################################
             if self.Strand_choice == "auto":
-                # In auto mode, check PAM-less cutting
-                fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(
-                    self.Donor_final
-                )  # get PAMless cfd cut
-                rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(
-                    str(Seq(self.Donor_final).reverse_complement())
-                )
-                self.Donor_strand = self.flip_strand(self.Donor_strand)
-                PAMless_cfd = max(
-                    [fwd_scan_highest_PAMless_cfd, rev_scan_highest_PAMless_cfd]
-                )
-                # print(f"PAMless_cfd:{PAMless_cfd}")
-                if (
-                    PAMless_cfd > self.cfdThres
-                ):  # PAM-independent cutting can happen, choose gRNA (NT) strand
-                    if self.ENST_strand * self.gStrand == -1:
-                        self.Donor_final = str(
-                            Seq(self.Donor_final).reverse_complement()
-                        )
-                        self.Donor_strand = self.flip_strand(self.Donor_strand)
-                        # take revcom if gRNA is not on the same strand as the ENST (coding)
-                else:  # PAM-independent cutting can NOT happen, choose Manu strand
-                    self.Donor_final = self.select_Manu_strand(self.Donor_final)
+                # PAM-less cutting logic
+                # check PAM-less cutting
+                # fwd_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_coding(
+                #     self.Donor_final
+                # )  # get PAMless cfd cut
+                # rev_scan_highest_PAMless_cfd = self.slide_win_PAMLESScfd_noncoding(
+                #     str(Seq(self.Donor_final).reverse_complement())
+                # )
+                # self.Donor_strand = self.flip_strand(self.Donor_strand)
+                # PAMless_cfd = max(
+                #     [fwd_scan_highest_PAMless_cfd, rev_scan_highest_PAMless_cfd]
+                # )
+                # # print(f"PAMless_cfd:{PAMless_cfd}")
+                # if (
+                #     PAMless_cfd > self.cfdThres
+                # ):  # PAM-independent cutting can happen, choose gRNA (NT) strand
+                #     if self.ENST_strand * self.gStrand == -1:
+                #         self.Donor_final = str(
+                #             Seq(self.Donor_final).reverse_complement()
+                #         )
+                #         self.Donor_strand = self.flip_strand(self.Donor_strand)
+                #         # take revcom if gRNA is not on the same strand as the ENST (coding)
+                # else:  # PAM-independent cutting can NOT happen, choose Manu strand
+                #     self.Donor_final = self.select_Manu_strand(self.Donor_final)
+
+                # get donor strand according to relative location of edit site and cutsite
+                # if Distance between cut and edit > 0 , get + strand, else get - strand
+                if Cut2Ins_dist > 0:
+                    self.Donor_strand = "+"
+                else:
+                    self.Donor_strand = "-"
+
             else:
                 if self.Strand_choice == "NonTargetStrand":  # gRNAstrand
                     if self.ENST_strand * self.gStrand == -1:
