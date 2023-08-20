@@ -10,11 +10,11 @@ A web-portal is available at http://protospacejam.czbiohub.org/
 
 ## Key features:  
 - Fully standalone, no calling to other bioinformatics servers
-- Sophisticated guide RNA ranking system ([details](https://czbiohub.github.io/protoSpaceJAM/algorithm.html#grna-scoring))
+- Sophisticated guide RNA ranking system ([details](https://czbiohub-sf.github.io/protoSpaceJAM/algorithm.html#grna-scoring))
   - Specificity weight
   - Penalize cuts near exon-intron junctions etc.
   - Penalize cuts far away from the payload insertion site
-- Sophisticated DNA donor design ([details](https://czbiohub.github.io/protoSpaceJAM/algorithm.html#recoding-strategy))
+- Sophisticated DNA donor design ([details](https://czbiohub-sf.github.io/protoSpaceJAM/algorithm.html#recoding-strategy))
   - Recode to prevent recut
   - Recode to facilitate payload insertion and prevent recut
   - Automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
