@@ -41,6 +41,7 @@ class test_with_OpenCell_design(unittest.TestCase):
         if os.path.exists(os.path.join("tests", "quick_test_result")):
             shutil.rmtree(os.path.join("tests", "quick_test_result"))
 
+
     def test_if_generated_results(self):
         #check if results were generated
         self.assertTrue(os.path.isfile(os.path.join("tests", "quick_test_result", "result.csv")))

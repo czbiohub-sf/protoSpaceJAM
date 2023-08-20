@@ -4,10 +4,8 @@ import logging
 import os.path
 import pickle
 import sys
-
 import traceback
 import time
-
 import pandas as pd
 
 from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
@@ -16,12 +14,9 @@ from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files,
 # from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
 #     get_HDR_template
 
-
 def parse_args(test_mode=False):
     parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n")
-
     IO = parser.add_argument_group('input/output')
-    
     IO.add_argument(
         "--path2csv",
         default=os.path.join("input","test_input.csv"),
@@ -29,7 +24,6 @@ def parse_args(test_mode=False):
         help="path to a csv file containing ENST information, see input/test_input.csv for an example\n *required columns*: 'Ensembl_ID' (specifying the transcript ID), and either 'Target_terminus' or 'Chromosome','Coordinate' (specifying the terminus of the transcript or a genomic coordinate in the transcript)",
         metavar="<PATH_TO_CSV>",
     )
-
     IO.add_argument(
         "--outdir",
         default=os.path.join("output","test"),
@@ -45,7 +39,6 @@ def parse_args(test_mode=False):
         help="currently supports three genomes: GRCh38, GRCm39, GRCz11, ",
         metavar="<string>",
     )
-
     gRNA = parser.add_argument_group('gRNA')
     gRNA.add_argument(
         "--num_gRNA_per_design",
@@ -60,7 +53,6 @@ def parse_args(test_mode=False):
         action="store_true",
         help="turn off penalty for gRNAs cutting in UTRs or near splice junctions, default is applying penalty",
     )
-
     payload = parser.add_argument_group('payload')
     payload.add_argument(
         "--payload",
@@ -154,7 +146,6 @@ def parse_args(test_mode=False):
         type=int,
         metavar="<integer>",
     )
-
     recoding = parser.add_argument_group('recoding')
     recoding.add_argument(
         "--recoding_off",
@@ -196,9 +187,7 @@ def parse_args(test_mode=False):
     config = parser.parse_args()
     return config, parser
 
-#####################
-##      main       ##
-#####################
+
 def main(custom_args=None):
     """
     main function
@@ -1021,7 +1010,6 @@ def main(custom_args=None):
                             config["genome_ver"]
                             + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
-                        # print(f"{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{cut2ins_dist},{spec_score},{spec_weight:.6f},{dist_weight:.6f},{pos_weight:.6f},{final_weight:.6f},{cfd4},{cfd_scan},{cfdfinal},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len}\n")
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
@@ -1053,17 +1041,6 @@ def main(custom_args=None):
                 log.info(
                     f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts, elapsed time {elapsed_min:.2f} min ({elapsed_sec} sec)"
                 )
-                # gnum = len(gRNA_out_of_arms["start"]) + len(gRNA_out_of_arms["stop"])
-                # log.info(f"number of gRNAs outside the HDR arm: {gnum}")
-
-            ################
-            # early stopping#
-            ################
-            # if ENST_ID == "ENST00000562221":
-            #     sys.exit()
-            # num_to_process = 100
-            # if protein_coding_transcripts_count >=num_to_process:
-            #     break
 
         # write csv out
         endtime = datetime.datetime.now()
@@ -1074,32 +1051,6 @@ def main(custom_args=None):
             pass
         else:
             num_to_process = "all"
-
-        # write best gRNA dfs to file
-        # outdir = "pickles"
-        # mkdir(outdir)
-        # with open(
-        #     f"{outdir}/best_start_gRNAs_of_{num_to_process}_genes.pickle", "wb"
-        # ) as handle:
-        #     pickle.dump(best_start_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        # with open(
-        #     f"{outdir}/best_stop_gRNAs_of_{num_to_process}_genes.pickle", "wb"
-        # ) as handle:
-        #     pickle.dump(best_stop_gRNAs, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-        # write failed ENSTs to file
-        # with open(
-        #     f"{outdir}/start_failed_IDs_of_{num_to_process}_genes.pickle", "wb"
-        # ) as handle:
-        #     pickle.dump(start_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        # with open(
-        #     f"{outdir}/stop_failed_IDs_of_{num_to_process}_genes.pickle", "wb"
-        # ) as handle:
-        #     pickle.dump(stop_info.failed, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-        # write ENSTs (whose gRNA is outside of the default HDR arm) to file
-        # with open(f"pickles/gRNA_out_of_arms_{num_to_process}_genes.pickle", 'wb') as handle:
-        #    pickle.dump(gRNA_out_of_arms, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         log.info(
             f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped\n"
@@ -1114,22 +1065,18 @@ def main(custom_args=None):
         csvout_res.close()
         csvout_res2.close()
 
-
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
         traceback.print_exc()
         print("additional information:", e)
         PrintException()
 
+## end of main()
 
-##########################
-## end of main()        ##
-##########################
 def ret_six_dec(myvar):
     """
     retain six decimal points for printout
     """
-
     if type(myvar) == float:
         return f"{myvar:.6f}"
     elif type(myvar) == int:
@@ -1167,7 +1114,6 @@ class info:
     """
     info log class
     """
-
     def __init__(self) -> None:
         self.cfd1 = []
         self.cfd2 = []

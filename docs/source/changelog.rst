@@ -41,6 +41,10 @@ Algorithm
 
 Portal
 ------
+:Date: July 08, 2023 |bug fix aa7eb| Fixed a bug causing editing payload sequence custom genomic coordinate to fail
+
+:Date: July 08, 2023 |enhancement aa7eb| Make automatic the default strand selection mode for ssODN donors.
+
 :Date: July 06, 2023 |enhancement b95b4| Implement a maximum wait time of 5min for each *ad hoc* GenoPrimer design.
 
 :Date: June 26, 2023 |enhancement 74c6d| Add progress indicator for pJAM.
@@ -74,7 +78,10 @@ Portal
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
 
-
+.. |bug fix aa7eb| image:: https://img.shields.io/badge/aa7eb-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/4a62c8e95684d8283afd5f038ec2c51acbcaa7eb
+.. |enhancement aa7eb| image:: https://img.shields.io/badge/aa7eb-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/4a62c8e95684d8283afd5f038ec2c51acbcaa7eb
 .. |enhancement b95b4| image:: https://img.shields.io/badge/b95b4-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/2b6f8b1a004049129037773ff1758acaa60b95b4
 .. |enhancement c5c26| image:: https://img.shields.io/badge/c5c26-enhancement-green
