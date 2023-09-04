@@ -10,6 +10,7 @@ Key concepts
 |
 |
 Tunable parameters
+------------------
 .. figure:: /_static/images/tunable_parameters.png
    :width: 100%
    :align: center
@@ -18,11 +19,12 @@ Tunable parameters
 |
 gRNA scoring
 ------------
-To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composite ranking score that weighs (1) the on-target specificity of each candidate, (2) the distance between cut and insertion sites, and (3) the position of the gRNA with respect to important gene expression regulatory sequences, namely 5’ untranslated regions (UTRs) and splice sites 
+To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composite ranking score that weighs (1) the on-target specificity of each candidate, (2) the distance between cut and insertion sites, and (3) the position of the gRNA with respect to important gene expression regulatory sequences, namely 5’ untranslated regions (UTRs) and splice sites  
 .. figure:: /_static/images/score.png
    :width: 100%
    :align: center
    :alt: gRNA_scoring
+
 .. figure:: /_static/images/gRNA.png
    :width: 100%
    :align: center
@@ -46,6 +48,7 @@ Recoding strategy
       
 | Notes
 | - The Cutting Frequency Determination (CFD) score was created by `Doench et al. <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125/>`_  to calculate the off-target potential of sgRNA:DNA interaction.
+|
 |
 DNA donor processing strategy
 -----------------------------
