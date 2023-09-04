@@ -70,7 +70,7 @@ DNA donor processing strategy
 
 * Double-stranded DNA (dsDNA)
 
-In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content (65% or <25% GC content globally, and >52% difference in GC content between any given 50 bp stretches).  
+In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content ( outside of 25%-65% GC content globally, or a difference in GC content larger than 52% between any given 50 bp stretches).  
 
 * Single-stranded oligonucleotides (ssODN)
 
