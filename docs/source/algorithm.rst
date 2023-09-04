@@ -19,13 +19,14 @@ Tunable parameters
 |
 gRNA scoring
 ------------
-To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composite ranking score that weighs (1) the on-target specificity of each candidate, (2) the distance between cut and insertion sites, and (3) the position of the gRNA with respect to important gene expression regulatory sequences, namely 5’ untranslated regions (UTRs) and splice sites  
+To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composite ranking score that weighs (1) the on-target specificity of each candidate, (2) the distance between cut and insertion sites, and (3) the position of the gRNA with respect to important gene expression regulatory sequences, namely 5’ untranslated regions (UTRs) and splice sites.  
 
 .. figure:: /_static/images/score.png
    :width: 100%
    :align: center
    :alt: gRNA_scoring
-
+|
+| Weights:
 .. figure:: /_static/images/gRNA.png
    :width: 100%
    :align: center
