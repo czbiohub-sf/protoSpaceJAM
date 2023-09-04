@@ -21,7 +21,7 @@ Contents
 .. toctree::
 
    usage
-   algorithm
+   algorithm and parameters
    sourcecode
    changelog
    
