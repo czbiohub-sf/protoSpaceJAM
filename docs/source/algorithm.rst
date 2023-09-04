@@ -1,6 +1,6 @@
 Algorithm 
 =========
-
+|
 Key concepts
 ------------
 .. figure:: /_static/images/keyConcepts.png
@@ -35,10 +35,14 @@ To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composit
 Recoding strategy
 -----------------
 | protoSpaceJAM supports the optional introduction of silent “recoding” mutations in two separate key regions of the HDR donor:  
+
 * The Cas9/gRNA binding site  
+  
 The Cas9/gRNA binding site may still be present in the homology arm sequences when payload insertion does not destroy the original protospacer. In such cases, knock-in might be impaired because Cas9 might either cut the donor itself during the delivery of reagents in the cell, or re-cut the knock-in allele after DNA repair. This would respectively decrease donor availability or introduce unwanted genomic modifications, negatively impacting knock-in efficiency overall. A well-established practice is therefore to introduce silent mutations to inactivate the gRNA binding site within the HDR donor. protoSpaceJAM uses the Cutting Frequency Determination (CFD) scoring framework established by Doench and colleagues to predict the impact of individual protospacer and PAM mutations on the Cas9/gRNA cutting potential (14). For each gRNA, protoSpaceJAM identifies the minimum number of mutations that would bring the maximal CFD score in the donor sequence below a user-defined threshold (default: 0.03). When recoding within a protein-coding sequence, only silent mutations are used, leveraging maximal sequence divergence between synonymous codons while excluding rare codons. When recoding within a non-coding region, mutations are introduced in up to one of every three bases. No recoding is allowed in the immediate vicinity of splice junctions, to maintain universally conserved sequence motifs.  
+
 * The Cut-to-insert region  
-when having to perform Cas9/gRNA cuts at a distance from the insertion site, introducing silent mutations in the cut-to-insert region prevents the DNA repair tracks from resolving repair before reaching the payload sequence, thereby increasing the rate of payload insertion. protoSpaceJAM supports recoding within the cut-to-insert region, following the rules outlined above for coding and non-coding sequences and excluding recoding at splice junctions. 
+  
+When having to perform Cas9/gRNA cuts at a distance from the insertion site, introducing silent mutations in the cut-to-insert region prevents the DNA repair tracks from resolving repair before reaching the payload sequence, thereby increasing the rate of payload insertion. protoSpaceJAM supports recoding within the cut-to-insert region, following the rules outlined above for coding and non-coding sequences and excluding recoding at splice junctions. 
 
 |
 | There are three recoding intesities: "full", "prevent recut", and "none". 
