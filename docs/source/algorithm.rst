@@ -3,6 +3,9 @@ Algorithm
 |
 Key concepts
 ------------
+Key concepts as illustrated in an example of CRISPR knock-in design: a gRNA (blue) targeting the genomic region of interest, and the HDR donor sequence which could template the genomic insertion of a functional payload.  
+The HDR donor contains silent mutations (yellow stripes) that protects the donor from CRISPR-induced DNA strand breaks. Silent mutations (orange stripes) are added to the cut-to-insert region (between the gRNA cutsite and the payload insertion site) in the HDR donor to safeguard the knock-in rate. Recoded regions are not considered part of the effective homology arms.  
+
 .. figure:: /_static/images/keyConcepts.png
    :width: 100%
    :align: center
@@ -11,6 +14,8 @@ Key concepts
 |
 Tunable parameters
 ------------------
+The goal of protoSpaceJAM is to streamline the design of both gRNA and donor sequences using a biologically-informed set of rules (summarized in the fifgure below) that are fully described in subsequent sections of this page.  
+
 .. figure:: /_static/images/tunable_parameters.png
    :width: 100%
    :align: center
@@ -65,6 +70,7 @@ DNA donor processing strategy
 
 * Double-stranded DNA (dsDNA)
 
+In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content (``>``65% or <25% GC content globally, and >52% difference in GC content between any given 50 bp stretches).  
 
 * Single-stranded oligonucleotides (ssODN)
 
