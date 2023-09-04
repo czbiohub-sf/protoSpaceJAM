@@ -3,8 +3,8 @@ Algorithm
 |
 Key concepts
 ------------
-Key concepts as illustrated in an example of CRISPR knock-in design: a gRNA (blue) targeting the genomic region of interest, and the HDR donor sequence which could template the genomic insertion of a functional payload.  
-The HDR donor contains silent mutations (yellow stripes) that protects the donor from CRISPR-induced DNA strand breaks. Silent mutations (orange stripes) are added to the cut-to-insert region (between the gRNA cutsite and the payload insertion site) in the HDR donor to safeguard the knock-in rate. Recoded regions are not considered part of the effective homology arms.  
+| Key concepts as illustrated in an example of CRISPR knock-in design: a gRNA (blue) targeting the genomic region of interest, and the HDR donor sequence which could template the genomic insertion of a functional payload.  
+| The HDR donor contains silent mutations (yellow stripes) that protects the donor from CRISPR-induced DNA strand breaks. Silent mutations (orange stripes) are added to the cut-to-insert region (between the gRNA cutsite and the payload insertion site) in the HDR donor to safeguard the knock-in rate. Recoded regions are not considered part of the effective homology arms.  
 
 .. figure:: /_static/images/keyConcepts.png
    :width: 100%
@@ -44,7 +44,8 @@ Recoding strategy
 
 * The Cas9/gRNA binding site  
   
-The Cas9/gRNA binding site may still be present in the homology arm sequences when payload insertion does not destroy the original protospacer. In such cases, knock-in might be impaired because Cas9 might either cut the donor itself during the delivery of reagents in the cell, or re-cut the knock-in allele after DNA repair. This would respectively decrease donor availability or introduce unwanted genomic modifications, negatively impacting knock-in efficiency overall. A well-established practice is therefore to introduce silent mutations to inactivate the gRNA binding site within the HDR donor. protoSpaceJAM uses the Cutting Frequency Determination (CFD) scoring framework established by Doench and colleagues to predict the impact of individual protospacer and PAM mutations on the Cas9/gRNA cutting potential (14). For each gRNA, protoSpaceJAM identifies the minimum number of mutations that would bring the maximal CFD score in the donor sequence below a user-defined threshold (default: 0.03). When recoding within a protein-coding sequence, only silent mutations are used, leveraging maximal sequence divergence between synonymous codons while excluding rare codons. When recoding within a non-coding region, mutations are introduced in up to one of every three bases. No recoding is allowed in the immediate vicinity of splice junctions, to maintain universally conserved sequence motifs.  
+| The Cas9/gRNA binding site may still be present in the homology arm sequences when payload insertion does not destroy the original protospacer. In such cases, knock-in might be impaired because Cas9 might either cut the donor itself during the delivery of reagents in the cell, or re-cut the knock-in allele after DNA repair. This would respectively decrease donor availability or introduce unwanted genomic modifications, negatively impacting knock-in efficiency overall. 
+| A well-established practice is therefore to introduce silent mutations to inactivate the gRNA binding site within the HDR donor. protoSpaceJAM uses the Cutting Frequency Determination (CFD) scoring framework established by Doench and colleagues to predict the impact of individual protospacer and PAM mutations on the Cas9/gRNA cutting potential (14). For each gRNA, protoSpaceJAM identifies the minimum number of mutations that would bring the maximal CFD score in the donor sequence below a user-defined threshold (default: 0.03). When recoding within a protein-coding sequence, only silent mutations are used, leveraging maximal sequence divergence between synonymous codons while excluding rare codons. When recoding within a non-coding region, mutations are introduced in up to one of every three bases. No recoding is allowed in the immediate vicinity of splice junctions, to maintain universally conserved sequence motifs.  
 
 * The cut-to-insert region  
   
@@ -70,7 +71,7 @@ DNA donor processing strategy
 
 * Double-stranded DNA (dsDNA)
 
-In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content ( outside of 25-65 percent GC content globally, or a difference in GC content larger than 52 percent between any given 50 bp stretches).  
+In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content ( outside of 25-65``%`` GC content globally, or a difference in GC content larger than 52``%`` between any given 50 bp stretches).  
 
 * Single-stranded oligonucleotides (ssODN)
 
