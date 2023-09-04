@@ -20,6 +20,7 @@ Tunable parameters
 gRNA scoring
 ------------
 To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composite ranking score that weighs (1) the on-target specificity of each candidate, (2) the distance between cut and insertion sites, and (3) the position of the gRNA with respect to important gene expression regulatory sequences, namely 5’ untranslated regions (UTRs) and splice sites  
+
 .. figure:: /_static/images/score.png
    :width: 100%
    :align: center
@@ -33,9 +34,10 @@ To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composit
 |
 Recoding strategy
 -----------------
-| Silent mutations are included in the DNA donor to:
-| - Prevent recutting the genome after editing. 
-| - Facilitate payload insertion when the cut-to-insert distance is inevitably large.  
+| protoSpaceJAM supports the optional introduction of silent “recoding” mutations in two separate key regions of the HDR donor:  
+| * The Cas9/gRNA binding site  
+which may still be present in the homology arm sequences when payload insertion does not destroy the original protospacer. In such cases, knock-in might be impaired because Cas9 might either cut the donor itself during the delivery of reagents in the cell, or re-cut the knock-in allele after DNA repair. This would respectively decrease donor availability or introduce unwanted genomic modifications, negatively impacting knock-in efficiency overall. A well-established practice is therefore to introduce silent mutations to inactivate the gRNA binding site within the HDR donor. protoSpaceJAM uses the Cutting Frequency Determination (CFD) scoring framework established by Doench and colleagues to predict the impact of individual protospacer and PAM mutations on the Cas9/gRNA cutting potential (14). For each gRNA, protoSpaceJAM identifies the minimum number of mutations that would bring the maximal CFD score in the donor sequence below a user-defined threshold (default: 0.03). Because the payload sequence itself may by chance contain sequences homologous to the Cas9/gRNA binding site, all positions within the donor (including payload and payload/genome junctions) are considered in this calculation. When recoding within a protein-coding sequence, only silent mutations are used, leveraging maximal sequence divergence between synonymous codons while excluding rare codons. When recoding within a non-coding region, mutations are introduced in up to one of every three bases. No recoding is allowed in the immediate vicinity of splice junctions, to maintain universally conserved sequence motifs. For maximal flexibility, the user can decide whether recoding should prioritize mutations in the PAM region or within the protospacer itself.  
+| * Facilitate payload insertion when the cut-to-insert distance is inevitably large.  
 |
 | There are three recoding intesities: "full", "prevent recut", and "none". 
 | In "full", the cut-to-insert region is recoded to facilitate payload insertion. The gRNA or split gRNA (disrupted by the payload, creating a protopsacer-half and a PAM-half) are also recoded.
