@@ -1,12 +1,12 @@
 Algorithm 
 =========
 
-Overview
---------
-.. figure:: /_static/images/Algorithm.png
-   :width: 55%
+Key concepts
+------------
+.. figure:: /_static/images/keyConcepts.png
+   :width: 100%
    :align: center
-   :alt: Algorithm_overview
+   :alt: key_concepts
 |
 |
 gRNA scoring

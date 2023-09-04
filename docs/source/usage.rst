@@ -5,18 +5,20 @@ Usage
 Basic usage
 -----------
 
-Follow the stepper navigation to complete a job request in four easy steps:  
+protSpaceJAM's web app proves a step-by-step navigation system, guiding users through each stage of the process - configuration, verification, execution, and visualization of CRISPR knock-in designs  
+
 
 .. figure:: /_static/images/stepper.png
    :width: 90%
    :align: center
    :alt: Stepper navigation
 
-#. Create a submission list by using steps :guilabel:`Build your Job` and/or :guilabel:`Upload csv`
+#. Configure a submission by using one or both of these steps :guilabel:`Build your Job` and/or :guilabel:`Upload csv`  
+   (Please note that these two steps can continuously feed the same submission list)
 
-#. Confirm the submission list in the step :guilabel:`Submission list`
+#. Verify the submission list using step :guilabel:`Submission list`
 
-#. Start protoSpaceJAM in step :guilabel:`Jam it`
+#. Execute protoSpaceJAM using step :guilabel:`Jam it`
 
 #. View and download results in the last step :guilabel:`Results`
 
