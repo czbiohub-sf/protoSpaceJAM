@@ -9,20 +9,25 @@ Key concepts
    :alt: key_concepts
 |
 |
+Tunable parameters
+.. figure:: /_static/images/tunable_parameters.png
+   :width: 100%
+   :align: center
+   :alt: key_concepts
+|
+|
 gRNA scoring
 ------------
-The gRNAs score is computed from three weights that aim to (1) maximize specificity, (2) minimize cut-to-insert distance and (3) avoid cutting near splice junctions and in 5’ UTRs.
-
+To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composite ranking score that weighs (1) the on-target specificity of each candidate, (2) the distance between cut and insertion sites, and (3) the position of the gRNA with respect to important gene expression regulatory sequences, namely 5’ untranslated regions (UTRs) and splice sites 
+.. figure:: /_static/images/score.png
+   :width: 100%
+   :align: center
+   :alt: gRNA_scoring
 .. figure:: /_static/images/gRNA.png
    :width: 100%
    :align: center
    :alt: gRNA_scoring
-| Notes:
-| The gRNA specificity score is calculated in three steps:
-| (1) Identify all possible off-target hits of a gRNA in the genome with `BWA <https://bio-bwa.sourceforge.net/>`_. 
-| (2) Calculate the off-target `MIT guide specificity score <https://www.nature.com/articles/nbt.2647>`_ for each off-target hit.  
-| (3) Take the sum of all MIT scores and use formula 100/(100+sum(mitScores)) to calculate the gRNA specificity score.
-| 
+|
 |
 Recoding strategy
 -----------------
@@ -41,15 +46,6 @@ Recoding strategy
       
 | Notes
 | - The Cutting Frequency Determination (CFD) score was created by `Doench et al. <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125/>`_  to calculate the off-target potential of sgRNA:DNA interaction.
-|
-| Region definitions:
-|
-
-.. figure:: /_static/images/region.png
-   :width: 100%
-   :align: center
-   :alt: region_definition
-|
 |
 DNA donor processing strategy
 -----------------------------
