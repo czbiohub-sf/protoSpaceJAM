@@ -61,16 +61,16 @@ When having to perform Cas9/gRNA cuts at a distance from the insertion site, int
 |
 DNA donor processing strategy
 -----------------------------
-| A key goal of protoSpaceJAM is to provide the user with “synthesis-ready” donor sequences to streamline the knock-in experimental process. Therefore, the user can choose between two separate donor design modes - dsDNA and ssODN - that use separate donor processing strategies.
+| A key goal of protoSpaceJAM is to provide the user with “synthesis-ready” donor sequences to streamline the knock-in experimental process. Therefore, the user can choose between two separate donor design modes - dsDNA and ssODN - that use separate donor processing strategies.  
 
 * Double-stranded DNA (dsDNA)
 
-In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content (>65% or <25% GC content globally, and >52% difference in GC content between any given 50 bp stretches).
+In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content (>65% or <25% GC content globally, and >52% difference in GC content between any given 50 bp stretches).  
 
 * Single-stranded oligonucleotides (ssODN)
 
 For ssODN synthesis, there is typically no restriction in terms of sequence motifs, but rather in overall length. Therefore, the total length of ssODN donor is capped at a user-defined maximum (default: 200 nt).  
-ssODN donors require a choice of polarity for the ssDNA strand to be used. The polarity of the ssODN strand is especially important when using gRNAs with a large cut-to-insert distance. By default, protoSpaceJAM automatically selects the polarity of the ssODN strand to be in the favored orientation. To give the user even finer control over the ssODN strand to be used, four other strand selection modes are also available: Cas9/gRNA target vs non-target strand or transcribed vs non-transcribed strand.
+ssODN donors require a choice of polarity for the ssDNA strand to be used. The polarity of the ssODN strand is especially important when using gRNAs with a large cut-to-insert distance. By default, protoSpaceJAM automatically selects the polarity of the ssODN strand to be in the favored orientation. To give the user even finer control over the ssODN strand to be used, four other strand selection modes are also available: Cas9/gRNA target vs non-target strand or transcribed vs non-transcribed strand.  
 
 |
 | DNA donor processing strategy summary:
