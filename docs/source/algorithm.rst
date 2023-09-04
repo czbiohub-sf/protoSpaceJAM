@@ -26,7 +26,7 @@ To rank all candidate gRNAs for a possible design, protoSpaceJAM uses a composit
    :align: center
    :alt: gRNA_scoring
 |
-| Weights:
+| How weights are calculated:
 .. figure:: /_static/images/gRNA.png
    :width: 100%
    :align: center
@@ -46,10 +46,6 @@ The Cas9/gRNA binding site may still be present in the homology arm sequences wh
 When having to perform Cas9/gRNA cuts at a distance from the insertion site, introducing silent mutations in the cut-to-insert region prevents the DNA repair tracks from resolving repair before reaching the payload sequence, thereby increasing the rate of payload insertion. protoSpaceJAM supports recoding within the cut-to-insert region, following the rules outlined above for coding and non-coding sequences and excluding recoding at splice junctions. 
 
 |
-| There are three recoding intesities: "full", "prevent recut", and "none". 
-| In "full", both the Cas9/gRNA binding site and the cut-to-insert region are recoded.
-| In "prevent recut", only the Cas9/gRNA binding site is recoded.
-
 | Recoding strategy summary:
 .. figure:: /_static/images/recode.png
    :width: 100%
@@ -57,6 +53,9 @@ When having to perform Cas9/gRNA cuts at a distance from the insertion site, int
    :alt: Recode_strategy
       
 | Notes
+| - There are three recoding intesities: "full", "prevent recut", and "none". 
+|   In "full", both the Cas9/gRNA binding site and the cut-to-insert region are recoded.
+|   In "prevent recut", only the Cas9/gRNA binding site is recoded.
 | - The Cutting Frequency Determination (CFD) score was created by `Doench et al. <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125/>`_  to calculate the off-target potential of sgRNA:DNA interaction.
 |
 |
