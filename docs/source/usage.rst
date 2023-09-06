@@ -22,7 +22,7 @@ protoSpaceJAM's web app proves a step-by-step navigation system, guiding users t
 
 #. View and download results in the :guilabel:`Results` stage
 
-
+|
 1. Create a submission list
 ---------------------------
 | There are two ways to create a submission list.
@@ -35,7 +35,8 @@ Upload csv (efficient for large submission list)
     | Click :guilabel:`Download example csv` to obtain a template csv file.
     | Customize the csv file and then click :guilabel:`Upload csv` to upload.
     
-   
+|
+|
 (Optional) Load an example submission list
 ------------------------------------------
 
@@ -45,7 +46,8 @@ Upload csv (efficient for large submission list)
     
     * **upload csv**, click :guilabel:`Download example csv`, and upload by clicking :guilabel:`Upload csv`.
 
-
+|
+|
 2. Verify the submission list
 -----------------------------
 | An example of a submission list is shown below. Click :guilabel:`Confirm` to enable launching protoSpaceJAM
@@ -55,6 +57,8 @@ Upload csv (efficient for large submission list)
    :align: left
    :alt: Submission List 
 
+|
+|
 3. Execute protoSpaceJAM
 ------------------------
 | Click :guilabel:`Jam it` to start processing the submission list
@@ -63,6 +67,7 @@ Upload csv (efficient for large submission list)
    :align: center
    :alt: launch
    
+|
 |
 4. View and download results
 ----------------------------

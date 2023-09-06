@@ -50,7 +50,7 @@ Recoding strategy
 
 * The cut-to-insert region  
   
-When having to perform Cas9/gRNA cuts at a distance from the insertion site, introducing silent mutations in the cut-to-insert region prevents the DNA repair tracks from resolving repair before reaching the payload sequence, thereby increasing the rate of payload insertion. protoSpaceJAM supports recoding within the cut-to-insert region, following the rules outlined above for coding and non-coding sequences and excluding recoding at splice junctions. 
+When performing Cas9/gRNA cuts at a distance from the insertion site, introducing silent mutations in the cut-to-insert region prevents the DNA repair tracks from resolving repair before reaching the payload sequence, thereby increasing the rate of payload insertion. protoSpaceJAM supports recoding within the cut-to-insert region, following the rules outlined above for coding and non-coding sequences and excluding recoding at splice junctions. 
 
 |
 | Recoding strategy summary:
@@ -60,7 +60,7 @@ When having to perform Cas9/gRNA cuts at a distance from the insertion site, int
    :alt: Recode_strategy
       
 | Notes:
-| - There are three recoding intesities: "full", "prevent recut", and "none". 
+| - There are three recoding intensities: "full", "prevent recut", and "none". 
 |   In "full", both the Cas9/gRNA binding site and the cut-to-insert region are recoded.
 |   In "prevent recut", only the Cas9/gRNA binding site is recoded.
 | - The Cutting Frequency Determination (CFD) score was created by `Doench et al. <https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4744125/>`_  to calculate the off-target potential of sgRNA:DNA interaction.
@@ -72,7 +72,7 @@ DNA donor processing strategy
 
 * Double-stranded DNA (dsDNA)
 
-In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content ( outside of 25-65``%`` GC content globally, or a difference in GC content larger than 52``%`` between any given 50 bp stretches).  
+In dsDNA mode, sequence motifs that might be incompatible with commercial dsDNA synthesis are flagged within the final output table. These flags include homopolymeric runs of 10 or more As and Ts or 6 or more Gs and Cs and extreme GC content (outside of 25-65`%` GC content globally, or a difference in GC content larger than 52`%` between any given 50-bp stretches).  
 
 * Single-stranded oligonucleotides (ssODN)
 
