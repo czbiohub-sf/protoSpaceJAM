@@ -3012,7 +3012,7 @@ class MutatedSeq(str):
         pass
 
 def mutate_silently(
-    guide_seq: str # the sequence to be mutated, not limited to guide sequence
+    guide_seq: str, # the sequence to be mutated, not limited to guide sequence
     guide_strand_same: bool = False,
     skip_start_stop_codon: bool = True,
     all_permutations: bool = False,

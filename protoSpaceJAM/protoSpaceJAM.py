@@ -122,7 +122,7 @@ def parse_args(test_mode=False):
     donor.add_argument(
         "--ssODN_max_size",
         type=int,
-        default=200
+        default=200,
         help="Enforce a length restraint on the the ssODN donor (default: 200), The ssODN donor will be centered on the payload and the recoded region",
         metavar="<int>",
     )
