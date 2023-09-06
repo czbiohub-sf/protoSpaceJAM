@@ -21,7 +21,7 @@ def parse_args(test_mode=False):
         "--path2csv",
         default=os.path.join("input","test_input.csv"),
         type=str,
-        help="path to a csv file containing ENST information, see input/test_input.csv for an example\n *required columns*: 'Ensembl_ID' (specifying the transcript ID), and either 'Target_terminus' or 'Chromosome','Coordinate' (specifying the terminus of the transcript or a genomic coordinate in the transcript)",
+        help="Path to a csv file containing the input knock-in sites, see input/test_input.csv for an example\n *required columns*: 'Ensembl_ID' (specifying the transcript ID), and either 'Target_terminus' or 'Chromosome','Coordinate' (specifying the terminus of the transcript or a genomic coordinate in the transcript)",
         metavar="<PATH_TO_CSV>",
     )
     IO.add_argument(
@@ -29,14 +29,14 @@ def parse_args(test_mode=False):
         default=os.path.join("output","test"),
         type=str,
         metavar = "<PATH_TO_OUTPUT_DIRECTORY>",
-        help="output directory"
+        help="Path to the output directory"
     )
     genome = parser.add_argument_group('genome')
     genome.add_argument(
         "--genome_ver",
         default="GRCh38",
         type=str,
-        help="currently supports three genomes: GRCh38, GRCm39, GRCz11, ",
+        help="Genome and version to use, possible values are GRCh38, GRCm39, and GRCz11",
         metavar="<string>",
     )
     gRNA = parser.add_argument_group('gRNA')
@@ -44,42 +44,42 @@ def parse_args(test_mode=False):
         "--num_gRNA_per_design",
         default=1,
         type=int,
-        help="Number of gRNAs per design, default is 1",
+        help="Number of gRNAs to return per site (default: 1)",
         metavar="<integer>",
     )
     gRNA.add_argument(
         "--no_regulatory_penalty",
         default=False,
         action="store_true",
-        help="turn off penalty for gRNAs cutting in UTRs or near splice junctions, default is applying penalty",
+        help="Turn off penalty for gRNAs cutting in UTRs or near splice junctions, default: penalty on",
     )
     payload = parser.add_argument_group('payload')
     payload.add_argument(
         "--payload",
         default="",
         type=str,
-        help="payload for every site, regardless of termius or coordinates, overrides --Npayload, --Cpayload, POSpayload, --Tag, --Linker",
+        help="Define the payload sequence for every site, regardless of terminus or coordinates, overrides --Npayload, --Cpayload, POSpayload, --Tag, --Linker",
         metavar="<string>",
     )
     payload.add_argument(
         "--Npayload",
         default="ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
         type=str,
-        help="payload at the N terminus, default is mNG11 + XTEN80: ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT, overrides --Tag and --Linker",
+        help="Payload sequence to use at the N terminus (default: mNG11 + XTEN80): ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT, overrides --Tag and --Linker",
         metavar="<string>",
     )
     payload.add_argument(
         "--Cpayload",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the C terminus, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag and --Linker",
+        help="Payload sequence to use at the C terminus (default: XTEN80 + mNG11): GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag and --Linker",
         metavar="<string>",
     )
     payload.add_argument(
         "--POSpayload",
         default="GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
         type=str,
-        help="payload at the target coordinate, default is XTEN80 + mNG11: GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag and --Linker",
+        help="Payload sequence to use at the specific genomic coordinates (default: XTEN80 + mNG11): GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG, overrides --Tag and --Linker",
         metavar="<string>",
     )
     payload.add_argument(
@@ -101,48 +101,49 @@ def parse_args(test_mode=False):
     donor.add_argument(
         "--Donor_type",
         default="ssODN",
-        help="ssODN(default) or dsDNA",
+        help="Set the type of donor, possible values are ssODN and dsDNA (default: ssODN)",
         type=str,
         metavar="<string>",
     )
     donor.add_argument(
         "--HA_len",
         default=500,
-        help="length of the homology arm (on each side), will be the final arm length for dsDNA donors",
+        help="[dsDNA] Length of the desired homology arm on each side (default: 500)",
         type=int,
         metavar="<integer>",
     )
     donor.add_argument(
         "--Strand_choice",
-        default="NonTargetStrand",
-        help="only applies when --Donor_type is set to ssODN, possible values are auto,TargetStrand,NonTargetStrand,CodingStrand,NonCodingStrand",
+        default="auto",
+        help="[ssODN] Strand choice of ssoODN, Possible values are 'auto', 'TargetStrand', 'NonTargetStrand', 'CodingStrand' and 'NonCodingStrand'",
         type=str,
         metavar="<string>",
     )
     donor.add_argument(
         "--ssODN_max_size",
         type=int,
-        help="only applies when --Donor_type is set to ssODN. Enforce a length restraint of the donor (both arms + payload), setting this option will center the ssODN with respect to the payload and the recoded region",
+        default=200
+        help="Enforce a length restraint on the the ssODN donor (default: 200), The ssODN donor will be centered on the payload and the recoded region",
         metavar="<int>",
     )
     donor.add_argument(
         "--CheckEnzymes",
         default="",
-        help="Restriction enzyme sites to check, separated by |, for example: BsaI|EcoRI",
+        help="[dsDNA] Name of Restriction digestion enzymes, separated by '|', to flag and trim, for example BsaI|EcoRI (default: None)",
         type=str,
         metavar="<string>",
     )
     donor.add_argument(
         "--CustomSeq2Avoid",
         default="",
-        help="custom sequences to avoid, separated by |",
+        help="[dsDNA] Custom sequences, separated by '|', to flag and trim (default: None)",
         type=str,
         metavar="<string>",
     )
     donor.add_argument(
         "--MinArmLenPostTrim",
         default=0,
-        help="Minimum length the homology arm after trimming,  default is 0 (turning off trimming)",
+        help="[dsDNA] Minimum length of the homology arm after trimming. Set to 0 to turn off trimming (default: 0)",
         type=int,
         metavar="<integer>",
     )
@@ -151,30 +152,30 @@ def parse_args(test_mode=False):
         "--recoding_off",
         default=False,
         action="store_true",
-        help="turn off *all* recoding",
+        help="Turn off *all* recoding",
     )
     recoding.add_argument(
         "--recoding_stop_recut_only",
         default=False,
         action="store_true",
-        help="Recode in the gRNA to prevent recut",
+        help="Recode the gRNA recognition site to prevent recut",
     )
     recoding.add_argument(
         "--recoding_full",
         default=False,
         action="store_true",
-        help="Use full recoding: recode both the gRNA and region between insert and cut site",
+        help="Use full recoding: recode both the gRNA recognition site and the cut-to-insert region (default: on)",
     )
     recoding.add_argument(
         "--cfdThres",
         default=0.03,
-        help="protoSpaceJAM will attempt to lower the recut cfd to this threshold (by recoding), cfd values lower than the threshold will be considered not suceptible to being recut anymore.",
+        help="Threshold that protoSpaceJAM will attempt to lower the recut potential (measured by the CFD score) to (default: 0.03)",
         metavar="<float>",
     )
     recoding.add_argument(
         "--recode_order",
         default="PAM_first",
-        help="Prioritize recoding in the PAM or in protospacer, possible values: protospacer_first, PAM_first",
+        help="Prioritize recoding in the PAM or in protospacer, possible values: protospacer_first, PAM_first (default: PAM_first)",
         metavar="<string>",
     )
     misc = parser.add_argument_group('misc.')
