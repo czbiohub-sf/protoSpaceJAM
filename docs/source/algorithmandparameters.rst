@@ -3,8 +3,8 @@ Algorithm and parameters
 |
 Key concepts
 ------------
-| Key concepts as illustrated in an example of CRISPR knock-in design: a gRNA (blue) targeting the genomic region of interest, and the HDR donor sequence which could template the genomic insertion of a functional payload.  
-| The HDR donor contains silent mutations (yellow stripes) that protects the donor from CRISPR-induced DNA strand breaks. Silent mutations (orange stripes) are added to the cut-to-insert region (between the gRNA cutsite and the payload insertion site) in the HDR donor to safeguard the knock-in rate. Recoded regions are not considered part of the effective homology arms.  
+| Key concepts are illustrated in this example of CRISPR knock-in design: a gRNA (blue) targeting the genomic region of interest, and the HDR donor sequence that will template the genomic insertion of a functional payload.  
+| The HDR donor contains silent mutations (yellow stripes) that protects the donor from CRISPR-induced DNA strand breaks. Silent mutations (orange stripes) are added to the cut-to-insert region (between the gRNA cutsite and the payload insertion site) in the HDR donor to safeguard the knock-in. Recoded regions are not considered part of the effective homology arms.  
 
 .. figure:: /_static/images/keyConcepts.png
    :width: 100%
@@ -14,7 +14,7 @@ Key concepts
 |
 Tunable parameters
 ------------------
-The goal of protoSpaceJAM is to streamline the design of both gRNA and donor sequences using a biologically-informed set of rules (summarized in the fifgure below) that are fully described in subsequent sections of this page.  
+The goal of protoSpaceJAM is to streamline the design of both gRNA and donor sequences using a biologically informed set of rules (summarized in the figure below). These are fully described in subsequent sections of this page.  
 
 .. figure:: /_static/images/tunable_parameters.png
    :width: 100%
@@ -44,9 +44,9 @@ Recoding strategy
 
 * The Cas9/gRNA binding site  
   
-| The Cas9/gRNA binding site may still be present in the homology arm sequences when payload insertion does not destroy the original protospacer. In such cases, knock-in might be impaired because Cas9 might either cut the donor itself during the delivery of reagents in the cell, or re-cut the knock-in allele after DNA repair. This would respectively decrease donor availability or introduce unwanted genomic modifications, negatively impacting knock-in efficiency overall. 
+| The Cas9/gRNA binding site may still be present in the homology arm sequences when payload insertion does not destroy the original protospacer. In such cases, knock-in might be impaired because Cas9 could either cut the donor itself during the delivery of reagents in the cell, or re-cut the knock-in allele after DNA repair. This would respectively decrease donor availability or introduce unwanted genomic modifications, negatively impacting knock-in efficiency overall. 
 |
-| A well-established practice is therefore to introduce silent mutations to inactivate the gRNA binding site within the HDR donor. protoSpaceJAM uses the Cutting Frequency Determination (CFD) scoring framework established by Doench and colleagues to predict the impact of individual protospacer and PAM mutations on the Cas9/gRNA cutting potential (14). For each gRNA, protoSpaceJAM identifies the minimum number of mutations that would bring the maximal CFD score in the donor sequence below a user-defined threshold (default: 0.03). When recoding within a protein-coding sequence, only silent mutations are used, leveraging maximal sequence divergence between synonymous codons while excluding rare codons. When recoding within a non-coding region, mutations are introduced in up to one of every three bases. No recoding is allowed in the immediate vicinity of splice junctions, to maintain universally conserved sequence motifs.  
+| A well-established practice is therefore to introduce silent mutations to inactivate the gRNA binding site within the HDR donor. protoSpaceJAM uses the Cutting Frequency Determination (CFD) scoring framework established by Doench and colleagues to predict the impact of individual protospacer and PAM mutations on the Cas9/gRNA cutting potential. For each gRNA, protoSpaceJAM identifies the fewest mutations that would bring the maximal CFD score in the donor sequence below a user-defined threshold (default: 0.03). When recoding within a protein-coding sequence, only silent mutations are used, leveraging maximal sequence divergence between synonymous codons while excluding rare codons. When recoding in a non-coding region, mutations are introduced in up to one of every three bases. No recoding is allowed in the immediate vicinity of splice junctions, to maintain universally conserved sequence motifs.  
 
 * The cut-to-insert region  
   
