@@ -1384,7 +1384,7 @@ class HDR_flank:
             if global_GC > 65:
                 self.synFlags.append(f"global GC content {global_GC:.2f}% > 65%")
 
-            # Flag GC content skew (slide windown analysis)
+            # Flag GC content skew (slide window analysis)
             win_GC = self.slide_win_GC_content(seq=seq_noAmbiguous, win_size=50)
             # print(win_GC)
             max_diff = max(win_GC) - min(win_GC)
@@ -2660,6 +2660,8 @@ class HDR_flank:
 
     def select_Manu_strand(self, seq):
         """
+        Deprecated function
+
         select strand:
             if cut-to-insert is 0: use same strand as gRNA
             if recoding is off:
@@ -2993,7 +2995,6 @@ def check_RE_site(RE, seq):
     return RE.search(Seq(seq))
 
 
-# taken from CRISPYcrunch
 class MutatedSeq(str):
 
     # For mypy
@@ -3011,12 +3012,14 @@ class MutatedSeq(str):
         pass
 
 def mutate_silently(
-    guide_seq: str,
+    guide_seq: str # the sequence to be mutated, not limited to guide sequence
     guide_strand_same: bool = False,
     skip_start_stop_codon: bool = True,
     all_permutations: bool = False,
 ) -> Iterator[str]:
     """
+    Taken from CRISPYcrunch
+
     Generator that silently mutates input sequence by substituing a different
     codon that encodes the same amino acid. Changes one codon per iteration.
     Direction is from PAM inwards, unless all_permutations is True. The new
