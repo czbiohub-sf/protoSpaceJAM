@@ -41,9 +41,9 @@ Algorithm
 
 Portal
 ------
-:Date: Janurary 06, 2024 |enhancement 9a879| Add tooltip instruction for terminus offset (e.g. enable insertions at n bp uan and downstream of terminus).
+:Date: Janurary 06, 2024 |enhancement 9a879| Add tooltip instruction for terminus offset (e.g. enable insertions at n bp up and downstream of terminus).
 
-:Date: Janurary 06, 2024 |bug fix 9a879| fixed a parsing issue when using submission lists csv file (downloaded from a job) to upload and populate a new submission (not affecting the example template).
+:Date: Janurary 06, 2024 |bug fix 9a879| fixed a parsing issue preventing the use of submission lists csv file (downloaded from a job) in uploading and populating a new submission (this issue didn't affect the example template).
 
 :Date: July 08, 2023 |bug fix aa7eb| Fixed a bug causing editing payload sequence custom genomic coordinate to fail
 
