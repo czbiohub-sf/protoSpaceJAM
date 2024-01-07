@@ -57,6 +57,12 @@ python ./protoSpaceJAM/tests/run_quick_test_pJAM.py
 ```
 A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` at the end.
 
+full test suite can be run with 
+```
+python ./protoSpaceJAM/tests/run_full_tests_pJAM.py
+```
+A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` at the end.
+
 ### Run protoSpaceJAM
 ```
 conda activate protospacejam

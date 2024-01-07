@@ -41,6 +41,10 @@ Algorithm
 
 Portal
 ------
+:Date: Janurary 06, 2024 |enhancement 9a879| Add tooltip instruction for terminus offset (e.g. enable insertions at n bp uan and downstream of terminus).
+
+:Date: Janurary 06, 2024 |bug fix 9a879| fixed a parsing issue when using submission lists csv file (downloaded from a job) to upload and populate a new submission (not affecting the example template).
+
 :Date: July 08, 2023 |bug fix aa7eb| Fixed a bug causing editing payload sequence custom genomic coordinate to fail
 
 :Date: July 08, 2023 |enhancement aa7eb| Make automatic the default strand selection mode for ssODN donors.
@@ -78,6 +82,10 @@ Portal
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
 
+.. |bug fix 9a879| image:: https://img.shields.io/badge/9a879-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/9c201a0fa5211f42ad5a94699972d21738e9a879
+.. |enhancement 9a879| image:: https://img.shields.io/badge/9a879-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/9c201a0fa5211f42ad5a94699972d21738e9a879
 .. |bug fix aa7eb| image:: https://img.shields.io/badge/aa7eb-bug%20fix-red
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/4a62c8e95684d8283afd5f038ec2c51acbcaa7eb
 .. |enhancement aa7eb| image:: https://img.shields.io/badge/aa7eb-enhancement-green

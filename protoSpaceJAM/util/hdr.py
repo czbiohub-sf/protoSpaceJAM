@@ -144,6 +144,7 @@ class HDR_flank:
         self.MinArmLenPostTrim = int(syn_check_args["MinArmLenPostTrim"])
         self.recode_order = recoding_args["recode_order"]
         self.minCut2Ins_dist_ForUTRRecoding = 0
+        self.mut_every_n = 3
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -349,8 +350,8 @@ class HDR_flank:
                         ]:  # skip the first 2 and last 2 positions, b/c those were extra paddings see self.get_ins2cut_seq()
                             if item in ["0", "6", "5"]:
                                 counter += 1
-                                if counter % 3 != 0:
-                                    continue  #  mutate 1 in every 3 bp
+                                if counter % self.mut_every_n != 0:
+                                    continue  #  mutate 1 in every n bp
                                 base = seq[idx]
                                 mutbase = self.single_base_muation(base)
                                 seq = seq[:idx] + mutbase + seq[idx + 1 :]
@@ -537,8 +538,8 @@ class HDR_flank:
                             continue  # skip position if it is already mutated
                         if item == "6":  # "6" means 3'UTR
                             counter += 1
-                            if counter % 3 != 0:
-                                continue  #  mutate 1 in every 3 bp
+                            if counter % self.mut_every_n != 0:
+                                continue  #  mutate 1 in every n bp
                             base = seq[idx]
                             mutbase = self.single_base_muation(base)
                             self.post_Phase2_gRNA_seq = (
@@ -812,8 +813,8 @@ class HDR_flank:
                             continue  # skip position if it is already mutated
                         if item == "0":  # "0" means intron
                             counter += 1
-                            if counter % 3 != 0:
-                                continue  #  mutate 1 in every 3 bp
+                            if counter % self.mut_every_n != 0:
+                                continue  #  mutate 1 in every n bp
                             base = seq[idx]
                             mutbase = self.single_base_muation(base)
                             self.post_Phase4_gRNA_seq = (
@@ -983,8 +984,8 @@ class HDR_flank:
                             item == "5"
                         ):  # 0=3'UTR, 5=5'UTR (minus sites that are 3-bp dist to exon-intro junctions) #TODO check remove of item=="0"
                             counter += 1
-                            if counter % 3 != 0:
-                                continue  #  mutate 1 in every 3 bp
+                            if counter % self.mut_every_n != 0:
+                                continue  #  mutate 1 in every n bp
                             base = seq[idx]
                             mutbase = self.single_base_muation(base)
                             self.post_Phase5_gRNA_seq = (

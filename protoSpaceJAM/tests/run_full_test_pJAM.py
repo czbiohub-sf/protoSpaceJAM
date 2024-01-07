@@ -52,7 +52,7 @@ class test_with_OpenCell_design(unittest.TestCase):
         print("comparing results...")
 
         #define path to results
-        ExpectedResPath = os.path.join("tests","GroundTruths", "OpenCell_design_full_reocoding_result.csv")
+        ExpectedResPath = os.path.join("tests","GroundTruths", "OpenCell_design_full_recoding_result.csv")
         NewResPath = os.path.join("tests","OpenCell_design","result.csv")
 
         #compare results
