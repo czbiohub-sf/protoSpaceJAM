@@ -5,6 +5,8 @@ Changelog
 
 Algorithm
 ---------
+:Date: March 1, 2024 |enhancement fc5b3| Add support for SpCas9-VQR and enAsCas12a.
+
 :Date: June 26, 2023 |enhancement c5c26| Use Bowtie as the default aligner to check unintended PCR products in primer design.
 
 :Date: June 2, 2023 |enhancement 756ad| Add an option to disable penalizing gRNAs that cut in UTRs or near splice junctions.
@@ -41,9 +43,13 @@ Algorithm
 
 Portal
 ------
+:Date: March 01, 2024 |bug fix 25946| Fixed a bug where payloads are empty when defined by selecting tag and linker 
+
+:Date: March 01, 2024 |enhancement 25946| Add a nuclease selection dropdown for SpCas9 and enAsCas12a.
+
 :Date: Janurary 06, 2024 |enhancement 9a879| Add tooltip instruction for terminus offset (e.g. enable insertions at n bp up and downstream of terminus).
 
-:Date: Janurary 06, 2024 |bug fix 9a879| fixed a parsing issue preventing the use of submission lists csv file (downloaded from a job) in uploading and populating a new submission (this issue didn't affect the example template).
+:Date: Janurary 06, 2024 |bug fix 9a879| Fixed a parsing issue preventing the use of submission lists csv file (downloaded from a job) in uploading and populating a new submission (this issue didn't affect the example template).
 
 :Date: July 08, 2023 |bug fix aa7eb| Fixed a bug causing editing payload sequence custom genomic coordinate to fail
 
@@ -81,6 +87,13 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+.. |enhancement fc5b3| image:: https://img.shields.io/badge/9a879-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/0b48770f9767a357b78c9c7c251523dba08fc5b3
+
+.. |bug fix 25946| image:: https://img.shields.io/badge/25946-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/65fe28e67fcc93e3f9f3d22e671bbb6e18d25946
+.. |enhancement 25946| image:: https://img.shields.io/badge/25946-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/65fe28e67fcc93e3f9f3d22e671bbb6e18d25946
 
 .. |bug fix 9a879| image:: https://img.shields.io/badge/9a879-bug%20fix-red
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/9c201a0fa5211f42ad5a94699972d21738e9a879
