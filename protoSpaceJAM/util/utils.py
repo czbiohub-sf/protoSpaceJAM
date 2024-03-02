@@ -372,6 +372,7 @@ def get_gRNAs_target_coordinate(
     loc2file_index,
     loc2posType,
     genome_ver,
+    pam,
     spec_score_flavor,
     reg_penalty,
     dist=50,
@@ -404,6 +405,7 @@ def get_gRNAs_target_coordinate(
         dist=dist,
         loc2file_index=loc2file_index,
         genome_ver=genome_ver,
+        pam=pam,
     )
     # rank gRNAs
     ranked_df_gRNAs_target_pos = rank_gRNAs_for_tagging(
@@ -430,6 +432,7 @@ def get_gRNAs(
     loc2file_index,
     loc2posType,
     genome_ver,
+    pam,
     spec_score_flavor,
     reg_penalty,
     dist=50,
@@ -463,6 +466,7 @@ def get_gRNAs(
         dist=dist,
         loc2file_index=loc2file_index,
         genome_ver=genome_ver,
+        pam=pam,
     )
     # rank gRNAs
     ranked_df_gRNAs_ATG = rank_gRNAs_for_tagging(
@@ -492,6 +496,7 @@ def get_gRNAs(
         dist=dist,
         loc2file_index=loc2file_index,
         genome_ver=genome_ver,
+        pam=pam,
     )
     # rank gRNAs
     ranked_df_gRNAs_stop = rank_gRNAs_for_tagging(
@@ -878,7 +883,7 @@ def get_start_stop_loc(ENST_ID, ENST_info):
     return [ATG_loc, stop_loc]
 
 
-def get_gRNAs_near_loc(loc, dist, loc2file_index, genome_ver):
+def get_gRNAs_near_loc(loc, dist, loc2file_index, genome_ver, pam):
     """
     input
         loc: [chr,pos,strand]
@@ -886,6 +891,7 @@ def get_gRNAs_near_loc(loc, dist, loc2file_index, genome_ver):
     return:
         a dataframe of guide RNAs which cuts <[dist] to the loc, the columns are "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"
     """
+    pam=pam.upper()
     chr = loc[0]
     pos = loc[1]
     chr_dict = loc2file_index[chr]
@@ -907,6 +913,7 @@ def get_gRNAs_near_loc(loc, dist, loc2file_index, genome_ver):
     for file in target_files:
         file_path = os.path.join(
             "precomputed_gRNAs",
+            f"gRNAs_{pam}",
             f"gRNA_{genome_ver}",
             "gRNA.tab.gz.split.BwaMapped.scored",
             file,

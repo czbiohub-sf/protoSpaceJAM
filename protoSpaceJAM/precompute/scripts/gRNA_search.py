@@ -33,7 +33,7 @@ class gRNA:
         self.pam3p_flank = pam3p_flank
         self.offTargets = []
 
-def search_gRNA(protosp_len, PAM, search_in, flanksize=100):
+def search_gRNA(protosp_len, PAM, PAMloc, search_in, flanksize=100):
     """
     Features:
         search gRNA in both positive and negative strand of the input
@@ -42,6 +42,8 @@ def search_gRNA(protosp_len, PAM, search_in, flanksize=100):
     Return:
         a list of gRNA objects
     """
+    assert PAMloc in ["3", "5"], f"PAMloc must be a string and takes value either '3' or '5'"
+
     protosp_len = protosp_len
     gPAM = PAM
     gPAM = re.sub(
@@ -57,10 +59,17 @@ def search_gRNA(protosp_len, PAM, search_in, flanksize=100):
     gPAM = re.sub("D", "[AGT]", gPAM, flags=re.IGNORECASE)  # IUPAC nucleotide code
     gPAM = re.sub("H", "[ACT]", gPAM, flags=re.IGNORECASE)  # IUPAC nucleotide code
     gPAM = re.sub("V", "[ACG]", gPAM, flags=re.IGNORECASE)  # IUPAC nucleotide code
-    gRNA_regex = re.compile(
-        r"(?=(.{" + re.escape(str(protosp_len)) + r"})" + r"(" + gPAM + r"))",
-        re.IGNORECASE,
-    )  # use lookahead assertion (?=...) to find overlapping gRNAs
+
+    if PAMloc == "3":
+        gRNA_regex = re.compile(
+            r"(?=(.{" + re.escape(str(protosp_len)) + r"})" + r"(" + gPAM + r"))",
+            re.IGNORECASE,
+        )  # use lookahead assertion (?=...) to find overlapping gRNAs
+    elif PAMloc == "5":
+        gRNA_regex = re.compile(
+            r"(?=(" + gPAM + r")" + r"(.{" + re.escape(str(protosp_len)) + r"}))",
+            re.IGNORECASE,
+        )
     # print(gRNA_regex)
     gRNA_list = []
 
@@ -68,8 +77,12 @@ def search_gRNA(protosp_len, PAM, search_in, flanksize=100):
     for m in gRNA_regex.finditer(search_in):
         if m:
             if len(m.groups()) >= 2:
-                protosp = m.group(1)
-                gPAM = m.group(2)
+                if PAMloc == "3":
+                    protosp = m.group(1)
+                    gPAM = m.group(2)
+                elif PAMloc == "5":
+                    protosp = m.group(2)
+                    gPAM = m.group(1)
                 st, en = m.span()
                 end = st + len(protosp) + len(gPAM)
                 st = st + 1  # change from 0-index to 1-indexed
@@ -102,8 +115,12 @@ def search_gRNA(protosp_len, PAM, search_in, flanksize=100):
     for m in gRNA_regex.finditer(search_in_revcom):
         if m:
             if len(m.groups()) >= 2:
-                protosp = m.group(1)
-                gPAM = m.group(2)
+                if PAMloc == "3":
+                    protosp = m.group(1)
+                    gPAM = m.group(2)
+                elif PAMloc == "5":
+                    protosp = m.group(2)
+                    gPAM = m.group(1)
                 st, en = m.span()
                 end = st + len(protosp) + len(gPAM)
 

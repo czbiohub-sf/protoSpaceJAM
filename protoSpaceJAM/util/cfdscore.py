@@ -422,8 +422,8 @@ def cfd_score(wt: str, sg: str, pam="NGG", guide_strand_same=True) -> float:
         pam = _revcom(pam)
 
     # assumed to end in NGG
-    if len(wt) >= 23 and not wt[20:23].upper().endswith("GG"):
-        raise ValueError(f"wild type should end in NGG\noffending seq {wt}")
+    # if len(wt) >= 23 and not wt[20:23].upper().endswith("GG"):
+    #     raise ValueError(f"wild type should end in NGG\noffending seq {wt}")
 
     wt = wt[:20]
 

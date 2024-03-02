@@ -23,12 +23,16 @@ bash serialize_fa.sh # serialize genome fasta for fast access
 
 ## Search for gRNAs in the genomes
 This step takes ~1.5 hours for each genome  
-PAM (if other than NGG) can be specificed by using passing the --pam argument to gRNA_scan_get_all_gRNA.py in `search_gRNAs.sh`  
+PAM sequences should be specified in this format: a single on-target PAM followed by "|" and one or more off-target PAM (off-target PAMs should be separated by comma)
 ```shell
+pam="NGG|NGA,NAG" && pamloc="3"
+#pam="TTTV|TTTN" && pamloc="5"
+#pam="NGA|NGG" && pamloc="3"
+
 mkdir gRNAs
-bash search_gRNAs.sh GRCh38 Homo_sapiens
-bash search_gRNAs.sh GRCm39 Mus_musculus
-bash search_gRNAs.sh GRCz11 Danio_rerio
+bash search_gRNAs.sh GRCh38 Homo_sapiens "${pam}" "${pamloc}"
+bash search_gRNAs.sh GRCm39 Mus_musculus "${pam}" "${pamloc}"
+bash search_gRNAs.sh GRCz11 Danio_rerio "${pam}" "${pamloc}"
 ```
 </br>
 
@@ -48,35 +52,36 @@ bash split4mapping.sh GRCz11 Danio_rerio
 ```
 ### Run bwa on the hpc
 
-Prep work before running bwa to map the gRNAs to the genome.
+prep work which includes determining the size of the array jobs for each genome
 ```shell
 rm -rf bwa.slurm.out && mkdir bwa.slurm.out
 chmod -R a+xX ./utils/FindOfftargetBwa/bin
-job_array_size_h38=$(ls -A gRNAs/gRNA_GRCh38/gRNA.tab.gz.split | wc -l)
-job_array_size_m39=$(ls -A gRNAs/gRNA_GRCm39/gRNA.tab.gz.split | wc -l)
-job_array_size_z11=$(ls -A gRNAs/gRNA_GRCz11/gRNA.tab.gz.split | wc -l)
-echo "Please set the human gRNA job array size to: $job_array_size_h38"
-echo "Please set the mouse gRNA job array size to: $job_array_size_m39"
-echo "Please set the zebrafish gRNA job array size to: $job_array_size_z11"
+job_array_size_h38=$(cat gRNAs/gRNA_GRCh38/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz.out.split.tab | wc -l)
+job_array_size_m39=$(cat gRNAs/gRNA_GRCm39/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz.out.split.tab | wc -l)
+job_array_size_z11=$(cat gRNAs/gRNA_GRCz11/Danio_rerio.GRCz11.dna_sm.primary_assembly.fa.gz.out.split.tab | wc -l)
 ```
 The following commands submit three batch jobs to the hpc, each takes ~20 hours to finish with 1000 cores  
-please set the correct array job size in `map_gRNA.sh` before executing the following commands.  
-*For example, to create an array job of 3217 (and run 1000 simultaneously): `--array=1-3217s%1000`*
+
 ```shell
-sbatch map_gRNA.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa .
-sbatch map_gRNA_mm39.sh GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa .
-sbatch map_gRNA_z11.sh GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa .
+bash map_gRNA_wrapper.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_h38}" 100
+bash map_gRNA_wrapper.sh GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_m39}" 100
+bash map_gRNA_wrapper.sh GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_z11}" 100
 ```
 ## Compute off-target score
 submit three batch jobs to the hpc, takes ~10 hours to finish with 1000 cores
 ```shell
-sbatch score_gRNA.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa .
-sbatch score_gRNA.sh GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa .
-sbatch score_gRNA.sh GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa .
-#index the off-target scores
+rm -rf score.slurm.out && mkdir score.slurm.out
+bash score_gRNA_wrapper.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_h38}" 100
+bash score_gRNA_wrapper.sh GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_m39}" 100
+bash score_gRNA_wrapper.sh GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_z11}" 100
+```
+index the off-target scores
+```shell
 python scripts/index_gRNA_results.py --gzdir gRNAs/gRNA_GRCh38/gRNA.tab.gz.split.BwaMapped.scored
+python scripts/index_gRNA_results.py --gzdir gRNAs/gRNA_GRCm39/gRNA.tab.gz.split.BwaMapped.scored
+python scripts/index_gRNA_results.py --gzdir gRNAs/gRNA_GRCz11/gRNA.tab.gz.split.BwaMapped.scored
 ```
 ## Clean up and move precomputed files to destination
 ```shell
-bash post_processing.sh
+bash post_processing.sh "${pam}"
 ```

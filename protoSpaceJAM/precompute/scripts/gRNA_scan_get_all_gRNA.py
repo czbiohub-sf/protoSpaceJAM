@@ -38,15 +38,33 @@ def parse_args():
         help="path to the human genome fasta.gz file",
         metavar="",
     )
+    parser.add_argument(
+        "--pam",
+        default="NGG",
+        type=str,
+        help="PAM motif",
+        metavar="",
+    )
+    parser.add_argument(
+        "--pamloc",
+        default="3",
+        type=str,
+        help="position of PAM motif, either 3 or 5 end of the protospacer",
+        metavar="",
+    )
+    parser.add_argument(
+        "--protosp_len",
+        default=20,
+        type=int,
+        help="protospacer length",
+        metavar="",
+    )
     config = parser.parse_args()
     if len(sys.argv) == 1:  # print help message if arguments are not valid
         parser.print_help()
         sys.exit(1)
     return config
 
-
-protosp_len = 20
-PAM = "NGG"
 
 logging.setLoggerClass(ColoredLogger)
 # logging.basicConfig()
@@ -55,6 +73,11 @@ log.propagate = False
 log.setLevel(logging.INFO)  # set the level of warning displayed
 
 config = vars(parse_args())
+
+protosp_len = config["protosp_len"]
+PAM = config["pam"]
+PAMloc = config["pamloc"]
+PAM = PAM.split("|")[0]
 
 #####################
 ##      main       ##
@@ -95,7 +118,7 @@ def main():
 
                 # get gRNAs
                 res_gRNA_list = search_gRNA(
-                    protosp_len=protosp_len, PAM=PAM, search_in=seq
+                    protosp_len=protosp_len, PAM=PAM, PAMloc=PAMloc, search_in=seq
                 )
 
                 # process gRNAs
