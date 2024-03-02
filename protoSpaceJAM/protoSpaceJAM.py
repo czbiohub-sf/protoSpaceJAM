@@ -41,6 +41,13 @@ def parse_args(test_mode=False):
     )
     gRNA = parser.add_argument_group('gRNA')
     gRNA.add_argument(
+        "--pam",
+        default="NGG",
+        type=str,
+        help="PAM sequence (default: NGG)",
+        metavar="<string>",
+    )
+    gRNA.add_argument(
         "--num_gRNA_per_design",
         default=1,
         type=int,
@@ -290,6 +297,10 @@ def main(custom_args=None):
                 + ", please correct the issue and try again"
             )
 
+        # check pam
+        if not config["pam"].upper() in ["NGG", "NGA", "TTTV"]:
+            sys.exit("PAM must be NGG, NGA or TTTV, please correct the issue and try again")
+
         # parse payload
         Linker = config["Linker"]
         Tag = config["Tag"]
@@ -331,6 +342,7 @@ def main(custom_args=None):
         loc2file_index = read_pickle_files(
             os.path.join(
                 "precomputed_gRNAs",
+                "gRNAs_" + config["pam"].upper(),
                 "gRNA_" + config["genome_ver"],
                 "gRNA.tab.gz.split.BwaMapped.scored",
                 "loc2file_index.pickle",
@@ -578,6 +590,7 @@ def main(custom_args=None):
                         loc2posType=loc2posType,
                         dist=max_cut2ins_dist,
                         genome_ver=config["genome_ver"],
+                        pam=config["pam"],
                         spec_score_flavor=spec_score_flavor,
                         reg_penalty=reg_penalty,
                     )
@@ -726,6 +739,7 @@ def main(custom_args=None):
                     loc2posType=loc2posType,
                     dist=max_cut2ins_dist,
                     genome_ver=config["genome_ver"],
+                    pam=config["pam"],
                     spec_score_flavor=spec_score_flavor,
                     reg_penalty=reg_penalty,
                 )
@@ -885,6 +899,7 @@ def main(custom_args=None):
                     loc2posType=loc2posType,
                     dist=max_cut2ins_dist,
                     genome_ver=config["genome_ver"],
+                    pam=config["pam"],
                     spec_score_flavor=spec_score_flavor,
                     reg_penalty=reg_penalty,
                 )

@@ -45,6 +45,13 @@ def parse_args():
         metavar="",
     )
     parser.add_argument(
+        "--pam",
+        default="NGG",
+        type=str,
+        help="PAM sequence, default: NGG",
+        metavar="",
+    )
+    parser.add_argument(
         "--thread",
         default="",
         type=str,
@@ -68,7 +75,6 @@ config = vars(parse_args())
 genome_fa = config["genome_fa"]
 bwa_idx = config["bwa_idx"]
 thread2use = config["thread"]
-pam_len = 3
 protospacer_len = 20
 n_gRNA_per_chunk = 200
 #####################
@@ -92,7 +98,7 @@ def main():
             # shutil.rmtree(outdir_path)  # remove existing dir
             pass
         else:
-            os.makedirs(outdir_path)
+            os.makedirs(outdir_path, exist_ok=True)
 
         # process gRNA (bwa and parse in chunks)
         total_chunk_count = str(
@@ -156,6 +162,8 @@ def main():
                         f"{genome_fa}",
                         f"--guideLen",
                         f"20",
+                        f"--pam",
+                        f"{config['pam']}",
                         f"--thread",
                         f"{thread2use}",
                     ]
@@ -263,6 +271,8 @@ def main():
                     f"{genome_fa}",
                     f"--guideLen",
                     f"20",
+                    f"--pam",
+                    f"{config['pam']}",
                     f"--thread",
                     f"{thread2use}",
                 ]

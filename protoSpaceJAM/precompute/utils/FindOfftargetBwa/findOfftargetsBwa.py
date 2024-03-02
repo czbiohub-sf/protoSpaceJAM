@@ -27,7 +27,7 @@ log.setLevel(logging.INFO)  # set the level of warning displayed
 
 
 def parse_args():
-    parser = MyParser(description="This script does XXX")
+    parser = MyParser(description="")
     parser.add_argument(
         "--fa", default="", type=str, help="name of the input fa", metavar=""
     )
@@ -58,6 +58,9 @@ def parse_args():
         "--guideLen", default="", type=str, help="guide length", metavar=""
     )
     parser.add_argument(
+        "--pam", default="NGG", type=str, help="PAM sequence", metavar=""
+    )
+    parser.add_argument(
         "--thread", default="", type=str, help="num of thread to use", metavar=""
     )
 
@@ -78,6 +81,7 @@ GENOME_FA = config["genome_fa"]
 GENOME_IDX_BWA = config["bwa_idx"]
 GUIDELEN = config["guideLen"]
 thread2use = config["thread"]
+pam = config["pam"].upper()
 
 ###########################################
 # ATTENTION:################################
@@ -108,7 +112,7 @@ offtargetPams = {
     "ATTN": ["TTTN", "GTTN"],
     "TTYN": ["VTTV", "TRTV"],
 }
-DEFAULTPAM = "NGG"
+DEFAULTPAM = pam.upper()
 
 # minimum off-target score of standard off-targets (those that end with NGG)
 # This should probably be based on the CFD score these days
@@ -261,8 +265,6 @@ def annotateBedWithPos(inBed, outBed):
 ###bwa###
 #########
 
-pam = "NGG"
-
 # BWA: allow up to X mismatches
 maxMMs = 4
 
@@ -374,6 +376,13 @@ p.communicate()  # wait for the commands to process
 # p = Popen(command,  stdout=subprocess.PIPE, shell=True, stderr=mystderr, universal_newlines=True)
 # p.communicate()
 
+if len(pam.split("|")) == 1:
+    altPats = ",".join(offtargetPams.get(pam, ["na"]))
+else:
+    altPats = pam.split("|")[1]
+    pam = pam.split("|")[0]
+altPamMinScore = str(ALTPAMMINSCORE)
+
 # one-liner command that parses the matches and convert to bed format
 path_to_stderr_file = os.path.join(bwa_wd_path, f"bwa.extract_matches_pipe.stderr.txt")
 mystderr = open(path_to_stderr_file, "w+")
@@ -382,8 +391,7 @@ p = Popen(command, stdout=subprocess.PIPE, shell=True, stderr=mystderr)
 p.communicate()  # wait for the commands to process
 
 # queue.startStep(batchId, "filter", "Removing matches without a PAM motif")
-altPats = ",".join(offtargetPams.get(pam, ["na"]))
-altPamMinScore = str(ALTPAMMINSCORE)
+
 # shmFaFname = os.path.join("/dev/shm", GENOME) #bwa_genome_idx is the name ends with .fa
 
 # EXTRACTION OF SEQUENCES + ANNOTATION - big headache!!

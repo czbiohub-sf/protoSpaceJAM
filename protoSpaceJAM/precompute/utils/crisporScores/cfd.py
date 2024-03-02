@@ -5,7 +5,7 @@ import pickle
 import re
 import sys
 from os.path import dirname
-
+import pandas as pd
 
 def calcMitGuideScore(hitSum):
     """ Sguide defined on http://crispr.mit.edu/about
@@ -33,6 +33,15 @@ def get_mm_pam_scores():
     pam_scores = pickle.load(open(os.path.join(dataDir, "pam_scores.pkl"), "rb"))
     return (mm_scores, pam_scores)
 
+def get_mm_pam_scores_cas12a():
+    """
+    """
+    dataDir = os.path.join(dirname(__file__), "bin", "CFD_Scoring_Cas12a")
+    df = pd.read_csv(os.path.join(dataDir, "off_targ_enCas12a.csv"))
+    df['mm_pos'] = df["MM"] + "," + df["Pos"].astype(str)
+    mm_scores = dict(zip(df['mm_pos'], df['avg_percent_active']))
+    return mm_scores
+
 
 # Reverse complements a given string
 def revcom(s):
@@ -59,8 +68,24 @@ def calc_cfd(wt, sg, pam):
     score *= pam_scores[pam]
     return score
 
+def calc_cfd_cas12a(wt, sg):
+    mm_scores_cas12a = get_mm_pam_scores_cas12a()
+    score = 1
+    sg = sg.replace("T", "U")
+    wt = wt.replace("T", "U")
+    s_list = list(sg)
+    wt_list = list(wt)
+    for i, sl in enumerate(s_list):
+        if wt_list[i] == sl:
+            score *= 1
+        else:
+            key = "r" + wt_list[i] + ":d" + revcom(sl) + "," + str(i + 1)
+            score *= mm_scores_cas12a[key]
+    return score
+
 
 mm_scores, pam_scores = None, None
+mm_scores_cas12a = None
 
 
 def calcCfdScore(guideSeq, otSeq):
@@ -95,6 +120,38 @@ def calcCfdScore(guideSeq, otSeq):
         cfd_score = calc_cfd(wt, sg, pam)
         return cfd_score
 
+
+def calcCfdScore_cas12a(guideSeq, otSeq):
+    """ PAM sequence must not be included
+    >>> calcCfdScore("GGGGGGGGGGGGGGGGGGGGGGG", "GGGGGGGGGGGGGGGGGAAAGGG")
+    0.4635989007074176
+    >>> calcCfdScore("GGGGGGGGGGGGGGGGGGGGGGG", "GGGGGGGGGGGGGGGGGGGGGGG")
+    1.0
+    >>> calcCfdScore("GGGGGGGGGGGGGGGGGGGGGGG", "aaaaGaGaGGGGGGGGGGGGGGG")
+    0.5140384614450001
+    # mismatches:      *               !!
+    >>> calcCfdScore("ATGGTCGGACTCCCTGCCAGAGG", "ATGGTGGGACTCCCTGCCAGAGG")
+    0.5
+
+    # mismatches:    *  ** *
+    >>> calcCfdScore("ATGGTCGGACTCCCTGCCAGAGG", "ATGATCCAAATCCCTGCCAGAGG")
+    0.53625000020625
+
+    >>> calcCfdScore("ATGTGGAGATTGCCACCTACCGG", "ATCTGGAGATTGCCACCTACAGG")
+
+    """
+    global mm_scores_cas12a
+    if mm_scores_cas12a is None:
+        mm_scores_cas12a = get_mm_pam_scores_cas12a()
+    wt = guideSeq.upper()
+    off = otSeq.upper()
+    m_wt = re.search("[^ATCG]", wt)
+    m_off = re.search("[^ATCG]", off)
+    if (m_wt is None) and (m_off is None):
+        sg = off[:20]
+        wt = wt[:20]
+        cfd_score = calc_cfd_cas12a(wt, sg)
+        return cfd_score
 
 # ==== END CFD score source provided by John Doench
 
@@ -175,5 +232,7 @@ def calcHitScore(string1, string2):
 
 
 if __name__ == "__main__":
-    print(calcCfdScore("GGGGGGGGGGGGGGGGGGGGGGG", "GGGGGGGGGGGGGGGGGAAAGGG"))
+    print(calcCfdScore("GGGGGGGGGGGGGGGGGGGGGGG", "GGGGGGGGGGGGGGGGGGGCGGG"))
+    print(calcHitScore("ATGTGGAGATTGCCACCTAC", "ATCTGGAGATTGCCACCTAC"))
+    print(calcCfdScore_cas12a("GGGGGGGGGGGGGGGGGGGGGGG", "GGGGGGGGGGGGGGGGGGGCGGG"))
     print(calcHitScore("ATGTGGAGATTGCCACCTAC", "ATCTGGAGATTGCCACCTAC"))

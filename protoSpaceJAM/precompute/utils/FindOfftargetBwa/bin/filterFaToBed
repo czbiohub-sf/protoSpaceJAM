@@ -148,7 +148,7 @@ def main():
     pamLen = len(pamPat)
 
     if len(altPats)>0 and altPats!=["na"]:
-        assert(len(pamPat)==len(altPats[0]))
+        assert len(pamPat)==len(altPats[0]), "pamPat and altPat[0] have to be same length, pamPat:{}, altPats[0]:{}".format(pamPat, altPats[0])
 
     guideSeqs = dict()
     for guideSeqFname in guideSeqFnames.split(","):
