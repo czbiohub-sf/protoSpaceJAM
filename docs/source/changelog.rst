@@ -43,7 +43,7 @@ Algorithm
 
 Portal
 ------
-:Date: March 01, 2024 |bug fix 25946| Fixed a bug where payloads are empty when defined by selecting tag and linker 
+:Date: March 01, 2024 |bug fix 25946| Fixed a bug where payloads are empty when defined by selecting tag and linker. 
 
 :Date: March 01, 2024 |enhancement 25946| Add a nuclease selection dropdown for SpCas9 and enAsCas12a.
 

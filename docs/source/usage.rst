@@ -23,6 +23,11 @@ protoSpaceJAM's web app proves a step-by-step navigation system, guiding users t
 #. View and download results in the :guilabel:`Results` stage
 
 |
+
+Check out a demo video at https://www.youtube.com/watch?v=MVGGJkzkwfc
+
+|
+
 1. Create a submission list
 ---------------------------
 | There are two ways to create a submission list.
