@@ -43,6 +43,12 @@ Algorithm
 
 Portal
 ------
+:Date: March 07, 2024 |enhancement c5d3b| Added buttons to delete individual submissions from the submission list 
+
+:Date: March 07, 2024 |enhancement c5d3b| Added an option to skip the linker sequence
+
+:Date: March 07, 2024 |enhancement c5d3b| User-tunable parameters will remain last used values when users switch between design steps
+
 :Date: March 01, 2024 |bug fix 25946| Fixed a bug where payloads are empty when defined by selecting tag and linker. 
 
 :Date: March 01, 2024 |enhancement 25946| Add a nuclease selection dropdown for SpCas9 and enAsCas12a.
@@ -87,14 +93,14 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+.. |enhancement c5d3b| image:: https://img.shields.io/badge/c5d3b-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/0fecd264e844d4e6903574b6857635288b2c5d3b
 .. |enhancement fc5b3| image:: https://img.shields.io/badge/9a879-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/0b48770f9767a357b78c9c7c251523dba08fc5b3
-
 .. |bug fix 25946| image:: https://img.shields.io/badge/25946-bug%20fix-red
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/65fe28e67fcc93e3f9f3d22e671bbb6e18d25946
 .. |enhancement 25946| image:: https://img.shields.io/badge/25946-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/65fe28e67fcc93e3f9f3d22e671bbb6e18d25946
-
 .. |bug fix 9a879| image:: https://img.shields.io/badge/9a879-bug%20fix-red
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/9c201a0fa5211f42ad5a94699972d21738e9a879
 .. |enhancement 9a879| image:: https://img.shields.io/badge/9a879-enhancement-green
