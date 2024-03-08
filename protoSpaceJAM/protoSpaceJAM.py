@@ -60,6 +60,27 @@ def parse_args(test_mode=False):
         action="store_true",
         help="Turn off penalty for gRNAs cutting in UTRs or near splice junctions, default: penalty on",
     )
+    gRNA.add_argument(
+        "--alpha1",
+        default=1.0,
+        type=float,
+        help="scaling factor for specificity weight",
+        metavar="<float>",
+    )
+    gRNA.add_argument(
+        "--alpha2",
+        default=1.0,
+        type=float,
+        help="scaling factor for cut to insert dist. weight",
+        metavar="<float>",
+    )
+    gRNA.add_argument(
+        "--alpha3",
+        default=1.0,
+        type=float,
+        help="scaling factor for position weight",
+        metavar="<float>",
+    )
     payload = parser.add_argument_group('payload')
     payload.add_argument(
         "--payload",
@@ -327,6 +348,13 @@ def main(custom_args=None):
                 HDR_arm_len = derived_HDR_arm_len + 100
                 print(f"HA_len is adjusted to {HDR_arm_len}")
 
+        # check alpha values
+        if config["alpha1"] < 0 or config["alpha2"] < 0 or config["alpha3"] < 0:
+            sys.exit("alpha values must be non-negative, please correct the issue and try again")
+        if config["alpha1"] >1 or config["alpha2"] >1  or config["alpha3"] >1 :
+            sys.exit("alpha values must be <= 1, please correct the issue and try again")
+        alphas = [config["alpha1"], config["alpha2"], config["alpha3"]] 
+
         # TODO: fix  the potential infinite loop
         # check memory requirement
         enough_mem = test_memory(4200)
@@ -593,6 +621,7 @@ def main(custom_args=None):
                         pam=config["pam"],
                         spec_score_flavor=spec_score_flavor,
                         reg_penalty=reg_penalty,
+                        alphas = alphas,
                     )
 
                     if ranked_df_gRNAs_target_pos.empty == True:
@@ -742,6 +771,7 @@ def main(custom_args=None):
                     pam=config["pam"],
                     spec_score_flavor=spec_score_flavor,
                     reg_penalty=reg_penalty,
+                    alphas = alphas,
                 )
 
                 if ranked_df_gRNAs_ATG.empty == True:
@@ -902,6 +932,7 @@ def main(custom_args=None):
                     pam=config["pam"],
                     spec_score_flavor=spec_score_flavor,
                     reg_penalty=reg_penalty,
+                    alphas = alphas,
                 )
 
                 if ranked_df_gRNAs_stop.empty == True:
