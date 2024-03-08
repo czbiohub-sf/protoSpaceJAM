@@ -375,6 +375,7 @@ def get_gRNAs_target_coordinate(
     pam,
     spec_score_flavor,
     reg_penalty,
+    alphas,
     dist=50,
 ):
     """
@@ -417,6 +418,7 @@ def get_gRNAs_target_coordinate(
         type="start",
         spec_score_flavor=spec_score_flavor,
         reg_penalty=reg_penalty,
+        alphas=alphas,
     )
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_target_pos.sort_values(
         "final_weight", ascending=False
@@ -435,6 +437,7 @@ def get_gRNAs(
     pam,
     spec_score_flavor,
     reg_penalty,
+    alphas,
     dist=50,
 ):
     """
@@ -478,6 +481,7 @@ def get_gRNAs(
         type="start",
         spec_score_flavor=spec_score_flavor,
         reg_penalty=reg_penalty,
+        alphas=alphas
     )
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_ATG.sort_values(
         "final_weight", ascending=False
@@ -508,6 +512,7 @@ def get_gRNAs(
         type="stop",
         spec_score_flavor=spec_score_flavor,
         reg_penalty=reg_penalty,
+        alphas=alphas
     )
     ranked_df_gRNAs_stop = ranked_df_gRNAs_stop.sort_values(
         "final_weight", ascending=False
@@ -517,12 +522,12 @@ def get_gRNAs(
 
 
 def rank_gRNAs_for_tagging(
-    loc, gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, reg_penalty, alpha=1
+    loc, gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, reg_penalty, alphas=[1, 1, 1]
 ):
     """
     input:  loc         [chr,pos,strand]  #start < end
             gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"  !! neg strand: start > end
-            alpha       specificity weight is raised to the power of alpha
+            alphas       scaling factor for the weights, default [1,1,1]
             type        "start" or "stop:
     output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"  !! neg strand: start > end
     """
@@ -592,9 +597,9 @@ def rank_gRNAs_for_tagging(
         )
 
         final_score = (
-            float(pow(specificity_weight, alpha))
-            * float(distance_weight)
-            * float(position_weight)
+            float(specificity_weight * alphas[0])
+            * float(distance_weight * alphas[1])
+            * float(position_weight * alphas[2])
         )
         col_final_weight.append(final_score)
 
