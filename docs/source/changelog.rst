@@ -5,7 +5,10 @@ Changelog
 
 Algorithm
 ---------
-:Date: March 7, 2024 |enhancement 47b8a| Add scaling factors for weights used in gRNA scoring/ranking
+
+:Date: April 4, 2024 |bug fix d8898| Fixed an issue preventing homology arm length be less than 200bp in dsDNA donor mode.
+
+:Date: March 7, 2024 |enhancement 47b8a| Add scaling factors for weights used in gRNA scoring/ranking.
 
 :Date: March 1, 2024 |enhancement fc5b3| Add support for SpCas9-VQR and enAsCas12a.
 
@@ -96,6 +99,10 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+
+
+.. |bug fix d8898| image:: https://img.shields.io/badge/d8898-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/430b678bf7b9411adee1ab7869fbeff6c37d8898
 .. |enhancement 47b8a| image:: https://img.shields.io/badge/47b8a-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/b2027e1dd0073968008b6e55f6efc64f03647b8a
 .. |enhancement c5d3b| image:: https://img.shields.io/badge/c5d3b-enhancement-green
