@@ -5,6 +5,8 @@ Changelog
 
 Algorithm
 ---------
+:Date: March 7, 2024 |enhancement 47b8a| Add scaling factors for weights used in gRNA scoring/ranking
+
 :Date: March 1, 2024 |enhancement fc5b3| Add support for SpCas9-VQR and enAsCas12a.
 
 :Date: June 26, 2023 |enhancement c5c26| Use Bowtie as the default aligner to check unintended PCR products in primer design.
@@ -43,6 +45,7 @@ Algorithm
 
 Portal
 ------
+
 :Date: March 07, 2024 |enhancement c5d3b| Added buttons to delete individual submissions from the submission list 
 
 :Date: March 07, 2024 |enhancement c5d3b| Added an option to skip the linker sequence
@@ -93,6 +96,8 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+.. |enhancement 47b8a| image:: https://img.shields.io/badge/47b8a-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/b2027e1dd0073968008b6e55f6efc64f03647b8a
 .. |enhancement c5d3b| image:: https://img.shields.io/badge/c5d3b-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/0fecd264e844d4e6903574b6857635288b2c5d3b
 .. |enhancement fc5b3| image:: https://img.shields.io/badge/9a879-enhancement-green

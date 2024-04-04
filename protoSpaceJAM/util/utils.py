@@ -1016,6 +1016,7 @@ def get_seq(chr, start, end, strand, genome_ver):
     end (the end position is not included
     strand 1 or -1 (str)
     """
+    print(f"fetching {chr}:{start}-{end} strand {strand}")
     chr_file_path = os.path.join("genome_files", "fa_pickle", genome_ver, f"{chr}.pk")
     log.debug(f"opening file {chr_file_path}")
     if os.path.isfile(chr_file_path):

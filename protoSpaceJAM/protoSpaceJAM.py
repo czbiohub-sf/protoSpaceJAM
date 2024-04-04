@@ -338,9 +338,9 @@ def main(custom_args=None):
 
 
         # check if HA_len is too short to satisfy ssODN_max_size
-        if ssODN_max_size is not None:
+        if ssODN_max_size is not None and config["Donor_type"] == "ssODN":
             max_payload_size = max([len(config["Npayload"]), len(config["Cpayload"])])
-            derived_HDR_arm_len = ssODN_max_size - max_payload_size / 2
+            derived_HDR_arm_len = round((ssODN_max_size - max_payload_size) / 2)
             if derived_HDR_arm_len >= HDR_arm_len:
                 print(
                     f"HA_len={HDR_arm_len} is to short to meet the requirement of ssODN_max_size={ssODN_max_size}, payload size={max_payload_size}\n ssODN_max_size={ssODN_max_size} requires HA_len = ssODN_max_size- max_payload_size / 2 = {derived_HDR_arm_len}"
@@ -349,8 +349,8 @@ def main(custom_args=None):
                 print(f"HA_len is adjusted to {HDR_arm_len}")
 
         # check alpha values
-        if config["alpha1"] < 0 or config["alpha2"] < 0 or config["alpha3"] < 0:
-            sys.exit("alpha values must be non-negative, please correct the issue and try again")
+        if config["alpha1"] <= 0 or config["alpha2"] <= 0 or config["alpha3"] <= 0:
+            sys.exit("alpha values must >0, please correct the issue and try again")
         if config["alpha1"] >1 or config["alpha2"] >1  or config["alpha3"] >1 :
             sys.exit("alpha values must be <= 1, please correct the issue and try again")
         alphas = [config["alpha1"], config["alpha2"], config["alpha3"]] 
