@@ -64,21 +64,21 @@ def parse_args(test_mode=False):
         "--alpha1",
         default=1.0,
         type=float,
-        help="scaling factor for specificity weight",
+        help="scaling factor for specificity weight, default: 1.0, range: [0,1]",
         metavar="<float>",
     )
     gRNA.add_argument(
         "--alpha2",
         default=1.0,
         type=float,
-        help="scaling factor for cut to insert dist. weight",
+        help="scaling factor for cut to insert dist. weight, default: 1.0, range: [0,1]",
         metavar="<float>",
     )
     gRNA.add_argument(
         "--alpha3",
         default=1.0,
         type=float,
-        help="scaling factor for position weight",
+        help="scaling factor for position weight, default: 1.0, range: [0,1]",
         metavar="<float>",
     )
     payload = parser.add_argument_group('payload')
@@ -195,6 +195,12 @@ def parse_args(test_mode=False):
         help="Use full recoding: recode both the gRNA recognition site and the cut-to-insert region (default: on)",
     )
     recoding.add_argument(
+        "--recoding_coding_region_only",
+        default=False,
+        action="store_true",
+        help="Only recode the coding region",
+    )
+    recoding.add_argument(
         "--cfdThres",
         default=0.03,
         help="Threshold that protoSpaceJAM will attempt to lower the recut potential (measured by the CFD score) to (default: 0.03)",
@@ -296,6 +302,7 @@ def main(custom_args=None):
             "recoding_full": config["recoding_full"],
             "cfdThres": float(config["cfdThres"]),
             "recode_order": config["recode_order"],
+            "recoding_coding_region_only": config["recoding_coding_region_only"],
         }
 
         # check donor args
@@ -349,10 +356,12 @@ def main(custom_args=None):
                 print(f"HA_len is adjusted to {HDR_arm_len}")
 
         # check alpha values
-        if config["alpha1"] <= 0 or config["alpha2"] <= 0 or config["alpha3"] <= 0:
-            sys.exit("alpha values must >0, please correct the issue and try again")
+        if config["alpha1"] < 0 or config["alpha2"] < 0 or config["alpha3"] < 0:
+            sys.exit("alpha values must >= 0, please correct the issue and try again")
         if config["alpha1"] >1 or config["alpha2"] >1  or config["alpha3"] >1 :
             sys.exit("alpha values must be <= 1, please correct the issue and try again")
+        if config["alpha1"] == 0 and config["alpha2"] == 0 and config["alpha3"] == 0:
+            sys.exit("At least one alpha value must be > 0, please correct the issue and try again")
         alphas = [config["alpha1"], config["alpha2"], config["alpha3"]] 
 
         # TODO: fix  the potential infinite loop

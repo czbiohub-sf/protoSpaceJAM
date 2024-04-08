@@ -596,11 +596,16 @@ def rank_gRNAs_for_tagging(
             f"strand {strand} {start}-{end} cutPos {cutPos} insert_loc {loc} cut2insDist {cut2insDist} distance_weight {distance_weight:.2f} CFD_score {CSS} specificity_weight {specificity_weight} pos_type {position_type} position_weight {position_weight}"
         )
 
-        final_score = (
-            float(specificity_weight * alphas[0])
-            * float(distance_weight * alphas[1])
-            * float(position_weight * alphas[2])
-        )
+        # calc. final_weight
+        final_score = 1
+        for weight, alpha in zip([specificity_weight, distance_weight, position_weight], alphas):
+            if alpha != 0:
+                final_score *= float(weight * alpha)
+        # final_score = (
+        #     float(specificity_weight * alphas[0])
+        #     * float(distance_weight * alphas[1])
+        #     * float(position_weight * alphas[2])
+        # )
         col_final_weight.append(final_score)
 
     # add info and weight columns to the df
@@ -1016,7 +1021,7 @@ def get_seq(chr, start, end, strand, genome_ver):
     end (the end position is not included
     strand 1 or -1 (str)
     """
-    print(f"fetching {chr}:{start}-{end} strand {strand}")
+    #print(f"fetching {chr}:{start}-{end} strand {strand}")
     chr_file_path = os.path.join("genome_files", "fa_pickle", genome_ver, f"{chr}.pk")
     log.debug(f"opening file {chr_file_path}")
     if os.path.isfile(chr_file_path):
