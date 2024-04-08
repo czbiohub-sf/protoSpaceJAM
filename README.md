@@ -59,9 +59,9 @@ A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` 
 
 full test suite can be run with 
 ```
-python ./protoSpaceJAM/tests/run_full_tests_pJAM.py
+python ./protoSpaceJAM/tests/run_full_test_pJAM.py
 ```
-A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` at the end.
+A successful test will have a printout similar to `Ran 2 tests in s   OK` at the end.
 
 ### Run protoSpaceJAM
 ```

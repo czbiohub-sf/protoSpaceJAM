@@ -40,6 +40,7 @@ class test_with_OpenCell_design(unittest.TestCase):
         #Remove results
         if os.path.exists(os.path.join("tests", "quick_test_result")):
             shutil.rmtree(os.path.join("tests", "quick_test_result"))
+        #pass    #keep results
 
 
     def test_if_generated_results(self):

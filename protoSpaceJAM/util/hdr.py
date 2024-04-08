@@ -217,7 +217,7 @@ class HDR_flank:
         # TODO: check this line
         self.cutPos, self.gPAM_end = self.get_gRNA_pos(self.gStart, self.gStrand)
 
-        # check if the whole 23nt gRNA is in the HDR flank
+        # check if the whole gRNA is in the HDR flank
         (
             self.entire_gRNA_in_HDR_arms,
             self.gStart_in_HDR_arms,
@@ -336,7 +336,7 @@ class HDR_flank:
                 start = self.ins2cut_postCodontmut.start
                 end = self.ins2cut_postCodontmut.end
                 self.postPhase1Seq = seq
-                if abs(self.Cut2Ins_dist) >= self.minCut2Ins_dist_ForUTRRecoding:
+                if abs(self.Cut2Ins_dist) >= self.minCut2Ins_dist_ForUTRRecoding and not recoding_args['recoding_coding_region_only']: # recode UTRs only if (1) the distance between cut and insert is larger than the threshold (2) not recoding coding region only
                     # print(phases)
                     # print([item for idx,item in (list(enumerate(phases))) if idx not in [0,1,len(phases) - 1,len(phases) - 2]])
                     # print(f"len:{len(phases)-4} Cut2Ins_dist:{self.Cut2Ins_dist}")
@@ -455,7 +455,7 @@ class HDR_flank:
                 seq,
                 phases,
             ) = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-            if cfd > self.cfdThres:  # mutate if in 3' UTR
+            if cfd > self.cfdThres and not recoding_args['recoding_coding_region_only']:  # mutate if in 3' UTR while: 1. CFD score is above threshold 2. not recoding coding region only
                 # mutate PAM if PAM first
                 (
                     left,
@@ -625,9 +625,9 @@ class HDR_flank:
                 left, right, cfd, seq, phases = self.get_uptodate_mut()
                 self.postPhase2ODN = left + tag + right
 
-            ###############################
+            ################################
             # phase 3 mutate codons in gRNA#
-            ###############################
+            ################################
             (
                 left,
                 right,
@@ -729,7 +729,7 @@ class HDR_flank:
             ######################################################
             left, right, cfd, seq, phases = self.get_uptodate_mut()
 
-            if cfd > self.cfdThres:  # mutate protospacer if in intron
+            if cfd > self.cfdThres and not recoding_args["recoding_coding_region_only"]:  # mutate protospacer if in intron while: 1. CFD score is above threshold 2. not recoding coding region only
                 # mutate PAM if PAM first
                 (
                     left,
@@ -912,7 +912,7 @@ class HDR_flank:
                 seq,
                 phases,
             ) = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
-            if cfd >= self.cfdThres:  #
+            if cfd >= self.cfdThres and not recoding_args["recoding_coding_region_only"]:  # mutate if in 5' UTR while: 1. CFD score is above threshold 2. not recoding coding region only
 
                 # mutate PAM if PAM first
                 latest_cfd = cfd

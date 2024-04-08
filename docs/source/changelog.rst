@@ -6,7 +6,7 @@ Changelog
 Algorithm
 ---------
 
-:Date: April 4, 2024 |bug fix d8898| Fixed an issue preventing homology arm length be less than 200bp in dsDNA donor mode.
+:Date: April 4, 2024 |bug fix d8898| Fixed an issue preventing homology arm length be less than 200 bp in dsDNA donor mode.
 
 :Date: March 7, 2024 |enhancement 47b8a| Add scaling factors for weights used in gRNA scoring/ranking.
 
