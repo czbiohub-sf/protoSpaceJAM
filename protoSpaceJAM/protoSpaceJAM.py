@@ -7,6 +7,12 @@ import sys
 import traceback
 import time
 import pandas as pd
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio.SeqFeature import SeqFeature, FeatureLocation
+from Bio.GenBank import Record
+
 
 from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
     get_HDR_template #uncomment this for pip installation
@@ -448,6 +454,7 @@ def main(custom_args=None):
 
         # open log files
         mkdir(outdir)
+        mkdir(os.path.join(outdir, "genbank_files"))
         recut_CFD_all = open(os.path.join(outdir, "recut_CFD_all.txt"), "w")
         recut_CFD_fail = open(os.path.join(outdir, "recut_CFD_fail.txt"), "w")
         csvout_N = open(os.path.join(outdir, "out_Nterm_recut_cfd.csv"), "w")
@@ -744,8 +751,16 @@ def main(custom_args=None):
                                 + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                             )
 
+                        # donor features
+                        donor_features = HDR_template.Donor_features
+                        # write genbank file
+                        with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
+                            write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"])
+
+
                         # write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
+                        this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
@@ -906,8 +921,15 @@ def main(custom_args=None):
                             + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
 
+                    # donor features
+                    donor_features = HDR_template.Donor_features
+                    # write genbank file
+                    with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
+                        write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"])
+
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
+                    this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
                     recut_CFD_all.write(this_log)
                     if HDR_template.final_cfd > 0.03:
                         recut_CFD_fail.write(this_log)
@@ -1067,8 +1089,15 @@ def main(custom_args=None):
                             + f",{HDR_template.ENST_chr},{insert_pos},{ENST_ID},{name}\n"
                         )
 
+                    # donor features
+                    donor_features = HDR_template.Donor_features
+                    # write genbank file
+                    with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
+                        write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"])
+
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
+                    this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
                     recut_CFD_all.write(this_log)
                     if HDR_template.final_cfd > 0.03:
                         recut_CFD_fail.write(this_log)
@@ -1128,6 +1157,52 @@ def main(custom_args=None):
         PrintException()
 
 ## end of main()
+
+def write_genbank(handle, data_obj, donor_name, donor_type):
+    gb_record = Record.Record()
+    gb_record.locus = donor_name
+    gb_record.size = len(data_obj.Donor_final)
+    gb_record.residue_type = 'DNA'
+    gb_record.data_file_division = 'PLN'
+    gb_record.definition = ''
+    gb_record.accession = ['']
+    gb_record.version = ''
+    gb_record.keywords = ['DNA donor']
+    gb_record.source = "synthetic DNA donor"
+    gb_record.organism = 'synthetic DNA donor'
+    gb_record.taxonomy = ['synthetic DNA donor']
+    gb_record.sequence=data_obj.Donor_final
+
+    # Convert the Bio.GenBank record to a SeqRecord (needed for writing with SeqIO)
+    sequence = Seq(gb_record.sequence)
+    seq_record = SeqRecord(sequence, id=gb_record.accession[0], name=donor_name, description= f"DNA donor type: {donor_type}")
+    seq_record.annotations["date"] = get_current_date_formatted()
+    seq_record.annotations["data_file_division"] = gb_record.data_file_division
+    seq_record.annotations["organism"] = 'synthetic DNA donor'
+    seq_record.annotations["molecule_type"] = "DNA"
+
+    # Features 
+    if "gRNA_coord" in data_obj.Donor_features:
+        for feat in data_obj.Donor_features["gRNA_coord"]:
+            feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1], strand=data_obj.Donor_features["gRNA_strand"]), type='gRNA+PAM', qualifiers={"label": "gRNA+PAM"})
+            seq_record.features.append(feature)
+    if "recoding_coord" in data_obj.Donor_features:
+        for feat in data_obj.Donor_features["recoding_coord"]:
+            feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), type='recode', qualifiers={"label": "recode"})
+            seq_record.features.append(feature)
+
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["left_arm_coord"][0], end=data_obj.Donor_features["left_arm_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='left HA', qualifiers={"label": "left HA"})
+    seq_record.features.append(feature)
+
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["right_arm_coord"][0], end=data_obj.Donor_features["right_arm_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='right HA', qualifiers={"label": "right HA"})
+    seq_record.features.append(feature)
+
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='payload', qualifiers={"label": "payload"})
+    seq_record.features.append(feature)
+
+
+    # Write to a GenBank file using SeqIO for the actual file writing
+    SeqIO.write([seq_record], handle, 'genbank')
 
 def ret_six_dec(myvar):
     """
@@ -1216,6 +1291,12 @@ def test_memory(n):
     except:
         return False
 
+def get_current_date_formatted():
+    # Get the current date
+    current_date = datetime.datetime.now()
+    # Format the date as yyyy-mm-dd
+    formatted_date = current_date.strftime("%d-%b-%Y").upper()
+    return formatted_date
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
