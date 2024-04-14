@@ -52,6 +52,8 @@ Algorithm
 Portal
 ------
 
+:Date: April 14, 2024 |enhancement 2bd98| Add output: annotated DNA donor in GenBank format
+
 :Date: March 07, 2024 |enhancement c5d3b| Added buttons to delete individual submissions from the submission list 
 
 :Date: March 07, 2024 |enhancement c5d3b| Added an option to skip the linker sequence
@@ -103,6 +105,11 @@ Portal
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
 
+
+
+
+.. |enhancement 2bd98| image:: https://img.shields.io/badge/2bd98-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/bda4caee590bee33e1d00de9f067698f6382bd98
 .. |enhancement b286e| image:: https://img.shields.io/badge/b286e-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/491a8936eae7760aeb31c5c0cd6c7ad1a50b286e
 .. |bug fix d8898| image:: https://img.shields.io/badge/d8898-bug%20fix-red
