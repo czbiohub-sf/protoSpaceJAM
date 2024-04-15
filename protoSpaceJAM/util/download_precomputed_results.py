@@ -16,9 +16,14 @@ def parse_args():
         "--SpCas9_only",
         default=False,
         action="store_true",
-        help="if set, download precomputed results for SpCas9 only. Otherwise, download precomputed results for SpCas9, VQR-Cas9 and enAsCas12a.",
+        help
+        ="if set, download precomputed results for SpCas9 only. Otherwise, download precomputed results for SpCas9, VQR-Cas9 and enAsCas12a.",
     )
-
+    config = parser.parse_args()
+    if len(sys.argv) == 1:  # print help message if arguments are not valid
+        parser.print_help()
+        sys.exit(1)
+    return config
 
 def download_from_gdrive(
     id, name, dest_folder=".", overwrite=False, unzip=False
