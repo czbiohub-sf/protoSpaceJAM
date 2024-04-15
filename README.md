@@ -44,8 +44,13 @@ conda create -y -n protospacejam python=3.9 && conda activate protospacejam
 pip install .
 ```
 ### Download and unzip pre-computed data
+41G disk space required for (human, mouse and zebrafish genomes) x (SpCas9, VQR-SpCas9 and enAsCas12a)  
 ```
 python ./protoSpaceJAM/util/download_precomputed_results.py
+```
+25G disk space required for (human, mouse and zebrafish genomes) x SpCas9 
+```
+python ./protoSpaceJAM/util/download_precomputed_results.py --SpCas9_only
 ```
 PS: Default dependencies will only allow users to run protoSpaceJam 
 with existing pre-computed data. If you like to execute pre-computation
