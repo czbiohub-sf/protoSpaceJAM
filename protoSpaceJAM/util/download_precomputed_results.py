@@ -54,7 +54,7 @@ def download_from_gdrive(
 if __name__ == '__main__':
     if not os.path.exists("protoSpaceJAM"):
         sys.exit("Please run this script from the repo's root directory.")
-    config = vars(parse_args()[0])
+    config = vars(parse_args())
 
     id = "1BNq9j2yBW-a1oCcKZkNVSDFil8_KpQyt"
     if config["SpCas9_only"]:
