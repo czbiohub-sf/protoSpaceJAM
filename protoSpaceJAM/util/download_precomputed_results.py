@@ -20,9 +20,6 @@ def parse_args():
         ="if set, download precomputed results for SpCas9 only. Otherwise, download precomputed results for SpCas9, VQR-Cas9 and enAsCas12a.",
     )
     config = parser.parse_args()
-    if len(sys.argv) == 1:  # print help message if arguments are not valid
-        parser.print_help()
-        sys.exit(1)
     return config
 
 def download_from_gdrive(
@@ -61,9 +58,9 @@ if __name__ == '__main__':
         sys.exit("Please run this script from the repo's root directory.")
     config = vars(parse_args())
 
-    id = "1BNq9j2yBW-a1oCcKZkNVSDFil8_KpQyt"
+    id = "1E2BlwrPjHXQgGAiZFU9YYdPIR3Ovslna"
     if config["SpCas9_only"]:
-            id="1AunvrrNNJydBYQVI9eyniMXaKULDCF8K"
+            id="13uPuSPXZTP0F8oK1DzziE9CcuonvtkFd"
 
     download_from_gdrive(
         id=id,
