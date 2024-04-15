@@ -45,10 +45,12 @@ pip install .
 ```
 ### Download and unzip pre-computed data
 41G disk space (82G temporary) required for (human, mouse and zebrafish genomes) x (SpCas9, VQR-SpCas9 and enAsCas12a)  
+If the download is disrupted, rerun the same command to resume  
 ```
 python ./protoSpaceJAM/util/download_precomputed_results.py
 ```
-25G disk space (50 temporary) required for (human, mouse and zebrafish genomes) x SpCas9 
+25G disk space (50 temporary) required for (human, mouse and zebrafish genomes) x SpCas9  
+If the download is disrupted, rerun the same command to resume 
 ```
 python ./protoSpaceJAM/util/download_precomputed_results.py --SpCas9_only
 ```
