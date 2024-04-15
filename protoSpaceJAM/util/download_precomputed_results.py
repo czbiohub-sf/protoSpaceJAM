@@ -2,6 +2,23 @@ import os
 import tarfile
 import gdown
 import sys
+import argparse
+
+class MyParser(argparse.ArgumentParser):
+    def error(self, message):
+        sys.stderr.write("error: %s\n" % message)
+        self.print_help()
+        sys.exit(2)
+
+def parse_args():
+    parser = MyParser(description="download precomputed results\n")
+    parser.add_argument(
+        "--SpCas9_only",
+        default=False,
+        action="store_true",
+        help="if set, download precomputed results for SpCas9 only. Otherwise, download precomputed results for SpCas9, VQR-Cas9 and enAsCas12a.",
+    )
+
 
 def download_from_gdrive(
     id, name, dest_folder=".", overwrite=False, unzip=False
@@ -37,8 +54,14 @@ def download_from_gdrive(
 if __name__ == '__main__':
     if not os.path.exists("protoSpaceJAM"):
         sys.exit("Please run this script from the repo's root directory.")
+    config = vars(parse_args()[0])
+
+    id = "1BNq9j2yBW-a1oCcKZkNVSDFil8_KpQyt"
+    if config["SpCas9_only"]:
+            id="1AunvrrNNJydBYQVI9eyniMXaKULDCF8K"
+
     download_from_gdrive(
-        id="1cxqnKGPVg1elEcs_kIob5SKETEZ0egfg",
+        id=id,
         dest_folder=os.path.join("protoSpaceJAM"),
         name="precomputed_results.tar.gz",
         unzip=True,
