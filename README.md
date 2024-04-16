@@ -5,9 +5,10 @@
 ![license](https://img.shields.io/badge/license-BSD--3-brightgreen)
 ![status](https://img.shields.io/badge/status-pre--release-orange)
 # protoSpaceJAM 
-A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
-A web-portal is available at http://protospacejam.czbiohub.org/
+:computer: A standalone program to design guide RNA and repair donors for CRISPR knock-in experiments  
+:globe_with_meridians: A web-portal is available at http://protospacejam.czbiohub.org/
 
+&nbsp;
 ## Key features:  
 - Fully standalone, no calling to other bioinformatics servers
 - Sophisticated guide RNA ranking system ([details](https://czbiohub-sf.github.io/protoSpaceJAM/algorithm.html#grna-scoring))
@@ -23,8 +24,8 @@ A web-portal is available at http://protospacejam.czbiohub.org/
   - Enforce maximum length of DNA donor
 - Use/generate pre-computed genome-wide guide RNAs and their properties for fast runtime
 
-
-## Usage
+&nbsp;
+## Installation
 
 ### Clone the repository
 ```
@@ -44,11 +45,15 @@ conda create -y -n protospacejam python=3.9 && conda activate protospacejam
 pip install .
 ```
 ### Download and unzip pre-computed data
-41G disk space required for (human, mouse and zebrafish genomes) x (SpCas9, VQR-SpCas9 and enAsCas12a)  
+[Option 1]  
+:floppy_disk: 41G disk space (82G temporary) required for (human🕺, mouse🐭 and zebrafish🐟 genomes) x (SpCas9, VQR-SpCas9 and enAsCas12a)  
+If the download is disrupted, rerun the same command to resume  
 ```
 python ./protoSpaceJAM/util/download_precomputed_results.py
 ```
-25G disk space required for (human, mouse and zebrafish genomes) x SpCas9 
+[Option 2]  
+:floppy_disk: 25G disk space (50G temporary) required for (human🕺, mouse🐭 and zebrafish 🐟 genomes) x SpCas9  
+If the download is disrupted, rerun the same command to resume 
 ```
 python ./protoSpaceJAM/util/download_precomputed_results.py --SpCas9_only
 ```
@@ -68,11 +73,13 @@ python ./protoSpaceJAM/tests/run_full_test_pJAM.py
 ```
 A successful test will have a printout similar to Ran 2 tests in 1873.836s` at the end.
 
-### Run protoSpaceJAM
+&nbsp;
+## Usage
 ```
 conda activate protospacejam
 protoSpaceJAM --path2csv input/test_input.csv --outdir output/test
 ```
 
+&nbsp;
 ## License
 Distributed under the terms of the BSD-3 license, "protoSpaceJAM" is free and open source software
