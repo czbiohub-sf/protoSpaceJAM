@@ -45,21 +45,18 @@ conda create -y -n protospacejam python=3.9 && conda activate protospacejam
 pip install .
 ```
 ### Download and unzip pre-computed data
-[Option 1]  
+
 :floppy_disk: 41G disk space (82G temporary) required for (human🕺, mouse🐭 and zebrafish🐟 genomes) x (SpCas9, VQR-SpCas9 and enAsCas12a)  
-If the download is disrupted, rerun the same command to resume  
 ```
 python ./protoSpaceJAM/util/download_precomputed_results.py
 ```
-[Option 2]  
-:floppy_disk: 25G disk space (50G temporary) required for (human🕺, mouse🐭 and zebrafish 🐟 genomes) x SpCas9  
-If the download is disrupted, rerun the same command to resume 
-```
-python ./protoSpaceJAM/util/download_precomputed_results.py --SpCas9_only
-```
-PS: Default dependencies will only allow users to run protoSpaceJam 
-with existing pre-computed data. If you like to execute pre-computation
-steps please follow [here](https://github.com/czbiohub-sf/protoSpaceJAM/tree/main/protoSpaceJAM/precompute)
+If the download process is disrupted, rerun the same command to resume.  
+If prompted to download with browser, place the file in `protoSpaceJAM/protoSpaceJAM/` and rerun the command with an additional argument `--use_local`   
+
+[less disk space option]  
+:floppy_disk: 25G disk space (50G temporary), add additional argument `--SpCas9_only`
+
+👉 If you like to precompute your own gRNAs, please follow [here](https://github.com/czbiohub-sf/protoSpaceJAM/tree/main/protoSpaceJAM/precompute)
 
 ### Run a quick test to verify installation
 ```
