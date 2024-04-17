@@ -51,8 +51,11 @@ Algorithm
 
 Portal
 ------
+:Date: April 16, 2024 |enhancement b0df0| Tunable primer parameters (e.g. amplicon size and Tm range)
 
-:Date: April 14, 2024 |enhancement 2bd98| Add output: annotated DNA donor in GenBank format
+:Date: April 15, 2024 |enhancement 480fd| Improved santitization of user input
+
+:Date: April 14, 2024 |enhancement 2bd98| Annotated DNA donor in GenBank format
 
 :Date: March 07, 2024 |enhancement c5d3b| Added buttons to delete individual submissions from the submission list 
 
@@ -106,8 +109,10 @@ Portal
 
 
 
-
-
+.. |enhancement b0df0| image:: https://img.shields.io/badge/b0df0-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/1f5f7ebda71109305a6b0f3c3e0f44a4d15b0df0
+.. |enhancement 480fd| image:: https://img.shields.io/badge/480fd-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/944a1779710d5e3333087ac7d94b534fb78480fd
 .. |enhancement 2bd98| image:: https://img.shields.io/badge/2bd98-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/bda4caee590bee33e1d00de9f067698f6382bd98
 .. |enhancement b286e| image:: https://img.shields.io/badge/b286e-enhancement-green
