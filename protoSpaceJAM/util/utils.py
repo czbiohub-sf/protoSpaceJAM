@@ -600,7 +600,7 @@ def rank_gRNAs_for_tagging(
         final_score = 1
         for weight, alpha in zip([specificity_weight, distance_weight, position_weight], alphas):
             if alpha != 0:
-                final_score *= float(weight * alpha)
+                final_score *= float(weight ** alpha)
         # final_score = (
         #     float(specificity_weight * alphas[0])
         #     * float(distance_weight * alphas[1])

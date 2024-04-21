@@ -70,21 +70,21 @@ def parse_args(test_mode=False):
         "--alpha1",
         default=1.0,
         type=float,
-        help="scaling factor for specificity weight, default: 1.0, range: [0,1]",
+        help="raise the specificity weight to the power of this number, default: 1.0, range: [0,1]",
         metavar="<float>",
     )
     gRNA.add_argument(
         "--alpha2",
         default=1.0,
         type=float,
-        help="scaling factor for cut to insert dist. weight, default: 1.0, range: [0,1]",
+        help="raise the insert dist. weight to the power of this number, default: 1.0, range: [0,1]",
         metavar="<float>",
     )
     gRNA.add_argument(
         "--alpha3",
         default=1.0,
         type=float,
-        help="scaling factor for position weight, default: 1.0, range: [0,1]",
+        help="raise the position weight to the power of this number, default: 1.0, range: [0,1]",
         metavar="<float>",
     )
     payload = parser.add_argument_group('payload')
