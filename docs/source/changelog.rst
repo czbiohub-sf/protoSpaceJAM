@@ -5,6 +5,9 @@ Changelog
 
 Algorithm
 ---------
+
+:Date: April 21, 2024 |bug fix bae68| gRNA weight are now raised to the power of the scaling factor.
+
 :Date: April 8, 2024 |enhancement b286e| Added an argument to recode only in coding region. 
 
 :Date: April 8, 2024 |enhancement b286e| The scaling factor of gRNA scoring weights can be zero, the corresponding weight will be ignored if the scaling factor is zero.
@@ -51,6 +54,12 @@ Algorithm
 
 Portal
 ------
+:Date: April 21, 2024 |enhancement 95c22| Added a warning message when the primer deisgn can't utilize precomputed primers (longer wait times)
+
+:Date: April 21, 2024 |enhancement 95c22| Added a warning message when the PCR amplicon length is shorter than the DNA donor (PCR amplicon could be generated from the DNA donor).
+
+:Date: April 21, 2024 |enhancement 95c22| Added a warning message when the DNA donor length is shorter than the payload (there is no room for homology arms).
+
 :Date: April 16, 2024 |enhancement b0df0| Tunable primer parameters (e.g. amplicon size and Tm range)
 
 :Date: April 15, 2024 |enhancement 480fd| Improved santitization of user input
@@ -107,8 +116,10 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
-
-
+.. |enhancement 95c22| image:: https://img.shields.io/badge/95c22-enhancement-green
+    https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/6708a930342a255c8fb64eba0b3356111e195c22
+.. |bug fix bae68| image:: https://img.shields.io/badge/bae68-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/774961a0824a59e3bb7294b6ed5df8b28f0bae68
 .. |enhancement b0df0| image:: https://img.shields.io/badge/b0df0-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/1f5f7ebda71109305a6b0f3c3e0f44a4d15b0df0
 .. |enhancement 480fd| image:: https://img.shields.io/badge/480fd-enhancement-green
