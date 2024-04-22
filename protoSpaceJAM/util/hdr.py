@@ -114,6 +114,7 @@ class HDR_flank:
         Donor_type,
         Strand_choice,
         syn_check_args,
+        coordinate_without_ENST,
     ) -> None:
 
         self.left_flk_seq = (
@@ -145,6 +146,7 @@ class HDR_flank:
         self.recode_order = recoding_args["recode_order"]
         self.minCut2Ins_dist_ForUTRRecoding = 0
         self.mut_every_n = 3
+        self.coordinate_without_ENST = coordinate_without_ENST
 
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
@@ -262,7 +264,7 @@ class HDR_flank:
             flag = check_near_EI_IE_junction(
                 self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType
             )
-            if flag:  # update cutPos2nearestOffLimitJunc
+            if flag and not self.coordinate_without_ENST:  # update cutPos2nearestOffLimitJunc
                 if self.cutPos2nearestOffLimitJunc == ">100":
                     self.cutPos2nearestOffLimitJunc = -i
                 elif abs(self.cutPos2nearestOffLimitJunc) >= abs(i):
@@ -271,7 +273,7 @@ class HDR_flank:
             flag = check_near_EI_IE_junction(
                 self.ENST_chr, self.ENST_ID, self.cutPos + i, self.loc2posType
             )
-            if flag:  # update cutPos2nearestOffLimitJunc
+            if flag and not self.coordinate_without_ENST:  # update cutPos2nearestOffLimitJunc
                 if self.cutPos2nearestOffLimitJunc == ">100":
                     self.cutPos2nearestOffLimitJunc = -i
                 elif abs(self.cutPos2nearestOffLimitJunc) >= abs(i):
@@ -478,6 +480,7 @@ class HDR_flank:
                             pos=pos,
                             loc2posType=self.loc2posType,
                         )
+                        position_type = [] if self.coordinate_without_ENST else position_type # support for coordinate without ENST
                         PAM_pos_types = PAM_pos_types + position_type
                     (
                         left,
@@ -585,6 +588,7 @@ class HDR_flank:
                             pos=pos,
                             loc2posType=self.loc2posType,
                         )
+                        position_type = [] if self.coordinate_without_ENST else position_type # support for coordinate without ENST
                         PAM_pos_types = PAM_pos_types + position_type
                     (
                         left,
@@ -752,6 +756,7 @@ class HDR_flank:
                             pos=pos,
                             loc2posType=self.loc2posType,
                         )
+                        position_type = [] if self.coordinate_without_ENST else position_type # support for coordinate without ENST
                         PAM_pos_types = PAM_pos_types + position_type
                     (
                         left,
@@ -861,6 +866,7 @@ class HDR_flank:
                             pos=pos,
                             loc2posType=self.loc2posType,
                         )
+                        position_type = [] if self.coordinate_without_ENST else position_type # support for coordinate without ENST
                         PAM_pos_types = PAM_pos_types + position_type
                     (
                         left,
@@ -2456,6 +2462,7 @@ class HDR_flank:
                 )
                 if flag:
                     tmp_lst[idx] = "5"
+                tmp_lst[idx] = "0" if self.coordinate_without_ENST else tmp_lst[idx] # support for coordinate without ENST
                 idx += 1
         else:
             for c in reversed(range(coord2, coord1 + 1)):
@@ -2467,6 +2474,7 @@ class HDR_flank:
                 )  ##
                 if flag:
                     tmp_lst[idx] = "5"
+                tmp_lst[idx] = "0" if self.coordinate_without_ENST else tmp_lst[idx] # support for coordinate without ENST
                 idx += 1
         return "".join(tmp_lst)
 
@@ -2486,6 +2494,7 @@ class HDR_flank:
                 )
                 if flag:
                     tmp_lst[idx] = "6"
+                tmp_lst[idx] = "0" if self.coordinate_without_ENST else tmp_lst[idx] # support for coordinate without ENST
                 idx += 1
         else:
             for c in reversed(range(coord2, coord1 + 1)):
@@ -2497,6 +2506,7 @@ class HDR_flank:
                 )  ##
                 if flag:
                     tmp_lst[idx] = "6"
+                tmp_lst[idx] = "0" if self.coordinate_without_ENST else tmp_lst[idx] # support for coordinate without ENST
                 idx += 1
         return "".join(tmp_lst)
 
@@ -2529,6 +2539,7 @@ class HDR_flank:
                     tmp_lst[idx] = "8"
                 elif flag1:
                     tmp_lst[idx] = "9"
+                tmp_lst[idx] = "0" if self.coordinate_without_ENST else tmp_lst[idx] # support for coordinate without ENST
                 idx += 1
         else:
             for c in reversed(range(coord2, coord1 + 1)):
@@ -2550,6 +2561,7 @@ class HDR_flank:
                     ] = "8"  # idx+1 is caused by reversing (range(coord2,coord1))
                 elif flag1:
                     tmp_lst[idx] = "9"
+                tmp_lst[idx] = "0" if self.coordinate_without_ENST else tmp_lst[idx] # support for coordinate without ENST
                 idx += 1
         return "".join(tmp_lst)
 
