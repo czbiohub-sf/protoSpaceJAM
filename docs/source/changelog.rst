@@ -5,6 +5,7 @@ Changelog
 
 Algorithm
 ---------
+:Date: April 22, 2024 |enhancement 39eae| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions)   
 
 :Date: April 21, 2024 |bug fix bae68| gRNA weight are now raised to the power of the scaling factor.
 
@@ -54,6 +55,8 @@ Algorithm
 
 Portal
 ------
+:Date: April 22, 2024 |enhancement 11a19| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions)   
+
 :Date: April 21, 2024 |enhancement 95c22| Added a warning message when the primer deisgn can't utilize precomputed primers (longer wait times)
 
 :Date: April 21, 2024 |enhancement 95c22| Added a warning message when the PCR amplicon length is shorter than the DNA donor (PCR amplicon could be generated from the DNA donor).
@@ -116,6 +119,11 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+
+.. |enhancement 39eae| image:: https://img.shields.io/badge/39eae-enhancement-green
+    https://github.com/czbiohub-sf/protoSpaceJAM/commit/01b9c995ece8109cd9204fb0bdaffe672d039eae
+.. |enhancement 11a19| image:: https://img.shields.io/badge/11a19-enhancement-green
+    https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/736df18677c6c9b8e84ffa418f7aac8db1011a19
 .. |enhancement 95c22| image:: https://img.shields.io/badge/95c22-enhancement-green
     https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/6708a930342a255c8fb64eba0b3356111e195c22
 .. |bug fix bae68| image:: https://img.shields.io/badge/bae68-bug%20fix-red
