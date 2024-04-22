@@ -121,11 +121,11 @@ Portal
 
 
 .. |enhancement 39eae| image:: https://img.shields.io/badge/39eae-enhancement-green
-    https://github.com/czbiohub-sf/protoSpaceJAM/commit/01b9c995ece8109cd9204fb0bdaffe672d039eae
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/01b9c995ece8109cd9204fb0bdaffe672d039eae
 .. |enhancement 11a19| image:: https://img.shields.io/badge/11a19-enhancement-green
-    https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/736df18677c6c9b8e84ffa418f7aac8db1011a19
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/736df18677c6c9b8e84ffa418f7aac8db1011a19
 .. |enhancement 95c22| image:: https://img.shields.io/badge/95c22-enhancement-green
-    https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/6708a930342a255c8fb64eba0b3356111e195c22
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/6708a930342a255c8fb64eba0b3356111e195c22
 .. |bug fix bae68| image:: https://img.shields.io/badge/bae68-bug%20fix-red
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/774961a0824a59e3bb7294b6ed5df8b28f0bae68
 .. |enhancement b0df0| image:: https://img.shields.io/badge/b0df0-enhancement-green
