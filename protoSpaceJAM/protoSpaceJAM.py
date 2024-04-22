@@ -511,7 +511,9 @@ def main(custom_args=None):
         ENST_design_counts = {} #used in the names of gRNA and donors
         Entry = 0 # Entry is defined by the portal, and if not using the portal, it is just the index of the row
         for index, row in df.iterrows():
-            ENST_ID = row["Ensembl_ID"].rstrip().lstrip()
+            ENST_ID = row["Ensembl_ID"]
+            if isinstance(ENST_ID, str):
+                ENST_ID =  ENST_ID.rstrip().lstrip()
             if "Target_terminus" in df.columns and row.isnull()["Target_terminus"] == False:
                 target_terminus = row["Target_terminus"].rstrip().lstrip().upper()
 
@@ -524,7 +526,7 @@ def main(custom_args=None):
                     sys.exit(f"invalid target terminus: {target_terminus}")
 
             # determine if the input is ENST-based or coordinate-based
-            ENST_based, coordinate_based = False, False
+            ENST_based, coordinate_based, coordinate_without_ENST = False, False, False
             if "Chromosome" in df.columns and "Coordinate" in df.columns and row.isnull()["Chromosome"] == False and row.isnull()["Coordinate"] == False:
                 chrom = str(row["Chromosome"]).rstrip().lstrip()
                 coordinate = str(row["Coordinate"]).rstrip().lstrip()
@@ -534,6 +536,12 @@ def main(custom_args=None):
                     and coordinate.isdigit()
                 ):
                     coordinate_based = True
+                    # check if ENST is provided,
+                    if not ENST_ID in ENST_info_index.keys():
+                        coordinate_without_ENST = True # support for coordinate-based design without ENST
+                        # create a dummy ENST_ID for the coordinate-based design without ENST
+                        ENST_ID = next(iter(ENST_PhaseInCodon_index))
+                        
             # if coordinate_based didn't check out, revert to ENST-based
             if coordinate_based == False:
                 ENST_based = True
@@ -543,13 +551,15 @@ def main(custom_args=None):
             if "Entry" in df.columns:
                 try:
                     Entry = str(row["Entry"]).rstrip().lstrip()
-                    ENST_in_db = True
+                    ENST_in_db = True # this bool indicates that the input is from the portal
                 except:
                     ENST_in_db = False
 
             # check if ENST_ID is in the database
-            if not ENST_ID in ENST_info_index.keys():
-                if not ENST_in_db:
+            if (    not ENST_ID in ENST_info_index.keys() 
+                and not coordinate_without_ENST
+                ):
+                if not ENST_in_db: # case where not using the portal
                     Entry += 1
                 log.warning(
                     f"skipping {ENST_ID} b/c transcript is not in the annotated ENST collection (excluding those on chr_patch_hapl_scaff)"
@@ -561,7 +571,8 @@ def main(custom_args=None):
                 continue
 
             # check if codon phase info exists
-            if not ENST_ID in ENST_PhaseInCodon_index.keys():
+            if (    not ENST_ID in ENST_PhaseInCodon_index.keys() 
+                and not coordinate_without_ENST):
                 if not ENST_in_db:
                     Entry += 1
                 log.warning(
@@ -595,6 +606,8 @@ def main(custom_args=None):
             else:
                 name = ""
             row_prefix = f"{ENST_ID},{ENST_info[ENST_ID].chr},{transcript_type},{name}"
+            if coordinate_without_ENST:
+                row_prefix = f",,,"
 
             # get codon_phase information for current ENST
             file_parts_list = ENST_PhaseInCodon_index[ENST_ID]
@@ -621,8 +634,11 @@ def main(custom_args=None):
                     Entry += 1
                 csvout_N.write(ENST_ID)
                 #check if the coordinate is in the ENST
-                if ENST_info[ENST_ID].chr == chrom and min(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end) <= int(coordinate) <=  max(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end):
-                    
+                coord_in_ENST = ENST_info[ENST_ID].chr == chrom and min(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end) <= int(coordinate) <=  max(ENST_info[ENST_ID].span_start, ENST_info[ENST_ID].span_end)
+
+                if not coordinate_without_ENST and not coord_in_ENST: # if the coordinate is not in the ENST (and user provided a ENST_ID to go with the coordinate)
+                    csvout_res.write(f"{Entry},{ENST_ID},ERROR: provided genomic coordinates are not in the {ENST_ID}\n")
+                else:                    
                     # get gRNAs
                     ranked_df_gRNAs_target_pos = get_gRNAs_target_coordinate(
                         ENST_ID=ENST_ID,
@@ -662,6 +678,7 @@ def main(custom_args=None):
                                 Strand_choice=config["Strand_choice"],
                                 recoding_args=recoding_args,
                                 syn_check_args=syn_check_args,
+                                coordinate_without_ENST = coordinate_without_ENST,
                             )
                         except Exception as e:
                             print("Unexpected error:", str(sys.exc_info()))
@@ -723,6 +740,10 @@ def main(custom_args=None):
                         ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
                         gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
                         donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
+                        if coordinate_without_ENST:
+                            gRNA_name = f"gRNA_{ENST_design_counts[ENST_ID]}"
+                            donor_name = f"donor_{ENST_design_counts[ENST_ID]}"
+
                         if config["Donor_type"] == "dsDNA":
                             donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
                         else:
@@ -760,7 +781,7 @@ def main(custom_args=None):
 
                         # write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
-                        this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
+                        #this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
                         recut_CFD_all.write(this_log)
                         if HDR_template.final_cfd > 0.03:
                             recut_CFD_fail.write(this_log)
@@ -773,8 +794,7 @@ def main(custom_args=None):
                             fiveUTR_log.write(
                                 f"phase5_UTR\t{HDR_template.info_phase5_5UTR[0]}\t{HDR_template.info_phase5_5UTR[1]}\n"
                             )
-                else:
-                    csvout_res.write(f"{Entry},{ENST_ID},ERROR: provided genomic coordinates are not in the {ENST_ID}\n")
+
 
             ###################################
             # best start gRNA and HDR template#
@@ -825,6 +845,7 @@ def main(custom_args=None):
                             Strand_choice=config["Strand_choice"],
                             recoding_args=recoding_args,
                             syn_check_args=syn_check_args,
+                            coordinate_without_ENST = coordinate_without_ENST,
                         )
                     except Exception as e:
                         print("Unexpected error:", str(sys.exc_info()))
@@ -929,7 +950,7 @@ def main(custom_args=None):
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
-                    this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
+                    #this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
                     recut_CFD_all.write(this_log)
                     if HDR_template.final_cfd > 0.03:
                         recut_CFD_fail.write(this_log)
@@ -993,6 +1014,7 @@ def main(custom_args=None):
                             ssODN_max_size=ssODN_max_size,
                             recoding_args=recoding_args,
                             syn_check_args=syn_check_args,
+                            coordinate_without_ENST = coordinate_without_ENST,
                         )
                     except Exception as e:
                         print("Unexpected error:", str(sys.exc_info()))
@@ -1097,7 +1119,7 @@ def main(custom_args=None):
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
-                    this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
+                    #this_log = f"{this_log}Donor features:\n{donor_features}\n\n"
                     recut_CFD_all.write(this_log)
                     if HDR_template.final_cfd > 0.03:
                         recut_CFD_fail.write(this_log)

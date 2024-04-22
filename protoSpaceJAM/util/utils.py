@@ -156,6 +156,7 @@ def get_HDR_template(
     Donor_type,
     Strand_choice,
     syn_check_args,
+    coordinate_without_ENST,
 ):
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
@@ -199,6 +200,11 @@ def get_HDR_template(
             for i in get_range(right_start, right_end)
         ]
 
+        # support for coordinate without ENST
+        if coordinate_without_ENST:
+            left_Arm_Phases = [0 for i in left_Arm_Phases] # treat as non-coding
+            right_Arm_Phases = [0 for i in right_Arm_Phases] # treat as non-coding
+
         myflank = HDR_flank(
             left_flk_seq=leftArm,
             right_flk_seq=rightArm,
@@ -223,6 +229,7 @@ def get_HDR_template(
             Strand_choice=Strand_choice,
             recoding_args=recoding_args,
             syn_check_args=syn_check_args,
+            coordinate_without_ENST=coordinate_without_ENST,
         )
         return myflank
         # log IDs whose gRNA is not in the default-size HDR arms
@@ -601,11 +608,7 @@ def rank_gRNAs_for_tagging(
         for weight, alpha in zip([specificity_weight, distance_weight, position_weight], alphas):
             if alpha != 0:
                 final_score *= float(weight ** alpha)
-        # final_score = (
-        #     float(specificity_weight * alphas[0])
-        #     * float(distance_weight * alphas[1])
-        #     * float(position_weight * alphas[2])
-        # )
+
         col_final_weight.append(final_score)
 
     # add info and weight columns to the df
