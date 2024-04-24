@@ -56,6 +56,8 @@ Algorithm
 Portal
 ------
 
+:Date: April 23, 2024 |enhancement 85146| Allow users to omit the transcript ID column entirely when specifying custom genomic coordinates. 
+
 :Date: April 22, 2024 |enhancement 4b7a9| Added a warning message when genomic coordinates are used without specifying transcript IDs  
 
 :Date: April 22, 2024 |enhancement 11a19| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions)   
@@ -122,7 +124,8 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
-
+.. |enhancement 85146| image:: https://img.shields.io/badge/85146-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/9b91d4a06939475fff862203593052d332085146
 .. |enhancement 4b7a9| image:: https://img.shields.io/badge/4b7a9-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/699bcf9147a956ad78a4611bfd6a73e03214b7a9
 .. |enhancement 39eae| image:: https://img.shields.io/badge/39eae-enhancement-green
