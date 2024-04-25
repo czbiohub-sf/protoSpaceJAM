@@ -1,8 +1,9 @@
 # Precompute gRNA and genome information
+This page provides step-by-step instructions for precomputing gRNAs for a user-specified PAM
 If you prefer downloading the precomputed gRNA, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM#download-and-unzip-pre-computed-data)
 
 ## Prerequisite
-All scripts and binary files in protoSpaceJAM/utils should be excutable
+All scripts and binary files in `protoSpaceJAM/utils` should be excutable
 
 ## Prepare genomes
 Download genome sequence and annotation files 
@@ -10,7 +11,7 @@ Download genome sequence and annotation files
 cd precompute
 bash download_genomes.sh
 ```
-Extract gene models and codon info (for protoSpaceJAM use)
+Extract gene models and codon info
 ```shell
 module load anaconda
 conda activate protospacejam
@@ -22,13 +23,24 @@ bash serialize_fa.sh # serialize genome fasta for fast access
 </br>
 
 ## Search for gRNAs in the genomes
-This step takes ~1.5 hours for each genome  
-PAM sequences should be specified in this format: a single on-target PAM followed by "|" and one or more off-target PAM (off-target PAMs should be separated by comma)
+specify PAM  
+PAM sequences should be specified in this format: a single on-target PAM followed by "|" and one or more off-target PAM (off-target PAMs should be separated by comma)  
+for 5' PAMs, set `pamloc` to "5", and for 3' PAMs, set `pamloc` = "3"    
+#### for SpCas9
 ```shell
 pam="NGG|NGA,NAG" && pamloc="3"
-#pam="TTTV|TTTN" && pamloc="5"
-#pam="NGA|NGG" && pamloc="3"
-
+```
+#### for SpCas9-VQR
+```shell
+pam="NGA|NGG" && pamloc="3"
+```
+#### for enAsCas12a
+```shell
+pam="TTTV|TTTN" && pamloc="5"
+```
+### search gRNA  
+This step takes ~1.5 hours for each genome  
+```shell
 mkdir gRNAs
 bash search_gRNAs.sh GRCh38 Homo_sapiens "${pam}" "${pamloc}"
 bash search_gRNAs.sh GRCm39 Mus_musculus "${pam}" "${pamloc}"
