@@ -40,7 +40,7 @@ pam="TTTV|TTTN" && pamloc="5"
 ```
 </br>
 
-## search gRNA  
+## Search gRNA  
 This step takes ~1.5 hours for each genome  
 ```shell
 mkdir gRNAs
