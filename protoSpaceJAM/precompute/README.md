@@ -81,6 +81,8 @@ bash map_gRNA_wrapper.sh GRCh38 Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa "
 bash map_gRNA_wrapper.sh GRCm39 Mus_musculus.GRCm39.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_m39}" 100
 bash map_gRNA_wrapper.sh GRCz11 Danio_rerio.GRCz11.dna_sm.primary_assembly.fa "${pam}" "${job_array_size_z11}" 100
 ```
+</br>
+
 ## Compute off-target score
 submit three batch jobs to the hpc, takes ~10 hours to finish with 1000 cores
 ```shell
@@ -95,6 +97,8 @@ python scripts/index_gRNA_results.py --gzdir gRNAs/gRNA_GRCh38/gRNA.tab.gz.split
 python scripts/index_gRNA_results.py --gzdir gRNAs/gRNA_GRCm39/gRNA.tab.gz.split.BwaMapped.scored
 python scripts/index_gRNA_results.py --gzdir gRNAs/gRNA_GRCz11/gRNA.tab.gz.split.BwaMapped.scored
 ```
+</br>
+
 ## Clean up and move precomputed files to destination
 ```shell
 bash post_processing.sh "${pam}"
