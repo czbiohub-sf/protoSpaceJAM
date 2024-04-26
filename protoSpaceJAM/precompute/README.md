@@ -39,6 +39,7 @@ pam="NGA|NGG" && pamloc="3"
 pam="TTTV|TTTN" && pamloc="5"
 ```
 </br>
+
 ## search gRNA  
 This step takes ~1.5 hours for each genome  
 ```shell
