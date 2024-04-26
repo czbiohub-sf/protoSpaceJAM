@@ -5,6 +5,7 @@ If you prefer downloading the precomputed gRNA, following the instructions [here
 ## Prerequisite
 All scripts and binary files in `protoSpaceJAM/utils` should be excutable
 
+</br>
 ## Prepare genomes
 Download genome sequence and annotation files 
 ```shell
@@ -20,10 +21,9 @@ python scripts/extract_gene_models_info.py --gff3_gz genome_files/Mus_musculus.G
 python scripts/extract_gene_models_info.py --gff3_gz genome_files/Danio_rerio.GRCz11.109.gff3.gz --out_dir genome_files/parsed_gff3/GRCz11
 bash serialize_fa.sh # serialize genome fasta for fast access
 ```
-</br>
 
-## Search for gRNAs in the genomes
-specify PAM  
+</br>
+## Specify PAM  
 PAM sequences should be specified in this format: a single on-target PAM followed by "|" and one or more off-target PAM (off-target PAMs should be separated by comma)  
 for 5' PAMs, set `pamloc` to "5", and for 3' PAMs, set `pamloc` = "3"    
 #### for SpCas9
@@ -38,7 +38,8 @@ pam="NGA|NGG" && pamloc="3"
 ```shell
 pam="TTTV|TTTN" && pamloc="5"
 ```
-### search gRNA  
+</br>
+## search gRNA  
 This step takes ~1.5 hours for each genome  
 ```shell
 mkdir gRNAs
