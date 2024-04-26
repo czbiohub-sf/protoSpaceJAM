@@ -1,5 +1,5 @@
 # Precompute gRNA and genome information
-This page provides step-by-step instructions for precomputing gRNAs for a user-specified PAM
+This page provides step-by-step instructions for precomputing gRNAs for a user-specified PAM  
 If you prefer downloading the precomputed gRNA, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM#download-and-unzip-pre-computed-data)
 
 ## Prerequisite
