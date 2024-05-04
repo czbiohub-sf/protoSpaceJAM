@@ -5,7 +5,7 @@ Changelog
 
 Algorithm
 ---------
-:Date: April 22, 2024 |enhancement 39eae| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions)   
+:Date: April 22, 2024 |enhancement 39eae| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions).   
 
 :Date: April 21, 2024 |bug fix bae68| gRNA weight are now raised to the power of the scaling factor.
 
@@ -33,11 +33,11 @@ Algorithm
 
 :Date: Feburary 7, 2023 |bug fix 6e2e5| Fixed a bug that causes mutating the same codons for a second time when scanning and fixing emerging cutsites in payload-homology chimeric regions.  
 
-:Date: Feburary 7, 2023 |bug fix 82c61| Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor
+:Date: Feburary 7, 2023 |bug fix 82c61| Fixed a bug where the last one in an array of recoded nucleoties sometimes were not reflected in the final donor.
 
-:Date: Feburary 6, 2023 |enhancement 78fd0| Changed the order of recoding in gRNAs and emerging cutsites (in window scan) to: 3'UTR -> codons -> intron -> 5'UTR
+:Date: Feburary 6, 2023 |enhancement 78fd0| Changed the order of recoding in gRNAs and emerging cutsites (in window scan) to: 3'UTR -> codons -> intron -> 5'UTR.
 
-:Date: Feburary 4, 2023 |enhancement 7da6a| Changed the order of recoding in gRNAs to: codons -> 3'UTR -> intron -> 5'UTR
+:Date: Feburary 4, 2023 |enhancement 7da6a| Changed the order of recoding in gRNAs to: codons -> 3'UTR -> intron -> 5'UTR.
 
 :Date: Feburary 1, 2023 |bug fix e20ed| Fixed two bugs in the dsDNA trimming logic: 1) the right arm was not trimming correctly, 2) report synthesis problems remaining after the trimming step.
 
@@ -55,30 +55,31 @@ Algorithm
 
 Portal
 ------
+:Date: April 23, 2024 |enhancement 35753| Fix error handling when tag and linker are both empty.
 
 :Date: April 23, 2024 |enhancement 85146| Allow users to omit the transcript ID column entirely when specifying custom genomic coordinates. 
 
-:Date: April 22, 2024 |enhancement 4b7a9| Added a warning message when genomic coordinates are used without specifying transcript IDs  
+:Date: April 22, 2024 |enhancement 4b7a9| Added a warning message when genomic coordinates are used without specifying transcript IDs.
 
-:Date: April 22, 2024 |enhancement 11a19| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions)   
+:Date: April 22, 2024 |enhancement 11a19| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions).   
 
-:Date: April 21, 2024 |enhancement 95c22| Added a warning message when the primer deisgn can't utilize precomputed primers (longer wait times)
+:Date: April 21, 2024 |enhancement 95c22| Added a warning message when the primer deisgn can't utilize precomputed primers (longer wait times).
 
 :Date: April 21, 2024 |enhancement 95c22| Added a warning message when the PCR amplicon length is shorter than the DNA donor (PCR amplicon could be generated from the DNA donor).
 
 :Date: April 21, 2024 |enhancement 95c22| Added a warning message when the DNA donor length is shorter than the payload (there is no room for homology arms).
 
-:Date: April 16, 2024 |enhancement b0df0| Tunable primer parameters (e.g. amplicon size and Tm range)
+:Date: April 16, 2024 |enhancement b0df0| Tunable primer parameters (e.g. amplicon size and Tm range).
 
-:Date: April 15, 2024 |enhancement 480fd| Improved santitization of user input
+:Date: April 15, 2024 |enhancement 480fd| Improved santitization of user input.
 
-:Date: April 14, 2024 |enhancement 2bd98| Annotated DNA donor in GenBank format
+:Date: April 14, 2024 |enhancement 2bd98| Annotated DNA donor in GenBank format.
 
-:Date: March 07, 2024 |enhancement c5d3b| Added buttons to delete individual submissions from the submission list 
+:Date: March 07, 2024 |enhancement c5d3b| Added buttons to delete individual submissions from the submission list .
 
-:Date: March 07, 2024 |enhancement c5d3b| Added an option to skip the linker sequence
+:Date: March 07, 2024 |enhancement c5d3b| Added an option to skip the linker sequence.
 
-:Date: March 07, 2024 |enhancement c5d3b| User-tunable parameters will remain last used values when users switch between design steps
+:Date: March 07, 2024 |enhancement c5d3b| User-tunable parameters will remain last used values when users switch between design steps.
 
 :Date: March 01, 2024 |bug fix 25946| Fixed a bug where payloads are empty when defined by selecting tag and linker. 
 
@@ -88,7 +89,7 @@ Portal
 
 :Date: Janurary 06, 2024 |bug fix 9a879| Fixed a parsing issue preventing the use of submission lists csv file (downloaded from a job) in uploading and populating a new submission (this issue didn't affect the example template).
 
-:Date: July 08, 2023 |bug fix aa7eb| Fixed a bug causing editing payload sequence custom genomic coordinate to fail
+:Date: July 08, 2023 |bug fix aa7eb| Fixed a bug causing editing payload sequence custom genomic coordinate to fail.
 
 :Date: July 08, 2023 |enhancement aa7eb| Make automatic the default strand selection mode for ssODN donors.
 
@@ -96,9 +97,9 @@ Portal
 
 :Date: June 26, 2023 |enhancement 74c6d| Add progress indicator for pJAM.
 
-:Date: June 26, 2023 |enhancement 392f8| Add gene ID and gene symbol for primer output
+:Date: June 26, 2023 |enhancement 392f8| Add gene ID and gene symbol for primer output.
 
-:Date: June 12, 2023 |enhancement 940a1| Add privacy and cookie policy
+:Date: June 12, 2023 |enhancement 940a1| Add privacy and cookie policy.
 
 :Date: May 19, 2023 |enhancement 04401| Updated to the CZ Biohub SF logo, improved helper text in several places.
 
@@ -108,7 +109,7 @@ Portal
 
 :Date: April 15, 2023 |enhancement 6b9db| Changed the interface to accomodate the input of custom genomic coordinates as edit sites. 
 
-:Date: Feburary 16, 2023 |bug fix 004c6| Entry number are now correct when there are 2+ gRNAs for each design. `Associated change: <https://github.com/czbiohub/protoSpaceJAM-portal/commit/68d37db4642fea22d3738ef5c37da3b9331004c6>`_ ProtospaceJAM will read "Entry" from input, and if fails, uses an auto increment
+:Date: Feburary 16, 2023 |bug fix 004c6| Entry number are now correct when there are 2+ gRNAs for each design. `Associated change: <https://github.com/czbiohub/protoSpaceJAM-portal/commit/68d37db4642fea22d3738ef5c37da3b9331004c6>`_ ProtospaceJAM will read "Entry" from input, and if fails, uses an auto increment.
 
 :Date: Feburary 14, 2023 |enhancement 49990| Added a link in the landing page to a Google form to get an invitation code. Complete the name change to "protoSpaceJAM". And several small changes, e.g. 'Launch' -> 'Jam it'. Fixed typos.
 
@@ -124,6 +125,8 @@ Portal
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
 
+.. |enhancement 35753| image:: https://img.shields.io/badge/35753-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/dad2b8ca1f018acfb28e3bf2949beb6170735753
 .. |enhancement 85146| image:: https://img.shields.io/badge/85146-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/9b91d4a06939475fff862203593052d332085146
 .. |enhancement 4b7a9| image:: https://img.shields.io/badge/4b7a9-enhancement-green
