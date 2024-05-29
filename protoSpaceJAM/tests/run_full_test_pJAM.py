@@ -39,8 +39,9 @@ class test_with_OpenCell_design(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        keep_results = True
         #Remove results
-        if os.path.exists(os.path.join("tests", "OpenCell_design")):
+        if (not keep_results) and  os.path.exists(os.path.join("tests", "OpenCell_design")):
             shutil.rmtree(os.path.join("tests", "OpenCell_design"))
         #pass    #keep results
 
