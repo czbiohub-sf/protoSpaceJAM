@@ -508,8 +508,9 @@ def main(custom_args=None):
         target_terminus = "None"
         target_coordinate = "None"
         ENST_in_db = False
-        ENST_design_counts = {} #used in the names of gRNA and donors
+        ENST_design_counts = {} #used to keep track of number of designs for each ENST
         Entry = 0 # Entry is defined by the portal, and if not using the portal, it is just the index of the row
+        total_entries = df.shape[0]
         for index, row in df.iterrows():
             ENST_ID = row["Ensembl_ID"]
             if isinstance(ENST_ID, str):
@@ -737,15 +738,19 @@ def main(custom_args=None):
                             donor = HDR_template.Donor_pretrim
                             
                         # gRNA and donor names
-                        ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
-                        gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
-                        donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
                         if coordinate_without_ENST:
-                            gRNA_name = f"gRNA_{ENST_design_counts[ENST_ID]}"
-                            donor_name = f"donor_{ENST_design_counts[ENST_ID]}"
+                            gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}"
+                            donor_name = f"{ENST_ID}_donor_entry{Entry}"
+                        else:
+                            chrom_coord = f"{chrom}_{coordinate}"
+                            ENST_design_counts[chrom_coord] = ENST_design_counts.get(chrom_coord, 0) + 1
+                            gRNA_name = f"{chrom_coord}_gRNA_entry{Entry}"
+                            donor_name = f"{chrom_coord}_donor_entry{Entry}"
 
                         if config["Donor_type"] == "dsDNA":
-                            donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
+                            # replace donor_ with donor_trimmed_
+                            donor_trimmed_name = donor_name.replace("donor_", "donor_trimmed_")
+                            #donor_trimmed_name = f"{ENST_ID}_donor_trimmed_design{ENST_design_counts[ENST_ID]}"
                         else:
                             donor_trimmed_name = "N/A for ssODN"
 
@@ -906,13 +911,14 @@ def main(custom_args=None):
                         
                     # gRNA and donor names
                     ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
-                    gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
-                    donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
+                    gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}"
+                    donor_name = f"{ENST_ID}_donor_entry{Entry}"
                     if config["Donor_type"] == "dsDNA":
-                        donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
+                        donor_trimmed_name = donor_name.replace("donor_", "donor_trimmed_")
+                        #donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
                     else:
                         donor_trimmed_name = "N/A for ssODN"
-
+                            
                     gRNA_cut_pos = (
                         HDR_template.CutPos
                     )  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
@@ -1075,10 +1081,11 @@ def main(custom_args=None):
                         
                     # gRNA and donor names
                     ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
-                    gRNA_name = f"{ENST_ID}_gRNA_{ENST_design_counts[ENST_ID]}"
-                    donor_name = f"{ENST_ID}_donor_{ENST_design_counts[ENST_ID]}"
+                    gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}"
+                    donor_name = f"{ENST_ID}_donor_entry{Entry}"
                     if config["Donor_type"] == "dsDNA":
-                        donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
+                        donor_trimmed_name = donor_name.replace("donor_", "donor_trimmed_")
+                        #donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
                     else:
                         donor_trimmed_name = "N/A for ssODN"
 
@@ -1145,8 +1152,9 @@ def main(custom_args=None):
                 endtime = datetime.datetime.now()
                 elapsed_sec = endtime - starttime
                 elapsed_min = elapsed_sec.seconds / 60
+                skipped_count = transcript_count - protein_coding_transcripts_count
                 log.info(
-                    f"processed {protein_coding_transcripts_count}/{transcript_count} transcripts, elapsed time {elapsed_min:.2f} min ({elapsed_sec} sec)"
+                    f"processed {protein_coding_transcripts_count}/{total_entries} transcripts (skipped {skipped_count}), elapsed time {elapsed_min:.2f} min ({elapsed_sec} sec)"
                 )
 
         # write csv out
@@ -1160,7 +1168,7 @@ def main(custom_args=None):
             num_to_process = "all"
 
         log.info(
-            f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{transcript_count} transcripts\nnonprotein-coding transcripts were skipped\n"
+            f"finished in {elapsed_min:.2f} min ({elapsed_sec} sec) , processed {protein_coding_transcripts_count}/{total_entries} transcripts\n{skipped_count} nonprotein-coding transcripts were skipped\n"
             f"results written to {config['outdir']}"
         )
 
@@ -1180,7 +1188,21 @@ def main(custom_args=None):
 
 ## end of main()
 
+def translate_sequence(dna_sequence):
+    return str(Seq(dna_sequence).translate())
+
 def write_genbank(handle, data_obj, donor_name, donor_type):
+    """write genebank file"""
+    if len(donor_name) > 16: # truncate donor_name to 16 characters (GenBank limit for locus name)
+        donor_name = donor_name.replace("ENST", "")
+        donor_name = donor_name.lstrip("0")
+        donor_name = donor_name.replace("donor", "")
+        donor_name = donor_name.replace("donor_trimmed", "")
+        donor_name = donor_name.replace("entry", "")
+        donor_name = donor_name.replace("__", "_")
+        if len(donor_name) > 16:
+            donor_name = donor_name[:16]
+
     gb_record = Record.Record()
     gb_record.locus = donor_name
     gb_record.size = len(data_obj.Donor_final)
@@ -1204,6 +1226,30 @@ def write_genbank(handle, data_obj, donor_name, donor_type):
     seq_record.annotations["molecule_type"] = "DNA"
 
     # Features 
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["left_arm_coord"][0], end=data_obj.Donor_features["left_arm_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='left HA', qualifiers={"label": "left HA"})
+    seq_record.features.append(feature)
+
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["right_arm_coord"][0], end=data_obj.Donor_features["right_arm_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='right HA', qualifiers={"label": "right HA"})
+    seq_record.features.append(feature)
+
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='payload', qualifiers={"label": "payload"})
+    seq_record.features.append(feature)
+    
+    if "coding_coord" in data_obj.Donor_features:
+        for feat in data_obj.Donor_features["coding_coord"]:
+            feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"], type='exon ', qualifiers={"label": "exon"})
+            seq_record.features.append(feature)
+    if "ORF_coord" in data_obj.Donor_features:
+        for feat in data_obj.Donor_features["ORF_coord"]:
+            #feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"], type='CDS-in-frame', qualifiers={"label": "CDS-in-frame"})
+            #seq_record.features.append(feature)
+
+            # Extract and translate the coding in-frame sequence
+            orf_sequence = sequence[feat[0]:feat[1]]
+            protein_sequence = translate_sequence(str(orf_sequence))
+            protein_feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"],type='CDS', qualifiers={"label": "CDS", "codon_start": 1, "translation": protein_sequence})
+            seq_record.features.append(protein_feature)
+
     if "gRNA_coord" in data_obj.Donor_features:
         for feat in data_obj.Donor_features["gRNA_coord"]:
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1], strand=data_obj.Donor_features["gRNA_strand"]), type='gRNA+PAM', qualifiers={"label": "gRNA+PAM"})
@@ -1213,14 +1259,6 @@ def write_genbank(handle, data_obj, donor_name, donor_type):
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), type='recode', qualifiers={"label": "recode"})
             seq_record.features.append(feature)
 
-    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["left_arm_coord"][0], end=data_obj.Donor_features["left_arm_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='left HA', qualifiers={"label": "left HA"})
-    seq_record.features.append(feature)
-
-    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["right_arm_coord"][0], end=data_obj.Donor_features["right_arm_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='right HA', qualifiers={"label": "right HA"})
-    seq_record.features.append(feature)
-
-    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='payload', qualifiers={"label": "payload"})
-    seq_record.features.append(feature)
 
 
     # Write to a GenBank file using SeqIO for the actual file writing

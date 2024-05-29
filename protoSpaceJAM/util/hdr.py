@@ -1434,7 +1434,7 @@ class HDR_flank:
                 self.Donor_final = self.Donor_postMut
             self.synFlags = "N/A for ssODN"
             self.effective_HA_len = "N/A if not enforcing max donor length"
-            self.strand_flipped = False
+            self.strand_flipped = False # whether the donor strand stay as the initialized strand (coding strand)
             ###################################################
             # Enforce max donor  size and centering           #
             # This handles both recoded and non-recoded donor #
@@ -1571,6 +1571,11 @@ class HDR_flank:
         #################################
         self.compute_donor_feature_coordinates()
 
+        #################################
+        # get donor phases              #
+        #################################
+        self.compute_donor_coding_coordinates()
+
     #############
     # END OF INIT#
     #############
@@ -1615,12 +1620,15 @@ class HDR_flank:
         """
         start = start_end_tuple[0]
         end = start_end_tuple[1]
-        center_start = self.centering_start
-        center_end = self.centering_end
+        center_start = 0
+        center_end = len(self.Donor_final) - 1
+        if self.ssODN_max_size is not None:
+            center_start = int(self.centering_start)
+            center_end = int(self.centering_end)
         if start < center_start and end < center_start: # coord is beyond the left of the ssODN
-            pass
+            return 
         elif start > center_end and end > center_end: # coord is beyond the right of the ssODN
-            pass
+            return
         elif start < center_start: 
             start = 0
             end = end - center_start + 1 # apply offset
@@ -1639,30 +1647,103 @@ class HDR_flank:
         """
         start = start_end_tuple[0]
         end = start_end_tuple[1]
-        center_start = self.dsDNA_trimming_start
-        center_end = self.dsDNA_trimming_end
-        if start < center_start and end < center_start: # coord is beyond the left of the ssODN
-            pass
-        elif start > center_end and end > center_end: # coord is beyond the right of the ssODN
-            pass
-        elif start < center_start: 
+        trimming_start = 0
+        trimming_end = len(self.Donor_final) - 1
+        if self.dsDNA_trimmed == True:
+            trimming_start = self.dsDNA_trimming_start
+            trimming_end = self.dsDNA_trimming_end
+        if start < trimming_start and end < trimming_start: # coord is beyond the left of the ssODN
+            return
+        elif start > trimming_end and end > trimming_end: # coord is beyond the right of the ssODN
+            return
+        elif start < trimming_start: 
             start = 0
-            end = end - center_start + 1  # apply offset
-        elif end > center_end: 
-            start = start - center_start + 1 # apply offset
-            ssODN_length = center_end - center_start + 1
+            end = end - trimming_start + 1  # apply offset
+        elif end > trimming_end: 
+            start = start - trimming_start + 1 # apply offset
+            ssODN_length = trimming_end - trimming_start + 1
             end = ssODN_length - 1 + 1
         else:
-            start = start - center_start  + 1 # apply offset
-            end = end - center_start + 1  # apply offset
+            start = start - trimming_start  + 1 # apply offset
+            end = end - trimming_start + 1  # apply offset
         return [int(start), int(end)]
+    
+    def get_coding_coord_from_phases(self, phases, ORF=False):
+        """
+        get the coding coordinates from the phases
+        for example, 000001231230002312 returns [[5, 10], [14, 17]]
+        phases: a string of phases
+        ORF: if True, return the coordinates of ORFs only
+        """
+        pattern = r"(?:123|231|312|12|23|31|1|2|3)+"
+        if ORF:
+            pattern = r"(?:123)+"
+        matches = re.finditer(pattern, phases)
+        list_of_positions = [(match.start(), match.end()-1) for match in matches if match.group()]
+        return list_of_positions
 
+    def compute_donor_coding_coordinates(self):
+        """
+        return the coordinates of the coding region in the donor
+        """
+        donor_phases = self.left_flk_phases + "X" * len(self.tag) + self.right_flk_phases # get the donor phases
+        coding_coord = self.get_coding_coord_from_phases(donor_phases) # get coding coordinates
+
+        if self.Donor_type == "ssODN":
+            #apply the centering logic to the coords
+            coding_coord = [self.apply_ssODN_centering_to_coords(i) for i in coding_coord]
+            coding_coord = [i for i in coding_coord if i] # remove None values
+
+            # special logic for ORF coordinates (first get the centered sequence phases, then get the ORF coordinates)
+            center_start = 0
+            center_end = len(self.Donor_final) - 1
+            if self.ssODN_max_size is not None:
+                center_start = int(self.centering_start)
+                center_end = int(self.centering_end)
+            donor_phases_center = donor_phases[center_start:center_end] # get the ORF coordinates
+            ORF_coord = self.get_coding_coord_from_phases(donor_phases_center, ORF=True)
+            ORF_coord = [(i[0], i[1]+1) for i in ORF_coord] # end offset
+
+            if self.strand_flipped: # flip the coordinates to matched the flipped strand
+                coding_coord = [[len(self.Donor_final)-i[1], len(self.Donor_final)-i[0]] for i in coding_coord]
+                ORF_coord = [[len(self.Donor_final)-i[1], len(self.Donor_final)-i[0]] for i in ORF_coord]
+
+        if self.Donor_type == "dsDNA": #TODO: add ORF coord to dsDNA mode
+            # convert the coordinates to 1-indexed
+            coding_coord = [[i[0], i[1]+1] for i in coding_coord]
+            self.info += f"donor_phases: {donor_phases}\n"
+            self.info += f"coding_coord: {coding_coord}\n"
+            #apply the trimming logic to the coords
+            if self.dsDNA_trimmed == True:
+                coding_coord = [self.apply_dsDNA_trimming_to_coords(i) for i in coding_coord]
+                coding_coord = [i for i in coding_coord if i] # remove None values
+
+            # special logic for ORF coordinates (first get the trimmed donor phases, then get the ORF coordinates)
+            trimming_start = 0
+            trimming_end = len(self.Donor_final) - 1
+            if self.dsDNA_trimmed == True:
+                trimming_start = self.dsDNA_trimming_start
+                trimming_end = self.dsDNA_trimming_end
+            donor_phases_trimmed = donor_phases[trimming_start:trimming_end]
+            ORF_coord = self.get_coding_coord_from_phases(donor_phases_trimmed, ORF=True)
+            ORF_coord = [(i[0]+1, i[1]+2) for i in ORF_coord] # end offset
+
+
+        if not hasattr(self, "Donor_features"):
+            self.Donor_features =  {    
+                "coding_coord": coding_coord,
+                "ORF_coord": ORF_coord
+            }
+        else:
+            self.Donor_features.update({    
+                "coding_coord": coding_coord,
+                "ORF_coord": ORF_coord
+            })
 
     def compute_donor_feature_coordinates(self):
         """
         return the coordinates of the features in the donor
         """
-
         gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.tag}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", case_sensitive=True)
         recoding_coord = self.compare_stretches(self.Donor_vanillia, self.Donor_postMut, case_sensitive=False)
         left_arm_coord = [0, len(self.gRNA_lc_Larm)-1]
@@ -1673,7 +1754,9 @@ class HDR_flank:
         if self.Donor_type == "ssODN":
             #apply the centering logic to the coords
             gRNA_coord = [self.apply_ssODN_centering_to_coords(i) for i in gRNA_coord]
+            gRNA_coord = [i for i in gRNA_coord if i] # remove None values
             recoding_coord = [self.apply_ssODN_centering_to_coords(i) for i in recoding_coord]
+            recoding_coord = [i for i in recoding_coord if i] # remove None values
             left_arm_coord = self.apply_ssODN_centering_to_coords(left_arm_coord)
             right_arm_coord = self.apply_ssODN_centering_to_coords(right_arm_coord)
             tag_coord = self.apply_ssODN_centering_to_coords(tag_coord)
@@ -1683,7 +1766,7 @@ class HDR_flank:
                 left_arm_coord = [len(self.Donor_final)-left_arm_coord[1], len(self.Donor_final)-left_arm_coord[0]]
                 right_arm_coord = [len(self.Donor_final)-right_arm_coord[1], len(self.Donor_final)-right_arm_coord[0]]
                 tag_coord = [len(self.Donor_final)-tag_coord[1], len(self.Donor_final)-tag_coord[0]]
-                HA_payload_strand = -1
+                HA_payload_strand = -1 # this is also the coding strand 
             # compute gRNA strand (relative to the donor)
             gRNA_strand = HA_payload_strand * self.convert_strand_to_numeric(self.gStrand) * self.convert_strand_to_numeric(self.ENST_strand)
 
@@ -1709,15 +1792,20 @@ class HDR_flank:
             # compute gRNA strand (relative to the dsDNA displaying strand)
             gRNA_strand = self.convert_strand_to_numeric(self.gStrand) * self.convert_strand_to_numeric(self.ENST_strand)
 
-        self.Donor_features =  {    
-            "gRNA_coord": gRNA_coord,
-            "recoding_coord": recoding_coord,
-            "left_arm_coord": left_arm_coord,
-            "right_arm_coord": right_arm_coord,
-            "tag_coord": tag_coord,
-            "HA_payload_strand": HA_payload_strand,
-            "gRNA_strand": gRNA_strand
-        }   
+        Donor_features = {    
+                "gRNA_coord": gRNA_coord,
+                "recoding_coord": recoding_coord,
+                "left_arm_coord": left_arm_coord,
+                "right_arm_coord": right_arm_coord,
+                "tag_coord": tag_coord,
+                "HA_payload_strand": HA_payload_strand,
+                "gRNA_strand": gRNA_strand
+            }
+
+        if not hasattr(self, "Donor_features"):
+            self.Donor_features =  Donor_features
+        else:
+            self.Donor_features.update(Donor_features)
 
     def flip_strand(self, strand):
         """
