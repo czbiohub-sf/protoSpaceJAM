@@ -4,7 +4,11 @@ Changelog
 |
 
 Algorithm
----------
+--------
+:Date: May 29, 2024 |bug fix 5d255| Fixed a bug where different designs may have the same donor name.   
+
+:Date: May 29, 2024 |enhancement 5d255| Added coding feature annotation to donor genbank output file.   
+
 :Date: April 22, 2024 |enhancement 39eae| Users can now omit transcript IDs when specifying custom genomic coordinates. (recoding will not be aware of coding regions and splice junctions).   
 
 :Date: April 21, 2024 |bug fix bae68| gRNA weight are now raised to the power of the scaling factor.
@@ -55,6 +59,12 @@ Algorithm
 
 Portal
 ------
+:Date: May 29, 2024 |enhancement 8fee25| Added an interface label: looking for another pam? ...
+
+:Date: May 29, 2024 |enhancement 8fee25| change interface label: minimum HA length -> stop trimming if HA are shorter than (use 0 base-pairs to inactivate trimming)
+
+:Date: May 29, 2024 |enhancement 8fee25| Added buttons "give us feed back / report a problem"
+
 :Date: April 23, 2024 |enhancement 35753| Fix error handling when tag and linker are both empty.
 
 :Date: April 23, 2024 |enhancement 85146| Allow users to omit the transcript ID column entirely when specifying custom genomic coordinates. 
@@ -124,7 +134,12 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
-
+.. |enhancement 8fee25| image:: https://img.shields.io/badge/8fee25-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/abd22de0ec7e4d978ebfee0407bf5aaa118fee25
+.. |bug fix 5d255| image:: https://img.shields.io/badge/5d255-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/ffe3a167fba255df7910f2a344932d4c29b5d255
+.. |enhancement 5d255| image:: https://img.shields.io/badge/5d255-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/ffe3a167fba255df7910f2a344932d4c29b5d255
 .. |enhancement 35753| image:: https://img.shields.io/badge/35753-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/dad2b8ca1f018acfb28e3bf2949beb6170735753
 .. |enhancement 85146| image:: https://img.shields.io/badge/85146-enhancement-green
