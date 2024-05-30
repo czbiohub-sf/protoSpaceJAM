@@ -61,9 +61,9 @@ Portal
 ------
 :Date: May 29, 2024 |enhancement 8fee25| Added an interface label: looking for another pam? ...
 
-:Date: May 29, 2024 |enhancement 8fee25| change interface label: minimum HA length -> stop trimming if HA are shorter than (use 0 base-pairs to inactivate trimming)
+:Date: May 29, 2024 |enhancement 8fee25| change interface label: minimum HA length -> stop trimming if HA are shorter than (use 0 base-pairs to inactivate trimming).
 
-:Date: May 29, 2024 |enhancement 8fee25| Added buttons "give us feed back / report a problem"
+:Date: May 29, 2024 |enhancement 8fee25| Added buttons "give us feed back / report a problem".
 
 :Date: April 23, 2024 |enhancement 35753| Fix error handling when tag and linker are both empty.
 
