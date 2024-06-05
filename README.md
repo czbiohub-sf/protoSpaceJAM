@@ -57,7 +57,7 @@ If prompted to download with browser, place the file in `protoSpaceJAM/protoSpac
 [less disk space option]  
 :floppy_disk: 25G disk space (50G temporary), add additional argument `--SpCas9_only`
 
-👉 If you like to precompute your own gRNAs, please follow [here](https://github.com/czbiohub-sf/protoSpaceJAM/tree/main/protoSpaceJAM/precompute)
+👉 If you like to precompute your own gRNAs, please follow instructions [here](https://github.com/czbiohub-sf/protoSpaceJAM/tree/main/protoSpaceJAM/precompute)
 
 ### Run a quick test to verify installation
 ```
