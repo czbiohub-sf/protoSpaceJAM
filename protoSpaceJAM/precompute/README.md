@@ -3,7 +3,7 @@ This page provides step-by-step instructions for precomputing gRNAs for a user-s
 If instead you prefer downloading the precomputed gRNAs, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM#download-and-unzip-pre-computed-data)
 
 ## Prerequisite
-All scripts and binary files in `protoSpaceJAM/utils` should be excutable
+All scripts and binary files in `protoSpaceJAM/utils` should be executable
 </br>
 
 ## Prepare genomes
