@@ -511,6 +511,7 @@ def main(custom_args=None):
         ENST_design_counts = {} #used to keep track of number of designs for each ENST
         Entry = 0 # Entry is defined by the portal, and if not using the portal, it is just the index of the row
         total_entries = df.shape[0]
+        skipped_count = 0
         for index, row in df.iterrows():
             ENST_ID = row["Ensembl_ID"]
             if isinstance(ENST_ID, str):
@@ -1234,11 +1235,18 @@ def write_genbank(handle, data_obj, donor_name, donor_type):
 
     feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='payload', qualifiers={"label": "payload"})
     seq_record.features.append(feature)
+    payload_sequence = sequence[data_obj.Donor_features["tag_coord"][0]:data_obj.Donor_features["tag_coord"][1]]
+    # translate the payload
+    payload_aa_seq = translate_sequence(str(payload_sequence))
+    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='CDS', qualifiers={"label": "CDS", "codon_start":1, "translation": payload_aa_seq})
+    seq_record.features.append(feature)
+
     
     if "coding_coord" in data_obj.Donor_features:
         for feat in data_obj.Donor_features["coding_coord"]:
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"], type='exon ', qualifiers={"label": "exon"})
             seq_record.features.append(feature)
+
     if "ORF_coord" in data_obj.Donor_features:
         for feat in data_obj.Donor_features["ORF_coord"]:
             #feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"], type='CDS-in-frame', qualifiers={"label": "CDS-in-frame"})
