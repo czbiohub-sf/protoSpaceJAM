@@ -1,6 +1,6 @@
-# Precompute gRNA and genome information
+# Precompute gRNAs for Ensembl genomes
 This page provides step-by-step instructions for precomputing gRNAs for a user-specified PAM  
-If instead you prefer downloading the precomputed gRNAs, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM#download-and-unzip-pre-computed-data)
+If instead you prefer downloading the precomputed gRNAs to use with protoSpaceJAM, following the instructions [here](https://github.com/czbiohub/protoSpaceJAM#download-and-unzip-pre-computed-data)
 
 ## Prerequisite
 All scripts and binary files in `protoSpaceJAM/utils` should be executable
