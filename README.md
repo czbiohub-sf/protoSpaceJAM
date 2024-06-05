@@ -5,9 +5,9 @@
 ![license](https://img.shields.io/badge/license-BSD--3-brightgreen)
 ![status](https://img.shields.io/badge/status-pre--release-orange)
 # protoSpaceJAM 
-:computer: protoSpaceJAM is a python package to design guide RNA and repair donors for CRISPR knock-in experiments  
-:globe_with_meridians: protoSpaceJAM can also be accessed through our web portal at http://protospacejam.czbiohub.org/  
-:open_book: Detailed information about protoSpaceJAM can be found in our [preprint](https://www.biorxiv.org/content/10.1101/2023.10.04.560793v1)
+:computer: protoSpaceJAM is a python package to design guide RNA and repair donors for CRISPR knock-in experiments at scale.  
+:globe_with_meridians: protoSpaceJAM can be accessed through our web portal at [http://protospacejam.czbiohub.org/](http://protospacejam.czbiohub.org/).  
+:open_book: protoSpaceJAM is described in our [preprint](https://www.biorxiv.org/content/10.1101/2023.10.04.560793v1).
 
 &nbsp;
 ## Key features:  
