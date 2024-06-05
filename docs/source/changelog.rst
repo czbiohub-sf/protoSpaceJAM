@@ -5,6 +5,8 @@ Changelog
 
 Algorithm
 --------
+:Date: June 05, 2024 |enhancement 5965d4| Added payload protein translation to the donor genbank output file.
+
 :Date: May 29, 2024 |bug fix 5d255| Fixed a bug where different designs may have the same donor name.   
 
 :Date: May 29, 2024 |enhancement 5d255| Added coding feature annotation to donor genbank output file.   
@@ -59,7 +61,7 @@ Algorithm
 
 Portal
 ------
-:Date: May 29, 2024 |enhancement 8fee25| Added an interface label: looking for another pam? ...
+:Date: May 29, 2024 |enhancement 8fee25| Added an interface label: "Looking for another PAM? Here are instructions to onboard your own. You can also contact us for help"
 
 :Date: May 29, 2024 |enhancement 8fee25| change interface label: minimum HA length -> stop trimming if HA are shorter than (use 0 base-pairs to inactivate trimming).
 
@@ -134,6 +136,8 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+.. |enhancement 5965d4| image:: https://img.shields.io/badge/5965d4-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/12e0186d9b3c1b8d845cd6d95fb8da55df5965d4
 .. |enhancement 8fee25| image:: https://img.shields.io/badge/8fee25-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal/commit/abd22de0ec7e4d978ebfee0407bf5aaa118fee25
 .. |bug fix 5d255| image:: https://img.shields.io/badge/5d255-bug%20fix-red
