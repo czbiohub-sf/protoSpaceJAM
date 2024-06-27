@@ -11,7 +11,8 @@ Workflow overview
    :align: center
    :alt: workflow 
 
-Check out the :doc:`usage` section for more information.   
+|
+Check out the :doc:`usage` section and our `paper <https://doi.org/10.1093/nar/gkae553>`_ paper for more information.   
 :doc:`sourcecode` is available. 
 
 
