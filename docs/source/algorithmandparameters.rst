@@ -3,7 +3,7 @@ Algorithm and parameters
 
 |
 For a detailed description of the algorithm and its parameters, please refer to our paper `here <https://doi.org/10.1093/nar/gkae553>`_.
-|
+
 
 Key concepts
 ------------
