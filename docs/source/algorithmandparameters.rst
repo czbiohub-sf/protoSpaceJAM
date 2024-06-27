@@ -1,6 +1,8 @@
 Algorithm and parameters
 ========================
 |
+For a detailed description of the algorithm and its parameters, please refer to our paper  <a href="https://doi.org/10.1093/nar/gkae553">here</a>.
+|
 Key concepts
 ------------
 | Key concepts are illustrated in this example of CRISPR knock-in design: a gRNA (blue) targeting the genomic region of interest, and the HDR donor sequence that will template the genomic insertion of a functional payload.  
