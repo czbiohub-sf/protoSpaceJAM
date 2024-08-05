@@ -19,9 +19,9 @@
 - Sophisticated DNA donor design ([details](https://czbiohub-sf.github.io/protoSpaceJAM/algorithm.html#recoding-strategy))
   - Recode to prevent recut
   - Recode to facilitate payload insertion and prevent recut
-  - Automated selection of of ssDNA donor for maximum chance of payload insertion and prevent recut
-  - Scan and trim hard-to-synthesis motifs
-  - Center the DNA donor around the region containing the payload and recoded bases. 
+  - Automate selection of ssDNA donor for maximum chance of payload insertion and prevent recut
+  - Scan and trim hard-to-synthesize motifs
+  - Center the DNA donor around the region containing the payload and recoded bases
   - Enforce maximum length of DNA donor
 - Use/generate pre-computed genome-wide guide RNAs and their properties for fast runtime
 
@@ -69,7 +69,7 @@ full test suite can be run with
 ```
 python ./protoSpaceJAM/tests/run_full_test_pJAM.py
 ```
-A successful test will have a printout similar to Ran 2 tests in 1873.836s` at the end.
+A successful test will have a printout similar to `Ran 2 tests in 1873.836s` at the end.
 
 &nbsp;
 ## Usage
