@@ -103,10 +103,12 @@ class HDR_flank:
         ENST_chr: str,
         gStart: int,
         gStrand: int,
-        InsPos: int,
+        InsPos: int, # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G", or the letter before the payload insertion in genomics-coord intersion mode,  in SNP mode, it is the first letter of the SNP payload replacement
         CutPos: int,
         Cut2Ins_dist: int,
+        payload_type: str,
         tag: str,
+        SNP_payload: str,
         name: str,
         ssODN_max_size,
         loc2posType,
@@ -131,7 +133,10 @@ class HDR_flank:
         self.InsPos = InsPos  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
         self.CutPos = CutPos
         self.Cut2Ins_dist = Cut2Ins_dist
+        self.payload_type = payload_type
         self.tag = tag
+        self.SNP_payload = SNP_payload
+        self.SNP_payload_len = len(self.SNP_payload)
         self.loc2posType = loc2posType
         self.name = name
         self.ssODN_max_size = ssODN_max_size
@@ -163,7 +168,22 @@ class HDR_flank:
         assert len(right_flk_phases) > 1
         self.right_flk_phases = self.join_int_list(right_flk_phases)
 
-        # TODO: check enzyme is in list
+        # adjustments for SNP mode (1 of 5)
+        # the overall logic is reuse the recoding logic developed for the insertion mode, with a few modifications:
+        # we replace the tag with the SNP payload **after** the recoding, but before dsDNA/ssODN processing
+        # during the tag -> SNP replacement, we delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
+        # during recoding we protect short stretch from recoding, thus avoiding where the recoding of first n letters affected adjacent letters.
+        # in adjustment 1 of 5,  here we change the phases of the first n letters of the right_flk_seq to 7 (to avoid recoding in the short stretch)
+        if self.payload_type == "SNP":
+            # Change phases of first n letters to "7"
+            right_phases_list = list(self.right_flk_phases)
+            for i in range(self.SNP_payload_len):
+                if i < len(right_phases_list):
+                    right_phases_list[i] = "7"
+            self.right_flk_phases = "".join(right_phases_list)
+            tag = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG" # use the default tag as a placeholder
+            self.tag = tag
+        # end of adjustments for SNP mode (1 of 5)
 
         if gStrand * ENST_strand >= 0:
             self.gRNA_in_coding_strand = True
@@ -305,9 +325,9 @@ class HDR_flank:
             self.mutatedPosIngRNA = []  # format 0-22, protospacer: 0-19, PAM: 20-22
             if not self.recoding_args["recoding_stop_recut_only"]:
 
-                ##############################
+                ###############################
                 # Phase 1 mutate insert-to-cut#
-                ##############################
+                ###############################
                 # trim insert-to-cut into frame
                 self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
                 self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
@@ -1274,6 +1294,13 @@ class HDR_flank:
             # set effective HA length
             self.effective_HA_len = "N/A for dsDNA"
 
+            # adjustments for SNP mode (2 of 5)
+            # tag -> SNP replacement in dsDNA donor, we also delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
+            if self.payload_type == "SNP":
+                # remove the first n letters of the right_flk_seq
+                self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload))
+                self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
+
             #################################
             # check synthesis considerations#
             #################################
@@ -1432,6 +1459,17 @@ class HDR_flank:
             # get recoded donor
             if not self.recoding_args["recoding_off"]:  # recoding is on
                 self.Donor_final = self.Donor_postMut
+
+            # adjustments for SNP mode (3 of 5)
+            # tag -> SNP replacement in ssODN donor, we also delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
+            if self.payload_type == "SNP":
+                # remove the first n letters of the right_flk_seq
+                self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload))
+                self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
+                self.Donor_postMut = self.Donor_final
+                tag = self.SNP_payload
+                self.tag = tag
+
             self.synFlags = "N/A for ssODN"
             self.effective_HA_len = "N/A if not enforcing max donor length"
             self.strand_flipped = False # whether the donor strand stay as the initialized strand (coding strand)
@@ -1446,7 +1484,7 @@ class HDR_flank:
                 # print(f"Centering")
                 # print(f"Donor_vanillia {self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}\n"
                 #      f"Donor_postmut  {self.Donor_postMut}")
-                if not self.recoding_args["recoding_off"]:  # recoding is on
+                if not self.recoding_args["recoding_off"] and not self.payload_type == "SNP":  # recoding is on
                     diff_loc = self.get_diff_loc(
                         str1=f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}",
                         str2=f"{self.Donor_postMut}",
@@ -1455,6 +1493,14 @@ class HDR_flank:
                     diff_loc = []  # skip get_diff_loc if recoding is off
                 # print(f"{diff_loc}")
                 # print(f"lengths:{len(self.gRNA_lc_Larm)}|{len(self.tag)}|{len(self.gRNA_lc_Rarm)}")
+
+                # adjustment for SNP mode (4 of 5)
+                # diff comparison between pre- and post-recoding
+                if not self.recoding_args["recoding_off"] and self.payload_type == "SNP":
+                    diff_loc = self.get_diff_loc(
+                        str1=f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}",
+                        str2=f"{self.Donor_final}", # here donor final has completed the tag -> SNP replacement, therefore we can compare with the left + right HA arms
+                    )
 
                 if (
                     len(diff_loc) == 0
@@ -1746,6 +1792,11 @@ class HDR_flank:
         """
         gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.tag}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", case_sensitive=True)
         recoding_coord = self.compare_stretches(self.Donor_vanillia, self.Donor_postMut, case_sensitive=False)
+        # adjustment for SNP mode (5 of 5)
+        # 
+        if self.payload_type == "SNP": 
+            gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", case_sensitive=True)
+            recoding_coord = self.compare_stretches(f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", f"{self.Donor_postMut}", case_sensitive=False) # Donor_postMut does not include the tag -> SNP replacement, therefore we can compare with the left + right HA arms
         left_arm_coord = [0, len(self.gRNA_lc_Larm)-1]
         right_arm_coord = [len(self.gRNA_lc_Larm) + len(self.tag), len(self.Donor_vanillia)-1]
         tag_coord = [len(self.gRNA_lc_Larm), len(self.gRNA_lc_Larm) + len(self.tag)-1]
@@ -3652,6 +3703,14 @@ def _best_mutation(
 
     return mutated, score
 
+def remove_n_bases_after_match(pattern: str, sequence: str, n: int) -> str:
+    # remove n bases from the sequence after the match
+    # this function is used in the SNP mode to identify the start of the right HA arm in the recoded donor sequence
+    index = sequence.find(pattern)
+    if index != -1:
+        # Remove two bases to the right of the match
+        return sequence[:index + len(pattern)] + sequence[index + len(pattern) + n:]
+    return sequence  # Return original if pattern not found
 
 if __name__ == "__main__":
     import doctest
