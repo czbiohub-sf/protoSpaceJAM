@@ -170,11 +170,13 @@ class HDR_flank:
 
         # adjustments for SNP mode (1 of 5)
         # the overall logic is reuse the recoding logic developed for the insertion mode, with a few modifications:
-        # we replace the tag with the SNP payload **after** the recoding, but before dsDNA/ssODN processing
-        # during the tag -> SNP replacement, we delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
-        # during recoding we protect short stretch from recoding, thus avoiding where the recoding of first n letters affected adjacent letters.
+        # (1) we replace the tag with the SNP payload **after** the recoding, but before dsDNA/ssODN processing
+        # (2) during the tag -> SNP replacement, we delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
+        # (3) during recoding we protect short stretch from recoding, thus avoiding where the recoding of first n letters affected adjacent letters.
         # in adjustment 1 of 5,  here we change the phases of the first n letters of the right_flk_seq to 7 (to avoid recoding in the short stretch)
         if self.payload_type == "SNP":
+            # save a copy of the right_flk_phases before adjusting the phases
+            self.right_flk_phases_before_SNPadjustment = self.right_flk_phases
             # Change phases of first n letters to "7"
             right_phases_list = list(self.right_flk_phases)
             for i in range(self.SNP_payload_len):
@@ -1297,6 +1299,8 @@ class HDR_flank:
             # adjustments for SNP mode (2 of 5)
             # tag -> SNP replacement in dsDNA donor, we also delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
             if self.payload_type == "SNP":
+                # save a copy of the donor_postMut before the tag -> SNP replacement
+                self.Donor_postMut_before_SNP = self.Donor_final.replace(self.tag, "")
                 # remove the first n letters of the right_flk_seq
                 self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload))
                 self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
@@ -1463,6 +1467,8 @@ class HDR_flank:
             # adjustments for SNP mode (3 of 5)
             # tag -> SNP replacement in ssODN donor, we also delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
             if self.payload_type == "SNP":
+                # save a copy of the donor_postMut before the tag -> SNP replacement
+                self.Donor_postMut_before_SNP = self.Donor_final.replace(self.tag, "")
                 # remove the first n letters of the right_flk_seq
                 self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload))
                 self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
@@ -1735,6 +1741,11 @@ class HDR_flank:
         donor_phases = self.left_flk_phases + "X" * len(self.tag) + self.right_flk_phases # get the donor phases
         coding_coord = self.get_coding_coord_from_phases(donor_phases) # get coding coordinates
 
+        # adjust the coding coordinates for SNP mode (6 of 6)
+        if self.payload_type == "SNP":
+            donor_phases = self.left_flk_phases + self.right_flk_phases_before_SNPadjustment
+            coding_coord = self.get_coding_coord_from_phases(donor_phases) # get coding coordinates
+
         if self.Donor_type == "ssODN":
             #apply the centering logic to the coords
             coding_coord = [self.apply_ssODN_centering_to_coords(i) for i in coding_coord]
@@ -1796,7 +1807,7 @@ class HDR_flank:
         # 
         if self.payload_type == "SNP": 
             gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", case_sensitive=True)
-            recoding_coord = self.compare_stretches(f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", f"{self.Donor_postMut}", case_sensitive=False) # Donor_postMut does not include the tag -> SNP replacement, therefore we can compare with the left + right HA arms
+            recoding_coord = self.compare_stretches(f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", f"{self.Donor_postMut_before_SNP}", case_sensitive=False) # Donor_postMut does not include the tag -> SNP replacement, therefore we can compare with the left + right HA arms
         left_arm_coord = [0, len(self.gRNA_lc_Larm)-1]
         right_arm_coord = [len(self.gRNA_lc_Larm) + len(self.tag), len(self.Donor_vanillia)-1]
         tag_coord = [len(self.gRNA_lc_Larm), len(self.gRNA_lc_Larm) + len(self.tag)-1]

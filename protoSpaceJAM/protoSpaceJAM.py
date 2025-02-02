@@ -313,10 +313,15 @@ def main(custom_args=None):
             )
 
         # process recoding args
-        if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]) and (not config["payload_type"] == "SNP"): # if user omit the recoding arguments, it will be set to full recoding
-            config["recoding_full"] = True
-            log.info("using default recoding intensity: full, which will recode to stop recut and recoding the cut-to-insert region")
-
+        if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]) and (not config["recoding_full"]): # if user omit the recoding arguments, it will be set to defaults
+            # defaults for SNP mode
+            if config["payload_type"] == "SNP":
+                config["recoding_stop_recut_only"] = True
+                log.info("using default recoding intensity (for SNP payload type): stop recut only")
+            else:
+                config["recoding_full"] = True
+                log.info("using default recoding intensity (for insertion payload type): full, which will recode to stop recut and recoding the cut-to-insert region")
+        
         if config["recoding_off"] or config["recoding_stop_recut_only"]:
             config["recoding_full"] = False
             log.info("recoding is turned off by user") if config["recoding_off"] else log.info("recoding intensity is set by the user to prevent recut")
@@ -372,15 +377,8 @@ def main(custom_args=None):
             log.info("payload_type is SNP")
             if config["SNPpayload"] == "":
                 sys.exit("--SNPpayload must be defined for SNP payload type")
-            # check if user required full recoding
-            if not config["recoding_full"]:
-                config["recoding_stop_recut_only"] = True
-                log.info("using default recoding intensity (for SNP payload type): stop recut only")
-            else:
-                log.info("recoding intensity is set by the user to: full, which will recode to stop recut and recoding the cut-to-insert region")
         else:
             sys.exit("payload_type must be insertion or SNP, please correct the issue and try again")
-
 
         # check if HA_len is too short to satisfy ssODN_max_size
         if ssODN_max_size is not None and config["Donor_type"] == "ssODN":

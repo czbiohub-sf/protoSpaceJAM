@@ -3,6 +3,7 @@
 
 protoSpaceJAM/tests/OpenCell_design/*
 protoSpaceJAM/tests/quick_test_result
+protoSpaceJAM/tests/quick_SNP_test_result
 protoSpaceJAM/tests/run_quick_test_pJAM_dsDNA.py
 
 ### PyCharm+all ###
