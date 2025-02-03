@@ -149,7 +149,9 @@ def get_HDR_template(
     ENST_PhaseInCodon,
     HDR_arm_len,
     genome_ver,
-    tag,
+    payload_type, # define insertion or SNP
+    tag, # for insertion
+    SNP_payload, # for SNP
     loc2posType,
     ssODN_max_size,
     recoding_args,
@@ -165,7 +167,7 @@ def get_HDR_template(
         Chr = row["chr"]
         InsPos = row[
             "Insert_pos"
-        ]  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G"
+        ]  # InsPos is the first letter of stop codon "T"AA or the last letter of the start codon AT"G", or the letter before the payload insertion in genomics-coord intersion mode,  in SNP mode, it is the first letter of the SNP payload replacement
         gStart = row["start"]
         gStrand = convert_strand(row["strand"])  # gRNA strand
         CutPos = get_cut_pos(gStart, gStrand)
@@ -222,12 +224,15 @@ def get_HDR_template(
             InsPos=InsPos,
             CutPos=CutPos,
             Cut2Ins_dist=Cut2Ins_dist,
+            payload_type=payload_type,
             tag=tag,
+            SNP_payload=SNP_payload,
             loc2posType=loc2posType,
             ssODN_max_size=ssODN_max_size,
             Donor_type=Donor_type,
             Strand_choice=Strand_choice,
             recoding_args=recoding_args,
+
             syn_check_args=syn_check_args,
             coordinate_without_ENST=coordinate_without_ENST,
         )

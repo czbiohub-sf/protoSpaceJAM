@@ -8,7 +8,7 @@ class test_with_OpenCell_design(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        print("running protoSpaceJAM tests using only four designs (quick test)...")
+        print("running protoSpaceJAM tests using seven designs (quick test)...")
         #change directory to protoSpaceJAM
         try:
             os.chdir(os.path.join('protoSpaceJAM'))
@@ -32,6 +32,8 @@ class test_with_OpenCell_design(unittest.TestCase):
                     "Cpayload": "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
                     "Strand_choice": "NonTargetStrand",
                     "recode_order": "PAM_first",
+                    "Donor_type": "dsDNA",
+                    "MinArmLenPostTrim": 200,
                     "test_mode": True}
         pJAM(test_args)
 
@@ -40,8 +42,7 @@ class test_with_OpenCell_design(unittest.TestCase):
         keep_results = True
         #Remove results
         if (not keep_results) and os.path.exists(os.path.join("tests", "quick_test_result")):
-            shutil.rmtree(os.path.join("tests", "quick_test_result"))
-        #pass    #keep results
+           shutil.rmtree(os.path.join("tests", "quick_test_result"))
 
 
     def test_if_generated_results(self):

@@ -29,26 +29,26 @@
 ## Installation
 
 ### Clone the repository
-```
+```sh
 git clone https://github.com/czbiohub/protoSpaceJAM
 ```
 ### Go the repository directory, switch the branch if running branch other than master
-```
+```sh
 cd protoSpaceJAM
 git checkout main
 ```
 ### Create conda environment and activate it
-```
+```sh
 conda create -y -n protospacejam python=3.9 && conda activate protospacejam
 ```
 ### Install protoSpaceJAM
-```
+```sh
 pip install .
 ```
 ### Download and unzip pre-computed data
 
 :floppy_disk: 41G disk space (82G temporary) required for (human🕺, mouse🐭 and zebrafish🐟 genomes) x (SpCas9, VQR-SpCas9 and enAsCas12a)  
-```
+```sh
 python ./protoSpaceJAM/util/download_precomputed_results.py
 ```
 If the download process is disrupted, rerun the same command to resume.  
@@ -59,21 +59,28 @@ If prompted to download with browser, place the file in `protoSpaceJAM/protoSpac
 
 👉 If you like to precompute your own gRNAs, please follow instructions [here](https://github.com/czbiohub-sf/protoSpaceJAM/tree/main/protoSpaceJAM/precompute)
 
-### Run a quick test to verify installation
-```
-python ./protoSpaceJAM/tests/run_quick_test_pJAM.py
+### Run tests to verify installation
+quick test: insertion mode 
+```sh
+python ./protoSpaceJAM/tests/run_quick_test_insertion.py
 ```
 A successful test will have a printout similar to `Ran 2 tests in 14.644s   OK` at the end.
 
-full test suite can be run with 
+quick test: SNP mode
+```sh
+python ./protoSpaceJAM/tests/run_quick_test_SNP.py
 ```
-python ./protoSpaceJAM/tests/run_full_test_pJAM.py
+A successful test will have a printout similar to `Ran 2 tests in 164.649s   OK` at the end.
+
+full test suite can be run with 
+```sh
+python ./protoSpaceJAM/tests/run_full_test.py
 ```
 A successful test will have a printout similar to `Ran 2 tests in 1873.836s` at the end.
 
 &nbsp;
 ## Usage
-```
+```sh
 conda activate protospacejam
 protoSpaceJAM --path2csv input/test_input.csv --outdir output/test
 ```

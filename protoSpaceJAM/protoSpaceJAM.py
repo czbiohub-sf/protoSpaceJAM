@@ -7,6 +7,7 @@ import sys
 import traceback
 import time
 import pandas as pd
+import argparse
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -21,7 +22,8 @@ from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files,
 #     get_HDR_template
 
 def parse_args(test_mode=False):
-    parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n")
+    parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n",
+                      formatter_class=argparse.RawTextHelpFormatter)  # Ensures newlines are preserved
     IO = parser.add_argument_group('input/output')
     IO.add_argument(
         "--path2csv",
@@ -89,6 +91,15 @@ def parse_args(test_mode=False):
     )
     payload = parser.add_argument_group('payload')
     payload.add_argument(
+        "--payload_type",
+        default="insertion",
+        type=str,
+        help="Define the payload type, possible values are 'insertion', 'SNP'\n"
+        "if payload_type is 'insertion', the payload sequence is the insertion sequence. payload sequence should be defined with --payload, or --Npayload, --Cpayload, --POSpayload, --Tag, --Linker.\n"
+        "if payload_type is 'SNP', the payload sequence is the SNP sequence. The payload sequence will replace the sequence starting at the specified coordinate defined by 'Chromosome' and 'Coordinate' columns of the input csv file. The payload sequence should be defined with --SNPpayload. ",
+        metavar="<string>",
+    )
+    payload.add_argument(
         "--payload",
         default="",
         type=str,
@@ -129,6 +140,12 @@ def parse_args(test_mode=False):
         type=str,
         help="default is the XTEN80 linker",
         metavar="<string>",
+    )
+    payload.add_argument(
+        "--SNPpayload",
+        default="",
+        type=str,
+        help="Payload sequence to use for SNPs",
     )
 
     donor = parser.add_argument_group('donor')
@@ -196,7 +213,7 @@ def parse_args(test_mode=False):
     )
     recoding.add_argument(
         "--recoding_full",
-        default=False,
+        default=False, # if user omit this argument, it will be set to True later in the code near line 317
         action="store_true",
         help="Use full recoding: recode both the gRNA recognition site and the cut-to-insert region (default: on)",
     )
@@ -296,11 +313,18 @@ def main(custom_args=None):
             )
 
         # process recoding args
-        if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]):
-            config["recoding_full"] = True
-
+        if (not config["recoding_off"]) and (not config["recoding_stop_recut_only"]) and (not config["recoding_full"]): # if user omit the recoding arguments, it will be set to defaults
+            # defaults for SNP mode
+            if config["payload_type"] == "SNP":
+                config["recoding_stop_recut_only"] = True
+                log.info("using default recoding intensity (for SNP payload type): stop recut only")
+            else:
+                config["recoding_full"] = True
+                log.info("using default recoding intensity (for insertion payload type): full, which will recode to stop recut and recoding the cut-to-insert region")
+        
         if config["recoding_off"] or config["recoding_stop_recut_only"]:
             config["recoding_full"] = False
+            log.info("recoding is turned off by user") if config["recoding_off"] else log.info("recoding intensity is set by the user to prevent recut")
 
         recoding_args = {
             "recoding_off": config["recoding_off"],
@@ -336,19 +360,25 @@ def main(custom_args=None):
             sys.exit("PAM must be NGG, NGA or TTTV, please correct the issue and try again")
 
         # parse payload
-        Linker = config["Linker"]
-        Tag = config["Tag"]
-
-        if config["payload"] == "":  # no payload override
-            if config["Npayload"] == "":  # no Npayload override
-                config["Npayload"] = Tag + Linker
-            if config["Cpayload"] == "":  # no Cpayload override
-                config["Cpayload"] = Linker + Tag
-        else:  # payload override
-            config["Npayload"] = config["payload"]
-            config["Cpayload"] = config["payload"]
-            config["POSpayload"] = config["payload"]
-
+        if config["payload_type"] == "insertion":
+            log.info("payload_type is insertion")
+            Linker = config["Linker"]
+            Tag = config["Tag"]
+            if config["payload"] == "":  # no payload override
+                if config["Npayload"] == "":  # no Npayload override
+                    config["Npayload"] = Tag + Linker
+                if config["Cpayload"] == "":  # no Cpayload override
+                    config["Cpayload"] = Linker + Tag
+            else:  # payload override
+                config["Npayload"] = config["payload"]
+                config["Cpayload"] = config["payload"]
+                config["POSpayload"] = config["payload"]
+        elif config["payload_type"] == "SNP":
+            log.info("payload_type is SNP")
+            if config["SNPpayload"] == "":
+                sys.exit("--SNPpayload must be defined for SNP payload type")
+        else:
+            sys.exit("payload_type must be insertion or SNP, please correct the issue and try again")
 
         # check if HA_len is too short to satisfy ssODN_max_size
         if ssODN_max_size is not None and config["Donor_type"] == "ssODN":
@@ -674,7 +704,9 @@ def main(custom_args=None):
                                 loc2posType=loc2posType,
                                 genome_ver=config["genome_ver"],
                                 HDR_arm_len=HDR_arm_len,
+                                payload_type=config["payload_type"],
                                 tag=config["POSpayload"],
+                                SNP_payload=config["SNPpayload"],
                                 ssODN_max_size=ssODN_max_size,
                                 Donor_type=config["Donor_type"],
                                 Strand_choice=config["Strand_choice"],
@@ -782,7 +814,7 @@ def main(custom_args=None):
                         donor_features = HDR_template.Donor_features
                         # write genbank file
                         with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
-                            write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"])
+                            write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
 
 
                         # write log
@@ -845,7 +877,9 @@ def main(custom_args=None):
                             loc2posType=loc2posType,
                             genome_ver=config["genome_ver"],
                             HDR_arm_len=HDR_arm_len,
+                            payload_type=config["payload_type"],
                             tag=config["Npayload"],
+                            SNP_payload=config["SNPpayload"],
                             ssODN_max_size=ssODN_max_size,
                             Donor_type=config["Donor_type"],
                             Strand_choice=config["Strand_choice"],
@@ -953,7 +987,7 @@ def main(custom_args=None):
                     donor_features = HDR_template.Donor_features
                     # write genbank file
                     with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
-                        write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"])
+                        write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
@@ -1015,7 +1049,9 @@ def main(custom_args=None):
                             loc2posType=loc2posType,
                             HDR_arm_len=HDR_arm_len,
                             genome_ver=config["genome_ver"],
+                            payload_type=config["payload_type"],
                             tag=config["Cpayload"],
+                            SNP_payload=config["SNPpayload"],
                             Donor_type=config["Donor_type"],
                             Strand_choice=config["Strand_choice"],
                             ssODN_max_size=ssODN_max_size,
@@ -1123,7 +1159,7 @@ def main(custom_args=None):
                     donor_features = HDR_template.Donor_features
                     # write genbank file
                     with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
-                        write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"])
+                        write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
@@ -1192,7 +1228,7 @@ def main(custom_args=None):
 def translate_sequence(dna_sequence):
     return str(Seq(dna_sequence).translate())
 
-def write_genbank(handle, data_obj, donor_name, donor_type):
+def write_genbank(handle, data_obj, donor_name, donor_type, payload_type):
     """write genebank file"""
     if len(donor_name) > 16: # truncate donor_name to 16 characters (GenBank limit for locus name)
         donor_name = donor_name.replace("ENST", "")
@@ -1237,12 +1273,13 @@ def write_genbank(handle, data_obj, donor_name, donor_type):
     seq_record.features.append(feature)
     payload_sequence = sequence[data_obj.Donor_features["tag_coord"][0]:data_obj.Donor_features["tag_coord"][1]]
     # translate the payload
-    payload_aa_seq = translate_sequence(str(payload_sequence))
-    feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='CDS', qualifiers={"label": "CDS", "codon_start":1, "translation": payload_aa_seq})
-    seq_record.features.append(feature)
+    if payload_type == "insertion":
+        payload_aa_seq = translate_sequence(str(payload_sequence))
+        feature = SeqFeature(FeatureLocation(start=data_obj.Donor_features["tag_coord"][0], end=data_obj.Donor_features["tag_coord"][1], strand=data_obj.Donor_features["HA_payload_strand"]), type='CDS', qualifiers={"label": "CDS", "codon_start":1, "translation": payload_aa_seq})
+        seq_record.features.append(feature)
 
     
-    if "coding_coord" in data_obj.Donor_features:
+    if "coding_coord" in data_obj.Donor_features: 
         for feat in data_obj.Donor_features["coding_coord"]:
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"], type='exon ', qualifiers={"label": "exon"})
             seq_record.features.append(feature)
