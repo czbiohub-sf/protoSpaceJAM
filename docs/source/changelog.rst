@@ -5,6 +5,8 @@ Changelog
 
 Algorithm
 --------
+:Date: Feburary 02, 2025 |feature 57a3a| Introduced a new payload type, 'SNP,' enabling mutation creation without altering genome length.
+
 :Date: June 05, 2024 |enhancement 5965d4| Added payload protein translation to the donor genbank output file.
 
 :Date: May 29, 2024 |bug fix 5d255| Fixed a bug where different designs may have the same donor name.   
@@ -61,6 +63,8 @@ Algorithm
 
 Portal
 ------
+:Date: Feburary 02, 2025 |feature 8713e| Introduced a new payload type, 'SNP,' enabling mutation creation without altering genome length.
+
 :Date: May 29, 2024 |enhancement 8fee25| Added an interface label: "Looking for another PAM? Here are instructions to onboard your own. You can also contact us for help"
 
 :Date: May 29, 2024 |enhancement 8fee25| change interface label: minimum HA length -> stop trimming if HA are shorter than (use 0 base-pairs to inactivate trimming).
@@ -136,6 +140,10 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+.. |feature 57a3a| image:: https://img.shields.io/badge/57a3a-feature-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/f219a8abaf8c19d03960cd1b75f2f160cab57a3a
+.. |feature 8713e| image:: https://img.shields.io/badge/8713e-feature-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal-private/commit/f4416bc986780a3ba72667dc9fc9c31ed4b8713e
 .. |enhancement 5965d4| image:: https://img.shields.io/badge/5965d4-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/12e0186d9b3c1b8d845cd6d95fb8da55df5965d4
 .. |enhancement 8fee25| image:: https://img.shields.io/badge/8fee25-enhancement-green
