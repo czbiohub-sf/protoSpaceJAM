@@ -5,6 +5,9 @@ Changelog
 
 Algorithm
 --------
+
+:Date: Feburary 17, 2025 |feature f13c6| Added the rat genome: mRatBN7.2 Ensembl to the list of supported/precomputed genomes.
+
 :Date: Feburary 02, 2025 |feature 57a3a| Introduced a new payload type, 'SNP,' enabling mutation creation without altering genome length.
 
 :Date: June 05, 2024 |enhancement 5965d4| Added payload protein translation to the donor genbank output file.
@@ -63,6 +66,9 @@ Algorithm
 
 Portal
 ------
+
+:Date: Feburary 17, 2025 |feature 8325e| Added the rat genome: mRatBN7.2 Ensembl.
+
 :Date: Feburary 02, 2025 |feature 8713e| Introduced a new payload type, 'SNP,' enabling mutation creation without altering genome length.
 
 :Date: May 29, 2024 |enhancement 8fee25| Added an interface label: "Looking for another PAM? Here are instructions to onboard your own. You can also contact us for help"
@@ -140,6 +146,10 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+.. |feature f13c6| image:: https://img.shields.io/badge/57a3a-feature-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/f46b1882b5264cca6bdabe1d67c309ca8d7f13c6
+.. |feature 8325e| image:: https://img.shields.io/badge/57a3a-feature-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal-private/commit/553c4f089a171bf159d9d0b8e388fa12aac8325e
 .. |feature 57a3a| image:: https://img.shields.io/badge/57a3a-feature-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/f219a8abaf8c19d03960cd1b75f2f160cab57a3a
 .. |feature 8713e| image:: https://img.shields.io/badge/8713e-feature-green
