@@ -23,7 +23,7 @@
   - Scan and trim hard-to-synthesize motifs
   - Center the DNA donor around the region containing the payload and recoded bases
   - Enforce maximum length of DNA donor
-- Use/generate pre-computed genome-wide guide RNAs and their properties for fast runtime
+- Use pre-computed genome-wide guide RNAs to generated knock-in designs at scale  
 
 &nbsp;
 ## Installation
