@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=Bwa
-#SBATCH --time=14-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --array=1-placeholder1%placeholder2
 #SBATCH --partition preempted
 #SBATCH --nodes=1
@@ -53,10 +53,12 @@ sleep $((MINWAIT+RANDOM % (MAXWAIT-MINWAIT)))
 if [ -e ${dirmapped}/${mappedgzfile} ] && $(gzip -t ${dirmapped}/${mappedgzfile}); then # check if mapped gzfile exists
     read linecount < <(gunzip -c ${dirmapped}/${mappedgzfile} | wc -l)
     if [ ${linecount} == ${gRNA_counts[$idx]} ] ; then  # check if the mapped gzfile contains all the gRNAs, skip mapping if it does
-    echo "${dirmapped}/${mappedgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}" >> gRNAs/gRNA_${1}/mapping_log.skipped.txt
-    exit 0
+        echo "${dirmapped}/${mappedgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}, skipping" >> gRNAs/gRNA_${1}/mapping_log.skipped.txt
+        echo "${dirmapped}/${mappedgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}, skipping"
+        exit 0
     fi
     echo "${dirmapped}/${mappedgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}" >> gRNAs/gRNA_${1}/mapping_log.reprocess.txt
+    echo "${dirmapped}/${mappedgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}"
 fi
 #remove previous (incomplete) mapped gzfile
 rm -rf ${dirmapped}/${gzfile::-7}.tab.*

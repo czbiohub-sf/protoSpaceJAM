@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=gRNA_score
-#SBATCH --time=14-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --array=1-placeholder1%placeholder2
 #SBATCH --nodes=1
 #SBATCH --partition preempted
@@ -50,13 +50,33 @@ mappedgzfile="${gzfile::-7}.tab.mapped.gz"
 scoredgzfile="${gzfile::-7}.tab.mapped.scored.gz"
 
 #main command
-if [ -e ${scoreddir}/${scoredgzfile} ] && $(gzip -t ${scoreddir}/${scoredgzfile}); then # check if scored gzfile exists
-    echo "${scoreddir}/${scoredgzfile} exists and is intact, skipping" >> gRNAs/gRNA_${1}/score_log.skipped.txt
-    exit 0
+
+#check if the temporary mapped gzfile exists
+temp_gzfile="${gzfile::-7}.tab.tmp.gz"
+if [ -f "${gzdir}/${temp_gzfile}" ]; then
+    echo "temporary mapped gzfile ${temp_gzfile} exists, do not proceed with scoring, exiting"
+    exit 1
+else
+    echo "temporary mapped gzfile ${temp_gzfile} does not exist, proceed with scoring"
 fi
-echo "${scoreddir}/${scoredgzfile} does not exist or is not intact, reprocessing" >> gRNAs/gRNA_${1}/score_log.reprocess.txt
+
+# check if scored (intact) gzfile exists
+if [ -e ${scoreddir}/${scoredgzfile} ] && $(gzip -t ${scoreddir}/${scoredgzfile}); then 
+
+    # check if the number of lines in the scored gzfile is the same as the number of gRNAs in the current file
+    read linecount < <(gunzip -c ${scoreddir}/${scoredgzfile} | wc -l)
+    if [ ${linecount} == ${gRNA_counts[$idx]} ] ; then  # check if the mapped gzfile contains all the gRNAs, skip mapping if it does
+        echo "${scoreddir}/${scoredgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}, skipping" >> gRNAs/gRNA_${1}/score_log.skipped.txt
+        echo "${scoreddir}/${scoredgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}, skipping"
+        exit 0
+    fi
+    echo "${scoreddir}/${scoredgzfile} has ${linecount} lines, expecting ${gRNA_counts[$idx]}"
+fi
+echo "${scoreddir}/${scoredgzfile} does not exist or is not intact, or the number of lines didn't match the number of gRNAs expected for this file, reprocessing" >> gRNAs/gRNA_${1}/score_log.reprocess.txt
 
 #remove previous (incomplete) scoring gzfile
-#rm -rf ${scoreddir}/${scoredgzfile}
+rm -rf ${scoreddir}/${scoredgzfile}
 
+#execute scoring
 python ${script_folder}/gRNA_calcScores.py --gzdir ${gzdir} --gzfile ${mappedgzfile} --pam ${pam} --skip_eff_score # skip efficiency score for now, just calculate the off-target score
+ 

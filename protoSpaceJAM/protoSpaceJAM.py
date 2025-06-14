@@ -44,7 +44,7 @@ def parse_args(test_mode=False):
         "--genome_ver",
         default="GRCh38",
         type=str,
-        help="Genome and version to use, possible values are GRCh38, GRCm39, and GRCz11",
+        help="Genome and version to use, possible values are GRCh38, GRCm39, GRCz11, and mRatBN7.2",
         metavar="<string>",
     )
     gRNA = parser.add_argument_group('gRNA')

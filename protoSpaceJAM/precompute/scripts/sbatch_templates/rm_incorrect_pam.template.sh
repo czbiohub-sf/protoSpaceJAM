@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=rm_incorrect_pam
-#SBATCH --time=14-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --array=1-placeholder1%placeholder2
 #SBATCH --nodes=1
 #SBATCH --partition preempted

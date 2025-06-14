@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Check if an argument is provided
-if [ "$#" -ne 5 ]; then
-    echo "Usage: $0 <genome-identifier> <genome-fasta-name> <pam> <size-of-array-job> <throttle>"
+# Check if less than 5 arguments are provided
+if [ "$#" -lt 5 ]; then
+    echo "Usage: $0 <genome-identifier> <genome-fasta-name> <pam> <size-of-array-job> <throttle> <cpu>"
     exit 1
 fi
 
@@ -22,6 +22,11 @@ cp "$sbatch_script" "$tmp_sbatch_script"
 # Use 'sed' to modify the array range in the sbatch script
 sed -i "s/--array=1-placeholder1%placeholder2/--array=1-${size_of_array_job}%${throttle}/" "${tmp_sbatch_script}"
 sed -i "s/--job-name=gRNA_score/--job-name=gRNA_score_${genome_identifier}/" "${tmp_sbatch_script}"
+
+# if the 6th argument is cpu then replace "preempted" with "cpu"
+if [ "$6" == "cpu" ]; then
+    sed -i "s/preempted/cpu/" "${tmp_sbatch_script}"
+fi
 
 # submit the sbatch job
 sbatch ${tmp_sbatch_script} ${genome_identifier} ${genome_fa_name} . ${pam}
