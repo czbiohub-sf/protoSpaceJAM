@@ -153,6 +153,16 @@ class HDR_flank:
         self.mut_every_n = 3
         self.coordinate_without_ENST = coordinate_without_ENST
 
+        #Pad self.tag if it is shorter than 23bp
+        self.tag_was_padded = False
+        if len(self.tag) <= 23:
+            self.tag_was_padded = True
+            self.original_tag = self.tag  # Store the original tag
+            self.filler_seq = "GATTACAGATTACAGATTACAGA"  # 23bp filler
+            middle_index = len(self.original_tag) // 2
+            padded_tag = self.original_tag[:middle_index] + self.filler_seq + self.original_tag[middle_index:]
+            self.tag = padded_tag # Update self.tag to the padded version for recoding
+
         assert len(left_flk_coord_lst) > 1
         self.left_flk_coord_lst = left_flk_coord_lst
 
@@ -1332,9 +1342,9 @@ class HDR_flank:
             self.cfd_score_post_ins = scan_highest_cfd
             self.Donor_postMut = "recoding turned off"
 
-        ##############################
+        ###############################
         # finished or skipped recoding#
-        ##############################
+        ###############################
         (
             left,
             right,
@@ -1342,6 +1352,18 @@ class HDR_flank:
             seq,
             phases,
         ) = self.get_uptodate_mut()  # not including slide window scan and mutation
+
+        # Remove the 23bp filler sequence if it was inserted (when the tag is <= 23bp)
+        if self.tag_was_padded:
+            # The current self.tag is the padded version.
+            padded_tag = self.tag 
+            # In the fully recoded donor, replace the padded tag with the original tag.
+            # This is safer because the padded_tag is much more unique than the filler_seq alone.
+            if hasattr(self, 'Donor_postMut') and self.Donor_postMut != "recoding turned off":
+                self.Donor_postMut = self.Donor_postMut.replace(padded_tag, self.original_tag, 1)
+            # Finally, restore self.tag to its original, unpadded state.
+            self.tag = self.original_tag
+        
         self.Donor_vanillia = f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}"
         if self.Donor_postMut == "recoding turned off":
             self.final_cfd = self.cfd_score_post_ins
