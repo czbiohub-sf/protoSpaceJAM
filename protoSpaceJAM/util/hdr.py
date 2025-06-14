@@ -168,12 +168,14 @@ class HDR_flank:
         assert len(right_flk_phases) > 1
         self.right_flk_phases = self.join_int_list(right_flk_phases)
 
-        # adjustments for SNP mode (1 of 5)
-        # the overall logic is reuse the recoding logic developed for the insertion mode, with a few modifications:
-        # (1) we replace the tag with the SNP payload **after** the recoding, but before dsDNA/ssODN processing
-        # (2) during the tag -> SNP replacement, we delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
-        # (3) during recoding we protect short stretch from recoding, thus avoiding where the recoding of first n letters affected adjacent letters.
-        # in adjustment 1 of 5,  here we change the phases of the first n letters of the right_flk_seq to 7 (to avoid recoding in the short stretch)
+        # adjustments for SNP mode (1 of 3)
+        # the overall strategy for SNP mode is reuse the recoding logic developed for the insertion mode, with a few modifications:
+        # (1) During recoding, we skip chimeric gRNA processing, which checks how the tag insertion disrupts the gRNA, and since the tag is just placeholder, we skip this step.
+        # (2) After the recoding, we replace the tag with the SNP payload. This is before dsDNA/ssODN processing
+        # (3) during the tag -> SNP replacement (removing the placeholder), we delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
+        # NOTE: during recoding we protect short stretch (where SNP payload would drop in place) from recoding, 
+        # we change the phases of the first n letters of the right_flk_seq to 7 (to avoid recoding the short stretch and codons that they are a part of), 
+        # we modified the trimming functions to changing the letters to lowercase (b/c "7" is not enought to protect from codon mutations as it may have flanking codon phases and survive trimming)
         if self.payload_type == "SNP":
             # save a copy of the right_flk_phases before adjusting the phases
             self.right_flk_phases_before_SNPadjustment = self.right_flk_phases
@@ -185,7 +187,7 @@ class HDR_flank:
             self.right_flk_phases = "".join(right_phases_list)
             tag = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG" # use the default tag as a placeholder
             self.tag = tag
-        # end of adjustments for SNP mode (1 of 5)
+        # end of adjustments for SNP mode (1 of 3)
 
         if gStrand * ENST_strand >= 0:
             self.gRNA_in_coding_strand = True
@@ -331,8 +333,11 @@ class HDR_flank:
                 # Phase 1 mutate insert-to-cut#
                 ###############################
                 # trim insert-to-cut into frame
+                #print(f"phase 1: gRNA in coding strand {self.gRNA_in_coding_strand}\n")
+                #print(f"phase 1 ins2cut:\n{self.ins2cut.seq}\n{self.ins2cut.phases}\n{self.ins2cut.start}-{self.ins2cut.end}")
                 self.ins2cut_Ltrimed = self.trim_left_into_frame(self.ins2cut)
                 self.ins2cut_LRtrimed = self.trim_right_into_frame(self.ins2cut_Ltrimed)
+                #print(f"phase 1 ins2cut_LRtrimed:\n{self.ins2cut_LRtrimed.seq}\n{self.ins2cut_LRtrimed.phases}\n{self.ins2cut_LRtrimed.start}-{self.ins2cut_LRtrimed.end}")
 
                 # mutate insert-to-cut sequence (codons only)
                 mutated_subseq = self.get_silent_mutations(
@@ -468,6 +473,8 @@ class HDR_flank:
             self.cfd_score_post_mut_ins = cfd_score(
                 self.gRNA_seq, self.post_mut_ins_gRNA_seq
             )
+            #print(f"phase 1 before mutate: \n{self.gRNA_seq}\n{self.gRNA_seq_phases}")
+            #print(f"phase 1 after mutate: \n{self.post_mut_ins_gRNA_seq}\n{self.post_mut_ins_gRNA_seq_phases}")
 
             ###############################
             # phase 2 mutate 3 UTR in gRNA#
@@ -480,6 +487,7 @@ class HDR_flank:
                 seq,
                 phases,
             ) = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+            #print(f"phase 2: gRNA in coding strand {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
             if cfd > self.cfdThres and not recoding_args['recoding_coding_region_only']:  # mutate if in 3' UTR while: 1. CFD score is above threshold 2. not recoding coding region only
                 # mutate PAM if PAM first
                 (
@@ -538,6 +546,7 @@ class HDR_flank:
                         Donor = Donor.replace(
                             self.revcom(seq), self.revcom(self.post_Phase2_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase2 = Donor[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase2 = Donor[-len(self.left_flk_seq) :]
                 # mutate protospacer
@@ -582,6 +591,7 @@ class HDR_flank:
                         Donor = Donor.replace(
                             self.revcom(seq), self.revcom(self.post_Phase2_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase2 = Donor[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase2 = Donor[-len(self.left_flk_seq) :]
 
@@ -646,6 +656,7 @@ class HDR_flank:
                         Donor = Donor.replace(
                             self.revcom(seq), self.revcom(self.post_Phase2_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase2 = Donor[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase2 = Donor[-len(self.left_flk_seq) :]
 
@@ -662,17 +673,21 @@ class HDR_flank:
                 seq,
                 phases,
             ) = self.get_uptodate_mut()  # get up-to-date gRNA seq and phases
+            
 
             if (
                 cfd > self.cfdThres
             ):  # CDS>=self.cfdThres, try mutating gRNA silently(codons) in parts not covered between insert and cut
-                # print(f"phase 3: gRNA in coding {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
+                #print(f"phase 3: gRNA in coding strand {self.gRNA_in_coding_strand}\n{seq}\n{phases}")
+                #print(f"cfd: {cfd}")
                 # get gRNA in coding strand
+
                 if self.gRNA_in_coding_strand == True:
                     seq_obj = seq_w_phase(seq=seq, phases=phases, start=1, end=23)
+                    seq_obj = self.convert_phase_7_to_lowercase(seq_obj) # convert phase 7 to lowercase
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                    # print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}\n{seq_obj_lrtrim.end}")
+                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}-{seq_obj_lrtrim.end}")
                     if len(seq_obj_lrtrim.seq) >= 3:
                         mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
                     else:
@@ -680,14 +695,16 @@ class HDR_flank:
                     untrimmed = seq_obj.seq.replace(
                         seq_obj_lrtrim.seq, mutated
                     )  # untrim: replace trimmed part with the mutated part
-                    # print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
+                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
                 else:
                     seq_obj = seq_w_phase(
                         seq=self.revcom(seq), phases=phases[::-1], start=1, end=23
                     )
+                    seq_obj = self.convert_phase_7_to_lowercase(seq_obj) # convert phase 7 to lowercase
+                    #print(f"phase 3 revcom:\n{seq_obj.seq}\n{seq_obj.phases}")
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
-                    # print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}\n{seq_obj_lrtrim.end}")
+                    #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}-{seq_obj_lrtrim.end}")
                     if len(seq_obj_lrtrim.seq) >= 3:
                         mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
                     else:
@@ -696,7 +713,7 @@ class HDR_flank:
                         seq_obj_lrtrim.seq, mutated
                     )  # untrim: replace trimmed part with the mutated part
                     untrimmed = self.revcom(untrimmed)
-                    # print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
+                    #print(f"phase 3 mutated:\n{mutated}\nuntrimmed:\n{untrimmed}\n{seq_obj.phases}")
 
                 # check for useless PAM mutations (only N in NGG is mutated without surrounding mutations)
                 last5 = untrimmed[-5:]
@@ -728,8 +745,10 @@ class HDR_flank:
                 Donor = f"{left}{self.tag}{right}"
                 Donor = Donor.replace(seq, untrimmed)
                 Donor = Donor.replace(self.revcom(seq), self.revcom(untrimmed))
+
                 self.left_flk_seq_Phase3 = Donor[0 : len(self.left_flk_seq)]
                 self.right_flk_seq_Phase3 = Donor[-len(self.left_flk_seq) :]
+                
                 # put mutated seq back to arms
                 # self.left_flk_seq_Phase3, self.right_flk_seq_Phase3 = self.put_silent_mutation_subseq_back(L_arm=self.left_flk_seq_CodonMut, R_arm=self.right_flk_seq_CodonMut,
                 #                                                                                                  mutated_subseq = self.mutated_trunc_gRNA,                                   # mutated_subseq is already in coding strand,
@@ -750,6 +769,11 @@ class HDR_flank:
                 )
             left, right, cfd, seq, phases = self.get_uptodate_mut()
             self.postPhase3ODN = left + tag + right
+
+            if self.payload_type == "SNP" and hasattr(self, "post_Phase3_gRNA_seq") and hasattr(self, "post_Phase3_gRNA_seq_phases"): # record the mutated gRNA sequence and phases in SNP mode
+                self.post_Phase3_gRNA_seq = untrimmed
+                self.post_Phase3_gRNA_seq_phases = phases
+                #print(f"post_Phase3_gRNA:\n{self.post_Phase3_gRNA_seq}\n{self.post_Phase3_gRNA_seq_phases}")
 
             ######################################################
             # phase 4 mutate intron in gRNA #
@@ -814,6 +838,7 @@ class HDR_flank:
                         ssODN = ssODN.replace(
                             self.revcom(seq), self.revcom(self.post_Phase4_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase4 = ssODN[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase4 = ssODN[-len(self.left_flk_seq) :]
 
@@ -860,6 +885,7 @@ class HDR_flank:
                         ssODN = ssODN.replace(
                             self.revcom(seq), self.revcom(self.post_Phase4_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase4 = ssODN[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase4 = ssODN[-len(self.left_flk_seq) :]
 
@@ -924,6 +950,7 @@ class HDR_flank:
                         ssODN = ssODN.replace(
                             self.revcom(seq), self.revcom(self.post_Phase4_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase4 = ssODN[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase4 = ssODN[-len(self.left_flk_seq) :]
 
@@ -982,6 +1009,7 @@ class HDR_flank:
                         ssODN = ssODN.replace(
                             self.revcom(seq), self.revcom(self.post_Phase5_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase5 = ssODN[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase5 = ssODN[-len(self.left_flk_seq) :]
 
@@ -1032,6 +1060,7 @@ class HDR_flank:
                         ssODN = ssODN.replace(
                             self.revcom(seq), self.revcom(self.post_Phase5_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase5 = ssODN[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase5 = ssODN[-len(self.left_flk_seq) :]
 
@@ -1084,6 +1113,7 @@ class HDR_flank:
                         ssODN = ssODN.replace(
                             self.revcom(seq), self.revcom(self.post_Phase5_gRNA_seq)
                         )
+
                         self.left_flk_seq_Phase5 = ssODN[0 : len(self.left_flk_seq)]
                         self.right_flk_seq_Phase5 = ssODN[-len(self.left_flk_seq) :]
 
@@ -1135,6 +1165,43 @@ class HDR_flank:
             scan_highest_cfd = max([fwd_scan_highest_cfd, rev_scan_highest_cfd])
 
             self.cfd_score_highest_in_win_scan = scan_highest_cfd
+
+            ###################################################
+            # SNP mode: debug #
+            # print gRNAs in each recoding-phase
+            # print(f"gRNA_seq:\n{self.gRNA_seq}\n{self.gRNA_seq_phases}")
+            self.final_gRNA_seq = self.gRNA_seq
+            self.final_gRNA_seq_phases = self.gRNA_seq_phases
+            if hasattr(self, "post_Phase1_gRNA_seq"):
+                #print(f"post_Phase1_gRNA:\n{self.post_Phase1_gRNA_seq}\n{self.post_Phase1_gRNA_seq_phases}")
+                self.final_gRNA_seq = self.post_Phase1_gRNA_seq
+                self.final_gRNA_seq_phases = self.post_Phase1_gRNA_seq_phases
+            if hasattr(self, "post_Phase2_gRNA_seq"):
+                #print(f"post_Phase2_gRNA:\n{self.post_Phase2_gRNA_seq}\n{self.post_Phase2_gRNA_seq_phases}")
+                self.final_gRNA_seq = self.post_Phase2_gRNA_seq
+                self.final_gRNA_seq_phases = self.post_Phase2_gRNA_seq_phases
+            if hasattr(self, "post_Phase3_gRNA_seq"):
+                #print(f"post_Phase3_gRNA:\n{self.post_Phase3_gRNA_seq}\n{self.post_Phase3_gRNA_seq_phases}")
+                self.final_gRNA_seq = self.post_Phase3_gRNA_seq
+                self.final_gRNA_seq_phases = self.post_Phase3_gRNA_seq_phases
+            if hasattr(self, "post_Phase4_gRNA_seq"):
+                #print(f"post_Phase4_gRNA:\n{self.post_Phase4_gRNA_seq}\n{self.post_Phase4_gRNA_seq_phases}")
+                self.final_gRNA_seq = self.post_Phase4_gRNA_seq
+                self.final_gRNA_seq_phases = self.post_Phase4_gRNA_seq_phases
+            if hasattr(self, "post_Phase5_gRNA_seq"):
+                #print(f"post_Phase5_gRNA:\n{self.post_Phase5_gRNA_seq}\n{self.post_Phase5_gRNA_seq_phases}")
+                self.final_gRNA_seq = self.post_Phase5_gRNA_seq  
+                self.final_gRNA_seq_phases = self.post_Phase5_gRNA_seq_phases
+            if hasattr(self, "post_Phase6_gRNA_seq"):
+                #print(f"post_Phase6_gRNA:\n{self.post_Phase6_gRNA_seq}\n{self.post_Phase6_gRNA_seq_phases}")
+                self.final_gRNA_seq = self.post_Phase6_gRNA_seq
+                self.final_gRNA_seq_phases = self.post_Phase6_gRNA_seq_phases
+            
+            # print(f"final_gRNA_seq:\n{self.final_gRNA_seq}\n{self.final_gRNA_seq_phases}")
+            
+            # whether_edits_in_gRNA = self.gRNA_seq != self.final_gRNA_seq
+            # if "7" in self.gRNA_seq_phases and whether_edits_in_gRNA:
+            # print("flag")
 
             ############################
             # log recoding information #
@@ -1299,6 +1366,16 @@ class HDR_flank:
             # adjustments for SNP mode (2 of 5)
             # tag -> SNP replacement in dsDNA donor, we also delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
             if self.payload_type == "SNP":
+                
+                # we noticed that the final donor may not carry recoded gRNA sequence, this happens when the gRNA contains the SNP payload
+                # we fix this by removing tag, replace the gRNA_seq with mutated gRNA, then restore tag
+                donor_without_tag = self.Donor_final.replace(self.tag, "")
+                if self.gRNA_seq in donor_without_tag:
+                    self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.final_gRNA_seq, replacement_target=self.gRNA_seq)
+                elif self.revcom(self.gRNA_seq) in donor_without_tag:
+                    self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.revcom(self.final_gRNA_seq), replacement_target=self.revcom(self.gRNA_seq))
+
+                # tag -> SNP replacement
                 # save a copy of the donor_postMut before the tag -> SNP replacement
                 self.Donor_postMut_before_SNP = self.Donor_final.replace(self.tag, "")
                 # remove the first n letters of the right_flk_seq
@@ -1467,10 +1544,20 @@ class HDR_flank:
             # adjustments for SNP mode (3 of 5)
             # tag -> SNP replacement in ssODN donor, we also delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
             if self.payload_type == "SNP":
+
+                # we noticed that the final donor may not carry recoded gRNA sequence, this happens when the gRNA contains the SNP payload
+                # we fix this by removing tag, replace the gRNA_seq with mutated gRNA, then restore tag
+                donor_without_tag = self.Donor_final.replace(self.tag, "")
+                if self.gRNA_seq in donor_without_tag:
+                    self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.final_gRNA_seq, replacement_target=self.gRNA_seq)
+                elif self.revcom(self.gRNA_seq) in donor_without_tag:
+                    self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.revcom(self.final_gRNA_seq), replacement_target=self.revcom(self.gRNA_seq))
+
+                # tag -> SNP replacement
                 # save a copy of the donor_postMut before the tag -> SNP replacement
                 self.Donor_postMut_before_SNP = self.Donor_final.replace(self.tag, "")
                 # remove the first n letters of the right_flk_seq
-                self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload))
+                self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload)) # remove n bases after the tag (to create room for the SNP payload)
                 self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
                 self.Donor_postMut = self.Donor_final
                 tag = self.SNP_payload
@@ -2745,7 +2832,7 @@ class HDR_flank:
             cfd = self.cfd_score_post_Phase5
             seq = self.post_Phase5_gRNA_seq
             phases = self.post_Phase5_gRNA_seq_phases
-        if hasattr(self, "cfd_score_post_Phase4"):
+        elif hasattr(self, "cfd_score_post_Phase4"):
             left = self.left_flk_seq_Phase4
             right = self.right_flk_seq_Phase4
             cfd = self.cfd_score_post_Phase4
@@ -2955,37 +3042,40 @@ class HDR_flank:
         # get chimeric gRNA:
         chimeric_gRNA = gRNA
         chimeric_gRNA_ph = gRNA_ph
+        #print(gRNA)
+        #print(gRNA_ph)
 
-        # print(f"gRNAleft {gRNAleft} {int(len(whole_arm)/2)} gRNAright{gRNAright}")
-        if (gRNAleft < int(len(whole_arm) / 2) <= gRNAright) and (
-            int(self.ENST_strand) * int(self.gStrand) > 0
-        ):  # gRNA is truncated, and gRNA is on the coding strand
-            chimeric_gRNA = whole_arm[int(len(whole_arm) / 2) : gRNAright + 1]
-            trunc_len = int(len(whole_arm) / 2) - gRNAleft
-            chimeric_gRNA = (
-                self.tag[-trunc_len:] + chimeric_gRNA
-            )  # make the chimeric gRNA
-            # chimeric phases
-            chimeric_gRNA_ph = whole_arm_ph[int(len(whole_arm) / 2) : gRNAright + 1]
-            chimeric_gRNA_ph = (
-                "X" * trunc_len + chimeric_gRNA_ph
-            )  # make the chimeric gRNA  #TODO missing the left side of Xs
+        if self.payload_type != "SNP": # only compute chimeric gRNA if not in SNP mode
+            # print(f"gRNAleft {gRNAleft} {int(len(whole_arm)/2)} gRNAright{gRNAright}")
+            if (gRNAleft < int(len(whole_arm) / 2) <= gRNAright) and (
+                int(self.ENST_strand) * int(self.gStrand) > 0
+            ):  # gRNA is truncated, and gRNA is on the coding strand
+                chimeric_gRNA = whole_arm[int(len(whole_arm) / 2) : gRNAright + 1]
+                trunc_len = int(len(whole_arm) / 2) - gRNAleft
+                chimeric_gRNA = (
+                    self.tag[-trunc_len:] + chimeric_gRNA
+                )  # make the chimeric gRNA
+                # chimeric phases
+                chimeric_gRNA_ph = whole_arm_ph[int(len(whole_arm) / 2) : gRNAright + 1]
+                chimeric_gRNA_ph = (
+                    "X" * trunc_len + chimeric_gRNA_ph
+                )  # make the chimeric gRNA  #TODO missing the left side of Xs
 
-        elif (gRNAleft < int(len(whole_arm) / 2) <= gRNAright) and (
-            int(self.ENST_strand) * int(self.gStrand) < 0
-        ):  # gRNA is truncated, and gRNA is NOT on the coding strand
-            chimeric_gRNA = whole_arm[gRNAleft : int(len(whole_arm) / 2)]
-            trunc_len = gRNAright - int(len(whole_arm) / 2) + 1
-            chimeric_gRNA = (
-                chimeric_gRNA + self.tag[:trunc_len]
-            )  # make the chimeric gRNA
-            # chimeric phases
-            chimeric_gRNA_ph = whole_arm_ph[gRNAleft : int(len(whole_arm) / 2)]
-            chimeric_gRNA_ph = (
-                chimeric_gRNA_ph + "X" * trunc_len
-            )  # TODO missing the right side of Xs
+            elif (gRNAleft < int(len(whole_arm) / 2) <= gRNAright) and (
+                int(self.ENST_strand) * int(self.gStrand) < 0
+            ):  # gRNA is truncated, and gRNA is NOT on the coding strand
+                chimeric_gRNA = whole_arm[gRNAleft : int(len(whole_arm) / 2)]
+                trunc_len = gRNAright - int(len(whole_arm) / 2) + 1
+                chimeric_gRNA = (
+                    chimeric_gRNA + self.tag[:trunc_len]
+                )  # make the chimeric gRNA
+                # chimeric phases
+                chimeric_gRNA_ph = whole_arm_ph[gRNAleft : int(len(whole_arm) / 2)]
+                chimeric_gRNA_ph = (
+                    chimeric_gRNA_ph + "X" * trunc_len
+                )  # TODO missing the right side of Xs
 
-        # reverse complement gRNA, if needed
+        # reverse complement gRNA, if needed, NOTE: this is performed for both SNP and insertion modes
         if int(self.ENST_strand) * int(self.gStrand) < 0:
             # revcom gRNA and trunc_gRNA
             gRNA = str(Seq(gRNA).reverse_complement())
@@ -3041,6 +3131,7 @@ class HDR_flank:
 
     def trim_left_into_frame(self, in_obj):
         obj = copy.copy(in_obj)
+
         if obj.seq == "":
             return obj
         for i in copy.copy(obj.phases):
@@ -3056,6 +3147,7 @@ class HDR_flank:
 
     def trim_right_into_frame(self, in_obj):
         obj = copy.copy(in_obj)
+
         if obj.seq == "":
             return obj
         for i in reversed(copy.copy(obj.phases)):
@@ -3067,6 +3159,26 @@ class HDR_flank:
                 return obj
         if obj.seq == "":  # trimmed all of the sequence
             obj.end = obj.start
+        return obj
+
+    def convert_phase_7_to_lowercase(self, in_obj):
+        obj = copy.copy(in_obj)
+        if obj.seq == "" or obj.phases == "":
+            return obj
+        
+        # Convert seq and phases to lists for easier manipulation
+        seq_list = list(obj.seq)
+        phases_list = list(obj.phases)
+        
+        # Check each phase and convert corresponding seq character to lowercase if phase is "7"
+        for i in range(len(phases_list)):
+            if phases_list[i] == "7":
+                seq_list[i] = seq_list[i].lower()
+        
+        # Convert back to string
+        obj.seq = ''.join(seq_list)
+        obj.phases = ''.join(phases_list)
+        
         return obj
 
     def to_0_index(self, start, end, strand, seq=""):
@@ -3722,6 +3834,50 @@ def remove_n_bases_after_match(pattern: str, sequence: str, n: int) -> str:
         # Remove two bases to the right of the match
         return sequence[:index + len(pattern)] + sequence[index + len(pattern) + n:]
     return sequence  # Return original if pattern not found
+
+def remove_replace_restore(parent_string, substring_to_remove, replacement_text, replacement_target):
+    """
+    Performs string operations: remove substring, replace another part, then restore substring.
+    
+    Args:
+        parent_string: The original string
+        substring_to_remove: The substring to temporarily remove
+        replacement_text: Text to replace with in step 2
+        replacement_target: Text to replace in step 2
+    
+    Returns:
+        final_string
+    """
+    
+    # Step 1: Document the location(s) of the substring before removing it
+    locations = []
+    start = 0
+    while True:
+        pos = parent_string.find(substring_to_remove, start)
+        if pos == -1:
+            break
+        locations.append(pos)
+        start = pos + 1
+    
+    # Remove the substring using replace()
+    string_after_removal = parent_string.replace(substring_to_remove, '')
+
+    # Step 2: Perform another replacement operation
+    string_after_second_replace = string_after_removal.replace(replacement_target, replacement_text)
+
+    # Step 3: Insert back the substring to its original location(s)
+    # We need to adjust positions based on previous removals
+    result = list(string_after_second_replace)
+    
+    # Insert substrings back from right to left to maintain correct positions
+    for i, location in enumerate(sorted(locations, reverse=True)):
+        # Adjust position based on how many substrings were removed before this position
+        adjusted_pos = location - (i * len(substring_to_remove))
+        result.insert(adjusted_pos, substring_to_remove)
+    
+    final_string = ''.join(result)
+
+    return final_string
 
 if __name__ == "__main__":
     import doctest
