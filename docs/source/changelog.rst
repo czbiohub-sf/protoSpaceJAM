@@ -6,7 +6,11 @@ Changelog
 Algorithm
 --------
 
-:Date: Feburary 17, 2025 |feature f13c6| Added the rat genome: mRatBN7.2 Ensembl to the list of supported/precomputed genomes.
+:Date: June 14, 2025 |bug fix 01d81| Fixed a bug in insertion mode where recoding crashes if the payload is shorter than 23bp.
+
+:Date: June 14, 2025 |bug fix 6d75b| Fixed a bug in SNP mode where recoding in gRNA is not reflected in the donor. (this bug manifests when the SNP payload overlaps with the gRNA).
+
+:Date: Feburary 17, 2025 |feature f13c6| Added the rat genome mRatBN7.2 to the list of supported/precomputed genomes.
 
 :Date: Feburary 02, 2025 |feature 57a3a| Introduced the 'SNP' payload type to support mutation creation while preserving genome length.
 
@@ -66,6 +70,10 @@ Algorithm
 
 Portal
 ------
+
+:Date: Feburary 17, 2025 |enhancement 421dad| Disabled "full" recoding for SNP-payload (for both input routes: build job and upload submission csv). "stop_recut" is allowed.
+
+:Date: Feburary 17, 2025 |enhancement 421dad| Added a warning when no transcript ID is supplied (as it reduced effectiveness of recoding which needs gene model annotations)
 
 :Date: Feburary 17, 2025 |feature 8325e| Added the rat genome: mRatBN7.2 Ensembl.
 
@@ -146,6 +154,12 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+.. |enhancement 421dad| image:: https://img.shields.io/badge/421dad-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal-private/commit/814f34f8d54e10b8b72b8132193f657cd4421dad
+.. |bug fix 01d81| image:: https://img.shields.io/badge/01d81-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/b1e7f3974d5d1c6488baf9334fbb80eacb101d81
+.. |bug fix 6d75b| image:: https://img.shields.io/badge/6d75b-bug%20fix-red
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/eed2b3746b39171c6fca619112bd5e436766d75b
 .. |feature f13c6| image:: https://img.shields.io/badge/f13c6-feature-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/f46b1882b5264cca6bdabe1d67c309ca8d7f13c6
 .. |feature 8325e| image:: https://img.shields.io/badge/8325e-feature-green
