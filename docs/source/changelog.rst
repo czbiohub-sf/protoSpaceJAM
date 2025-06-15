@@ -8,7 +8,7 @@ Algorithm
 
 :Date: June 14, 2025 |bug fix 01d81| Fixed a bug in insertion mode where recoding crashes if the payload is shorter than 23bp.
 
-:Date: June 14, 2025 |bug fix 6d75b| Fixed a bug in SNP mode where recoding in gRNA is not reflected in the donor. (this bug manifests when the SNP payload overlaps with the gRNA).
+:Date: June 14, 2025 |bug fix 6d75b| Fixed a bug in SNP mode where recoding in gRNA is not reflected in the donor (this bug manifests when the SNP payload overlaps with the gRNA).
 
 :Date: Feburary 17, 2025 |feature f13c6| Added the rat genome mRatBN7.2 to the list of supported/precomputed genomes.
 
@@ -71,9 +71,9 @@ Algorithm
 Portal
 ------
 
-:Date: Feburary 17, 2025 |enhancement 421dad| Disabled "full" recoding for SNP-payload (for both input routes: build job and upload submission csv). "stop_recut" is allowed.
+:Date: June 14, 2025 |enhancement 421dad| Disabled "full" recoding for SNP-payload (for both input routes: build job and upload submission csv). "stop_recut" is allowed.
 
-:Date: Feburary 17, 2025 |enhancement 421dad| Added a warning when no transcript ID is supplied (as it reduced effectiveness of recoding which needs gene model annotations)
+:Date: June 14, 2025 |enhancement 421dad| Added a warning when no transcript ID is supplied (as it reduced effectiveness of recoding which needs gene model annotations)
 
 :Date: Feburary 17, 2025 |feature 8325e| Added the rat genome: mRatBN7.2 Ensembl.
 
