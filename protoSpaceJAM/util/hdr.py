@@ -155,7 +155,7 @@ class HDR_flank:
 
         #Pad self.tag if it is shorter than 23bp
         self.tag_was_padded = False
-        if len(self.tag) <= 23:
+        if len(self.tag) <= 23 and self.payload_type != "SNP":
             self.tag_was_padded = True
             self.original_tag = self.tag  # Store the original tag
             self.filler_seq = "GATTACAGATTACAGATTACAGA"  # 23bp filler
