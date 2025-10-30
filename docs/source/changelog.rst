@@ -71,6 +71,8 @@ Algorithm
 Portal
 ------
 
+:Date: October 30, 2025 |enhancement 031f5| Fixed a bug that prevents downloading .gb files when multiple gRNAs are requested for a gene.
+
 :Date: June 14, 2025 |enhancement 421dad| Disabled "full" recoding for SNP-payload (for both input routes: build job and upload submission csv). "stop_recut" is allowed.
 
 :Date: June 14, 2025 |enhancement 421dad| Added a warning when no transcript ID is supplied (as it reduced effectiveness of recoding which needs gene model annotations)
@@ -154,6 +156,8 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+.. |enhancement 031f5| image:: https://img.shields.io/badge/031f5-enhancement-green
+    :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/d10f0d214005977e1186897076f22e5f5fa031f5
 .. |enhancement 421dad| image:: https://img.shields.io/badge/421dad-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal-private/commit/814f34f8d54e10b8b72b8132193f657cd4421dad
 .. |bug fix 01d81| image:: https://img.shields.io/badge/01d81-bug%20fix-red
