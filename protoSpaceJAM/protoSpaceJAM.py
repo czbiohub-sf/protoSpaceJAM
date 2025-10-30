@@ -771,14 +771,17 @@ def main(custom_args=None):
                             donor = HDR_template.Donor_pretrim
                             
                         # gRNA and donor names
+                        # Include gRNA rank in the name when multiple gRNAs are requested
+                        gRNA_rank_suffix = f"_rank{i+1}" if gRNA_num_out > 1 else ""
+
                         if coordinate_without_ENST:
-                            gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}"
-                            donor_name = f"{ENST_ID}_donor_entry{Entry}"
+                            gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}{gRNA_rank_suffix}"
+                            donor_name = f"{ENST_ID}_donor_entry{Entry}{gRNA_rank_suffix}"
                         else:
                             chrom_coord = f"{chrom}_{coordinate}"
                             ENST_design_counts[chrom_coord] = ENST_design_counts.get(chrom_coord, 0) + 1
-                            gRNA_name = f"{chrom_coord}_gRNA_entry{Entry}"
-                            donor_name = f"{chrom_coord}_donor_entry{Entry}"
+                            gRNA_name = f"{chrom_coord}_gRNA_entry{Entry}{gRNA_rank_suffix}"
+                            donor_name = f"{chrom_coord}_donor_entry{Entry}{gRNA_rank_suffix}"
 
                         if config["Donor_type"] == "dsDNA":
                             # replace donor_ with donor_trimmed_
@@ -943,11 +946,14 @@ def main(custom_args=None):
                     if config["Donor_type"] == "dsDNA":
                         donor_trimmed = HDR_template.Donor_final
                         donor = HDR_template.Donor_pretrim
-                        
+
                     # gRNA and donor names
+                    # Include gRNA rank in the name when multiple gRNAs are requested
+                    gRNA_rank_suffix = f"_rank{i+1}" if gRNA_num_out > 1 else ""
+
                     ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
-                    gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}"
-                    donor_name = f"{ENST_ID}_donor_entry{Entry}"
+                    gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}{gRNA_rank_suffix}"
+                    donor_name = f"{ENST_ID}_donor_entry{Entry}{gRNA_rank_suffix}"
                     if config["Donor_type"] == "dsDNA":
                         donor_trimmed_name = donor_name.replace("donor_", "donor_trimmed_")
                         #donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
@@ -1115,11 +1121,14 @@ def main(custom_args=None):
                     if config["Donor_type"] == "dsDNA":
                         donor_trimmed = HDR_template.Donor_final
                         donor = HDR_template.Donor_pretrim
-                        
+
                     # gRNA and donor names
+                    # Include gRNA rank in the name when multiple gRNAs are requested
+                    gRNA_rank_suffix = f"_rank{i+1}" if gRNA_num_out > 1 else ""
+
                     ENST_design_counts[ENST_ID] = ENST_design_counts.get(ENST_ID, 0) + 1
-                    gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}"
-                    donor_name = f"{ENST_ID}_donor_entry{Entry}"
+                    gRNA_name = f"{ENST_ID}_gRNA_entry{Entry}{gRNA_rank_suffix}"
+                    donor_name = f"{ENST_ID}_donor_entry{Entry}{gRNA_rank_suffix}"
                     if config["Donor_type"] == "dsDNA":
                         donor_trimmed_name = donor_name.replace("donor_", "donor_trimmed_")
                         #donor_trimmed_name = f"{ENST_ID}_donor_trimmed_{ENST_design_counts[ENST_ID]}"
