@@ -156,7 +156,7 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
-.. |enhancement 031f5| image:: https://img.shields.io/badge/031f5-enhancement-green
+.. |enhancement 031f5| image:: https://img.shields.io/badge/031f5-bug%20fix-red
     :target: https://github.com/czbiohub-sf/protoSpaceJAM/commit/d10f0d214005977e1186897076f22e5f5fa031f5
 .. |enhancement 421dad| image:: https://img.shields.io/badge/421dad-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal-private/commit/814f34f8d54e10b8b72b8132193f657cd4421dad
