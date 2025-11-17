@@ -174,9 +174,11 @@ class HDR_flank:
 
         assert len(left_flk_phases) > 1
         self.left_flk_phases = self.join_int_list(left_flk_phases)
+        self.left_flk_phases_vanilla = self.left_flk_phases # save a copy of the left HA phases before any adjustments
 
         assert len(right_flk_phases) > 1
         self.right_flk_phases = self.join_int_list(right_flk_phases)
+        self.right_flk_phases_vanilla = self.right_flk_phases # save a copy of the right HA phases before any adjustments
 
         # adjustments for SNP mode (1 of 3)
         # the overall strategy for SNP mode is reuse the recoding logic developed for the insertion mode, with a few modifications:
@@ -1732,10 +1734,16 @@ class HDR_flank:
         #################################
         self.compute_donor_feature_coordinates()
 
+        # added 2025-11-16: for viewing gRNA in the context of payloadless donor 
+        self.compute_payloadless_donor_feature_coordinates()
+
         #################################
         # get donor phases              #
         #################################
         self.compute_donor_coding_coordinates()
+
+        # added 2025-11-16: for viewing gRNA in the context of payloadless donor 
+        self.compute_payloadless_donor_coding_coordinates()
 
     #############
     # END OF INIT#
@@ -1905,6 +1913,7 @@ class HDR_flank:
                 "coding_coord": coding_coord,
                 "ORF_coord": ORF_coord
             })
+    
 
     def compute_donor_feature_coordinates(self):
         """
@@ -1977,6 +1986,87 @@ class HDR_flank:
             self.Donor_features =  Donor_features
         else:
             self.Donor_features.update(Donor_features)
+
+    def compute_payloadless_donor_coding_coordinates(self):
+        donor_phases = self.left_flk_phases_vanilla + self.right_flk_phases_vanilla # get the donor phases
+        coding_coord = self.get_coding_coord_from_phases(donor_phases) # get coding coordinates
+
+        if self.Donor_type == "ssODN":
+            coding_coord = [i for i in coding_coord if i] # remove None values
+            ORF_coord = self.get_coding_coord_from_phases(donor_phases, ORF=True)
+            ORF_coord = [(i[0], i[1]+1) for i in ORF_coord] # end offset
+            coding_coord = [(i[0], i[1]+1) for i in coding_coord] # new in payloadless mode: end offset for coding coord
+
+            if self.strand_flipped: # flip the coordinates to matched the flipped strand
+                _len = len(donor_phases)
+                coding_coord = [[_len-i[1], _len-i[0]] for i in coding_coord]
+                ORF_coord = [[_len-i[1], _len-i[0]] for i in ORF_coord]
+
+        if self.Donor_type == "dsDNA": #TODO: add ORF coord to dsDNA mode
+            # convert the coordinates to 1-indexed
+            coding_coord = [[i[0], i[1]+1] for i in coding_coord]
+            ORF_coord = self.get_coding_coord_from_phases(donor_phases, ORF=True)
+            ORF_coord = [(i[0]+1, i[1]+2) for i in ORF_coord] # end offset
+
+        
+        if not hasattr(self, "payloadless_donor_features"):
+            self.payloadless_donor_features =  {    
+                "coding_coord": coding_coord,
+                "ORF_coord": ORF_coord
+            }
+        else:
+            self.payloadless_donor_features.update({    
+                "coding_coord": coding_coord,
+                "ORF_coord": ORF_coord
+            })
+    
+    def compute_payloadless_donor_feature_coordinates(self):
+        gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", case_sensitive=True)
+        #gRNA_coord[1] += 1 # gRNA end offset 
+        left_arm_coord = [0, len(self.gRNA_lc_Larm)-1]
+        right_arm_coord = [len(self.gRNA_lc_Larm), len(self.gRNA_lc_Larm)+len(self.gRNA_lc_Rarm)-1]
+        HA_payload_strand = 1 # ssODN strand (1 for nonflipped, -1 for flipped)
+
+        if self.Donor_type == "ssODN":
+            gRNA_coord = [i for i in gRNA_coord if i] # remove None values
+
+            if self.strand_flipped: # flip the coordinates to matched the flipped strand
+                _len = len(self.gRNA_lc_Larm) + len(self.gRNA_lc_Rarm)
+                gRNA_coord = [[_len - i[1], _len - i[0]] for i in gRNA_coord]
+                left_arm_coord = [_len - left_arm_coord[1], _len - left_arm_coord[0]]
+                right_arm_coord = [_len - right_arm_coord[1], _len - right_arm_coord[0]]
+                HA_payload_strand = -1 # this is also the coding strand 
+            
+            # convert the coordinates to 1-indexed
+            gRNA_coord = [[i[0], i[1]+1] for i in gRNA_coord]
+            left_arm_coord = [left_arm_coord[0], left_arm_coord[1]+1]
+            right_arm_coord = [right_arm_coord[0], right_arm_coord[1]+1]
+
+            # compute gRNA strand (relative to the donor)
+            gRNA_strand = HA_payload_strand * self.convert_strand_to_numeric(self.gStrand) * self.convert_strand_to_numeric(self.ENST_strand)
+
+        if self.Donor_type == "dsDNA":
+            # convert the coordinates to 1-indexed
+            gRNA_coord = [[i[0], i[1]+1] for i in gRNA_coord]
+            left_arm_coord = [left_arm_coord[0], left_arm_coord[1]+1]
+            right_arm_coord = [right_arm_coord[0], right_arm_coord[1]+1]
+            # compute HA_payload strand
+            HA_payload_strand = 1 # the HA_payload strand is always 1 for dsDNA donor
+            # compute gRNA strand (relative to the dsDNA displaying strand)
+            gRNA_strand = self.convert_strand_to_numeric(self.gStrand) * self.convert_strand_to_numeric(self.ENST_strand)
+
+        payloadless_donor_features = {    
+                "gRNA_coord": gRNA_coord,
+                "left_arm_coord": left_arm_coord,
+                "right_arm_coord": right_arm_coord,
+                "gRNA_strand": gRNA_strand,
+                "HA_payload_strand": HA_payload_strand
+            }
+
+        if not hasattr(self, "payload_donor_gRNA_features"):
+            self.payloadless_donor_features =  payloadless_donor_features
+        else:
+            self.payloadless_donor_features.update(payloadless_donor_features)
 
     def flip_strand(self, strand):
         """
