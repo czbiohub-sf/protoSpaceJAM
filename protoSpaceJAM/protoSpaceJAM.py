@@ -818,7 +818,9 @@ def main(custom_args=None):
                         # write genbank file
                         with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
                             write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
-
+                        # write anothergenbank file without payload
+                        with open(os.path.join(outdir, "genbank_files", f"{donor_name}_gRNAonly_noPayload.gb"), "w") as gb_handle:
+                            write_genbank_gRNAonly_noPayload(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
 
                         # write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
@@ -994,6 +996,9 @@ def main(custom_args=None):
                     # write genbank file
                     with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
                         write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
+                    # write anothergenbank file without payload
+                    with open(os.path.join(outdir, "genbank_files", f"{donor_name}_gRNAonly_noPayload.gb"), "w") as gb_handle:
+                        write_genbank_gRNAonly_noPayload(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
@@ -1169,6 +1174,9 @@ def main(custom_args=None):
                     # write genbank file
                     with open(os.path.join(outdir, "genbank_files", f"{donor_name}.gb"), "w") as gb_handle:
                         write_genbank(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
+                    # write anothergenbank file without payload
+                    with open(os.path.join(outdir, "genbank_files", f"{donor_name}_gRNAonly_noPayload.gb"), "w") as gb_handle:
+                        write_genbank_gRNAonly_noPayload(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
@@ -1313,10 +1321,76 @@ def write_genbank(handle, data_obj, donor_name, donor_type, payload_type):
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), type='recode', qualifiers={"label": "recode"})
             seq_record.features.append(feature)
 
+    # Write to a GenBank file using SeqIO for the actual file writing
+    SeqIO.write([seq_record], handle, 'genbank')
+
+def write_genbank_gRNAonly_noPayload(handle, data_obj, donor_name, donor_type, payload_type):
+    """write genebank file with wt homology arm and gRNA only"""
+    if len(donor_name) > 16: # truncate donor_name to 16 characters (GenBank limit for locus name)
+        donor_name = donor_name.replace("ENST", "")
+        donor_name = donor_name.lstrip("0")
+        donor_name = donor_name.replace("donor", "")
+        donor_name = donor_name.replace("donor_trimmed", "")
+        donor_name = donor_name.replace("entry", "")
+        donor_name = donor_name.replace("__", "_")
+        if len(donor_name) > 16:
+            donor_name = donor_name[:16]
+
+    gb_record = Record.Record()
+    gb_record.locus = donor_name
+    gb_record.size = len(data_obj.left_flk_seq + data_obj.right_flk_seq)
+    gb_record.residue_type = 'DNA'
+    gb_record.data_file_division = 'PLN'
+    gb_record.definition = ''
+    gb_record.accession = ['']
+    gb_record.version = ''
+    gb_record.keywords = ['DNA sequence']
+    gb_record.source = "DNA sequence"
+    gb_record.organism = 'DNA sequence'
+    gb_record.taxonomy = ['DNA sequence']
+    gb_record.sequence=data_obj.left_flk_seq + data_obj.right_flk_seq
+
+    # Convert the Bio.GenBank record to a SeqRecord (needed for writing with SeqIO)
+    sequence = Seq(gb_record.sequence)
+    seq_record = SeqRecord(sequence, id=gb_record.accession[0], name=donor_name, description= f"wt homology arms and gRNA")
+    seq_record.annotations["date"] = get_current_date_formatted()
+    seq_record.annotations["data_file_division"] = gb_record.data_file_division
+    seq_record.annotations["organism"] = 'DNA sequence'
+    seq_record.annotations["molecule_type"] = "DNA"
+
+    # Features 
+    feature = SeqFeature(FeatureLocation(start=data_obj.payloadless_donor_features["left_arm_coord"][0], end=data_obj.payloadless_donor_features["left_arm_coord"][1], strand=data_obj.payloadless_donor_features["HA_payload_strand"]), type='left HA', qualifiers={"label": "left homology arm (before trimming)"})
+    seq_record.features.append(feature)
+
+    feature = SeqFeature(FeatureLocation(start=data_obj.payloadless_donor_features["right_arm_coord"][0], end=data_obj.payloadless_donor_features["right_arm_coord"][1], strand=data_obj.payloadless_donor_features["HA_payload_strand"]), type='right HA', qualifiers={"label": "right homology arm (before trimming)"})
+    seq_record.features.append(feature)
+
+    
+    if "coding_coord" in data_obj.payloadless_donor_features: 
+        for feat in data_obj.payloadless_donor_features["coding_coord"]:
+            feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.payloadless_donor_features["HA_payload_strand"], type='exon ', qualifiers={"label": "exon"})
+            seq_record.features.append(feature)
+
+    if "ORF_coord" in data_obj.payloadless_donor_features:
+        for feat in data_obj.payloadless_donor_features["ORF_coord"]:
+            #feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.Donor_features["HA_payload_strand"], type='CDS-in-frame', qualifiers={"label": "CDS-in-frame"})
+            #seq_record.features.append(feature)
+
+            # Extract and translate the coding in-frame sequence
+            orf_sequence = sequence[feat[0]:feat[1]]
+            protein_sequence = translate_sequence(str(orf_sequence))
+            protein_feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), strand=data_obj.payloadless_donor_features["HA_payload_strand"],type='CDS', qualifiers={"label": "CDS", "codon_start": 1, "translation": protein_sequence})
+            seq_record.features.append(protein_feature)
+
+    if "gRNA_coord" in data_obj.payloadless_donor_features:
+        for feat in data_obj.payloadless_donor_features["gRNA_coord"]:
+            feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1], strand=data_obj.payloadless_donor_features["gRNA_strand"]), type='gRNA+PAM', qualifiers={"label": "gRNA+PAM"})
+            seq_record.features.append(feature)
 
 
     # Write to a GenBank file using SeqIO for the actual file writing
     SeqIO.write([seq_record], handle, 'genbank')
+
 
 def ret_six_dec(myvar):
     """
