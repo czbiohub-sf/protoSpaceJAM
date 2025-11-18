@@ -70,7 +70,7 @@ Algorithm
 
 Portal
 ------
-:Date: November 17, 2025 |enhancement | Added an embedded sequence viewer to view the DNA donor sequence in the results page.
+:Date: November 17, 2025 |enhancement 55f09| Added an embedded sequence viewer to view the DNA donor sequence in the results page.
 
 :Date: October 30, 2025 |bug fix 031f5| Fixed a bug that prevents downloading .gb files when multiple gRNAs are requested for a gene.
 
