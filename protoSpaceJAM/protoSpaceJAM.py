@@ -1357,6 +1357,7 @@ def write_genbank_gRNAonly_noPayload(handle, data_obj, donor_name, donor_type, p
     seq_record.annotations["data_file_division"] = gb_record.data_file_division
     seq_record.annotations["organism"] = 'DNA sequence'
     seq_record.annotations["molecule_type"] = "DNA"
+    
 
     # Features 
     feature = SeqFeature(FeatureLocation(start=data_obj.payloadless_donor_features["left_arm_coord"][0], end=data_obj.payloadless_donor_features["left_arm_coord"][1], strand=data_obj.payloadless_donor_features["HA_payload_strand"]), type='left HA', qualifiers={"label": "left homology arm (before trimming)"})
