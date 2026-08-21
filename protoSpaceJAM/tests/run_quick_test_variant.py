@@ -1,26 +1,49 @@
 """
-protoSpaceJAM against a cell-line variant set, on six loci chosen to cover the weight table.
+protoSpaceJAM against a cell-line variant set, on the nine designs whose guides were verified by
+hand.
 
-The input rows, and what each one is here to exercise (genotypes are czML1175_KOLF2.1J-Parental
-hap1, read off the filtered joint callset):
+These are *every* OpenCell design whose gRNA recognition site (protospacer + PAM) carries a
+non-reference base in czML1175_KOLF2.1J-Parental hap1 -- nine designs, nine bases, nine VCF
+records, out of 1,201 designable rows (0.7%).  They are the cases where cell line mode changes
+the oligo you would order, so they are the cases worth pinning.
 
-    ENST00000463591 C   PRDM16-204   1:3386696 A>G het at the stop codon
-                                     -> distal_het 0.75 and seed_het 0.25 on ranks 2/3
-    ENST00000514428 N   RERE-218     1:8624343 C>T het inside a PAM
-                                     -> weight 0, PAM_differs_from_reference
-    1:946247                         a lone hom-alt substitution: exactly one base of the donor
-                                     differs from the reference, distal_hom 0.9 on rank 3
-    1:978812                         hom-alt in the seed of all three guides -> seed_hom 0.5
-    1:1168310                        a 2 bp insertion at the edit position and a 35 bp deletion
-                                     301 bp away: one indel_selected_hap survives into the final
-                                     donor, the other is centered out
-    1:1157315                        a 40 bp region where this sample has no genotype call at all
-                                     -> no_call_region, the reason that exists because the
-                                     single-sample VCF was extracted with --exclude-uncalled
+    Entry  gene           chr:pos        region  off  ref>var  GT   GQ  DP  weight
+      63   RABAC1-201     19:41959295    distal    4  C>T      1|0  36  32  0.75
+     114   NEK9-201       14:75084551    distal    3  C>T      1/1  58  61  0.90
+     146   RABGAP1L-201   1:174219147    distal    5  G>A      1/1  56  81  0.90
+     191   ACTR2-201      2:65268753     distal    7  G>A      1/1  54  73  0.90
+     273   BLVRA-201      7:43771165     seed     11  G>A      1/1  52  67  0.50
+     293   MAP1LC3B-201   16:87392422    distal    7  T>C      1/1  53  48  0.90
+     866   ARHGEF7-204    13:111217690   seed     18  T>C      1/1  55  39  0.50
+     966   CDK1-203       10:60794005    seed     11  A>G      1/1  57  76  0.50
+    1059   ULK3-201       15:74843106    distal    4  T>C      1|0  32  45  0.75
 
-Loci 3-6 were chosen against czML1175 *and* against the filtered callset.  Do not pick them from
-an upstream VCF: the previous fixture used 1:977899, which is a GQ=5 call and vanishes the moment
-a quality filter is applied.
+`off` is the 0-based offset along the protospacer in guide orientation (0 is PAM-distal, 19 abuts
+the PAM); `ref>var` are the genomic bases, which appear complemented in the six minus-strand
+guides.  Seven of nine are hom-alt with zero reference reads, the two hets are phased onto the
+selected haplotype, all nine carry GQ >= 32, and none sits in a homopolymer.  Entry 1059
+(ULK3-201) is the only design in the whole OpenCell run where cell line mode picked a *different*
+guide than the reference run.
+
+How the fixtures were made, and what makes them trustworthy
+-----------------------------------------------------------
+`tests/GroundTruths/quick_variant_*.csv` are this pipeline's own output -- but before they were
+promoted to fixtures, all nine guides were checked against `variant/manual_eval_set/`, which is
+independent evidence: `extract_grna_diffs.py` slices the guide window out of both genome pickles
+(`fa_pickle/GRCh38/` and `fa_pickle/GRCh38_KOLF2.1J_hap1/`), reverse-complements on the minus
+strand and diffs base by base against the source VCF, never reading protoSpaceJAM's own
+`gRNA_seq` columns.  Protospacer, PAM, reference protospacer, guide coordinates, variant weight
+and the reported variant string all matched for all nine.
+
+**If you ever regenerate these fixtures, re-run that check first.**  Regenerating them blind turns
+whatever the code now emits into the new "correct" answer, which is exactly the failure mode the
+manual verification exists to prevent.
+
+What this input does not cover
+------------------------------
+No variant landed in a PAM in this run, and none of the nine sits in a no-call region, so
+`pam_het`, `pam_hom`, `seed_het` and `no_call_region` are not exercised here.  `indel_selected_hap`
+is -- two of the nine have an unrepresentable indel in their homology arms.
 """
 
 import os
@@ -42,11 +65,22 @@ _variant_genome_dir = os.path.join(
 
 
 def _base_args(outdir):
+    """
+    The OpenCell parameters, verbatim from run_full_test_variant.py.
+
+    Guide choice has to be reproduced exactly or the verified sequences do not apply, and ranking
+    is sensitive to these.  num_gRNA_per_design stays at its default of 1, as the OpenCell run had
+    it: a penalized guide only reaches rank 1 when there was no better alternative, which is what
+    makes these nine the interesting ones.
+    """
     return {
         "path2csv": os.path.join("input", "test_input_variant.csv"),
         "outdir": outdir,
-        "num_gRNA_per_design": 3,
         "ssODN_max_size": 200,
+        "Npayload": "ACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATGGGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGT",
+        "Cpayload": "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG",
+        "Strand_choice": "NonTargetStrand",
+        "recode_order": "PAM_first",
         "test_mode": True,
     }
 
@@ -156,30 +190,56 @@ class test_variant_aware_design(unittest.TestCase):
 
     def test_weight_table_is_covered(self):
         """
-        Every region x zygosity combination the guide penalty can produce is reached.
+        Every region x zygosity combination *these nine reach* is still being classified.
 
         Without this, a change that silently stopped classifying (say) seed variants would still
         pass the fixture comparison -- it would just quietly regenerate a new "correct" answer the
         next time someone refreshed the ground truths.
+
+        The nine carry four distal_hom, three seed_hom and two distal_het, and no PAM variant at
+        all, so `pam_het`, `pam_hom` and `seed_het` cannot be asserted from this input.  They are
+        reachable through the weight table in util/variant_annot.py and through the full OpenCell
+        run; if you need them pinned in a quick test, they need loci chosen for it.
         """
         flags = set()
         for r in self._result_rows():
             flags.update(w for w in r["variant_warnings"].split(";") if w)
-        for expected in ("distal_het", "seed_het", "pam_het", "distal_hom", "seed_hom"):
+        for expected in ("distal_het", "distal_hom", "seed_hom"):
             self.assertIn(expected, flags, f"{expected} is not exercised by the test input")
+        self.assertIn("gRNA_seq_differs_from_reference", flags,
+                      "all nine guides are supposed to differ from the reference sequence")
+
+    def test_every_design_has_a_variant_in_its_guide(self):
+        """
+        The defining property of this input: all nine, no exceptions.
+
+        A design dropping out, or the ranking quietly preferring an unpenalized guide, would
+        otherwise show up only as a fixture diff someone might refresh away.
+        """
+        rows = self._result_rows()
+        self.assertEqual(len(rows), 9, "expected exactly nine designs")
+        for r in rows:
+            with self.subTest(design=r["ID"]):
+                self.assertTrue(r["variants_in_protospacer_PAM"],
+                                f"{r['ID']} was chosen for having a variant in its guide")
+                self.assertLess(float(r["variant_weight"]), 1.0)
+                self.assertEqual(r["spec_score_stale"], "True")
+                self.assertTrue(r["gRNA_seq_ref"], "the reference guide sequence should be reported")
+                self.assertNotEqual(r["gRNA_seq"], r["gRNA_seq_ref"])
 
     def test_unrepresented_variant_reasons_are_covered(self):
-        """The two ways a window can be untrustworthy while the SNVs are all correct."""
+        """
+        A window can be untrustworthy while every SNV in it is correct.
+
+        Only `indel_selected_hap` is reachable from these nine; `no_call_region` is not, so it is
+        not asserted here.  If both need pinning in a quick test, that needs a locus chosen for it.
+        """
         import csv
 
         with open(os.path.join(self.runtime_out, "variants_report.csv")) as fh:
             reasons = {r["skip_reason"] for r in csv.DictReader(fh)}
-        self.assertIn("indel_selected_hap", reasons)
-        self.assertIn(
-            "no_call_region",
-            reasons,
-            "no-call regions are not being reported; is the set built without --nocall_bed?",
-        )
+        self.assertIn("indel_selected_hap", reasons,
+                      "two of the nine have an unrepresentable indel in their homology arms")
 
 
 if __name__ == "__main__":
