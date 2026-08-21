@@ -7,9 +7,12 @@ import sys
 import math
 import pickle
 import logging
+from functools import lru_cache
 
 from protoSpaceJAM.util.hdr import HDR_flank #uncomment this for pip installation
+from protoSpaceJAM.util import variant_annot
 # from util.hdr import HDR_flank
+# from util import variant_annot
 
 class MyParser(argparse.ArgumentParser):
     def error(self, message):
@@ -159,7 +162,15 @@ def get_HDR_template(
     Strand_choice,
     syn_check_args,
     coordinate_without_ENST,
+    variant_ctx=None,
+    variant_report_ctx=None,
 ):
+    """
+    variant_ctx         personalizes the fetched reference slice (runtime --variant_set path);
+                        must be None when the sequence already comes from a substituted genome
+                        (--variant_genome), or the substitutions would be applied twice
+    variant_report_ctx  the VariantSet used for reporting only; set on both paths
+    """
     for index, row in df.iterrows():
         ENST_ID = row["ID"]
         ENST_genename = ENST_info[ENST_ID].name
@@ -188,6 +199,7 @@ def get_HDR_template(
             half_len=HDR_arm_len,
             type=type,
             genome_ver=genome_ver,
+            variant_ctx=variant_ctx,
         )  # start>end is possible
         left_Arm_Phases = [
             get_phase_in_codon0(
@@ -235,6 +247,7 @@ def get_HDR_template(
 
             syn_check_args=syn_check_args,
             coordinate_without_ENST=coordinate_without_ENST,
+            variant_ctx=variant_report_ctx,
         )
         return myflank
         # log IDs whose gRNA is not in the default-size HDR arms
@@ -271,10 +284,11 @@ def convert_strand(strand):
         return f"input strand:{strand} needs to be +/-"
 
 
-def get_HDR_arms(loc, half_len, type, genome_ver):
+def get_HDR_arms(loc, half_len, type, genome_ver, variant_ctx=None):
     """
     input:  loc         [chr,pos,strand]  #start < end , strand is the coding strand
             half_len      length of the HDR arm (one sided)
+            variant_ctx   optional variant_annot.VariantSet, passed straight to get_seq()
     return: HDR arms -> in coding strand <-
             [5'arm, 3'arm]
     """
@@ -289,6 +303,7 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
                 end=Pos + 1,
                 strand=1,
                 genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             vanilla_right_arm = get_seq(
                 chr=Chr,
@@ -296,6 +311,7 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
                 end=Pos + half_len + 1,
                 strand=1,
                 genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             return [
                 vanilla_left_arm,
@@ -307,10 +323,12 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
             ]
         elif Strand == -1:
             vanilla_left_arm = get_seq(
-                chr=Chr, start=Pos - half_len, end=Pos, strand=1, genome_ver=genome_ver
+                chr=Chr, start=Pos - half_len, end=Pos, strand=1, genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             vanilla_right_arm = get_seq(
-                chr=Chr, start=Pos, end=Pos + half_len, strand=1, genome_ver=genome_ver
+                chr=Chr, start=Pos, end=Pos + half_len, strand=1, genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             return [
                 reverse_complement(vanilla_right_arm),
@@ -325,10 +343,12 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
     elif type == "stop":
         if Strand == 1:
             vanilla_left_arm = get_seq(
-                chr=Chr, start=Pos - half_len, end=Pos, strand=1, genome_ver=genome_ver
+                chr=Chr, start=Pos - half_len, end=Pos, strand=1, genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             vanilla_right_arm = get_seq(
-                chr=Chr, start=Pos, end=Pos + half_len, strand=1, genome_ver=genome_ver
+                chr=Chr, start=Pos, end=Pos + half_len, strand=1, genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             return [
                 vanilla_left_arm,
@@ -345,6 +365,7 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
                 end=Pos + 1,
                 strand=1,
                 genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             vanilla_right_arm = get_seq(
                 chr=Chr,
@@ -352,6 +373,7 @@ def get_HDR_arms(loc, half_len, type, genome_ver):
                 end=Pos + half_len + 1,
                 strand=1,
                 genome_ver=genome_ver,
+                variant_ctx=variant_ctx,
             )
             return [
                 reverse_complement(vanilla_right_arm),
@@ -389,6 +411,7 @@ def get_gRNAs_target_coordinate(
     reg_penalty,
     alphas,
     dist=50,
+    variant_ctx=None,
 ):
     """
     input
@@ -431,6 +454,8 @@ def get_gRNAs_target_coordinate(
         spec_score_flavor=spec_score_flavor,
         reg_penalty=reg_penalty,
         alphas=alphas,
+        pam=pam,
+        variant_ctx=variant_ctx,
     )
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_target_pos.sort_values(
         "final_weight", ascending=False
@@ -451,6 +476,7 @@ def get_gRNAs(
     reg_penalty,
     alphas,
     dist=50,
+    variant_ctx=None,
 ):
     """
     Rank gRNAs that cut near the start and stop codon of an ENST_ID
@@ -493,7 +519,9 @@ def get_gRNAs(
         type="start",
         spec_score_flavor=spec_score_flavor,
         reg_penalty=reg_penalty,
-        alphas=alphas
+        alphas=alphas,
+        pam=pam,
+        variant_ctx=variant_ctx,
     )
     ranked_df_gRNAs_ATG = ranked_df_gRNAs_ATG.sort_values(
         "final_weight", ascending=False
@@ -524,7 +552,9 @@ def get_gRNAs(
         type="stop",
         spec_score_flavor=spec_score_flavor,
         reg_penalty=reg_penalty,
-        alphas=alphas
+        alphas=alphas,
+        pam=pam,
+        variant_ctx=variant_ctx,
     )
     ranked_df_gRNAs_stop = ranked_df_gRNAs_stop.sort_values(
         "final_weight", ascending=False
@@ -534,14 +564,22 @@ def get_gRNAs(
 
 
 def rank_gRNAs_for_tagging(
-    loc, gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, reg_penalty, alphas=[1, 1, 1]
+    loc, gRNA_df, loc2posType, ENST_ID, ENST_strand, type, spec_score_flavor, reg_penalty, alphas=[1, 1, 1],
+    pam="NGG", variant_ctx=None,
 ):
     """
     input:  loc         [chr,pos,strand]  #start < end
             gRNA_df     pandas dataframe, *unranked*   columns: "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"  !! neg strand: start > end
             alphas       scaling factor for the weights, default [1,1,1]
             type        "start" or "stop:
+            variant_ctx  optional variant_annot.VariantSet; adds a fourth multiplier to
+                         final_weight so guides whose PAM or seed is altered in the target cell
+                         line lose out to guides that are intact there
     output: gRNA_df     pandas dataframe *ranked*      columns: "seq","pam","start","end", "strand", "guideMITScore","guideCfdScore","guideCfdScorev2","guideCfdScorev3", "Eff_scores"  !! neg strand: start > end
+
+    The variant columns are always present (weight 1.0, empty flags) so downstream reporting does
+    not have to branch, but the multiplier is only applied when a variant set is in use -- with no
+    variant set the ranking is bit-for-bit what it was before this feature existed.
     """
     insPos = loc[
         1
@@ -552,6 +590,10 @@ def rank_gRNAs_for_tagging(
     col_dist_weight = []
     col_pos_weight = []
     col_final_weight = []
+    col_variant_weight = []
+    col_variant_flags = []
+    col_variant_summary = []
+    col_spec_score_stale = []
     Chrs = []
     ENSTs = []
     InsertPos = []
@@ -608,11 +650,30 @@ def rank_gRNAs_for_tagging(
             f"strand {strand} {start}-{end} cutPos {cutPos} insert_loc {loc} cut2insDist {cut2insDist} distance_weight {distance_weight:.2f} CFD_score {CSS} specificity_weight {specificity_weight} pos_type {position_type} position_weight {position_weight}"
         )
 
+        # assess the protospacer+PAM window against the cell line's variants
+        if variant_ctx is None:
+            variant_weight, variant_flags, variant_summary, spec_stale = 1.0, "", "", False
+        else:
+            assessment = variant_annot.assess_guide(
+                variant_ctx, Chr, start, end, strand, pam=pam
+            )
+            variant_weight = assessment["weight"]
+            variant_flags = assessment["flags"]
+            variant_summary = assessment["summary"]
+            spec_stale = assessment["stale"]
+        col_variant_weight.append(variant_weight)
+        col_variant_flags.append(variant_flags)
+        col_variant_summary.append(variant_summary)
+        col_spec_score_stale.append(spec_stale)
+
         # calc. final_weight
         final_score = 1
         for weight, alpha in zip([specificity_weight, distance_weight, position_weight], alphas):
             if alpha != 0:
                 final_score *= float(weight ** alpha)
+        if variant_ctx is not None:
+            # no alpha: this is a correctness penalty, not a user-tunable preference
+            final_score *= float(variant_weight)
 
         col_final_weight.append(final_score)
 
@@ -624,6 +685,10 @@ def rank_gRNAs_for_tagging(
     gRNA_df["spec_weight"] = col_spec_weight
     gRNA_df["dist_weight"] = col_dist_weight
     gRNA_df["pos_weight"] = col_pos_weight
+    gRNA_df["variant_weight"] = col_variant_weight
+    gRNA_df["variant_warnings"] = col_variant_flags
+    gRNA_df["variants_in_protospacer_PAM"] = col_variant_summary
+    gRNA_df["spec_score_stale"] = col_spec_score_stale
     gRNA_df["final_weight"] = col_final_weight
 
     # rank gRNAs based on the score
@@ -1022,28 +1087,44 @@ def update_dict_count(
     return dict
 
 
-def get_seq(chr, start, end, strand, genome_ver):
+@lru_cache(maxsize=2)
+def _load_contig_seq(genome_ver, chr):
+    """
+    The contig pickle as a plain string, memoized.
+
+    get_HDR_arms() calls get_seq() twice per design and consecutive designs are often on the
+    same chromosome, but each call used to re-unpickle the whole contig (237 MB for chr1).
+    maxsize is deliberately small: two human contigs already hold ~500 MB.
+    """
+    chr_file_path = os.path.join("genome_files", "fa_pickle", genome_ver, f"{chr}.pk")
+    log.debug(f"opening file {chr_file_path}")
+    if not os.path.isfile(chr_file_path):
+        sys.exit(f"ERROR: file not found: {chr_file_path}")
+    return str(read_pickle_files(chr_file_path).seq)
+
+
+def get_seq(chr, start, end, strand, genome_ver, variant_ctx=None):
     """
     chr
     start (1-indexed)
     end (the end position is not included
     strand 1 or -1 (str)
+    variant_ctx  an optional variant_annot.VariantSet; when given, its substitutions are written
+                 into the slice before it is returned, making every downstream homology arm,
+                 guide sequence, recoding and recut-CFD personalized to that sample/haplotype
     """
     #print(f"fetching {chr}:{start}-{end} strand {strand}")
-    chr_file_path = os.path.join("genome_files", "fa_pickle", genome_ver, f"{chr}.pk")
-    log.debug(f"opening file {chr_file_path}")
-    if os.path.isfile(chr_file_path):
-        # read file
-        chr_seqrecord = read_pickle_files(chr_file_path)
-        subseq = str(chr_seqrecord.seq)[
-            (start - 1) : (end - 1)
-        ]  # use -1 to convert 1-index to 0-index
-        if strand == "-1" or strand == -1:
-            return reverse_complement(subseq)
-        else:
-            return subseq
+    subseq = _load_contig_seq(genome_ver, chr)[
+        (start - 1) : (end - 1)
+    ]  # use -1 to convert 1-index to 0-index
+    if variant_ctx is not None:
+        # patch on the + strand, before any reverse-complementing; the materialized genome is
+        # the oracle for this and 6_validate_runtime_patch.py checks both strands against it
+        subseq = variant_ctx.patch(chr, start, subseq)
+    if strand == "-1" or strand == -1:
+        return reverse_complement(subseq)
     else:
-        sys.exit(f"ERROR: file not found: {chr_file_path}")
+        return subseq
 
 
 def cal_elapsed_time(starttime, endtime):
