@@ -7,6 +7,8 @@ protoSpaceJAM/tests/quick_SNP_test_result
 protoSpaceJAM/tests/quick_dsDNA_test_result
 protoSpaceJAM/tests/quick_variant_test_result
 protoSpaceJAM/tests/quick_variant_test_result_materialized
+protoSpaceJAM/tests/manual_eval_variant
+protoSpaceJAM/tests/manual_eval_reference
 protoSpaceJAM/tests/OpenCell_design_reference*
 protoSpaceJAM/tests/OpenCell_design_variant_set*
 protoSpaceJAM/tests/OpenCell_design_variant_genome*
@@ -136,6 +138,7 @@ protoSpaceJAM/input/*
 !protoSpaceJAM/input/mart_export_canonical_proteincoding.GRCz11.csv
 !protoSpaceJAM/input/test_input.csv
 !protoSpaceJAM/input/test_input_variant.csv
+!protoSpaceJAM/input/test_input_manual_eval.csv
 !protoSpaceJAM/input/OpenCell_protospaceX_design.csv
 
 output
