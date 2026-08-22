@@ -117,6 +117,7 @@ class HDR_flank:
         Strand_choice,
         syn_check_args,
         coordinate_without_ENST,
+        variant_ctx=None,
     ) -> None:
 
         self.left_flk_seq = (
@@ -152,6 +153,10 @@ class HDR_flank:
         self.minCut2Ins_dist_ForUTRRecoding = 0
         self.mut_every_n = 3
         self.coordinate_without_ENST = coordinate_without_ENST
+        # reporting only: the arms handed to us are already personalized (either patched at
+        # fetch time or read from a substituted genome).  This is how we say *which* variants
+        # did that, and where the emitted sequence is knowingly not the real haplotype.
+        self.variant_ctx = variant_ctx
 
         #Pad self.tag if it is shorter than 23bp
         self.tag_was_padded = False
@@ -266,6 +271,9 @@ class HDR_flank:
             left_flk_coord_lst=self.left_flk_coord_lst,
             right_flk_coord_lst=self.right_flk_coord_lst,
         )
+
+        # which of the cell line's variants landed in these arms
+        self.collect_donor_variants()
 
         # make gRNA lowercase
         self.gRNA_lc_Larm, self.gRNA_lc_Rarm = self.make_gRNA_lowercase()
@@ -1749,6 +1757,128 @@ class HDR_flank:
     # END OF INIT#
     #############
 
+    ###############################################
+    # variant reporting (see util/variant_annot.py)#
+    ###############################################
+
+    def arm_span(self):
+        """Genomic (lo, hi) covered by the two homology arms, 1-based inclusive."""
+        coords = self.left_flk_coord_lst + self.right_flk_coord_lst
+        return min(coords), max(coords)
+
+    def genomic_to_arm_index(self, pos):
+        """
+        Genomic position -> 0-based index into `left_flk_seq + right_flk_seq`, unclamped.
+
+        The arms are stored in the coding strand, so on a minus-strand gene index 0 is the
+        *highest* genomic coordinate.  This mirrors the `pos - Lstart` arithmetic in
+        get_trunc_gRNA/get_ins2cut_seq/make_gRNA_lowercase -- keep the two in step.
+        """
+        Lstart = self.left_flk_coord_lst[0]
+        Rend = self.right_flk_coord_lst[1]
+        if Lstart < Rend:
+            return pos - Lstart
+        whole_len = len(self.left_flk_seq) + len(self.right_flk_seq)
+        return whole_len - (pos - Rend) - 1
+
+    def variant_arm_coord(self, variant):
+        """
+        A variant's REF footprint as an inclusive [start, end] pair of whole-arm indices,
+        clipped to the arms.  Returns None if it does not overlap them at all.
+        """
+        whole_len = len(self.left_flk_seq) + len(self.right_flk_seq)
+        # the footprint's two ends swap over on a minus-strand gene, hence min/max
+        idxs = [self.genomic_to_arm_index(p) for p in (variant.pos, variant.end)]
+        lo, hi = max(min(idxs), 0), min(max(idxs), whole_len - 1)
+        if lo > hi:
+            return None
+        return [lo, hi]
+
+    def collect_donor_variants(self):
+        """
+        Populate self.donor_variants / self.variants_in_donor / self.donor_sequence_reliable.
+
+        `donor_sequence_reliable` False means at least one arm base is knowingly not what is in
+        the cell -- an indel on the selected haplotype, or a variant we could not phase.  No
+        amount of correct SNV substitution rescues that window, so it has to reach the user.
+        """
+        self.donor_variants = []
+        self.variants_in_donor = ""
+        self.donor_sequence_reliable = True
+        if self.variant_ctx is None:
+            return
+        lo, hi = self.arm_span()
+        found = self.variant_ctx.variants_in(self.ENST_chr, lo, hi)
+        # other-haplotype indels are dropped: hap1 really is reference-length there, so they say
+        # nothing about this donor
+        self.donor_variants = [v for v in found if v.applied or v.makes_sequence_unreliable]
+        self.variants_in_donor = ";".join(v.short() for v in self.donor_variants)
+        self.donor_sequence_reliable = not any(
+            v.makes_sequence_unreliable for v in self.donor_variants
+        )
+
+    def variant_label(self, v):
+        """The GenBank label for a variant; also the key used to test donor membership."""
+        if v.applied:
+            return f"variant {v.pos} {v.ref}>{v.alt} ({v.zygosity})"
+        if getattr(v, "is_region", False):
+            # a no-call span has no allele to name -- the point is that we do not know one
+            span = v.pos if v.end == v.pos else f"{v.pos}-{v.end}"
+            return f"NO-CALL {span} (genotype unknown)"
+        return f"UNREPRESENTED {v.pos} {v.ref}>{v.alt} ({v.reason})"
+
+    def variant_feature_labels(self):
+        """(label, whole_arm_coord) for every donor variant, for the GenBank track."""
+        out = []
+        for v in self.donor_variants:
+            coord = self.variant_arm_coord(v)
+            if coord is None:
+                continue
+            out.append((self.variant_label(v), coord))
+        return out
+
+    def variant_in_final_donor(self, v):
+        """
+        Did this variant survive ssODN centering / dsDNA trimming into the delivered donor?
+
+        The arms are 500 bp a side but an ssODN is centered down to ~200, so a variant can be
+        real, reported, and yet nowhere near the oligo the user actually orders.  Saying
+        "unreliable" about that donor would be crying wolf; saying nothing about the arms would
+        hide a genuine problem with the recoding and guide choice that were made using them.
+        """
+        kept = getattr(self, "variant_labels_in_final_donor", None)
+        if kept is None:          # feature coords not computed (should not happen post-init)
+            return True
+        return self.variant_label(v) in kept
+
+    def unreliable_variants(self, final_donor_only):
+        """Donor variants whose window the emitted sequence does not faithfully represent."""
+        vs = [v for v in getattr(self, "donor_variants", []) if v.makes_sequence_unreliable]
+        if not final_donor_only:
+            return vs
+        return [v for v in vs if self.variant_in_final_donor(v)]
+
+    def variant_coords_in_donor(self, with_tag):
+        """
+        Donor-vanilla coordinates of the donor variants, in the same index space the other
+        feature tracks start from: `left_flk_seq + tag + right_flk_seq` when the payload is
+        present, `left_flk_seq + right_flk_seq` when it is not (SNP mode, payloadless GenBank).
+
+        Returns a list of (label, [start, end]) with inclusive 0-based ends, matching what
+        compare_stretches() hands to the same downstream transforms.
+        """
+        labelled = []
+        L = len(self.left_flk_seq)
+        shift = len(self.tag) if with_tag else 0
+        for label, (lo, hi) in self.variant_feature_labels():
+            # the payload is spliced in between the arms, so anything in the right arm moves.
+            # A footprint straddling the junction ends up spanning the payload too, which is the
+            # honest rendering: an indel across the insertion point does affect all of it.
+            lo_d = lo + shift if lo >= L else lo
+            hi_d = hi + shift if hi >= L else hi
+            labelled.append((label, [lo_d, hi_d]))
+        return labelled
+
     def compare_stretches(self, str1, str2, case_sensitive=False):
         # return a list of start,end pairs for the stretches of differences between two strings
         # Ensure both strings are of the same length
@@ -1921,10 +2051,12 @@ class HDR_flank:
         """
         gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.tag}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.tag}{self.gRNA_lc_Rarm}", case_sensitive=True)
         recoding_coord = self.compare_stretches(self.Donor_vanillia, self.Donor_postMut, case_sensitive=False)
+        variant_labels = self.variant_coords_in_donor(with_tag=True)
         # adjustment for SNP mode (5 of 5)
         # 
         if self.payload_type == "SNP": 
             gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", case_sensitive=True)
+            variant_labels = self.variant_coords_in_donor(with_tag=False)
             recoding_coord = self.compare_stretches(f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", f"{self.Donor_postMut_before_SNP}", case_sensitive=False) # Donor_postMut does not include the tag -> SNP replacement, therefore we can compare with the left + right HA arms
         left_arm_coord = [0, len(self.gRNA_lc_Larm)-1]
         right_arm_coord = [len(self.gRNA_lc_Larm) + len(self.tag), len(self.Donor_vanillia)-1]
@@ -1937,12 +2069,15 @@ class HDR_flank:
             gRNA_coord = [i for i in gRNA_coord if i] # remove None values
             recoding_coord = [self.apply_ssODN_centering_to_coords(i) for i in recoding_coord]
             recoding_coord = [i for i in recoding_coord if i] # remove None values
+            variant_labels = [(lbl, self.apply_ssODN_centering_to_coords(i)) for lbl, i in variant_labels]
+            variant_labels = [(lbl, i) for lbl, i in variant_labels if i] # drop ones centered out
             left_arm_coord = self.apply_ssODN_centering_to_coords(left_arm_coord)
             right_arm_coord = self.apply_ssODN_centering_to_coords(right_arm_coord)
             tag_coord = self.apply_ssODN_centering_to_coords(tag_coord)
             if self.strand_flipped: # flip the coordinates to matched the flipped strand
                 gRNA_coord = [[len(self.Donor_final)-i[1], len(self.Donor_final)-i[0]] for i in gRNA_coord]
                 recoding_coord = [[len(self.Donor_final)-i[1], len(self.Donor_final)-i[0]] for i in recoding_coord]
+                variant_labels = [(lbl, [len(self.Donor_final)-i[1], len(self.Donor_final)-i[0]]) for lbl, i in variant_labels]
                 left_arm_coord = [len(self.Donor_final)-left_arm_coord[1], len(self.Donor_final)-left_arm_coord[0]]
                 right_arm_coord = [len(self.Donor_final)-right_arm_coord[1], len(self.Donor_final)-right_arm_coord[0]]
                 tag_coord = [len(self.Donor_final)-tag_coord[1], len(self.Donor_final)-tag_coord[0]]
@@ -1954,6 +2089,7 @@ class HDR_flank:
             # convert the coordinates to 1-indexed
             gRNA_coord = [[i[0], i[1]+1] for i in gRNA_coord]
             recoding_coord = [[i[0], i[1]+1] for i in recoding_coord]
+            variant_labels = [(lbl, [i[0], i[1]+1]) for lbl, i in variant_labels]
             left_arm_coord = [left_arm_coord[0], left_arm_coord[1]+1]
             right_arm_coord = [right_arm_coord[0], right_arm_coord[1]+1]
             tag_coord = [tag_coord[0], tag_coord[1]+1]
@@ -1962,6 +2098,8 @@ class HDR_flank:
             if self.dsDNA_trimmed == True: # TODO test trimmed dsDNA
                 gRNA_coord = [self.apply_dsDNA_trimming_to_coords(i) for i in gRNA_coord]
                 recoding_coord = [self.apply_dsDNA_trimming_to_coords(i) for i in recoding_coord]
+                variant_labels = [(lbl, self.apply_dsDNA_trimming_to_coords(i)) for lbl, i in variant_labels]
+                variant_labels = [(lbl, i) for lbl, i in variant_labels if i] # drop trimmed-off ones
                 left_arm_coord = self.apply_dsDNA_trimming_to_coords(left_arm_coord)
                 right_arm_coord = self.apply_dsDNA_trimming_to_coords(right_arm_coord)
                 tag_coord = self.apply_dsDNA_trimming_to_coords(tag_coord)
@@ -1972,9 +2110,12 @@ class HDR_flank:
             # compute gRNA strand (relative to the dsDNA displaying strand)
             gRNA_strand = self.convert_strand_to_numeric(self.gStrand) * self.convert_strand_to_numeric(self.ENST_strand)
 
+        self.variant_labels_in_final_donor = {lbl for lbl, _ in variant_labels}
+
         Donor_features = {    
                 "gRNA_coord": gRNA_coord,
                 "recoding_coord": recoding_coord,
+                "variant_coord": variant_labels,
                 "left_arm_coord": left_arm_coord,
                 "right_arm_coord": right_arm_coord,
                 "tag_coord": tag_coord,
@@ -2023,6 +2164,7 @@ class HDR_flank:
     def compute_payloadless_donor_feature_coordinates(self):
         gRNA_coord = self.compare_stretches(f"{self.left_flk_seq}{self.right_flk_seq}", f"{self.gRNA_lc_Larm}{self.gRNA_lc_Rarm}", case_sensitive=True)
         #gRNA_coord[1] += 1 # gRNA end offset 
+        variant_labels = self.variant_coords_in_donor(with_tag=False)
         left_arm_coord = [0, len(self.gRNA_lc_Larm)-1]
         right_arm_coord = [len(self.gRNA_lc_Larm), len(self.gRNA_lc_Larm)+len(self.gRNA_lc_Rarm)-1]
         HA_payload_strand = 1 # ssODN strand (1 for nonflipped, -1 for flipped)
@@ -2033,12 +2175,14 @@ class HDR_flank:
             if self.strand_flipped: # flip the coordinates to matched the flipped strand
                 _len = len(self.gRNA_lc_Larm) + len(self.gRNA_lc_Rarm)
                 gRNA_coord = [[_len - i[1], _len - i[0]] for i in gRNA_coord]
+                variant_labels = [(lbl, [_len - i[1], _len - i[0]]) for lbl, i in variant_labels]
                 left_arm_coord = [_len - left_arm_coord[1], _len - left_arm_coord[0]]
                 right_arm_coord = [_len - right_arm_coord[1], _len - right_arm_coord[0]]
                 HA_payload_strand = -1 # this is also the coding strand 
             
             # convert the coordinates to 1-indexed
             gRNA_coord = [[i[0], i[1]+1] for i in gRNA_coord]
+            variant_labels = [(lbl, [i[0], i[1]+1]) for lbl, i in variant_labels]
             left_arm_coord = [left_arm_coord[0], left_arm_coord[1]+1]
             right_arm_coord = [right_arm_coord[0], right_arm_coord[1]+1]
 
@@ -2048,6 +2192,7 @@ class HDR_flank:
         if self.Donor_type == "dsDNA":
             # convert the coordinates to 1-indexed
             gRNA_coord = [[i[0], i[1]+1] for i in gRNA_coord]
+            variant_labels = [(lbl, [i[0], i[1]+1]) for lbl, i in variant_labels]
             left_arm_coord = [left_arm_coord[0], left_arm_coord[1]+1]
             right_arm_coord = [right_arm_coord[0], right_arm_coord[1]+1]
             # compute HA_payload strand
@@ -2057,6 +2202,7 @@ class HDR_flank:
 
         payloadless_donor_features = {    
                 "gRNA_coord": gRNA_coord,
+                "variant_coord": variant_labels,
                 "left_arm_coord": left_arm_coord,
                 "right_arm_coord": right_arm_coord,
                 "gRNA_strand": gRNA_strand,
@@ -2138,6 +2284,10 @@ class HDR_flank:
         gRNA_seq, Null, gRNA_seq_phases, Null = self.get_post_integration_gRNA(
             self.left_flk_seq, self.right_flk_seq
         )  # get the original gRNA
+        # protospacer+PAM read straight out of the homology arms, so with a variant set in play
+        # this is the guide as it exists in the target cells -- unlike the precomputed table's
+        # `seq` column, which is always reference.  Only trustworthy if the whole guide fits.
+        self.gRNA_seq_from_arms = gRNA_seq if self.entire_gRNA_in_HDR_arms else ""
         (
             Null,
             post_payload_gRNA_seq,

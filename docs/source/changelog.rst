@@ -6,6 +6,28 @@ Changelog
 Algorithm
 --------
 
+:Date: August 20, 2026 |feature| Added variant-aware design. With ``--variant_set`` or ``--variant_genome``, homology arms, gRNA sequences, recoding and recut CFD are all computed from a cell line's own genome instead of the reference.
+
+:Date: August 20, 2026 |feature| Added the first variant set, KOLF2.1J parental (sample czML1175, GRCh38, haplotype 1, calls filtered at GQ>=20 and DP 25-120). Summary of the call set and its effect on design:
+
+   - 4,612,205 calls over 3.09 Gb, one per 670 bp.
+   - 2,632,109 length-preserving substitutions written into the sequence, one per 1,173 bp.
+   - 1,980,096 calls recorded but not applied: 1,115,389 on the other haplotype, 823,464 indels (552,610 of them on the selected haplotype), 39,237 substitutions inside homopolymer runs suppressed to the reference base, 2,002 unphased heterozygous, and 4 symbolic alleles.
+   - 400,732 no-call regions spanning 690,857 bp, where the sample has no genotype and the sequence is reported unreliable rather than assumed to be reference.
+   - Expected applied substitutions per window: 0.017 per 20 bp (one gRNA-sized window in 59) and 0.43 per 500 bp (one homology arm in 2.3). Counting every call rather than only the applied ones: 0.030 per 20 bp and 0.75 per 500 bp.
+   - Measured on the 1,201 designable OpenCell targets: 9 gRNAs (0.7%) carry an ALT base in the protospacer or PAM, 513 designs (42.7%) have at least one variant in their 1 kb homology arms, and 61 delivered ssODNs (5.1%) differ from the reference design.
+   - Design windows sit at start and stop codons, which are under purifying selection, so observed rates run below the genome-wide expectation above.
+
+:Date: August 20, 2026 |feature| gRNAs whose protospacer or PAM carries a non-reference base are down-weighted during ranking, by how far the base sits from the PAM and by zygosity; a variant that cannot be represented, anywhere in the gRNA, sets the weight to zero.
+
+:Date: August 20, 2026 |feature| Added nine variant columns to ``result.csv`` and a per-job ``variants_report.csv`` naming every variant that touched a design, whether it survived into the delivered donor, and whether the sequence in that window is trustworthy. Both appear only in variant mode, so reference-mode output is byte-identical to before.
+
+:Date: August 20, 2026 |enhancement| Insertions and deletions are reported rather than applied, because every precomputed asset is keyed to reference coordinates; windows overlapping one are flagged as unreliable instead of being silently emitted at the wrong length.
+
+:Date: August 20, 2026 |bug fix| The reported gRNA sequence is now read out of the homology arms rather than from the precomputed gRNA table, which returned the reference sequence even when the design was built on a different one.
+
+:Date: August 20, 2026 |feature| Added ``precompute/variant_sets/``, the pipeline that turns a joint-called VCF into a variant set, along with validators that check the materialized genome against the source VCF and the runtime patch against the materialized genome.
+
 :Date: June 14, 2025 |bug fix 01d81| Fixed a bug in insertion mode where recoding crashes if the payload is shorter than 23bp.
 
 :Date: June 14, 2025 |bug fix 6d75b| Fixed a bug in SNP mode where recoding in gRNA is not reflected in the donor (this bug manifests when the SNP payload overlaps with the gRNA).
@@ -70,6 +92,12 @@ Algorithm
 
 Portal
 ------
+:Date: August 20, 2026 |feature| Added a "Cell line / variant background" dropdown under Genome, listing the variant sets available on the deployment; selecting one designs against that cell line's genome. Defaults to the reference genome, and is hidden when no variant set is installed.
+
+:Date: August 20, 2026 |enhancement| Submissions using different variant backgrounds are never merged into one run, and the job-level ``result.csv`` gains the variant columns when any row uses a background.
+
+:Date: August 20, 2026 |enhancement| Added the ``/api/variant_sets`` endpoint, also served at ``protospacex/variant_sets`` so that the dropdown still appears on deployments whose nginx does not yet route ``/api/``.
+
 :Date: November 17, 2025 |enhancement 55f09| Added an embedded sequence viewer to view the DNA donor sequence in the results page.
 
 :Date: October 30, 2025 |bug fix 031f5| Fixed a bug that prevents downloading .gb files when multiple gRNAs are requested for a gene.
@@ -157,6 +185,13 @@ Portal
 :Date: January 26, 2023 |enhancement 0c23a| Default changed to "non-target strand" (including the example).
 
 :Date: January 26, 2023 |enhancement 54621| Default changed to "Prioritize recoding in PAM" (including the example).
+
+.. Hashless badges for the August 20, 2026 variant-aware entries: those commits do not exist
+   yet. Once they are pushed, replace |feature| / |enhancement| / |bug fix| in those entries with
+   hashed substitutions in the style of the ones below, and delete these three definitions.
+.. |feature| image:: https://img.shields.io/badge/-feature-green
+.. |enhancement| image:: https://img.shields.io/badge/-enhancement-green
+.. |bug fix| image:: https://img.shields.io/badge/-bug%20fix-red
 .. |enhancement 55f09| image:: https://img.shields.io/badge/55f09-enhancement-green
     :target: https://github.com/czbiohub-sf/protoSpaceJAM-portal-private/commit/e4b89c616b04e0f4b96fb1ff8571778eefb55f09
 .. |bug fix 031f5| image:: https://img.shields.io/badge/031f5-bug%20fix-red

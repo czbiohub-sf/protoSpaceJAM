@@ -6,6 +6,13 @@ If instead you prefer downloading the precomputed gRNAs to use with protoSpaceJA
 All scripts and binary files in `protoSpaceJAM/utils` should be executable
 </br>
 
+## Related: cell-line variant sets
+Everything on this page precomputes gRNAs against a **reference** genome. To build a genome carrying
+a particular cell line's genotype — so homology arms, guide sequences, recoding and recut CFD are
+personalized — see [`variant_sets/README.md`](variant_sets/README.md). That pipeline is
+self-contained and consumes the assets built here rather than replacing them.
+</br>
+
 ## Prepare genomes
 Download genome sequence and annotation files 
 ```shell

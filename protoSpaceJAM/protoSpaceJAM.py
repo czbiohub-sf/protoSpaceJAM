@@ -17,9 +17,12 @@ from Bio.GenBank import Record
 
 from protoSpaceJAM.util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs,get_gRNAs_target_coordinate, \
     get_HDR_template #uncomment this for pip installation
+from protoSpaceJAM.util.variant_annot import load_variant_set #uncomment this for pip installation
+from protoSpaceJAM.util import variant_annot #uncomment this for pip installation
 
 # from util.utils import MyParser, ColoredLogger, read_pickle_files, cal_elapsed_time, get_gRNAs, get_gRNAs_target_coordinate, \
 #     get_HDR_template
+# from util.variant_annot import load_variant_set
 
 def parse_args(test_mode=False):
     parser = MyParser(description="protoSpaceJAM: perfectionist CRISPR knock-in design at scale\n",
@@ -45,6 +48,26 @@ def parse_args(test_mode=False):
         default="GRCh38",
         type=str,
         help="Genome and version to use, possible values are GRCh38, GRCm39, GRCz11, and mRatBN7.2",
+        metavar="<string>",
+    )
+    genome.add_argument(
+        "--variant_set",
+        default="",
+        type=str,
+        help="Design against a cell line's genotype instead of the plain reference.\n"
+        "The named variant set's substitutions are applied to every sequence protoSpaceJAM reads,\n"
+        "so homology arms, guide sequences, recoding and recut CFD are all personalized.\n"
+        "Variant sets live in genome_files/variant_sets/ and are built by\n"
+        "precompute/variant_sets/4_make_variant_genome.py. Mutually exclusive with --variant_genome.",
+        metavar="<string>",
+    )
+    genome.add_argument(
+        "--variant_genome",
+        default="",
+        type=str,
+        help="Same as --variant_set, but reads the pre-substituted genome pickles rather than\n"
+        "patching at runtime. Slower to build, identical output; kept as the oracle the runtime\n"
+        "path is validated against. Mutually exclusive with --variant_set.",
         metavar="<string>",
     )
     gRNA = parser.add_argument_group('gRNA')
@@ -359,6 +382,62 @@ def main(custom_args=None):
         if not config["pam"].upper() in ["NGG", "NGA", "TTTV"]:
             sys.exit("PAM must be NGG, NGA or TTTV, please correct the issue and try again")
 
+        ##################################
+        # variant-aware design (optional)#
+        ##################################
+        # Three things get decided here and nothing downstream re-decides them:
+        #   seq_genome_ver  which fa_pickle directory homology arms are read from
+        #   variant_patch   the VariantSet that patches slices as they are fetched (runtime path)
+        #   variant_set     the VariantSet used for reporting and guide penalties (both paths)
+        # With neither flag all three fall back to today's behaviour and the feature is inert.
+        config["variant_set"] = (config.get("variant_set") or "").strip()
+        config["variant_genome"] = (config.get("variant_genome") or "").strip()
+        if config["variant_set"] and config["variant_genome"]:
+            sys.exit(
+                "--variant_set and --variant_genome are mutually exclusive "
+                "(they are two implementations of the same thing); please pick one"
+            )
+        variant_set = None
+        variant_patch = None
+        seq_genome_ver = config["genome_ver"]
+        variant_name = config["variant_set"] or config["variant_genome"]
+        if variant_name:
+            try:
+                variant_set = load_variant_set(
+                    variant_name, expected_genome_ver=config["genome_ver"]
+                )
+            except (FileNotFoundError, ValueError) as e:
+                available = sorted(
+                    d for d in os.listdir(os.path.join("genome_files", "variant_sets"))
+                    if os.path.isfile(
+                        os.path.join("genome_files", "variant_sets", d, "manifest.json")
+                    )
+                ) if os.path.isdir(os.path.join("genome_files", "variant_sets")) else []
+                sys.exit(f"{e}\navailable variant sets: {', '.join(available) or '(none built)'}")
+            if config["variant_genome"]:
+                # the substituted pickles already carry the ALT bases; patching again would be a
+                # no-op today but would double-apply the moment a non-idempotent edit is added
+                seq_genome_ver = config["variant_genome"]
+                if not os.path.isdir(os.path.join("genome_files", "fa_pickle", seq_genome_ver)):
+                    sys.exit(
+                        f"--variant_genome {seq_genome_ver}: no materialized genome at "
+                        f"genome_files/fa_pickle/{seq_genome_ver}; it was probably built with "
+                        f"--no_materialize, use --variant_set {seq_genome_ver} instead"
+                    )
+                if not variant_set.manifest.get("materialized", False):
+                    sys.exit(
+                        f"--variant_genome {seq_genome_ver}: the manifest says this set was not "
+                        f"materialized; use --variant_set {seq_genome_ver} instead"
+                    )
+            else:
+                variant_patch = variant_set
+            log.info(
+                f"variant-aware design ON: set={variant_name} sample={variant_set.sample} "
+                f"hap{variant_set.haplotype} "
+                f"mode={'materialized genome' if config['variant_genome'] else 'runtime patch'}"
+            )
+        variant_mode = variant_set is not None
+
         # parse payload
         if config["payload_type"] == "insertion":
             log.info("payload_type is insertion")
@@ -495,10 +574,25 @@ def main(custom_args=None):
         fiveUTR_log = open(os.path.join(outdir, "fiveUTR.txt"), "w")
 
         # open result file and write header
+        # The variant columns are appended only in variant mode: with no flag the file must stay
+        # byte-identical to what it was before this feature (tests/run_quick_test_*.py).
         csvout_res = open(f"{outdir}/result.csv", "w")
         csvout_res.write(
-            f"Entry,ID,chr,transcript_type,name,terminus,gRNA_name,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut_pos-insert_pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,name_of_DNA_donor,DNA donor,name_of_trimmed_DNA_Donor,trimmed_DNA_donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc,strand(gene/gRNA/donor)\n"
+            f"Entry,ID,chr,transcript_type,name,terminus,gRNA_name,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut_pos-insert_pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,name_of_DNA_donor,DNA donor,name_of_trimmed_DNA_Donor,trimmed_DNA_donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc,strand(gene/gRNA/donor)"
+            + (VARIANT_COLUMNS_HEADER if variant_mode else "")
+            + "\n"
         )   #"Entry,ID,chr,transcript_type,name,terminus,gRNA_seq,PAM,gRNA_start,gRNA_end,gRNA_cut_pos,edit_pos,distance_between_cut_and_edit(cut pos - insert pos),specificity_score,specificity_weight,distance_weight,position_weight,final_weight,cfd_before_recoding,cfd_after_recoding,cfd_after_windowScan_and_recoding,max_recut_cfd,DNA donor,effective_HA_len,synthesis_problems,cutPos2nearestOffLimitJunc,strand(gene/gRNA/donor)\n"
+
+        # per-job variant report: one row per (design, variant).  This is where
+        # indel_selected_hap surfaces, so nobody orders a donor whose distal arm is still
+        # reference sequence without being told.
+        csvout_variants = None
+        if variant_mode:
+            csvout_variants = open(f"{outdir}/variants_report.csv", "w")
+            csvout_variants.write(
+                "Entry,ID,terminus,gRNA_name,donor_name,chr,pos,ref,alt,zygosity,"
+                "applied,skip_reason,region,in_final_donor,sequence_reliable\n"
+            )
 
         # open result file2 for GenoPrimer input
         csvout_res2 = open(f"{outdir}/input_for_GenoPrimer.csv", "w")
@@ -686,6 +780,7 @@ def main(custom_args=None):
                         spec_score_flavor=spec_score_flavor,
                         reg_penalty=reg_penalty,
                         alphas = alphas,
+                        variant_ctx=variant_set,
                     )
 
                     if ranked_df_gRNAs_target_pos.empty == True:
@@ -702,7 +797,7 @@ def main(custom_args=None):
                                 type="start", # this borrowed option specifies that the edit is immediately after the coordinate
                                 ENST_PhaseInCodon=ENST_PhaseInCodon,
                                 loc2posType=loc2posType,
-                                genome_ver=config["genome_ver"],
+                                genome_ver=seq_genome_ver,
                                 HDR_arm_len=HDR_arm_len,
                                 payload_type=config["payload_type"],
                                 tag=config["POSpayload"],
@@ -713,6 +808,8 @@ def main(custom_args=None):
                                 recoding_args=recoding_args,
                                 syn_check_args=syn_check_args,
                                 coordinate_without_ENST = coordinate_without_ENST,
+                                variant_ctx=variant_patch,
+                                variant_report_ctx=variant_set,
                             )
                         except Exception as e:
                             print("Unexpected error:", str(sys.exc_info()))
@@ -764,6 +861,11 @@ def main(custom_args=None):
                             pos_weight,
                             final_weight,
                         ) = get_res(current_gRNA, spec_score_flavor)
+                        variant_suffix = ""
+                        if variant_mode:
+                            seq, pam, variant_suffix = variant_res_fields(
+                                variant_set, current_gRNA, HDR_template, seq, pam, config["pam"]
+                            )
                         donor = HDR_template.Donor_final
                         donor_trimmed = "N/A for ssODN"
                         if config["Donor_type"] == "dsDNA":
@@ -796,7 +898,7 @@ def main(custom_args=None):
                         insert_pos = HDR_template.InsPos
                         if config["recoding_off"]:
                             csvout_res.write(
-                                f"{Entry},{row_prefix},-,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                                f"{Entry},{row_prefix},-,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}{variant_suffix}\n"
                             )
                             csvout_res2.write( f"{Entry},"+
                                 config["genome_ver"]
@@ -806,7 +908,7 @@ def main(custom_args=None):
                             if not isinstance(cfd4, float):
                                 cfd4 = ""
                             csvout_res.write(
-                                f"{Entry},{row_prefix},-,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                                f"{Entry},{row_prefix},-,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}{variant_suffix}\n"
                             )
                             csvout_res2.write( f"{Entry},"+
                                 config["genome_ver"]
@@ -821,6 +923,12 @@ def main(custom_args=None):
                         # write anothergenbank file without payload
                         with open(os.path.join(outdir, "genbank_files", f"{donor_name}_gRNAonly_noPayload.gb"), "w") as gb_handle:
                             write_genbank_gRNAonly_noPayload(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
+
+                        if variant_mode:
+                            write_variants_report(
+                                csvout_variants, variant_set, Entry, ENST_ID, "-",
+                                gRNA_name, donor_name, HDR_template, current_gRNA, config["pam"],
+                            )
 
                         # write log
                         this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
@@ -859,6 +967,7 @@ def main(custom_args=None):
                     spec_score_flavor=spec_score_flavor,
                     reg_penalty=reg_penalty,
                     alphas = alphas,
+                    variant_ctx=variant_set,
                 )
 
                 if ranked_df_gRNAs_ATG.empty == True:
@@ -880,7 +989,7 @@ def main(custom_args=None):
                             type="start",
                             ENST_PhaseInCodon=ENST_PhaseInCodon,
                             loc2posType=loc2posType,
-                            genome_ver=config["genome_ver"],
+                            genome_ver=seq_genome_ver,
                             HDR_arm_len=HDR_arm_len,
                             payload_type=config["payload_type"],
                             tag=config["Npayload"],
@@ -891,6 +1000,8 @@ def main(custom_args=None):
                             recoding_args=recoding_args,
                             syn_check_args=syn_check_args,
                             coordinate_without_ENST = coordinate_without_ENST,
+                            variant_ctx=variant_patch,
+                            variant_report_ctx=variant_set,
                         )
                     except Exception as e:
                         print("Unexpected error:", str(sys.exc_info()))
@@ -942,6 +1053,11 @@ def main(custom_args=None):
                         pos_weight,
                         final_weight,
                     ) = get_res(current_gRNA, spec_score_flavor)
+                    variant_suffix = ""
+                    if variant_mode:
+                        seq, pam, variant_suffix = variant_res_fields(
+                            variant_set, current_gRNA, HDR_template, seq, pam, config["pam"]
+                        )
 
                     donor = HDR_template.Donor_final
                     donor_trimmed = "N/A for ssODN"
@@ -971,7 +1087,7 @@ def main(custom_args=None):
                             f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
                         )
                         csvout_res.write(
-                            f"{Entry},{row_prefix},N,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},N,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}{variant_suffix}\n"
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
@@ -984,7 +1100,7 @@ def main(custom_args=None):
                         if not isinstance(cfd4, float):
                             cfd4 = ""
                         csvout_res.write(
-                            f"{Entry},{row_prefix},N,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},N,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}{variant_suffix}\n"
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
@@ -999,6 +1115,12 @@ def main(custom_args=None):
                     # write anothergenbank file without payload
                     with open(os.path.join(outdir, "genbank_files", f"{donor_name}_gRNAonly_noPayload.gb"), "w") as gb_handle:
                         write_genbank_gRNAonly_noPayload(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
+
+                    if variant_mode:
+                        write_variants_report(
+                            csvout_variants, variant_set, Entry, ENST_ID, "N",
+                            gRNA_name, donor_name, HDR_template, current_gRNA, config["pam"],
+                        )
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n    donor before any recoding:{HDR_template.Donor_vanillia}\n     donor after all recoding:{HDR_template.Donor_postMut}\ndonor centered(if applicable):{HDR_template.Donor_final}\n          donor (best strand):{HDR_template.Donor_final}\n\n"
@@ -1037,6 +1159,7 @@ def main(custom_args=None):
                     spec_score_flavor=spec_score_flavor,
                     reg_penalty=reg_penalty,
                     alphas = alphas,
+                    variant_ctx=variant_set,
                 )
 
                 if ranked_df_gRNAs_stop.empty == True:
@@ -1059,7 +1182,7 @@ def main(custom_args=None):
                             ENST_PhaseInCodon=ENST_PhaseInCodon,
                             loc2posType=loc2posType,
                             HDR_arm_len=HDR_arm_len,
-                            genome_ver=config["genome_ver"],
+                            genome_ver=seq_genome_ver,
                             payload_type=config["payload_type"],
                             tag=config["Cpayload"],
                             SNP_payload=config["SNPpayload"],
@@ -1069,6 +1192,8 @@ def main(custom_args=None):
                             recoding_args=recoding_args,
                             syn_check_args=syn_check_args,
                             coordinate_without_ENST = coordinate_without_ENST,
+                            variant_ctx=variant_patch,
+                            variant_report_ctx=variant_set,
                         )
                     except Exception as e:
                         print("Unexpected error:", str(sys.exc_info()))
@@ -1120,6 +1245,11 @@ def main(custom_args=None):
                         pos_weight,
                         final_weight,
                     ) = get_res(current_gRNA, spec_score_flavor)
+                    variant_suffix = ""
+                    if variant_mode:
+                        seq, pam, variant_suffix = variant_res_fields(
+                            variant_set, current_gRNA, HDR_template, seq, pam, config["pam"]
+                        )
 
                     donor = HDR_template.Donor_final
                     donor_trimmed = "N/A for ssODN"
@@ -1149,7 +1279,7 @@ def main(custom_args=None):
                             f",{cfd1},{cfd2},{cfd3},{cfd4},{cfd_scan},{cfd_scan_no_recode},{cfdfinal}\n"
                         )
                         csvout_res.write(
-                            f"{Entry},{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},recoding turned off,,{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}{variant_suffix}\n"
                         )
                         csvout_res2.write( f"{Entry},"+
                             config["genome_ver"]
@@ -1162,7 +1292,7 @@ def main(custom_args=None):
                         if not isinstance(cfd4, float):
                             cfd4 = ""
                         csvout_res.write(
-                            f"{Entry},{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}\n"
+                            f"{Entry},{row_prefix},C,{gRNA_name},{seq},{pam},{s},{e},{gRNA_cut_pos},{insert_pos},{cut2ins_dist},{spec_score},{ret_six_dec(spec_weight)},{ret_six_dec(dist_weight)},{ret_six_dec(pos_weight)},{ret_six_dec(final_weight)},{ret_six_dec(pre_recoding_cfd_score)},{ret_six_dec(cfd4)},{ret_six_dec(cfd_scan)},{ret_six_dec(cfdfinal)},{donor_name},{donor},{donor_trimmed_name},{donor_trimmed},{HDR_template.effective_HA_len},{HDR_template.synFlags},{HDR_template.cutPos2nearestOffLimitJunc},{strands}{variant_suffix}\n"
                         )
                         csvout_res2.write(f"{Entry},"+
                             config["genome_ver"]
@@ -1177,6 +1307,12 @@ def main(custom_args=None):
                     # write anothergenbank file without payload
                     with open(os.path.join(outdir, "genbank_files", f"{donor_name}_gRNAonly_noPayload.gb"), "w") as gb_handle:
                         write_genbank_gRNAonly_noPayload(handle = gb_handle, data_obj = HDR_template, donor_name = donor_name, donor_type = config["Donor_type"], payload_type = config["payload_type"])
+
+                    if variant_mode:
+                        write_variants_report(
+                            csvout_variants, variant_set, Entry, ENST_ID, "C",
+                            gRNA_name, donor_name, HDR_template, current_gRNA, config["pam"],
+                        )
 
                     # write log
                     this_log = f"{HDR_template.info}{HDR_template.info_arm}{HDR_template.info_p1}{HDR_template.info_p2}{HDR_template.info_p3}{HDR_template.info_p4}{HDR_template.info_p5}{HDR_template.info_p6}\n--------------------final CFD:{ret_six_dec(HDR_template.final_cfd)}\n   donor before any recoding:{HDR_template.Donor_vanillia}\n    donor after all recoding:{HDR_template.Donor_postMut}\n             donor centered:{HDR_template.Donor_final}\ndonor centered (best strand):{HDR_template.Donor_final}\n\n"
@@ -1233,6 +1369,8 @@ def main(custom_args=None):
         fiveUTR_log.close()
         csvout_res.close()
         csvout_res2.close()
+        if csvout_variants is not None:
+            csvout_variants.close()
 
     except Exception as e:
         print("Unexpected error:", str(sys.exc_info()))
@@ -1320,6 +1458,10 @@ def write_genbank(handle, data_obj, donor_name, donor_type, payload_type):
         for feat in data_obj.Donor_features["recoding_coord"]:
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), type='recode', qualifiers={"label": "recode"})
             seq_record.features.append(feature)
+    # cell-line variants, rendered alongside gRNA+PAM and recode; empty unless a variant set is in use
+    for label, feat in data_obj.Donor_features.get("variant_coord", []):
+        feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), type='variation', qualifiers={"label": label})
+        seq_record.features.append(feature)
 
     # Write to a GenBank file using SeqIO for the actual file writing
     SeqIO.write([seq_record], handle, 'genbank')
@@ -1387,6 +1529,9 @@ def write_genbank_gRNAonly_noPayload(handle, data_obj, donor_name, donor_type, p
         for feat in data_obj.payloadless_donor_features["gRNA_coord"]:
             feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1], strand=data_obj.payloadless_donor_features["gRNA_strand"]), type='gRNA+PAM', qualifiers={"label": "gRNA+PAM"})
             seq_record.features.append(feature)
+    for label, feat in data_obj.payloadless_donor_features.get("variant_coord", []):
+        feature = SeqFeature(FeatureLocation(start=feat[0], end=feat[1]), type='variation', qualifiers={"label": label})
+        seq_record.features.append(feature)
 
 
     # Write to a GenBank file using SeqIO for the actual file writing
@@ -1441,6 +1586,129 @@ class info:
         self.cfd4 = []
         self.cfdfinal = []
         self.failed = []
+
+
+# ==================================================================================================
+# variant-aware reporting
+#
+# Everything here is a no-op unless --variant_set/--variant_genome is in play.  The column block is
+# appended rather than interleaved so a reader of an old result.csv sees exactly the old columns.
+# ==================================================================================================
+
+VARIANT_COLUMNS_HEADER = (
+    ",variant_source,variant_sample,variant_haplotype,variants_in_donor,"
+    "variants_in_protospacer_PAM,variant_weight,spec_score_stale,gRNA_seq_ref,variant_warnings"
+)
+
+
+def split_derived_guide(derived, ref_seq, ref_pam, pam_arg):
+    """
+    Split the protospacer+PAM string read out of the personalized homology arms.
+
+    Returns (protospacer, PAM), or (None, None) when the string cannot be trusted: the guide ran
+    off the end of the arms, or its length disagrees with the precomputed table's own
+    seq+pam length (hdr.get_gRNA_pos() hard-codes the 23 nt Cas9 geometry, so a 24 nt Cas12a
+    guide does not line up).  Callers fall back to the reference and say so.
+    """
+    if not derived or len(derived) != len(ref_seq) + len(ref_pam):
+        return None, None
+    if variant_annot.pam_is_5prime(pam_arg):
+        seq, pam = derived[len(ref_pam):], derived[: len(ref_pam)]
+    else:
+        seq, pam = derived[: len(ref_seq)], derived[len(ref_seq):]
+    # HDR_flank upper-cases the arms, but the precomputed table carries dna_sm soft-masking in
+    # its casing.  Restore it so an untouched guide reads back exactly as it did before.
+    return match_case(seq, ref_seq), match_case(pam, ref_pam)
+
+
+def match_case(seq, template):
+    """`seq` rewritten in `template`'s per-base casing."""
+    return "".join(c.lower() if t.islower() else c.upper() for c, t in zip(seq, template))
+
+
+def get_variant_res(gRNA_row):
+    """The variant columns rank_gRNAs_for_tagging() attached to the chosen guide."""
+    return (
+        gRNA_row["variant_weight"].values[0],
+        gRNA_row["variant_warnings"].values[0],
+        gRNA_row["variants_in_protospacer_PAM"].values[0],
+        bool(gRNA_row["spec_score_stale"].values[0]),
+    )
+
+
+def variant_res_fields(variant_set, gRNA_row, HDR_template, ref_seq, ref_pam, pam_arg):
+    """
+    Build the reported guide sequence/PAM and the trailing variant columns for one design.
+
+    The guide sequence is the single most important thing this function fixes: it used to come
+    straight from the reference precomputed table even when the donor around it had been
+    personalized, so the user could order an oligo that does not match their cells.
+    """
+    variant_weight, warnings, guide_variants, stale = get_variant_res(gRNA_row)
+    warn = [w for w in str(warnings).split(";") if w]
+
+    derived = getattr(HDR_template, "gRNA_seq_from_arms", "")
+    seq, pam = split_derived_guide(derived, ref_seq, ref_pam, pam_arg)
+    if seq is None:
+        seq, pam = ref_seq, ref_pam
+        warn.append("gRNA_seq_not_derivable_from_arms")
+    gRNA_seq_ref = ref_seq if seq.upper() != ref_seq.upper() else ""
+    if gRNA_seq_ref:
+        warn.append("gRNA_seq_differs_from_reference")
+    if pam.upper() != ref_pam.upper():
+        warn.append("PAM_differs_from_reference")
+    in_donor = HDR_template.unreliable_variants(final_donor_only=True)
+    in_arms = HDR_template.unreliable_variants(final_donor_only=False)
+    if in_donor:
+        warn.append("donor_sequence_unreliable")
+    elif in_arms:
+        # centered/trimmed out of the delivered donor, but the recoding and guide choice were
+        # made using these arms, so it is still worth saying
+        warn.append("arms_sequence_unreliable")
+
+    suffix = (
+        f",{variant_set.set_name},{variant_set.sample},{variant_set.haplotype}"
+        f",{getattr(HDR_template, 'variants_in_donor', '')},{guide_variants}"
+        f",{ret_six_dec(float(variant_weight))},{stale},{gRNA_seq_ref},{';'.join(warn)}"
+    )
+    return seq, pam, suffix
+
+
+def write_variants_report(
+    handle, variant_set, entry, ID, terminus, gRNA_name, donor_name, HDR_template,
+    gRNA_row, pam_arg,
+):
+    """
+    One row per (design, variant).  Donor-arm variants and guide variants are merged so a
+    variant that is in both appears once, labelled with the guide region -- which is the label
+    that matters.
+    """
+    if handle is None:
+        return
+    rows = {}
+    for v in getattr(HDR_template, "donor_variants", []):
+        rows[(v.pos, v.ref, v.alt)] = (v, "donor_arm")
+
+    start = gRNA_row["start"].values[0]
+    end = gRNA_row["end"].values[0]
+    strand = gRNA_row["strand"].values[0]
+    windows = variant_annot.guide_subwindows(
+        start, end, strand,
+        pam_len=len(str(pam_arg)),
+        five_prime_pam=variant_annot.pam_is_5prime(pam_arg),
+    )
+    for v in variant_set.variants_in(HDR_template.ENST_chr, *windows["guide"]):
+        if not (v.applied or v.makes_sequence_unreliable):
+            continue
+        region = variant_annot.region_of(v, windows)
+        rows[(v.pos, v.ref, v.alt)] = (v, "guide_" + region)
+
+    for _, (v, region) in sorted(rows.items()):
+        handle.write(
+            f"{entry},{ID},{terminus},{gRNA_name},{donor_name},{v.chrom},{v.pos},{v.ref},"
+            f"{v.alt},{v.zygosity},{v.applied},{v.reason or ''},{region},"
+            f"{HDR_template.variant_in_final_donor(v)},{not v.makes_sequence_unreliable}\n"
+        )
 
 
 def get_res(best_start_gRNA, spec_score_flavor):
