@@ -21,18 +21,10 @@ Algorithm
      homology arms (1kb)  513 (42.7%)    68.7%       0.62
      ssODN (101bp)        61 (5.1%)      8.3%        0.61
      ===================  =============  ==========  =========
-     
+
    - Design windows sit at start and stop codons, which are under purifying selection, so observed rates run below the genome-wide expectation.
 
 :Date: August 20, 2026 |feature 67811| gRNAs whose protospacer or PAM carries a non-reference base are down-weighted during ranking, by how far the base sits from the PAM and by zygosity; a variant that cannot be represented, anywhere in the gRNA, sets the weight to zero.
-
-:Date: August 20, 2026 |feature 67811| Added nine variant columns to ``result.csv`` and a per-job ``variants_report.csv`` naming every variant that touched a design, whether it survived into the delivered donor, and whether the sequence in that window is trustworthy. Both appear only in variant mode, so reference-mode output is byte-identical to before.
-
-:Date: August 20, 2026 |enhancement 67811| Insertions and deletions are reported rather than applied, because every precomputed asset is keyed to reference coordinates; windows overlapping one are flagged as unreliable instead of being silently emitted at the wrong length.
-
-:Date: August 20, 2026 |bug fix 67811| The reported gRNA sequence is now read out of the homology arms rather than from the precomputed gRNA table, which returned the reference sequence even when the design was built on a different one.
-
-:Date: August 20, 2026 |feature 67811| Added ``precompute/variant_sets/``, the pipeline that turns a joint-called VCF into a variant set, along with validators that check the materialized genome against the source VCF and the runtime patch against the materialized genome.
 
 :Date: June 14, 2025 |bug fix 01d81| Fixed a bug in insertion mode where recoding crashes if the payload is shorter than 23bp.
 
@@ -99,10 +91,6 @@ Algorithm
 Portal
 ------
 :Date: August 20, 2026 |feature 1953f| Added a "Cell line / variant background" dropdown under Genome, listing the variant sets available on the deployment; selecting one designs against that cell line's genome. Defaults to the reference genome, and is hidden when no variant set is installed.
-
-:Date: August 20, 2026 |enhancement 1953f| Submissions using different variant backgrounds are never merged into one run, and the job-level ``result.csv`` gains the variant columns when any row uses a background.
-
-:Date: August 20, 2026 |enhancement 1953f| Added the ``/api/variant_sets`` endpoint, also served at ``protospacex/variant_sets`` so that the dropdown still appears on deployments whose nginx does not yet route ``/api/``.
 
 :Date: November 17, 2025 |enhancement 55f09| Added an embedded sequence viewer to view the DNA donor sequence in the results page.
 
