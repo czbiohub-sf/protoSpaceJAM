@@ -12,8 +12,17 @@ Algorithm
 
    - 2,632,109 length-preserving substitutions, one per 1,173 bp.
    - 1,980,096 calls recorded but not applied: 1,115,389 on the other haplotype, 823,464 indels (552,610 of them on the selected haplotype), 39,237 substitutions inside homopolymer runs suppressed to the reference base, 2,002 unphased heterozygous, and 4 symbolic alleles.
-   - Measured on the 1,201 designable OpenCell targets: 9 gRNAs (0.7%) carry an ALT base in the protospacer or PAM, 513 designs (42.7%) have at least one variant in their 1 kb homology arms, and 61 delivered ssODNs (5.1%) differ from the reference design.
-   - Design windows sit at start and stop codons, which are under purifying selection, so observed rates run below the genome-wide expectation above.
+   - Measured on the 1,201 designable OpenCell targets, beside what a genome-wide rate predicts for a window of the same size:
+
+     ===================  =============  ==========  =========
+     window               observed       expected    obs / exp
+     ===================  =============  ==========  =========
+     gRNA + PAM (23bp)    9 (0.7%)       2.6%        0.29
+     homology arms (1kb)  513 (42.7%)    68.7%       0.62
+     ssODN (101bp)        61 (5.1%)      8.3%        0.61
+     ===================  =============  ==========  =========
+     
+   - Design windows sit at start and stop codons, which are under purifying selection, so observed rates run below the genome-wide expectation.
 
 :Date: August 20, 2026 |feature 67811| gRNAs whose protospacer or PAM carries a non-reference base are down-weighted during ranking, by how far the base sits from the PAM and by zygosity; a variant that cannot be represented, anywhere in the gRNA, sets the weight to zero.
 
