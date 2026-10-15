@@ -190,18 +190,14 @@ class HDR_flank:
         # (1) During recoding, we skip chimeric gRNA processing, which checks how the tag insertion disrupts the gRNA, and since the tag is just placeholder, we skip this step.
         # (2) After the recoding, we replace the tag with the SNP payload. This is before dsDNA/ssODN processing
         # (3) during the tag -> SNP replacement (removing the placeholder), we delete a short stretch from 5' of right HA arm. The length of the short stretch matches the length of the SNP payload, therefore incorporating the SNP payload into the HA arm without inserting any sequence.
-        # NOTE: during recoding we protect short stretch (where SNP payload would drop in place) from recoding, 
-        # we change the phases of the first n letters of the right_flk_seq to 7 (to avoid recoding the short stretch and codons that they are a part of), 
-        # we modified the trimming functions to changing the letters to lowercase (b/c "7" is not enought to protect from codon mutations as it may have flanking codon phases and survive trimming)
+        # Protect the payload and its overlapping codons using original transcript phases, after regional masking so UTR/junction masks cannot erase protection.
+        self.snp_protected_indices = frozenset()
         if self.payload_type == "SNP":
-            # save a copy of the right_flk_phases before adjusting the phases
-            self.right_flk_phases_before_SNPadjustment = self.right_flk_phases
-            # Change phases of first n letters to "7"
-            right_phases_list = list(self.right_flk_phases)
-            for i in range(self.SNP_payload_len):
-                if i < len(right_phases_list):
-                    right_phases_list[i] = "7"
-            self.right_flk_phases = "".join(right_phases_list)
+            self.snp_protected_indices = self._snp_protected_arm_indices(
+                self.left_flk_phases_vanilla,
+                self.right_flk_phases_vanilla,
+                self.SNP_payload_len,
+            )
             tag = "GGTGGCGGATTGGAAGTTTTGTTTCAAGGTCCAGGAAGTGGTACCGAGCTCAACTTCAAGGAGTGGCAAAAGGCCTTTACCGATATGATG" # use the default tag as a placeholder
             self.tag = tag
         # end of adjustments for SNP mode (1 of 3)
@@ -284,6 +280,15 @@ class HDR_flank:
             self.left_flk_phases = self.left_flk_phases_masked
             self.right_flk_phases = self.right_flk_phases_masked
 
+        if self.snp_protected_indices:
+            arm_phases = self.left_flk_phases + self.right_flk_phases
+            arm_phases = "".join(
+                "7" if i in self.snp_protected_indices else phase
+                for i, phase in enumerate(arm_phases)
+            )
+            self.left_flk_phases = arm_phases[:len(self.left_flk_seq)]
+            self.right_flk_phases = arm_phases[len(self.left_flk_seq):]
+
         # get gRNA left/right coord respective to the whole arm (gRNA orientation can be both -1 and +1)
         null, self.g_leftcoord, self.g_rightcoord = self.get_trunc_gRNA(
             self.left_flk_seq, self.right_flk_seq
@@ -361,7 +366,7 @@ class HDR_flank:
 
                 # mutate insert-to-cut sequence (codons only)
                 mutated_subseq = self.get_silent_mutations(
-                    self.ins2cut_LRtrimed.seq.upper()
+                    self.ins2cut_LRtrimed.seq.upper(), self.ins2cut_LRtrimed.phases
                 )  # mutated_subseq is always in coding strand
 
                 # put mutated insert2cut region into HDR flank
@@ -704,12 +709,11 @@ class HDR_flank:
 
                 if self.gRNA_in_coding_strand == True:
                     seq_obj = seq_w_phase(seq=seq, phases=phases, start=1, end=23)
-                    seq_obj = self.convert_phase_7_to_lowercase(seq_obj) # convert phase 7 to lowercase
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
                     #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}-{seq_obj_lrtrim.end}")
                     if len(seq_obj_lrtrim.seq) >= 3:
-                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq, seq_obj_lrtrim.phases)
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(
@@ -720,13 +724,12 @@ class HDR_flank:
                     seq_obj = seq_w_phase(
                         seq=self.revcom(seq), phases=phases[::-1], start=1, end=23
                     )
-                    seq_obj = self.convert_phase_7_to_lowercase(seq_obj) # convert phase 7 to lowercase
                     #print(f"phase 3 revcom:\n{seq_obj.seq}\n{seq_obj.phases}")
                     seq_obj_ltrim = self.trim_left_into_frame(seq_obj)
                     seq_obj_lrtrim = self.trim_right_into_frame(seq_obj_ltrim)
                     #print(f"phase 3 trimmed:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}\n{seq_obj_lrtrim.start}-{seq_obj_lrtrim.end}")
                     if len(seq_obj_lrtrim.seq) >= 3:
-                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                        mutated = self.get_silent_mutations(seq_obj_lrtrim.seq, seq_obj_lrtrim.phases)
                     else:
                         mutated = seq_obj_lrtrim.seq
                     untrimmed = seq_obj.seq.replace(
@@ -1402,9 +1405,9 @@ class HDR_flank:
                 # we noticed that the final donor may not carry recoded gRNA sequence, this happens when the gRNA contains the SNP payload
                 # we fix this by removing tag, replace the gRNA_seq with mutated gRNA, then restore tag
                 donor_without_tag = self.Donor_final.replace(self.tag, "")
-                if self.gRNA_seq in donor_without_tag:
+                if not self.recoding_args["recoding_off"] and self.gRNA_seq in donor_without_tag:
                     self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.final_gRNA_seq, replacement_target=self.gRNA_seq)
-                elif self.revcom(self.gRNA_seq) in donor_without_tag:
+                elif not self.recoding_args["recoding_off"] and self.revcom(self.gRNA_seq) in donor_without_tag:
                     self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.revcom(self.final_gRNA_seq), replacement_target=self.revcom(self.gRNA_seq))
 
                 # tag -> SNP replacement
@@ -1413,6 +1416,7 @@ class HDR_flank:
                 # remove the first n letters of the right_flk_seq
                 self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload))
                 self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
+                self._validate_snp_protected_sequence(self.Donor_final)
 
             #################################
             # check synthesis considerations#
@@ -1580,9 +1584,9 @@ class HDR_flank:
                 # we noticed that the final donor may not carry recoded gRNA sequence, this happens when the gRNA contains the SNP payload
                 # we fix this by removing tag, replace the gRNA_seq with mutated gRNA, then restore tag
                 donor_without_tag = self.Donor_final.replace(self.tag, "")
-                if self.gRNA_seq in donor_without_tag:
+                if not self.recoding_args["recoding_off"] and self.gRNA_seq in donor_without_tag:
                     self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.final_gRNA_seq, replacement_target=self.gRNA_seq)
-                elif self.revcom(self.gRNA_seq) in donor_without_tag:
+                elif not self.recoding_args["recoding_off"] and self.revcom(self.gRNA_seq) in donor_without_tag:
                     self.Donor_final = remove_replace_restore(parent_string=self.Donor_final, substring_to_remove=self.tag, replacement_text=self.revcom(self.final_gRNA_seq), replacement_target=self.revcom(self.gRNA_seq))
 
                 # tag -> SNP replacement
@@ -1591,6 +1595,7 @@ class HDR_flank:
                 # remove the first n letters of the right_flk_seq
                 self.Donor_final = remove_n_bases_after_match(self.tag, self.Donor_final, len(self.SNP_payload)) # remove n bases after the tag (to create room for the SNP payload)
                 self.Donor_final = self.Donor_final.replace(self.tag, self.SNP_payload)
+                self._validate_snp_protected_sequence(self.Donor_final)
                 self.Donor_postMut = self.Donor_final
                 tag = self.SNP_payload
                 self.tag = tag
@@ -1756,6 +1761,50 @@ class HDR_flank:
     #############
     # END OF INIT#
     #############
+
+    @staticmethod
+    def _snp_protected_arm_indices(left_phases, right_phases, payload_len):
+        """Protect the SNP and its annotated codons in coding-oriented arm coordinates."""
+        if payload_len < 0 or payload_len > len(right_phases):
+            raise ValueError("SNP payload must fit within the right homology arm")
+        payload_indices = set(range(len(left_phases), len(left_phases) + payload_len))
+        protected = set(payload_indices)
+        codon = []
+        previous_phase = None
+
+        def protect_codon():
+            if payload_indices.intersection(codon):
+                protected.update(codon)
+
+        # Noncoding gaps can separate one codon at exon junctions; keep that group across gaps, starting a new group at phase 1 or a phase break.
+        for index, phase in enumerate(left_phases + right_phases):
+            if phase not in "123":
+                continue
+            if phase == "1" or (previous_phase is not None and int(phase) != int(previous_phase) + 1):
+                protect_codon()
+                codon = []
+            codon.append(index)
+            previous_phase = phase
+            if phase == "3":
+                protect_codon()
+                codon = []
+                previous_phase = None
+        protect_codon()  # A homology arm can end within a codon.
+        return frozenset(protected)
+
+    def _validate_snp_protected_sequence(self, donor):
+        """Verify protected codons before donor trimming, centering, or strand selection."""
+        original = self.left_flk_seq + self.right_flk_seq
+        payload_start = len(self.left_flk_seq)
+        expected = (
+            original[:payload_start]
+            + self.SNP_payload
+            + original[payload_start + self.SNP_payload_len:]
+        )
+        if len(donor) != len(original):
+            raise ValueError("SNP donor length changed during payload assembly")
+        if any(donor[index].upper() != expected[index].upper() for index in self.snp_protected_indices):
+            raise ValueError("SNP donor changed a protected payload-overlapping codon")
 
     ###############################################
     # variant reporting (see util/variant_annot.py)#
@@ -1990,7 +2039,7 @@ class HDR_flank:
 
         # adjust the coding coordinates for SNP mode (6 of 6)
         if self.payload_type == "SNP":
-            donor_phases = self.left_flk_phases + self.right_flk_phases_before_SNPadjustment
+            donor_phases = self.left_flk_phases_vanilla + self.right_flk_phases_vanilla
             coding_coord = self.get_coding_coord_from_phases(donor_phases) # get coding coordinates
 
         if self.Donor_type == "ssODN":
@@ -2523,7 +2572,7 @@ class HDR_flank:
 
                 if len(seq_obj_lrtrim.seq) >= 3:
                     # print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
-                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq, seq_obj_lrtrim.phases)
                     self.phase6recoded = True
                 else:
                     mutated = seq_obj_lrtrim.seq
@@ -2781,7 +2830,7 @@ class HDR_flank:
 
                 if len(seq_obj_lrtrim.seq) >= 3:
                     # print(f"mutating:\n{seq_obj_lrtrim.seq}\n{seq_obj_lrtrim.phases}")
-                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq)
+                    mutated = self.get_silent_mutations(seq_obj_lrtrim.seq, seq_obj_lrtrim.phases)
                     self.phase6recoded = True
                 else:
                     mutated = seq_obj_lrtrim.seq
@@ -3154,20 +3203,26 @@ class HDR_flank:
         else:
             return False
 
-    def get_silent_mutations(self, seq):
-        """
-        input: a stretch of codons
-        """
+    def get_silent_mutations(self, seq, phases=None):
+        """Recode a stretch of codons while preserving phase-7 bases and their input case."""
+        if phases is not None and len(phases) != len(seq):
+            raise ValueError("Sequence and recoding phases must have equal lengths")
+        masked_seq = seq if phases is None else "".join(
+            base.lower() if phase == "7" else base
+            for base, phase in zip(seq, phases)
+        )
         mutated_subseq = ""
         # mutate
         for mutated_subseq in mutate_silently(
-            seq
+            masked_seq
         ):  # get the last item in the generator
             pass
         # preserve lowercase in input seq
         tmp = list(mutated_subseq)
         for idx, item in enumerate(seq):
-            if item.islower():
+            if phases is not None and phases[idx] == "7":
+                tmp[idx] = item
+            elif item.islower():
                 tmp[idx] = tmp[idx].lower()
         mutated_subseq = "".join(tmp)
 
